@@ -1,92 +1,161 @@
-# Assessment3
+# Automated Assessment Tool
+by Team S
 
+## TEAM ETHOS:
+PIZZA FOR ALL
 
+## TODO
+### Questions for Friday?
+- Q T1&T2
+- Feedback (within Question) - clarification
 
-## Getting started
+### For next Wednesday
+- Due to Java Test there's no pressure on coding immediately
+- Look into Flask & Blueprints
+- Planning before coding to justify project management styles
+- Think about turning your task into User Stories/Issues
+-- Create CRC cards & rough consideration of UML class diagrams
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Developer practices
+Commit message format to follow Git principles:
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+https://git.kernel.org/pub/scm/git/git.git/tree/Documentation/SubmittingPatches?id=HEAD#n133
+https://stackoverflow.com/questions/3580013/should-i-use-past-or-present-tense-in-git-commit-messages
 
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
+```git
+[Verb] [Noun]
+Description
 ```
-cd existing_repo
-git remote add origin https://git.cardiff.ac.uk/c2074914/assessment3.git
-git branch -M main
-git push -uf origin main
+
+i.e.
+```git
+Finish Coursework
+We finished the coursework. Yay.
 ```
 
-## Integrate with your tools
+- TODO: look into relationship between commit messages and issues
+( #7 [text] -> relates to issue #7 )
 
-- [ ] [Set up project integrations](https://git.cardiff.ac.uk/c2074914/assessment3/-/settings/integrations)
+- Everyone make their own sandbox GitLab project to explore functionality.
 
-## Collaborate with your team
+Good use of Git branches
+- Never work on 'main'
+- Always work on 'your branch'
+- Always pull to 'your branch' from 'main' before pushing/merging to main
+- Always delete 'your branch' after merging (i.e. leave the default)
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+Keep Git repo ONLY for project files
+Use Teams for storing supporting files (i.e. images/pdfs/etc.)
 
-## Test and Deploy
+Reduce likelihood of single points of failure
+Everyone to be aware of everything all of the time
 
-Use the built-in continuous integration in GitLab.
+Code to look good (apply PEP8 principles: https://www.python.org/dev/peps/pep-0008/)
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Please use formatter "Black" on code
+https://pypi.org/project/black/
 
-***
+Keep requirements.txt up-to-date
+- If adding to requirements.txt, please tell everyone (/add to commit message)
 
-# Editing this README
+Secret keys = Environment variables for security
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!).  Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+Documentation to be updated regularly.
+- Wiki (GitLab)
+-- External
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+- Docstrings
+-- Internal
 
-## Name
-Choose a self-explaining name for your project.
+## TECH STACK:
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+Front-end: HTML/CSS/JS - opt. dedicated framework (tbc.)
+Back-end: Flask (Python) - using Blueprints etc.
+Database: MySQL (uni server) / AbSQL (totally a thing)
+Deployment: OpenShift
+Test framework: PyTest / built-in for Flask
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+## SCHEDULED MEETINGS:
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+OPTIONAL Monday meeting (11am-12pm): Online
+- Time for use as and when required 
+-- Could be for paired work or general chats
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+Wednesday (11am-1pm): Big Room => Turing Suite
+- 30 mins: team meeting
+- 60 mins: pair programming
+- 30 mins: team meeting
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+Friday (9am-1pm): Online
+- Test cases
+-- Max 7 test cases (NO MORE TESTS ALLOWED)
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+## FEATURES TO CODE:
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+Each feature will have a Lead and a Second.
+This is to prevent single points of failure.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+[ Lead > Second ]
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+1. Add (edit & delete) T1 Q [ Alex > Lins ]
+2. Add (edit & delete) T2 Q [ Dan > Jake ]
+3. Add (edit & delete) Summative/Formative Assessment [ Matt > Rich ]
+4. Student Take Assessment [ Lins > Abs ]
+5. Staff Review Statistics [ Jake > Alex ]
+6. Student Review Statistics [ Rich > Dan ]
+7. Advanced/Updated/Legendary Gamification [ Abs > Matt ]
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+Definitions:
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+- A question must consist of at least:
+-- question
+-- answer
+-- correctness check
+-- feedback
 
-## License
-For open source projects, say how it is licensed.
+- T1: Multiple choice & True/False
+- T2: Text input
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Links to watch
+Creating Class Diagrams (CRC cards)
+https://www.linkedin.com/learning/programming-foundations-object-oriented-design-3/creating-class-diagrams-attributes
+
+Blueprints:
+https://flask.palletsprojects.com/en/1.1.x/blueprints/
+
+### Commit message templates
+
+https://gist.github.com/lisawolderiksen/a7b99d94c92c6671181611be1641c733
+https://thoughtbot.com/blog/better-commit-messages-with-a-gitmessage-template
+https://thoughtbot.com/blog/write-good-commit-messages-by-blaming-others
+https://thoughtbot.com/blog/5-useful-tips-for-a-better-commit-message
+
+### Nice to haves
+
+- look into GitLab functionality!
+-- Milestones
+-- CI/CD
+
+- tailored feedback based on specific mistake types
+
+- web-based, desktop (Linux for Abs) and PS4OS
+-- order a Sony PS SDK
+-- Run "Doom" in the AAT
+
+-- soundtrack
+-- speed mode 
+-- boss rush (Magrit)
+
+-- secondary economy through data sales
+-- ad space/microtransactions
+-- lootboxes
+-- nft support
+-- aatcoin
+
+- Q2
+-- add input of code?
+
+
+
+
+
