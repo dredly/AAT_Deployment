@@ -18,7 +18,7 @@ PIZZA FOR ALL
 - Think about turning your task into User Stories/Issues
 -- Create CRC cards & rough consideration of UML class diagrams
 
-## Developer practices
+## DEVELOPER PRACTICES:
 Commit message format to follow Git principles:
 
 https://git.kernel.org/pub/scm/git/git.git/tree/Documentation/SubmittingPatches?id=HEAD#n133
@@ -118,7 +118,7 @@ Definitions:
 - T1: Multiple choice & True/False
 - T2: Text input
 
-## Links to watch
+## LINKS TO WATCH:
 Creating Class Diagrams (CRC cards)
 https://www.linkedin.com/learning/programming-foundations-object-oriented-design-3/creating-class-diagrams-attributes
 
