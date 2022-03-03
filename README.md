@@ -6,7 +6,7 @@ by Team S
 ## TEAM ETHOS:
 PIZZA FOR ALL
 
-## TODO
+## TODO:
 ### Questions for Friday?
 - Q T1&T2
 - Feedback (within Question) - clarification
