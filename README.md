@@ -1,6 +1,8 @@
 # Automated Assessment Tool
 by Team S
 
+[[_TOC_]]
+
 ## TEAM ETHOS:
 PIZZA FOR ALL
 
