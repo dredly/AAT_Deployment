@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('legendary_gamification.static', filename='styles.css') }}">
+{% endblock styles %}
+
+{% block content %}
+    <h1>Achievements</h1>
+    <div class="content-container">
+        <div class="content">
+            <div class="leaderboard-section">
+                <div class="leader-title">
+                    <h3>LeaderBoard</h3>
+                </div>
+                <div id="leaderboard"></div>
+            </div>
+
+            <div class="collectables-section">
+                <div class="collect-title">
+                    <h3>Your Achievements</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

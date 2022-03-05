@@ -1,0 +1,101 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: green;
+    margin-left: 20px;
+    text-align: center;
+}
+
+ul {
+    list-style: none;
+}
+
+nav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    padding-top: 0px;
+    text-decoration: none;
+    font-size: 17px;
+    padding-left: 0;
+}
+
+nav {
+    background-color: rgb(41, 41, 41);
+    overflow: hidden;
+}
+
+#leaderboard {
+    background-color: rebeccapurple;
+    height: 470px;
+    width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.leader-title {
+    display: flex;
+    vertical-align: middle;
+}
+
+.leader-title h3 {
+    padding: 10px 0;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #0235df;
+    width: 700px;
+    text-align: center;
+    color: #f2f2f2;
+    vertical-align: middle;
+}
+
+.leaderboard-section {
+    margin: 20px;
+    background-color: bisque;
+    flex: 1;
+}
+
+.content-container {
+    display: flex;
+    background-color: #fa0000;
+    margin-left: 50px;
+    margin-right: 50px;
+    height: 700px;
+    justify-content: center;
+    align-items: center;
+}
+
+.content {
+    background-color: rgb(0, 0, 0);
+    width: 95%;
+    height: 88%;
+    display: flex;
+    flex-direction: row;
+    /* margin: 0 auto; */;
+}
+
+.collectables-section {
+    margin: 20px;
+    background-color: aqua;
+    flex: 1;
+}
+
+.collect-title {
+    display: flex;
+    vertical-align: middle;
+}
+
+.collect-title h3 {
+    padding: 10px 0;
+    margin-right: auto;
+    margin-left: auto;
+    background-color: #0235df;
+    width: 700px;
+    text-align: center;
+    color: #f2f2f2;
+    vertical-align: middle;
+}
