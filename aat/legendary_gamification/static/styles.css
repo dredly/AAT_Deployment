@@ -32,7 +32,7 @@ nav {
 #leaderboard {
     background-color: rebeccapurple;
     height: 470px;
-    width: 700px;
+    width: auto;
     margin-left: auto;
     margin-right: auto;
 }
@@ -46,10 +46,9 @@ nav {
     padding: 10px 0;
     margin-left: auto;
     margin-right: auto;
-    background-color: #0235df;
-    width: 700px;
+    width: auto;
     text-align: center;
-    color: #f2f2f2;
+    color: #000000;
     vertical-align: middle;
 }
 
@@ -93,9 +92,34 @@ nav {
     padding: 10px 0;
     margin-right: auto;
     margin-left: auto;
-    background-color: #0235df;
-    width: 700px;
+    width: auto;
     text-align: center;
-    color: #f2f2f2;
+    color: #000000;
     vertical-align: middle;
+}
+
+.time-bar-container {
+    padding: 0;
+    height: 20px;
+    background-color: #000000;
+    width: 700px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: solid;
+    border-width: 3px;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.red-bar {
+    background-color: #fa0000;
+    flex: 0.4;
+    height: 100%;
+}
+
+.white-bar {
+    flex: 1.6;
 }

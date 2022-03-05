@@ -1,4 +1,3 @@
-from turtle import left
 from flask import render_template
 from . import legendary_gamification
 

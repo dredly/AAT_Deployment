@@ -2,6 +2,7 @@
 
 {% block styles %}
     <link rel="stylesheet" href="{{ url_for('legendary_gamification.static', filename='styles.css') }}">
+
 {% endblock styles %}
 
 {% block content %}
@@ -22,4 +23,13 @@
             </div>
         </div>
     </div>
+
+    <div class="time-bar-container">
+        <div class="red-bar"></div>
+        <div class="white-bar"></div>
+    </div>
+
+    <script src="{{ url_for('legendary_gamification.static', filename='easytimer.min.js') }}"></script>
+    <script src="{{ url_for('legendary_gamification.static', filename='scripts.js') }}"></script>
+
 {% endblock content %}
