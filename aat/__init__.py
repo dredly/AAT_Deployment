@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from .models import db, QuestionT2
+from .models import db, QuestionT2, QuestionT1, AnswersT1
 from .assessments import assessments
 from .auth import auth
 from .stats import stats
