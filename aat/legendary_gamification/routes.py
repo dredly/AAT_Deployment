@@ -10,12 +10,19 @@ def achievements():
         choice = request.form['options']
         if choice == "option3":
             return redirect("correctement")
+        else:
+            return redirect("tortement")
     return render_template("achievements.html", question=question, options=options)
 
 
 @legendary_gamification.route("/correctement")
 def correct_answer():
     return render_template("correct_answer.html")
+
+
+@legendary_gamification.route("/tortement")
+def wrong_answer():
+    return render_template("wrong_answer.html")
 
 
 @legendary_gamification.route("/level-up")

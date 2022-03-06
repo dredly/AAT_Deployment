@@ -15,5 +15,6 @@ timer.addEventListener('secondsUpdated', function(e) {
     }
     if (timer.getTimeValues().seconds === 10) {
         timeBarRed.style.backgroundColor = "red";
+        setTimeout(() => {window.location.href = "http://127.0.0.1:5000/legendary_gamification/tortement";}, 500);
     }
 });
