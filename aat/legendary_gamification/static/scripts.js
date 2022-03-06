@@ -7,7 +7,7 @@ timer.start({precision: 'seconds', startValues: {seconds: 0}, target: {seconds: 
 
 timer.addEventListener('secondsUpdated', function(e) {
     timeBarRed.style.flex =  timer.getTimeValues().seconds * 0.2;
-    timeBarWhite.style.flex = (10 - timer.getTimeValues().seconds) * 0.2
+    // timeBarWhite.style.flex = (10 - timer.getTimeValues().seconds) * 0.2
     console.log(timer.getTotalTimeValues().seconds)
     if (timer.getTimeValues().seconds >= 7 && timer.getTimeValues().seconds < 10) {
         timeBarRed.style.backgroundColor = "red";
