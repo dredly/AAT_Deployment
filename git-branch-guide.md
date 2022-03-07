@@ -21,7 +21,7 @@ version 0.1
 [localBranch] $ git add . && git commit -m "useful commit message"
 
 [ Optional: Push branch to Lab (need GlobalProtech ]
-[localBranch] $ git push --set-us
+[localBranch] $ git push --set-upstream origin [localBranch]
 
 ## Move to main branch
 [localBranch] $ git checkout main
