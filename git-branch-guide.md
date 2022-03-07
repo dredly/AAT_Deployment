@@ -18,7 +18,7 @@ version 0.1
 [...DO CODING GOOD...]
 
 ## Add & commit new changes on [localBranch]
-[localBranch] $ git add . && git commit -m "useful commit message"
+[localBranch] $ git commit -am "useful commit message"
 
 [ Optional: Push branch to Lab (need GlobalProtech ]
 [localBranch] $ git push --set-upstream origin [localBranch]
