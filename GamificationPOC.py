@@ -15,11 +15,11 @@ class User:
         self.streak = streak
 
     def addPoints(self, points):
-        self.points += (points * (self.streak / 10)) + (50 / self.rank)
+        self.points += points + (points * (self.streak / 10)) + (50 / self.rank)
         # self.streak += 1
 
     def deductPoints(self, points):
-        self.points -= (points * (self.streak / 10)) + (50 / self.rank)
+        self.points -= points + (50 / self.rank)
 
     def increaseRank(self):
         self.rank += 1
@@ -36,6 +36,9 @@ class User:
     def getStreak(self):
         return self.streak
 
+    def setStreak(self, streak):
+        self.streak = streak
+
 
 
 if __name__ == "__main__":
@@ -47,6 +50,26 @@ if __name__ == "__main__":
     possiblePoints = [10, 20, 50, 100]
 
     while True:
+        # 70% chance of user losing streak
+        streaker = random.randrange(10)
+        if streaker > 2:
+            bob.setStreak(bob.getStreak() + 1)
+        else:
+            bob.setStreak(1)
+
+        streaker = random.randrange(10)
+        if streaker > 2:
+            alexa.setStreak(alexa.getStreak() + 1)
+        else:
+            alexa.setStreak(1)
+
+        streaker = random.randrange(10)
+        if streaker > 2:
+            echo.setStreak(echo.getStreak() + 1)
+        else:
+            echo.setStreak(1)
+
+        # 50% chance of answer being right or wrong
         future = random.randrange(2)
         if future == 0:
             bob.addPoints(possiblePoints[random.randrange(4)])
@@ -59,12 +82,12 @@ if __name__ == "__main__":
         else: 
             alexa.deductPoints(possiblePoints[random.randrange(4)])
 
-
         future = random.randrange(2)
         if future == 0:
             echo.addPoints(possiblePoints[random.randrange(4)])
         else: 
             echo.deductPoints(possiblePoints[random.randrange(4)])
+
 
         for userTop in users:
             for userBottom in users:
@@ -75,8 +98,8 @@ if __name__ == "__main__":
         with open("aat/legendary_gamification/ranks.txt", "w") as f:
             f.write(f"{bob.getRank()}:Bob:{bob.getPoints()}\n{alexa.getRank()}:Alexa:{alexa.getPoints()}\n{echo.getRank()}:Echo:{echo.getPoints()}")
 
-        print(f"Bob: {bob.getPoints()}, Rank: {bob.getRank()}")
-        print(f"Alexa: {alexa.getPoints()}, Rank: {alexa.getRank()}")
-        print(f"Echo: {echo.getPoints()}, Rank: {echo.getRank()}")
+        print(f"Bob: {bob.getPoints()}, Rank: {bob.getRank()}, Streak: {bob.getStreak()}")
+        print(f"Alexa: {alexa.getPoints()}, Rank: {alexa.getRank()}, Streak: {alexa.getStreak()}")
+        print(f"Echo: {echo.getPoints()}, Rank: {echo.getRank()}, Streak: {echo.getStreak()}")
         print("-" * 20)
         time.sleep(1)
