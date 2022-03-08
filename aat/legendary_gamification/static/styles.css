@@ -42,6 +42,8 @@ nav {
     width: auto;
     margin-left: 20px;
     margin-right: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 .leader-title {
@@ -64,6 +66,12 @@ nav {
     margin: 20px;
     background-color: bisque;
     flex: 1;
+}
+
+.user-rank {
+    text-align: center;
+    border-bottom: 3px solid black;
+    font-size: 30px;
 }
 
 .content-container {

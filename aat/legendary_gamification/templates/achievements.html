@@ -14,7 +14,15 @@
                     <h3>LeaderBoard</h3>
                 </div>
                 <div class="divider"></div>
-                <div id="leaderboard"></div>
+                <div id="leaderboard">
+                    {% for i in range(ranks | length) %}
+                    <div class="user-rank">
+                        <h4>
+                            {{ i+1 }}: {{ ranks[i].split(":")[1] }} - {{ ranks[i].split(":")[2] }} 
+                        </h4>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
 
             <div class="collectables-section">

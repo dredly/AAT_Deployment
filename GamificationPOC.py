@@ -72,6 +72,9 @@ if __name__ == "__main__":
                     if userTop.getRank() < userBottom.getRank():
                         switchRank(userTop, userBottom)
 
+        with open("aat/legendary_gamification/ranks.txt", "w") as f:
+            f.write(f"{bob.getRank()}:Bob:{bob.getPoints()}\n{alexa.getRank()}:Alexa:{alexa.getPoints()}\n{echo.getRank()}:Echo:{echo.getPoints()}")
+
         print(f"Bob: {bob.getPoints()}, Rank: {bob.getRank()}")
         print(f"Alexa: {alexa.getPoints()}, Rank: {alexa.getRank()}")
         print(f"Echo: {echo.getPoints()}, Rank: {echo.getRank()}")
