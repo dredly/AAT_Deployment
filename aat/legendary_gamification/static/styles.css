@@ -106,6 +106,15 @@ nav {
     vertical-align: middle;
 }
 
+.rank-up-button-container {
+    display: flex;
+    text-align: center;
+    height: 470px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
 .time-bar-container {
     padding: 0;
     height: 20px;
@@ -141,4 +150,19 @@ nav {
 
 .send-button {
     margin-top: 5px;
+}
+
+.reset-container {
+    text-align: center;
+}
+
+.end-assess-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.end-assess-form input{
+    width: 100px;
 }

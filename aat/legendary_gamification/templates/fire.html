@@ -5,10 +5,6 @@
 {% endblock styles %}
 
 {% block content %}
-
-{% if question_counter > 1 %}
-    <h1>Congratulations your good for nothing brain actually comprehended 1st grade python</h1>
-{% else %}
     <div class="timer-container">
         <h1 class="timer">10</h1>
     </div>
@@ -22,16 +18,15 @@
             <form action="" method="POST">
                 <h4>{{ question }}</h4>
                 <div class="question-options">
-                    <input type="radio" name="options" id="option1" value="option1"> {{options[0]}} </input><br>
-                    <input type="radio" name="options" id="option2" value="option2"> {{options[1]}} </input><br>
-                    <input type="radio" name="options" id="option3" value="option3"> {{options[2]}} </input><br>
-                    <input type="radio" name="options" id="option4" value="option4"> {{options[3]}} </input><br>
-                    <input type="submit" value="send" class='send-button'>
+                    <input type="radio" name="options" id="option1" value="0"> {{ options[0] }} </input><br>
+                    <input type="radio" name="options" id="option2" value="1"> {{ options[1] }} </input><br>
+                    <input type="radio" name="options" id="option3" value="2"> {{ options[2] }} </input><br>
+                    <input type="radio" name="options" id="option4" value="3"> {{ options[3] }} </input><br>
+                    <input type="submit" name="button" value="send" class='send-button'>
                 </div>
             </form>
         </div>
     </div>
-{% endif %}
 {% endblock content %}
 
 {% block scripts %}
