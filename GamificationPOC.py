@@ -69,7 +69,7 @@ if __name__ == "__main__":
         else:
             echo.setStreak(1)
 
-        # 50% chance of answer being right or wrong
+        # 50% chance of answer being right
         future = random.randrange(2)
         if future == 0:
             bob.addPoints(possiblePoints[random.randrange(4)])
