@@ -2,7 +2,7 @@ from tkinter import N
 from flask import redirect, render_template, request, url_for
 from . import assessments
 from ..models import Assessment, QuestionT2
-from .forms import NewQuestionForm
+from .forms import NewQuestionForm, DeleteQuestionsForm
 from .. import db
 
 
@@ -43,14 +43,27 @@ def new_question(id):
     return render_template("new_question.html", assessment=assessment, form=form)
 
 
+@assessments.route("/<int:id>/delete_questions", methods=["GET", "POST"])
+def delete_questions(id):
+    assessment = Assessment.query.get_or_404(id)
+    questions = QuestionT2.query.filter_by(assessment_id=id).all()
+    form = DeleteQuestionsForm()
+    form.questions_to_delete.choices = [
+        (question.id, question.question_text[:15]) for question in questions
+    ]
+    if request.method == "POST":
+        # Query which returns the questions that were selected for deletion
+        for_deletion = [int(q) for q in form.questions_to_delete.data]
+        questions_to_delete = QuestionT2.query.filter(
+            QuestionT2.id.in_(for_deletion)
+        ).all()
+        for question in questions_to_delete:
+            db.session.delete(question)
+        db.session.commit()
+        return redirect(url_for("assessments.show_assessment", id=id))
+    return render_template("delete_questions.html", assessment=assessment, form=form)
+
+
 @assessments.route("/new")
 def new_assessment():
     return render_template("new_assessment.html")
-
-
-# Just for testing
-@assessments.route("/showallquestionst2")
-def allt2():
-    t2questions = QuestionT2.query.all()
-    print(t2questions)
-    return "All t2 questions"

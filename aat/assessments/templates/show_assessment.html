@@ -5,4 +5,5 @@
 <h3>{{question.question_text}}</h3>
 {% endfor %}
 <a href="{{url_for('assessments.new_question', id=assessment.id)}}">Add a question</a>
+<a href="{{url_for('assessments.delete_questions', id=assessment.id)}}">Delete Questions</a>
 {% endblock %}
