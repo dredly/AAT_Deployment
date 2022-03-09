@@ -1,0 +1,7 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1>{{assessment.title}}</h1>
+{% for question in questions %}
+<h3>{{question.question_text}}</h3>
+{% endfor %}
+{% endblock %}
