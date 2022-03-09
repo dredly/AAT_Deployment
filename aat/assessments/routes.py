@@ -1,6 +1,9 @@
-from flask import render_template
+from tkinter import N
+from flask import redirect, render_template, request, url_for
 from . import assessments
 from ..models import Assessment, QuestionT2
+from .forms import NewQuestionForm
+from .. import db
 
 
 @assessments.route("/")
@@ -17,6 +20,27 @@ def show_assessment(id):
     return render_template(
         "show_assessment.html", assessment=assessment, questions=questions
     )
+
+
+@assessments.route("/<int:id>/new_question", methods=["GET", "POST"])
+def new_question(id):
+    assessment = Assessment.query.get_or_404(id)
+    form = NewQuestionForm()
+    if request.method == "POST":
+        question_text = request.form["question_text"]
+        correct_answer = request.form["correct_answer"]
+        weighting = request.form["weighting"]
+        new_question = QuestionT2(
+            question_text=question_text,
+            correct_answer=correct_answer,
+            weighting=weighting,
+            assessment_id=id,
+        )
+        db.session.add(new_question)
+        db.session.commit()
+        return redirect(url_for("assessments.show_assessment", id=id))
+
+    return render_template("new_question.html", assessment=assessment, form=form)
 
 
 @assessments.route("/new")
