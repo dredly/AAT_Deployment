@@ -71,11 +71,11 @@ Documentation to be updated regularly.
 
 ## TECH STACK:
 
-Front-end: HTML/CSS/JS - opt. dedicated framework (tbc.)
-Back-end: Flask (Python) - using Blueprints etc.
-Database: MySQL (uni server) / AbSQL (totally a thing)
-Deployment: OpenShift
-Test framework: PyTest / built-in for Flask
+- Front-end: HTML/CSS/JS - opt. dedicated framework (tbc.)
+- Back-end: Flask (Python) - using Blueprints etc.
+- Database: MySQL (uni server) / AbSQL (totally a thing)
+- Deployment: OpenShift
+- Test framework: PyTest (built-in for Flask)
 
 ## SCHEDULED MEETINGS:
 
