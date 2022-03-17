@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends("layout.html") %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assessments</title>
-    <!-- IMPORTANT: use url_for(blueprintame.static) otherwise it won't work -->
-    <link rel="stylesheet" href="{{ url_for('assessments.static', filename='assessment_styles.css') }}">
-</head>
-
-<body>
-    <h1>All assessments here</h1>
-</body>
-
-</html>
+{% block content %}
+<h1>All assessments here</h1>
+{% for assessment in assessments %}
+<a href="{{ url_for('assessments.show_assessment', id=assessment.id) }}">
+    <h2>{{ assessment.title }}</h2>
+</a>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1>Delete questions from {{assessment.title}}</h1>
+<form method="POST" action="">
+    {{ form.csrf_token}}
+    {{form.questions_to_delete.label}}{{form.questions_to_delete}}
+    {{form.submit}}
+</form>
+{% endblock %}

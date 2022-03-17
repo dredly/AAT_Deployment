@@ -12,6 +12,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "aat.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SECRET_KEY"] = "NOTSECUREINEEDTOCHANGETHISASAP"
 
 app.register_blueprint(assessments, url_prefix="/assessments")
 app.register_blueprint(stats, url_prefix="/stats")
