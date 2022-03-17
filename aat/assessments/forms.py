@@ -4,8 +4,10 @@ from wtforms.validators import DataRequired
 from ..models import QuestionT2, Assessment
 
 
-class NewQuestionForm(FlaskForm):
-    question_text = TextAreaField("Enter question text", validators=[DataRequired()])
+class QuestionForm(FlaskForm):
+    question_text = TextAreaField(
+        "Enter question text", default="", validators=[DataRequired()]
+    )
     correct_answer = TextAreaField(
         "Enter the correct answer", validators=[DataRequired()]
     )
@@ -16,6 +18,8 @@ class NewQuestionForm(FlaskForm):
 class DeleteQuestionsForm(FlaskForm):
     questions_to_delete = SelectMultipleField(
         "Select questions to delete",
+        # Choices starts off empty, as it is populated dynamically
+        # based on the questions on a particular assessment
         choices=[],
     )
     submit = SubmitField("Delete selected questions")

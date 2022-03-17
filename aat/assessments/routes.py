@@ -2,7 +2,7 @@ from tkinter import N
 from flask import redirect, render_template, request, url_for
 from . import assessments
 from ..models import Assessment, QuestionT2
-from .forms import NewQuestionForm, DeleteQuestionsForm
+from .forms import QuestionForm, DeleteQuestionsForm
 from .. import db
 
 
@@ -25,7 +25,7 @@ def show_assessment(id):
 @assessments.route("/<int:id>/new_question", methods=["GET", "POST"])
 def new_question(id):
     assessment = Assessment.query.get_or_404(id)
-    form = NewQuestionForm()
+    form = QuestionForm()
     if request.method == "POST":
         question_text = request.form["question_text"]
         correct_answer = request.form["correct_answer"]
@@ -41,6 +41,17 @@ def new_question(id):
         return redirect(url_for("assessments.show_assessment", id=id))
 
     return render_template("new_question.html", assessment=assessment, form=form)
+
+
+@assessments.route("/<int:id>/edit_question/<int:q_id>", methods=["GET", "POST"])
+def edit_question(id, q_id):
+    assessment = Assessment.query.get_or_404(id)
+    question = QuestionT2.query.get_or_404(q_id)
+    form = QuestionForm()
+    form.question_text.data = question.question_text
+    form.correct_answer.data = question.correct_answer
+    form.weighting.data = question.weighting
+    return render_template("edit_question.html", assessment=assessment, form=form)
 
 
 @assessments.route("/<int:id>/delete_questions", methods=["GET", "POST"])
