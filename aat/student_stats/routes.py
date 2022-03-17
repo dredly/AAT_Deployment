@@ -2,11 +2,6 @@ from . import student_stats
 from flask import render_template
 
 
-@student_stats.route("/korok")
-def korok():
-    return render_template("you_found_me.html")
-
-
 @student_stats.route("/")
 def course_view():
     """

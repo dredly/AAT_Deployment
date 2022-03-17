@@ -3,5 +3,5 @@ from flask import render_template
 
 
 @app.route("/")
-def initial_home():
+def index():
     return render_template("landing_page.html")

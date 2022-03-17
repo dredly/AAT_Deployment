@@ -1,26 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>AAT</title>
-	</head>
-	<body>
-		<h1>WELCOME TO OUR AAT!!!</h1>
-		<h2>Contents</h2>
-		<ul>
-			<li>
-				<a href="{{ url_for('auth.login') }}">Auth</a>
-			</li>
-			<li>
-				<a href="{{ url_for('stats.index') }}">Stats</a>
-			</li>
-			<li>
-				<a href="{{ url_for('student_stats.course_view') }}"
-					>Student Stats</a
-				>
-			</li>
-		</ul>
-	</body>
-</html>
+{% extends 'layout.html' %} {% block content %}
+
+<h1>WELCOME TO OUR AAT!!!</h1>
+<h2>Contents</h2>
+<ul>
+	<li>
+		<a href="{{ url_for('assessments.index') }}">Assessments</a>
+	</li>
+
+	<li>
+		<a href="{{ url_for('auth.login') }}">Auth</a>
+	</li>
+	<li>
+		<a href="{{ url_for('stats.index') }}">Stats</a>
+	</li>
+	<li>
+		<a href="{{ url_for('student_stats.course_view') }}">Student Stats</a>
+	</li>
+</ul>
+{% endblock %}
