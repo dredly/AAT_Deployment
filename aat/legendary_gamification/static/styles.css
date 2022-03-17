@@ -178,3 +178,8 @@ nav {
 .end-assess-form input{
     width: 100px;
 }
+
+.achievements-junkyard {
+    background-color: aqua;
+    text-align: center;
+}

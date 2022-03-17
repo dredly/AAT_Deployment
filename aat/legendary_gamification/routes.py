@@ -19,10 +19,12 @@ question_counter = 0
 @legendary_gamification.route("/achievements", methods=["GET", "POST"])
 def achievements():
     with open("aat/legendary_gamification/ranks.txt", 'r') as f:
-        lines = f.readlines()
+        lines_ranks = f.readlines()
+    with open("aat/legendary_gamification/ranks.txt", 'r') as f:
+        lines_achievements = f.readlines()
     if request.method == "POST":
         return redirect("rapid-fire")
-    return render_template("achievements.html", ranks=sorted(lines))
+    return render_template("achievements.html", ranks=sorted(lines_ranks), awards=lines_achievements)
 
 
 @legendary_gamification.route("/correctement")

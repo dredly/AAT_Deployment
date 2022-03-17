@@ -54,18 +54,27 @@ if __name__ == "__main__":
         streaker = random.randrange(10)
         if streaker > 2:
             bob.setStreak(bob.getStreak() + 1)
+            if bob.getStreak() > 7:
+                with open("aat/legendary_gamification/awards.txt", "a") as f:
+                    f.write(f"Bob has earned Loyalty\n")
         else:
             bob.setStreak(1)
 
         streaker = random.randrange(10)
         if streaker > 2:
             alexa.setStreak(alexa.getStreak() + 1)
+            if alexa.getStreak() > 7:
+                with open("aat/legendary_gamification/awards.txt", "a") as f:
+                    f.write(f"Alexa has earned Loyalty\n")
         else:
             alexa.setStreak(1)
 
         streaker = random.randrange(10)
         if streaker > 2:
             echo.setStreak(echo.getStreak() + 1)
+            if echo.getStreak() > 7:
+                with open("aat/legendary_gamification/awards.txt", "a") as f:
+                    f.write(f"Echo has earned Loyalty\n")
         else:
             echo.setStreak(1)
 
@@ -73,20 +82,38 @@ if __name__ == "__main__":
         future = random.randrange(2)
         if future == 0:
             bob.addPoints(possiblePoints[random.randrange(4)])
+            if bob.getPoints() >= 1200:
+                with open("aat/legendary_gamification/awards.txt", "a") as f:
+                    f.write(f"Bob has earned the achievement 'Would you like some py?'\n")
         else: 
             bob.deductPoints(possiblePoints[random.randrange(4)])
+            if bob.getPoints() <= 900:
+                with open("aat/legendary_gamification/awards.txt", "a") as f:
+                    f.write(f"Bob has earned the achievement 'Snaking my way downtown'\n")
 
         future = random.randrange(2)
         if future == 0: 
             alexa.addPoints(possiblePoints[random.randrange(4)])
+            if alexa.getPoints() >= 1200:
+                with open("aat/legendary_gamification/awards.txt", "a") as f:
+                    f.write(f"Alexa has earned the achievement 'Would you like some py?'\n")
         else: 
             alexa.deductPoints(possiblePoints[random.randrange(4)])
+            if alexa.getPoints() <= 900:
+                with open("aat/legendary_gamification/awards.txt", "a") as f:
+                    f.write(f"Alexa has earned the achievement 'Snaking my way downtown'\n")
 
         future = random.randrange(2)
         if future == 0:
             echo.addPoints(possiblePoints[random.randrange(4)])
+            if echo.getPoints() >= 1200:
+                with open("aat/legendary_gamification/awards.txt", "a") as f:
+                    f.write(f"Echo has earned the achievement 'Would you like some py?'\n")
         else: 
             echo.deductPoints(possiblePoints[random.randrange(4)])
+            if echo.getPoints() <= 900:
+                with open("aat/legendary_gamification/awards.txt", "a") as f:
+                    f.write(f"Echo has earned the achievement 'Snaking my way downtown'\n")
 
 
         for userTop in users:

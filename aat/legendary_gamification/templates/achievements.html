@@ -16,7 +16,7 @@
                 <div id="leaderboard">
                     {% for i in range(ranks | length) %}
                     <div class="user-rank">
-                        <h4>
+                        <h4 id="user-leaderboard">
                             {{ i+1 }}. {{ ranks[i].split(":")[1] }} - {{ ranks[i].split(":")[2] }} 
                         </h4>
                     </div>
@@ -35,8 +35,17 @@
                     </form>
                 </div>
             </div>
+
+            <div class="achievements-junkyard">
+                {% for i in range(awards | length) %}
+                    {{ awards[i] }}
+                {% endfor %}
+            </div>
         </div>
     </div>
 
 {% endblock content %}
 
+<!-- {% block scripts %}
+    <script src="{{ url_for('legendary_gamification.static', filename='awards.js') }}"></script>
+{% endblock %} -->
