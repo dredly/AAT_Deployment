@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Student - Module View</title>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+		<link
+			rel="stylesheet"
+			href="{{url_for('static',filename='student-stats-style.css')}}"
+		/>
+	</head>
+	<body>
+		<h1>
+			<a href="{{ url_for('student_stats.course_view') }}">COURSE VIEW</a>
+			> MODULE VIEW
+		</h1>
+		<h2>Module: {{module_id}}</h2>
+		<p>
+			Total: {{headline_marks.0}}/{{headline_marks.1}} ({{ "%.2d" |
+			format((headline_marks.0/headline_marks.1)*100)}}%)
+		</p>
+
+		<div class="content-block">
+			<div
+				class="chart-container"
+				style="position: relative; height: 20vh; margin-bottom: 12rem"
+			>
+				<canvas id="myChart"></canvas>
+			</div>
+		</div>
+
+		<p>(data hardcoded for testing)</p>
+
+		{% for assessment, mark_tuple in dictionary_of_marks.items() %}
+		<div class="content-block">
+			<a
+				href="{{ url_for('student_stats.assessment_view',assessment_id=assessment, module_id=module_id) }}"
+			>
+				<h1>Assessment: {{assessment}}</h1>
+			</a>
+			<p>
+				Total: {{mark_tuple.0}}/{{mark_tuple.1}} ({{ "%.2d" |
+				format((mark_tuple.0/mark_tuple.1)*100)}}%)
+			</p>
+		</div>
+
+		{% endfor %}
+
+		<script>
+			const correct = '{{headline_marks.0}}';
+			const incorrect = '{{headline_marks.1-headline_marks.0}}';
+
+			const ctx = document.getElementById('myChart').getContext('2d');
+			const myChart = new Chart(ctx, {
+				type: 'pie',
+				data: {
+					labels: ['Correct', 'Incorrect'],
+					datasets: [
+						{
+							label: 'Module View',
+							data: [correct, incorrect],
+							backgroundColor: [
+								'rgb(54, 162, 235)',
+								'rgb(255, 99, 132)',
+							],
+							hoverOffset: 4,
+						},
+					],
+				},
+			});
+		</script>
+	</body>
+</html>
