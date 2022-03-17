@@ -6,19 +6,11 @@ by Team S
 ## TEAM ETHOS:
 PIZZA FOR ALL
 
-## TODO:
-### Questions for Friday?
-- Q T1&T2
-- Feedback (within Question) - clarification
-
-### For next Wednesday
-- Due to Java Test there's no pressure on coding immediately
-- Look into Flask & Blueprints
-- Planning before coding to justify project management styles
-- Think about turning your task into User Stories/Issues
--- Create CRC cards & rough consideration of UML class diagrams
-
 ## DEVELOPER PRACTICES:
+Page titles can either be defined by:
+- overwriting the {% block title %} i.e. in your template putting {% block title %}My Page Title{% endblock %}
+- in routes.py defining the variable "title". This will then become the page's title.
+
 Commit message format to follow Git principles:
 
 https://git.kernel.org/pub/scm/git/git.git/tree/Documentation/SubmittingPatches?id=HEAD#n133
