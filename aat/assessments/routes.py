@@ -48,6 +48,12 @@ def edit_question(id, q_id):
     assessment = Assessment.query.get_or_404(id)
     question = QuestionT2.query.get_or_404(q_id)
     form = QuestionForm()
+    if request.method == "POST":
+        question.question_text = form.question_text.data
+        question.correct_answer = form.correct_answer.data
+        question.weighting = form.weighting.data
+        db.session.commit()
+        return redirect(url_for("assessments.show_assessment", id=id))
     form.question_text.data = question.question_text
     form.correct_answer.data = question.correct_answer
     form.weighting.data = question.weighting
