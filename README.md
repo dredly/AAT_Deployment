@@ -71,11 +71,11 @@ Documentation to be updated regularly.
 
 ## TECH STACK:
 
-Front-end: HTML/CSS/JS - opt. dedicated framework (tbc.)
-Back-end: Flask (Python) - using Blueprints etc.
-Database: MySQL (uni server) / AbSQL (totally a thing)
-Deployment: OpenShift
-Test framework: PyTest / built-in for Flask
+- Front-end: HTML/CSS/JS - opt. dedicated framework (tbc.)
+- Back-end: Flask (Python) - using Blueprints etc.
+- Database: MySQL (uni server) / AbSQL (totally a thing)
+- Deployment: OpenShift
+- Test framework: PyTest (built-in for Flask)
 
 ## SCHEDULED MEETINGS:
 
@@ -127,35 +127,33 @@ https://flask.palletsprojects.com/en/1.1.x/blueprints/
 
 ### Commit message templates
 
-https://gist.github.com/lisawolderiksen/a7b99d94c92c6671181611be1641c733
-https://thoughtbot.com/blog/better-commit-messages-with-a-gitmessage-template
-https://thoughtbot.com/blog/write-good-commit-messages-by-blaming-others
-https://thoughtbot.com/blog/5-useful-tips-for-a-better-commit-message
+- https://gist.github.com/lisawolderiksen/a7b99d94c92c6671181611be1641c733
+- https://thoughtbot.com/blog/better-commit-messages-with-a-gitmessage-template
+- https://thoughtbot.com/blog/write-good-commit-messages-by-blaming-others
+- https://thoughtbot.com/blog/5-useful-tips-for-a-better-commit-message
 
 ### Nice to haves
 
-- look into GitLab functionality!
--- Milestones
--- CI/CD
-
+- look into GitLab functionality
+    - Milestones
+    - CI/CD
 - tailored feedback based on specific mistake types
 
 - web-based, desktop (Linux for Abs) and PS4OS
--- order a Sony PS SDK
--- Run "Doom" in the AAT
+- order a Sony PS SDK
+    - Run "Doom" in the AAT
+    - soundtrack
+    - speed mode 
+    - boss rush (Magrit)
 
--- soundtrack
--- speed mode 
--- boss rush (Magrit)
-
--- secondary economy through data sales
--- ad space/microtransactions
--- lootboxes
--- nft support
--- aatcoin
+- secondary economy through data sales
+    - ad space/microtransactions
+    - lootboxes
+    - nft support
+    - aatcoin
 
 - Q2
--- add input of code?
+    - add input of code?
 
 
 
