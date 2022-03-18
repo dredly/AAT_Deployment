@@ -64,7 +64,7 @@ if __name__ == "__main__":
         streaker = random.randrange(10)
         if streaker > 2:
             bob.setStreak(bob.getStreak() + 1)
-            if bob.getStreak() > 7:
+            if bob.getStreak() >= 7:
                 if "bob" not in badge_flags["Loyalty"]:
                     with open("aat/legendary_gamification/awards.txt", "a") as f:
                         badge_flags["Loyalty"].append("bob")
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         streaker = random.randrange(10)
         if streaker > 2:
             alexa.setStreak(alexa.getStreak() + 1)
-            if alexa.getStreak() > 7:
+            if alexa.getStreak() >= 7:
                 if "alexa" not in badge_flags["Loyalty"]:
                     with open("aat/legendary_gamification/awards.txt", "a") as f:
                         badge_flags["Loyalty"].append("alexa")
@@ -86,7 +86,7 @@ if __name__ == "__main__":
         streaker = random.randrange(10)
         if streaker > 2:
             echo.setStreak(echo.getStreak() + 1)
-            if echo.getStreak() > 7:
+            if echo.getStreak() >= 7:
                 if "echo" not in badge_flags["Loyalty"]:
                     with open("aat/legendary_gamification/awards.txt", "a") as f:
                         badge_flags["Loyalty"].append("echo")

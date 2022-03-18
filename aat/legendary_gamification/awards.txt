@@ -1,6 +1,7 @@
 Alexa has earned the achievement 'Would you like some py?'
-Echo has earned the achievement 'Snaking my way downtown'
-Bob has earned the achievement 'Snaking my way downtown'
+Echo has earned the achievement 'Would you like some py?'
+Bob has earned the achievement 'Would you like some py?'
 Alexa has earned Loyalty
+Bob has earned the achievement 'Snaking my way downtown'
 Echo has earned Loyalty
 Bob has earned Loyalty
