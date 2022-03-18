@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import TextAreaField, IntegerField, SubmitField, SelectMultipleField
 from wtforms.validators import DataRequired
-from ..models import QuestionT2, Assessment
+from ..models import Assessment
 
 
 class QuestionForm(FlaskForm):

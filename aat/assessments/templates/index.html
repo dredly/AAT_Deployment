@@ -3,7 +3,7 @@
 {% block content %}
 <h1>All assessments here</h1>
 {% for assessment in assessments %}
-<a href="{{ url_for('assessments.show_assessment', id=assessment.id) }}">
+<a href="#">
     <h2>{{ assessment.title }}</h2>
 </a>
 {% endfor %}
