@@ -20,7 +20,7 @@ question_counter = 0
 def achievements():
     with open("aat/legendary_gamification/ranks.txt", 'r') as f:
         lines_ranks = f.readlines()
-    with open("aat/legendary_gamification/ranks.txt", 'r') as f:
+    with open("aat/legendary_gamification/awards.txt", 'r') as f:
         lines_achievements = f.readlines()
     if request.method == "POST":
         return redirect("rapid-fire")

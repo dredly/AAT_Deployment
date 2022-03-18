@@ -1,6 +1,16 @@
 import time
 import random
 
+ach_flags = {"A star is born": [],
+             "Snaking my way downtown": [],
+             "Would you like some py?": [],
+             "It's sort-a-cool": []}
+
+badge_flags = {"Loyalty": [],
+               "Primes": [],
+               "Omnivorous": [],
+               "Sith": []}
+
 def switchRank(user1, user2):
     temp = user1.getRank()
     user1.setRank(user2.getRank())
@@ -55,8 +65,10 @@ if __name__ == "__main__":
         if streaker > 2:
             bob.setStreak(bob.getStreak() + 1)
             if bob.getStreak() > 7:
-                with open("aat/legendary_gamification/awards.txt", "a") as f:
-                    f.write(f"Bob has earned Loyalty\n")
+                if "bob" not in badge_flags["Loyalty"]:
+                    with open("aat/legendary_gamification/awards.txt", "a") as f:
+                        badge_flags["Loyalty"].append("bob")
+                        f.write(f"Bob has earned Loyalty\n")
         else:
             bob.setStreak(1)
 
@@ -64,8 +76,10 @@ if __name__ == "__main__":
         if streaker > 2:
             alexa.setStreak(alexa.getStreak() + 1)
             if alexa.getStreak() > 7:
-                with open("aat/legendary_gamification/awards.txt", "a") as f:
-                    f.write(f"Alexa has earned Loyalty\n")
+                if "alexa" not in badge_flags["Loyalty"]:
+                    with open("aat/legendary_gamification/awards.txt", "a") as f:
+                        badge_flags["Loyalty"].append("alexa")
+                        f.write(f"Alexa has earned Loyalty\n")
         else:
             alexa.setStreak(1)
 
@@ -73,8 +87,10 @@ if __name__ == "__main__":
         if streaker > 2:
             echo.setStreak(echo.getStreak() + 1)
             if echo.getStreak() > 7:
-                with open("aat/legendary_gamification/awards.txt", "a") as f:
-                    f.write(f"Echo has earned Loyalty\n")
+                if "echo" not in badge_flags["Loyalty"]:
+                    with open("aat/legendary_gamification/awards.txt", "a") as f:
+                        badge_flags["Loyalty"].append("echo")
+                        f.write(f"Echo has earned Loyalty\n")
         else:
             echo.setStreak(1)
 
@@ -83,37 +99,49 @@ if __name__ == "__main__":
         if future == 0:
             bob.addPoints(possiblePoints[random.randrange(4)])
             if bob.getPoints() >= 1200:
-                with open("aat/legendary_gamification/awards.txt", "a") as f:
-                    f.write(f"Bob has earned the achievement 'Would you like some py?'\n")
+                if "bob" not in ach_flags["Would you like some py?"]:
+                    with open("aat/legendary_gamification/awards.txt", "a") as f:
+                        ach_flags["Would you like some py?"].append("bob")
+                        f.write(f"Bob has earned the achievement 'Would you like some py?'\n")
         else: 
             bob.deductPoints(possiblePoints[random.randrange(4)])
             if bob.getPoints() <= 900:
-                with open("aat/legendary_gamification/awards.txt", "a") as f:
-                    f.write(f"Bob has earned the achievement 'Snaking my way downtown'\n")
+                if "bob" not in ach_flags["Snaking my way downtown"]:
+                    with open("aat/legendary_gamification/awards.txt", "a") as f:
+                        ach_flags["Snaking my way downtown"].append("bob")
+                        f.write(f"Bob has earned the achievement 'Snaking my way downtown'\n")
 
         future = random.randrange(2)
         if future == 0: 
             alexa.addPoints(possiblePoints[random.randrange(4)])
             if alexa.getPoints() >= 1200:
-                with open("aat/legendary_gamification/awards.txt", "a") as f:
-                    f.write(f"Alexa has earned the achievement 'Would you like some py?'\n")
+                if "alexa" not in ach_flags["Would you like some py?"]:
+                    with open("aat/legendary_gamification/awards.txt", "a") as f:
+                        ach_flags["Would you like some py?"].append("alexa")
+                        f.write(f"Alexa has earned the achievement 'Would you like some py?'\n")
         else: 
             alexa.deductPoints(possiblePoints[random.randrange(4)])
             if alexa.getPoints() <= 900:
-                with open("aat/legendary_gamification/awards.txt", "a") as f:
-                    f.write(f"Alexa has earned the achievement 'Snaking my way downtown'\n")
+                if "alexa" not in ach_flags["Snaking my way downtown"]:
+                    with open("aat/legendary_gamification/awards.txt", "a") as f:
+                        ach_flags["Snaking my way downtown"].append("alexa")
+                        f.write(f"Alexa has earned the achievement 'Snaking my way downtown'\n")
 
         future = random.randrange(2)
         if future == 0:
             echo.addPoints(possiblePoints[random.randrange(4)])
             if echo.getPoints() >= 1200:
-                with open("aat/legendary_gamification/awards.txt", "a") as f:
-                    f.write(f"Echo has earned the achievement 'Would you like some py?'\n")
+                if "echo" not in ach_flags["Would you like some py?"]:
+                    with open("aat/legendary_gamification/awards.txt", "a") as f:
+                        ach_flags["Would you like some py?"].append("echo")
+                        f.write(f"Echo has earned the achievement 'Would you like some py?'\n")
         else: 
             echo.deductPoints(possiblePoints[random.randrange(4)])
             if echo.getPoints() <= 900:
-                with open("aat/legendary_gamification/awards.txt", "a") as f:
-                    f.write(f"Echo has earned the achievement 'Snaking my way downtown'\n")
+                if "echo" not in ach_flags["Snaking my way downtown"]:
+                    with open("aat/legendary_gamification/awards.txt", "a") as f:
+                        ach_flags["Snaking my way downtown"].append("echo")
+                        f.write(f"Echo has earned the achievement 'Snaking my way downtown'\n")
 
 
         for userTop in users:

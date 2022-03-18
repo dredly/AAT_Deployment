@@ -84,6 +84,7 @@ nav {
     height: 700px;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 
 .content {

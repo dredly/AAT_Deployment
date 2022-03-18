@@ -35,17 +35,16 @@
                     </form>
                 </div>
             </div>
-
-            <div class="achievements-junkyard">
-                {% for i in range(awards | length) %}
+        </div>
+        <div class="achievements-junkyard">
+            {% for i in range(awards | length) %}
+            <div class="award-bar">
+                <h4 id="award-description">
                     {{ awards[i] }}
-                {% endfor %}
+                </h4>
             </div>
+            {% endfor %}
         </div>
     </div>
 
 {% endblock content %}
-
-<!-- {% block scripts %}
-    <script src="{{ url_for('legendary_gamification.static', filename='awards.js') }}"></script>
-{% endblock %} -->
