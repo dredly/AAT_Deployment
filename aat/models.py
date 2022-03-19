@@ -20,6 +20,7 @@ class Assessment(db.Model):
     num_of_credits = db.Column(db.Integer, nullable=False, default=0)
     is_summative = db.Column(db.Boolean, nullable=False, default=False)
     # --- Relationships --- TODO: add more as tables are added to the db
+    question_t1 = db.relationship("QuestionT1", backref="assessment", lazy=True)
     question_t2 = db.relationship("QuestionT2", backref="assessment", lazy=True)
 
 
@@ -33,6 +34,8 @@ class QuestionT1(db.Model):
     # --- Other Columns ---
     num_of_marks = db.Column(db.Integer, nullable=False)
     question_text = db.Column(db.Text, nullable=False)
+    # --- Relationships ---
+    option = db.relationship("Option", backref="questiont1", lazy=True)
 
 
 class QuestionT2(db.Model):
@@ -48,8 +51,14 @@ class QuestionT2(db.Model):
     correct_answer = db.Column(db.Text, nullable=False)
 
 
-# class Option(db.Model):
-#     pass
+class Option(db.Model):
+    __tablename__ = "Option"
+    # --- Foreign Keys ---
+    option_id = db.Column(db.Integer, primary_key=True)
+    q_t1_id = db.Column(db.Integer, db.ForeignKey("QuestionT1.q_t1_id"), nullable=False)
+    # ---- Other Columns ---
+    option_text = db.Column(db.Text, nullable=False)
+    is_correct = db.Column(db.Boolean, nullable=False, default=False)
 
 
 class Module(db.Model):
