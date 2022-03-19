@@ -34,8 +34,33 @@ with app.app_context():
         is_summative=False,
     )
 
+    # Create some Type 2 Questions
+    question_t2_1 = QuestionT2(
+        assessment_id=1,
+        num_of_marks=5,
+        question_text="What flag do you use to add a commit message?",
+        correct_answer="-m",
+    )
+    question_t2_2 = QuestionT2(
+        assessment_id=1,
+        num_of_marks=10,
+        question_text="which command is used to upload your commits to a remote repository?",
+        correct_answer="push",
+    )
+    question_t2_3 = QuestionT2(
+        assessment_id=3,
+        num_of_marks=10,
+        question_text="Which symbol is used to select by class using document.querySelector()?",
+        correct_answer=".",
+    )
+
+    # Add assessments and questions
     db.session.add(assessment1)
     db.session.add(assessment2)
     db.session.add(assessment3)
+
+    db.session.add(question_t2_1)
+    db.session.add(question_t2_2)
+    db.session.add(question_t2_3)
 
     db.session.commit()
