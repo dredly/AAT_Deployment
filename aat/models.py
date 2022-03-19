@@ -19,14 +19,26 @@ class Assessment(db.Model):
     time_limit = db.Column(db.Integer)  # Time limit in seconds
     num_of_credits = db.Column(db.Integer, nullable=False, default=0)
     is_summative = db.Column(db.Boolean, nullable=False, default=False)
-    # --- Relationships --- TODO
+    # --- Relationships --- TODO: add more as tables are added to the db
+    question_t2 = db.relationship("QuestionT2", backref="assessment", lazy=True)
 
 
 # class QuestionT1(db.Model):
 #     pass
 
-# class QuestionT2(db.Model):
-#     pass
+
+class QuestionT2(db.Model):
+    __tablename__ = "QuestionT2"
+    q_t2_id = db.Column(db.Integer, primary_key=True)
+    # --- Foreign Keys ---
+    assessment_id = db.Column(
+        db.Integer, db.ForeignKey("Assessment.assessment_id"), nullable=False
+    )
+    # --- Other Columns ---
+    num_of_marks = db.Column(db.Integer, nullable=False)
+    question_text = db.Column(db.Text, nullable=False)
+    correct_answer = db.Column(db.Text, nullable=False)
+
 
 # class Option(db.Model):
 #     pass
