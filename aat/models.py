@@ -11,7 +11,7 @@ class Assessment(db.Model):
     __tablename__ = "Assessment"
     assessment_id = db.Column(db.Integer, primary_key=True)
     # --- Foreign Keys --- CONTAINS PLACEHOLDERS
-    module_id = db.Column(db.Integer, nullable=False)
+    module_id = db.Column(db.Integer, db.ForeignKey("Module.module_id"), nullable=False)
     staff_id = db.Column(db.Integer, nullable=False)
     # --- Other Columns ---
     title = db.Column(db.String(120), nullable=False)
@@ -43,8 +43,16 @@ class QuestionT2(db.Model):
 # class Option(db.Model):
 #     pass
 
-# class Module(db.Model):
-#     pass
+class Module(db.Model):
+    __tablename__ = "Module"
+    module_id = db.Column(db.Integer, primary_key=True)
+    # --- Other Columns ---
+    title = db.Column(db.String(120), unique=True, nullable=False)
+    total_credits = db.Column(db.Integer, nullable=False)
+     # --- Relationship ---
+    assessments = db.relationship("Assessment", backref="module", lazy=True)
+    
+    
 
 # class Student(db.Model):
 #     pass

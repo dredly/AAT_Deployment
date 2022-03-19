@@ -3,6 +3,7 @@ from aat import app
 from aat.models import *
 
 with app.app_context():
+    db.drop_all()
     db.create_all()
 
     # Create some assessments
@@ -54,7 +55,14 @@ with app.app_context():
         correct_answer=".",
     )
 
-    # Add assessments and questions
+    # Create modules 
+    module_1 = Module(
+        module_id = 1,
+        title = "Databases and Modelling",
+        total_credits = 120,
+    )
+
+    # Add assessments, questions and modules 
     db.session.add(assessment1)
     db.session.add(assessment2)
     db.session.add(assessment3)
@@ -62,5 +70,7 @@ with app.app_context():
     db.session.add(question_t2_1)
     db.session.add(question_t2_2)
     db.session.add(question_t2_3)
+
+    db.session.add(module_1)
 
     db.session.commit()

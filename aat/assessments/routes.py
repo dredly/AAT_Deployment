@@ -1,7 +1,7 @@
 from tkinter import N
 from flask import redirect, render_template, request, url_for
 from . import assessments
-from ..models import Assessment, QuestionT2
+from ..models import Assessment, QuestionT2, Module
 from .forms import QuestionForm, DeleteQuestionsForm
 from .. import db
 
@@ -9,7 +9,8 @@ from .. import db
 @assessments.route("/")
 def index():
     assessments = Assessment.query.all()
-    return render_template("index.html", assessments=assessments)
+    modules = Module.query.all()
+    return render_template("index.html", assessments=assessments, modules=modules)
 
 
 @assessments.route("/<int:id>")

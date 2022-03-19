@@ -7,4 +7,11 @@
     <h2>{{ assessment.title }}</h2>
 </a>
 {% endfor %}
+
+<!-- Just used for viewing how data is displayed -->
+{% for module in modules %}
+<h2> {{ module.title }} {{module.total_credits}} </h2>
+
+
+{% endfor %}
 {% endblock %}
