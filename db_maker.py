@@ -25,13 +25,30 @@ with app.app_context():
         is_summative=True,
     )
     assessment3 = Assessment(
-        module_id=2,
+        module_id=1,
         staff_id=3,
         title="DOM Manipulation in JS",
         due_date=None,
         time_limit=60 * 60 * 20,
         num_of_credits=0,
         is_summative=False,
+    )
+
+    # Create some Type 1 Questions
+    question_t1_1 = QuestionT1(
+        assessment_id=1,
+        num_of_marks=2,
+        question_text="Which command do use use to view a particular commit?",
+    )
+    question_t1_2 = QuestionT1(
+        assessment_id=2,
+        num_of_marks=5,
+        question_text="What does git rebase do?",
+    )
+    question_t1_3 = QuestionT1(
+        assessment_id=2,
+        num_of_marks=5,
+        question_text="What does git stash do?",
     )
 
     # Create some Type 2 Questions
@@ -54,14 +71,14 @@ with app.app_context():
         correct_answer=".",
     )
 
-    # Create modules 
+    # Create modules
     module_1 = Module(
-        module_id = 1,
-        title = "Databases and Modelling",
-        total_credits = 120,
+        module_id=1,
+        title="Databases and Modelling",
+        total_credits=120,
     )
 
-    # Add assessments, questions and modules 
+    # Add assessments, questions and modules
     db.session.add(assessment1)
     db.session.add(assessment2)
     db.session.add(assessment3)
@@ -69,6 +86,10 @@ with app.app_context():
     db.session.add(question_t2_1)
     db.session.add(question_t2_2)
     db.session.add(question_t2_3)
+
+    db.session.add(question_t1_1)
+    db.session.add(question_t1_2)
+    db.session.add(question_t1_3)
 
     db.session.add(module_1)
 

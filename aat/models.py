@@ -23,8 +23,16 @@ class Assessment(db.Model):
     question_t2 = db.relationship("QuestionT2", backref="assessment", lazy=True)
 
 
-# class QuestionT1(db.Model):
-#     pass
+class QuestionT1(db.Model):
+    __tablename__ = "QuestionT1"
+    q_t1_id = db.Column(db.Integer, primary_key=True)
+    # --- Foreign Keys ---
+    assessment_id = db.Column(
+        db.Integer, db.ForeignKey("Assessment.assessment_id"), nullable=False
+    )
+    # --- Other Columns ---
+    num_of_marks = db.Column(db.Integer, nullable=False)
+    question_text = db.Column(db.Text, nullable=False)
 
 
 class QuestionT2(db.Model):
@@ -43,16 +51,16 @@ class QuestionT2(db.Model):
 # class Option(db.Model):
 #     pass
 
+
 class Module(db.Model):
     __tablename__ = "Module"
     module_id = db.Column(db.Integer, primary_key=True)
     # --- Other Columns ---
     title = db.Column(db.String(120), unique=True, nullable=False)
     total_credits = db.Column(db.Integer, nullable=False)
-     # --- Relationship ---
+    # --- Relationship ---
     assessments = db.relationship("Assessment", backref="module", lazy=True)
-    
-    
+
 
 # class Student(db.Model):
 #     pass
