@@ -51,6 +51,18 @@ with app.app_context():
         question_text="What does git stash do?",
     )
 
+    # Create some Options
+    option1 = Option(q_t1_id=1, option_text="checkout", is_correct=True)
+    option2 = Option(q_t1_id=1, option_text="reset")
+    option3 = Option(q_t1_id=1, option_text="commit")
+
+    option4 = Option(q_t1_id=2, option_text="wrong answer")
+    option5 = Option(q_t1_id=2, option_text="right answer", is_correct=True)
+
+    option6 = Option(q_t1_id=3, option_text="wrong answer")
+    option7 = Option(q_t1_id=3, option_text="right answer", is_correct=True)
+    option8 = Option(q_t1_id=3, option_text="another wrong answer")
+
     # Create some Type 2 Questions
     question_t2_1 = QuestionT2(
         assessment_id=1,
@@ -78,18 +90,27 @@ with app.app_context():
         total_credits=120,
     )
 
-    # Add assessments, questions and modules
+    # Add assessments, questions, options and modules
     db.session.add(assessment1)
     db.session.add(assessment2)
     db.session.add(assessment3)
 
-    db.session.add(question_t2_1)
-    db.session.add(question_t2_2)
-    db.session.add(question_t2_3)
-
     db.session.add(question_t1_1)
     db.session.add(question_t1_2)
     db.session.add(question_t1_3)
+
+    db.session.add(option1)
+    db.session.add(option2)
+    db.session.add(option3)
+    db.session.add(option4)
+    db.session.add(option5)
+    db.session.add(option6)
+    db.session.add(option7)
+    db.session.add(option8)
+
+    db.session.add(question_t2_1)
+    db.session.add(question_t2_2)
+    db.session.add(question_t2_3)
 
     db.session.add(module_1)
 
