@@ -3,7 +3,6 @@ from aat import app
 from aat.models import *
 
 with app.app_context():
-    db.drop_all()
     db.create_all()
 
     # Create some assessments
