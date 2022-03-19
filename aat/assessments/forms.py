@@ -11,7 +11,7 @@ class QuestionForm(FlaskForm):
     correct_answer = TextAreaField(
         "Enter the correct answer", validators=[DataRequired()]
     )
-    weighting = IntegerField("Select a weighting", validators=[DataRequired()])
+    num_of_marks = IntegerField("How many marks?", validators=[DataRequired()])
     submit = SubmitField("Add question")
 
 
