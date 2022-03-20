@@ -20,7 +20,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "aa
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # Make sure to install python-dotenv, and check the .env.example file
 # Then simply make your own .env file with the same format
-app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
+# app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
 
 app.register_blueprint(assessments, url_prefix="/assessments")
 app.register_blueprint(stats, url_prefix="/stats")
