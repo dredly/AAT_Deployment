@@ -24,7 +24,7 @@ from .student_stats import student_stats
 
 # Admin
 from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
+from .views import AdminView
 
 load_dotenv()
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -50,15 +50,15 @@ from . import routes
 # ADMIN
 admin = Admin(app=app, name="Admin Panel", template_mode="bootstrap3")
 admin.add_views(
-    ModelView(Assessment, db.session),
-    ModelView(QuestionT1, db.session),
-    ModelView(QuestionT2, db.session),
-    ModelView(Option, db.session),
-    ModelView(Module, db.session),
-    ModelView(TakesAssessment, db.session),
-    ModelView(ResponseT1, db.session),
-    ModelView(ResponseT2, db.session),
-    ModelView(User, db.session),
-    ModelView(Role, db.session),
+    AdminView(Assessment, db.session),
+    AdminView(QuestionT1, db.session),
+    AdminView(QuestionT2, db.session),
+    AdminView(Option, db.session),
+    AdminView(Module, db.session),
+    AdminView(TakesAssessment, db.session),
+    AdminView(ResponseT1, db.session),
+    AdminView(ResponseT2, db.session),
+    AdminView(User, db.session),
+    AdminView(Role, db.session),
 )
 # Now accessible through /admin/
