@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from .models import db, Assessment, QuestionT2, Teacher, Student 
+from .models import db, login_manager, Assessment, QuestionT2, User, Role
 from .assessments import assessments
 from .auth import auth
 from .stats import stats
@@ -29,6 +29,7 @@ app.register_blueprint(student_stats, url_prefix="/student-stats")
 app.register_blueprint(auth)
 
 db.init_app(app)
+login_manager.init_app(app)
 
 from . import routes
 
@@ -37,7 +38,7 @@ admin = Admin(app=app, name="Admin Panel", template_mode="bootstrap3")
 admin.add_views(
     ModelView(Assessment, db.session),
     ModelView(QuestionT2, db.session),
-    ModelView(Teacher, db.session), 
-    ModelView(Student, db.session)
+    ModelView(User, db.session), 
+    ModelView(Role, db.session)
 )
 # Now accessible through /admin/
