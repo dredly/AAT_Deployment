@@ -23,3 +23,7 @@ class DeleteQuestionsForm(FlaskForm):
         choices=[],
     )
     submit = SubmitField("Delete selected questions")
+
+class AnswerType2Form(FlaskForm): 
+    answer = TextAreaField(validators=[DataRequired()])
+    submit = SubmitField("Submit Answer")

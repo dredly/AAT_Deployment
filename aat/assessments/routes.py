@@ -2,7 +2,7 @@ from tkinter import N
 from flask import redirect, render_template, request, url_for, abort
 from . import assessments
 from ..models import Assessment, QuestionT2, Module, User 
-from .forms import QuestionForm, DeleteQuestionsForm
+from .forms import QuestionForm, DeleteQuestionsForm, AnswerType2Form
 from .. import db
 
 
@@ -103,25 +103,36 @@ def take_assessment(id):
     question_ids = []
     for question in questions: 
         question_ids.append(question.q_t2_id)
-    return render_template("assessment_summary.html", title="Complete Assessment", assessment=assessment, questions=question_ids)
+    return render_template("assessment_summary.html", 
+                title="Complete Assessment", 
+                assessment=assessment, 
+                questions=question_ids)
 
 
-@assessments.route("/take_assessment/question/<int:assessment_id>/<question_ids>")
+@assessments.route("/take_assessment/question/<int:assessment_id>/<question_ids>", methods=['GET', 'POST'])
 def answer_question(assessment_id, question_ids):
+    form = AnswerType2Form()
+    assessment = Assessment.query.get_or_404(assessment_id)
     list_version = question_ids.replace("[", "").replace("]", "").split(",")
     question_numbers = [int(x) for x in list_version]
-    if len(question_numbers) > 1:
+    if len(question_numbers) >= 1:
         question_id = question_numbers.pop(0)
     else: 
         question_id = question_numbers[0]
     question = QuestionT2.query.filter_by(q_t2_id=question_id).first()
-    return render_template("answer_question.html", question=question, assessment_id=assessment_id, question_ids=question_numbers)
+    if request.method == 'POST':
+        print(form.answer.data)
+        return render_template("mark_answer.html", 
+                assessment_id=assessment_id, 
+                question_ids=question_numbers)
+    return render_template("answer_question.html", 
+                question=question, 
+                assessment=assessment, 
+                form=form,  
+                question_ids=question_numbers)
 
 @assessments.route("/take_assesssment/answer/<int:assessment_id>/<question_ids>")
 def mark_answer(assessment_id, question_ids): 
-    if len(question_ids) == 1: 
-        question_ids = question_ids
-    else: 
-        question_ids = str(question_ids)
-    print(question_ids)
-    return render_template("mark_answer.html", assessment_id=assessment_id, question_ids=question_ids)
+    return render_template("mark_answer.html", 
+                assessment_id=assessment_id, 
+                question_ids=question_ids)

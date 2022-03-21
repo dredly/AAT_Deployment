@@ -1,13 +1,16 @@
 {% extends("layout.html") %}
 {% block content %}
-{# <h1>{{assessment.title}}</h1>
-#}
+<h1>{{assessment.title}}</h1>
+
 <p>{{ question.question_text }}</p>
-<p>{{ question.num_of_marks }}</p>
+<p>Marks available: {{ question.num_of_marks }}</p>
 
 <p>Length of question list: {{ question_ids|length }}</p>
 
-<button type="button"><a href="{{ url_for('assessments.mark_answer', assessment_id=assessment_id, question_ids=question_ids) }}">Submit Answer</a></button>
-
+<form method="POST" action="">
+    {{ form.csrf_token }}
+    {{ form.answer }}
+    <button type="submit" value="Submit Answer">Submit Answer</button>
+</form>
 
 {% endblock %}
