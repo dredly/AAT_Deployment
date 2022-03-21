@@ -5,5 +5,9 @@
 <p>{{ question.question_text }}</p>
 <p>{{ question.num_of_marks }}</p>
 
+<p>Length of question list: {{ question_ids|length }}</p>
+
+<button type="button"><a href="{{ url_for('assessments.mark_answer', assessment_id=assessment_id, question_ids=question_ids) }}">Submit Answer</a></button>
+
 
 {% endblock %}

@@ -110,6 +110,18 @@ def take_assessment(id):
 def answer_question(assessment_id, question_ids):
     list_version = question_ids.replace("[", "").replace("]", "").split(",")
     question_numbers = [int(x) for x in list_version]
-    question_id = question_numbers.pop(0)
+    if len(question_numbers) > 1:
+        question_id = question_numbers.pop(0)
+    else: 
+        question_id = question_numbers[0]
     question = QuestionT2.query.filter_by(q_t2_id=question_id).first()
     return render_template("answer_question.html", question=question, assessment_id=assessment_id, question_ids=question_numbers)
+
+@assessments.route("/take_assesssment/answer/<int:assessment_id>/<question_ids>")
+def mark_answer(assessment_id, question_ids): 
+    if len(question_ids) == 1: 
+        question_ids = question_ids
+    else: 
+        question_ids = str(question_ids)
+    print(question_ids)
+    return render_template("mark_answer.html", assessment_id=assessment_id, question_ids=question_ids)

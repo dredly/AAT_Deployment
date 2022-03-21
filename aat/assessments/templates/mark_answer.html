@@ -1,0 +1,13 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1>Question Marked</h1>
+
+{# <button type="button"><a href="{{ url_for('assessments.answer_question', assessment_id=assessment.assessment_id, question_ids=question_ids) }}">Submit Answer</a></button>
+#}
+{% if question_ids|length == 1 %}
+    <button type="button"><a href="{{ url_for('index') }}">End Assessment</a></button>
+{% else %}
+    <button type="button"><a href="{{ url_for('assessments.answer_question', assessment_id=assessment_id, question_ids=question_ids) }}">Next Question</a></button>
+{% endif %}
+
+{% endblock %}
