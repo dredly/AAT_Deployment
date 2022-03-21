@@ -108,7 +108,7 @@ class Role(db.Model):
     def insert_roles(): 
         roles = {
             'Student': [Permission.ANSWER_ASSESSMENT], 
-            'Teacher': [Permission.WRITE_ASSESSMENT, Permission.ADMIN], 
+            'Lecturer': [Permission.WRITE_ASSESSMENT, Permission.ADMIN], 
             'Admin': [Permission.ADMIN]
         }
         default_role = 'Student'

@@ -42,3 +42,8 @@ admin.add_views(
     ModelView(Role, db.session)
 )
 # Now accessible through /admin/
+
+# Context Processor to make Permission variables available to templates 
+@app.context_processor 
+def inject_permissions(): 
+    return dict(Permission=Permission)
