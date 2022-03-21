@@ -11,7 +11,7 @@ with app.app_context():
     # Create some assessments
     assessment1 = Assessment(
         module_id=1,
-        staff_id=1,
+        lecturer_id=1,
         title="Git Basics",
         due_date=None,
         time_limit=60 * 60 * 30,
@@ -20,7 +20,7 @@ with app.app_context():
     )
     assessment2 = Assessment(
         module_id=1,
-        staff_id=2,
+        lecturer_id=2,
         title="Advanced Git",
         due_date=None,
         time_limit=60 * 60 * 45,
@@ -29,7 +29,7 @@ with app.app_context():
     )
     assessment3 = Assessment(
         module_id=1,
-        staff_id=3,
+        lecturer_id=3,
         title="DOM Manipulation in JS",
         due_date=None,
         time_limit=60 * 60 * 20,

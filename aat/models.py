@@ -16,7 +16,7 @@ class Assessment(db.Model):
     assessment_id = db.Column(db.Integer, primary_key=True)
     # --- Foreign Keys --- CONTAINS PLACEHOLDERS
     module_id = db.Column(db.Integer, db.ForeignKey("Module.module_id"), nullable=False)
-    lecturer_id = db.Column(db.Integer, nullable=False)
+    lecturer_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     # --- Other Columns ---
     title = db.Column(db.String(120), nullable=False)
     due_date = db.Column(db.DateTime)
@@ -26,6 +26,9 @@ class Assessment(db.Model):
     # --- Relationships --- TODO: add more as tables are added to the db
     question_t1 = db.relationship("QuestionT1", backref="assessment", lazy=True)
     question_t2 = db.relationship("QuestionT2", backref="assessment", lazy=True)
+    takes_assessment = db.relationship(
+        "TakesAssessment", backref="assessment", lazy=True
+    )
 
 
 class QuestionT1(db.Model):
@@ -71,18 +74,43 @@ class Module(db.Model):
     # --- Other Columns ---
     title = db.Column(db.String(120), unique=True, nullable=False)
     total_credits = db.Column(db.Integer, nullable=False)
-    # --- Relationship ---
-    assessments = db.relationship("Assessment", backref="module", lazy=True)
+    # --- Relationships ---
+    assessment = db.relationship("Assessment", backref="module", lazy=True)
 
 
-# class TakesAssessment(db.Model):
-#     pass
+class TakesAssessment(db.Model):
+    __tablename__ = "TakesAssessment"
+    takes_assessment_id = db.Column(db.Integer, primary_key=True)
+    # --- Foreign Keys ---
+    student_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    assessment_id = db.Column(
+        db.Integer, db.ForeignKey("Assessment.assessment_id"), nullable=False
+    )
+    # --- Relationships ---
+    response_t1 = db.relationship("ResponseT1", backref="takes_assessment", lazy=True)
+    response_t2 = db.relationship("ResponseT2", backref="takes_assessment", lazy=True)
 
-# class ResponseT1(db.Model):
-#     pass
 
-# class ResponseT2(db.Model):
-#     pass
+class ResponseT1(db.Model):
+    __tablename__ = "ResponseT1"
+    response_t1_id = db.Column(db.Integer, primary_key=True)
+    # --- Foreign Keys ---
+    takes_assessment_id = db.Column(
+        db.Integer, db.ForeignKey("TakesAssessment.takes_assessment_id"), nullable=False
+    )
+    # --- Other Columns ---
+    response_content = db.Column(db.Integer, nullable=False)
+
+
+class ResponseT2(db.Model):
+    __tablename__ = "ResponseT2"
+    response_t2_id = db.Column(db.Integer, primary_key=True)
+    # --- Foreign Keys ---
+    takes_assessment_id = db.Column(
+        db.Integer, db.ForeignKey("TakesAssessment.takes_assessment_id"), nullable=False
+    )
+    # --- Other Columns ---
+    response_content = db.Column(db.Text, nullable=False)
 
 
 class User(UserMixin, db.Model):
@@ -92,12 +120,15 @@ class User(UserMixin, db.Model):
     hashed_password = db.Column(db.String(128))
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
+    # --- Relationships ---
+    assessment = db.relationship("Assessment", backref="user", lazy=True)
+    takes_assessment = db.relationship("TakesAssessment", backref="user", lazy=True)
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.role is None:
             if self.is_admin:
-                self.role = Role.query.filter_by(name="Teacher").first()
+                self.role = Role.query.filter_by(name="Lecturer").first()
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
 
