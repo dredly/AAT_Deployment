@@ -1,7 +1,7 @@
 from tkinter import N
-from flask import redirect, render_template, request, url_for
+from flask import redirect, render_template, request, url_for, abort
 from . import assessments
-from ..models import Assessment, QuestionT2, Module
+from ..models import Assessment, QuestionT2, Module, User 
 from .forms import QuestionForm, DeleteQuestionsForm
 from .. import db
 
@@ -85,3 +85,31 @@ def delete_questions(id):
 @assessments.route("/new")
 def new_assessment():
     return render_template("new_assessment.html")
+
+
+# Linsey Routes:
+
+# @assessments.route("/<username>/assessments")
+# def list_assessments(username): 
+#     user = User.query.filter_by(name=username).first()
+#     if user is None: 
+#         abort(404)
+#     assessments = user.assessments.order_by(Assessment.due_date.desc()).all()
+
+@assessments.route("/take_assessment/<int:id>")
+def take_assessment(id): 
+    assessment = Assessment.query.get_or_404(id)
+    questions = QuestionT2.query.filter_by(assessment_id=id).all()
+    question_ids = []
+    for question in questions: 
+        question_ids.append(question.q_t2_id)
+    return render_template("assessment_summary.html", title="Complete Assessment", assessment=assessment, questions=question_ids)
+
+
+@assessments.route("/take_assessment/question/<int:assessment_id>/<question_ids>")
+def answer_question(assessment_id, question_ids):
+    list_version = question_ids.replace("[", "").replace("]", "").split(",")
+    question_numbers = [int(x) for x in list_version]
+    question_id = question_numbers.pop(0)
+    question = QuestionT2.query.filter_by(q_t2_id=question_id).first()
+    return render_template("answer_question.html", question=question, assessment_id=assessment_id, question_ids=question_numbers)
