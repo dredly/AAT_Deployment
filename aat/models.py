@@ -16,7 +16,7 @@ class Assessment(db.Model):
     assessment_id = db.Column(db.Integer, primary_key=True)
     # --- Foreign Keys --- CONTAINS PLACEHOLDERS
     module_id = db.Column(db.Integer, db.ForeignKey("Module.module_id"), nullable=False)
-    staff_id = db.Column(db.Integer, nullable=False)
+    lecturer_id = db.Column(db.Integer, nullable=False)
     # --- Other Columns ---
     title = db.Column(db.String(120), nullable=False)
     due_date = db.Column(db.DateTime)
