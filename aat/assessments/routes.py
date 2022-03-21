@@ -112,16 +112,10 @@ def take_assessment(id):
         db.session.add(taken_assessment)
         db.session.commit()
         print(question_ids)
-        new_taken_assessment_id = taken_assessment.takes_assessment_id
-        print(new_taken_assessment_id)
-        print(type(new_taken_assessment_id))
-        # TODO find a way to send question variable into template through this link 
-        # return answer_question(assessment.assessment_id, new_taken_assessment_id, question_ids)
-        return render_template("answer_question.html", 
-                assessment_id=assessment.assessment_id, 
-                taken_assessment_id=taken_assessment.takes_assessment_id, 
-                question_ids=question_ids,
-                assessment=assessment)
+        return redirect(url_for('assessments.answer_question', 
+                    assessment_id=assessment.assessment_id,
+                    taken_assessment_id=taken_assessment.takes_assessment_id,
+                    question_ids=question_ids))
     return render_template("assessment_summary.html", 
                 title="Complete Assessment", 
                 assessment=assessment, 
@@ -138,6 +132,7 @@ def answer_question(assessment_id, taken_assessment_id, question_ids):
         print("isn't a list")
         list_version = question_ids.replace("[", "").replace("]", "").split(",")
         question_numbers = [int(x) for x in list_version]
+        print(question_numbers)
     else: 
         print("is a list")
         question_numbers = question_ids
@@ -152,6 +147,10 @@ def answer_question(assessment_id, taken_assessment_id, question_ids):
                 question_ids=question_numbers,
                 taken_assessment=taken_assessment_id, 
                 question=question)
+        # return redirect(url_for("assessments.mark_answer", 
+        #         assessment_id=assessment_id, 
+        #         taken_assessment_id=taken_assessment.takes_assessment_id, 
+        #         question_ids=question_numbers))
     return render_template("answer_question.html", 
                 question=question, 
                 assessment=assessment, 
