@@ -1,9 +1,10 @@
 from tkinter import N
 from flask import redirect, render_template, request, url_for, abort
 from . import assessments
-from ..models import Assessment, QuestionT2, Module, User 
+from ..models import Assessment, QuestionT2, Module, TakesAssessment, User 
 from .forms import QuestionForm, DeleteQuestionsForm, AnswerType2Form
 from .. import db
+from flask_login import current_user
 
 
 @assessments.route("/")
@@ -99,6 +100,8 @@ def new_assessment():
 @assessments.route("/take_assessment/<int:id>")
 def take_assessment(id): 
     assessment = Assessment.query.get_or_404(id)
+    taken_assessment = TakesAssessment(student_id=current_user._get_current_object(), 
+                assessment_id=assessment)
     questions = QuestionT2.query.filter_by(assessment_id=id).all()
     question_ids = []
     for question in questions: 
@@ -106,7 +109,8 @@ def take_assessment(id):
     return render_template("assessment_summary.html", 
                 title="Complete Assessment", 
                 assessment=assessment, 
-                questions=question_ids)
+                questions=question_ids,
+                taken_assessment=taken_assessment)
 
 
 @assessments.route("/take_assessment/question/<int:assessment_id>/<question_ids>", methods=['GET', 'POST'])

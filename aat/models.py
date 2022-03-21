@@ -109,6 +109,7 @@ class ResponseT2(db.Model):
     takes_assessment_id = db.Column(
         db.Integer, db.ForeignKey("TakesAssessment.takes_assessment_id"), nullable=False
     )
+    t2_question_id = db.Column(db.Integer, db.ForeignKey("QuestionT2.q_t2_id"), nullable=False)
     # --- Other Columns ---
     response_content = db.Column(db.Text, nullable=False)
 
