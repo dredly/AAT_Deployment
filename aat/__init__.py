@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from .models import db, login_manager, Assessment, QuestionT2, User, Role, Permission
+from .models import db, login_manager, Assessment, QuestionT2, User, Role, Permission, Option, Module, TakesAssessment, ResponseT1, ResponseT2
 from .assessments import assessments
 from .auth import auth
 from .stats import stats
@@ -40,6 +40,9 @@ admin.add_views(
     ModelView(QuestionT2, db.session),
     ModelView(User, db.session),
     ModelView(Role, db.session),
+    ModelView(TakesAssessment, db.session),
+    ModelView(ResponseT1, db.session),
+    ModelView(ResponseT2, db.session)
 )
 # Now accessible through /admin/
 
