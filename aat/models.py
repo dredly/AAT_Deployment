@@ -75,6 +75,16 @@ class Module(db.Model):
     assessments = db.relationship("Assessment", backref="module", lazy=True)
 
 
+# class TakesAssessment(db.Model):
+#     pass
+
+# class ResponseT1(db.Model):
+#     pass
+
+# class ResponseT2(db.Model):
+#     pass
+
+
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -151,7 +161,7 @@ class Role(db.Model):
     def insert_roles():
         roles = {
             "Student": [Permission.ANSWER_ASSESSMENT],
-            "Teacher": [Permission.WRITE_ASSESSMENT, Permission.ADMIN],
+            "Lecturer": [Permission.WRITE_ASSESSMENT, Permission.ADMIN],
             "Admin": [Permission.ADMIN],
         }
         default_role = "Student"
