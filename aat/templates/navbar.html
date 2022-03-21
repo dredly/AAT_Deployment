@@ -8,17 +8,17 @@
 		<li>
 			<a href="{{ url_for('assessments.index') }}">Assessments</a>
 		</li>
-		{% if not current_user.is_authenticated %} 
-			<li>
-				<a href="{{ url_for('auth.login') }}">Login</a>  
-			</li>
-			<li>
-				<a href="{{ url_for('auth.register') }}">Register</a>  
-			</li>
+		{% if not current_user.is_authenticated %}
+		<li>
+			<a href="{{ url_for('auth.login') }}">Login</a>
+		</li>
+		<li>
+			<a href="{{ url_for('auth.register') }}">Register</a>
+		</li>
 		{% else %}
-			<li>
-				<a href="{{ url_for('auth.logout') }}">Log Out</a>  
-			</li>
+		<li>
+			<a href="{{ url_for('auth.logout') }}">Log Out</a>
+		</li>
 		{% endif %}
 		<li>
 			<a href="{{ url_for('stats.index') }}">Stats</a>
@@ -29,9 +29,9 @@
 			>
 		</li>
 		{# {% if current_user.can(Permission.ADMIN) %} #}
-			<li>
-				<a href="{{ url_for('admin.index') }}">Admin</a>
-			</li>
-		{# {% endif %} #}
-	</ul>
+		<li class="admin">
+			<a href="{{ url_for('admin.index') }}">Admin</a>
+		</li>
+			{# {% endif %} #}
+</ul>
 </nav>
