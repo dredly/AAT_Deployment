@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from .models import db, login_manager, Assessment, QuestionT2, User, Role
+from .models import db, login_manager, Assessment, QuestionT2, User, Role, Permission
 from .assessments import assessments
 from .auth import auth
 from .stats import stats
