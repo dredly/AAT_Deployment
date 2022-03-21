@@ -1,21 +1,35 @@
 <nav>
 	<ul>
-        <li><a href="{{ url_for('index') }}">AAT</a></li>
-        <li>|</li>
+		<li><a href="{{ url_for('index') }}">AAT</a></li>
+		<li>|</li>
 		<li>
 			<a href="{{ url_for('index') }}">Home</a>
-        </li>
-        <li>
-            <a href="{{ url_for('assessments.index') }}">Assessments</a>
-        </li>
-        <li>
-            <a href="{{ url_for('auth.login') }}">Auth</a>
-        </li>
-        <li>
-            <a href="{{ url_for('stats.index') }}">Stats</a>
-        </li>
-        <li>
-            <a href="{{ url_for('student_stats.course_view') }}">Student Stats</a>
-        </li>
+		</li>
+		<li>
+			<a href="{{ url_for('assessments.index') }}">Assessments</a>
+		</li>
+		{% if not current_user.is_authenticated %} 
+			<li>
+				<a href="{{ url_for('auth.login') }}">Login</a>  
+			</li>
+			<li>
+				<a href="{{ url_for('auth.register') }}">Register</a>  
+			</li>
+		{% else %}
+			<li>
+				<a href="{{ url_for('auth.logout') }}">Log Out</a>  
+			</li>
+		{% endif %}
+		<li>
+			<a href="{{ url_for('stats.index') }}">Stats</a>
+		</li>
+		<li>
+			<a href="{{ url_for('student_stats.course_view') }}"
+				>Student Stats</a
+			>
+		</li>
+		<li>
+			<a href="{{ url_for('admin.index') }}">Admin</a>
+		</li>
 	</ul>
 </nav>
