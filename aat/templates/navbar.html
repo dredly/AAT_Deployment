@@ -8,9 +8,18 @@
 		<li>
 			<a href="{{ url_for('assessments.index') }}">Assessments</a>
 		</li>
-		<li>
-			<a href="{{ url_for('auth.login') }}">Login</a> {# TODO adjust to if else vs login / logout / register #} 
-		</li>
+		{% if not current_user.is_authenticated %} 
+			<li>
+				<a href="{{ url_for('auth.login') }}">Login</a>  
+			</li>
+			<li>
+				<a href="{{ url_for('auth.register') }}">Register</a>  
+			</li>
+		{% else %}
+			<li>
+				<a href="{{ url_for('auth.logout') }}">Log Out</a>  
+			</li>
+		{% endif %}
 		<li>
 			<a href="{{ url_for('stats.index') }}">Stats</a>
 		</li>

@@ -3,7 +3,7 @@ from .. import db
 from ..models import User
 from .forms import RegistrationForm, LoginForm
 from flask import redirect, render_template, request, url_for 
-from flask_login import login_user
+from flask_login import login_user, logout_user
 from ..decorators import admin_required, permission_required 
 
 
@@ -39,3 +39,8 @@ def registered():
 @auth.route("/logged_in")
 def logged_in(): 
     return render_template("in.html", title="Welcome!")
+
+@auth.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
