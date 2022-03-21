@@ -2,9 +2,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-<<<<<<< HEAD
-from .models import db, login_manager, Assessment, QuestionT2, User, Role, Permission, Option, Module, TakesAssessment, ResponseT1, ResponseT2
-=======
+
 from .models import (
     db,
     login_manager,
@@ -20,7 +18,6 @@ from .models import (
     Role,
     Permission,
 )
->>>>>>> 9923ff29fe7a89585d8b1b8f6575b54624e20067
 from .assessments import assessments
 from .auth import auth
 from .stats import stats
