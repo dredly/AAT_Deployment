@@ -38,8 +38,8 @@ admin = Admin(app=app, name="Admin Panel", template_mode="bootstrap3")
 admin.add_views(
     ModelView(Assessment, db.session),
     ModelView(QuestionT2, db.session),
-    ModelView(User, db.session), 
-    ModelView(Role, db.session)
+    ModelView(User, db.session),
+    ModelView(Role, db.session),
 )
 # Now accessible through /admin/
 
