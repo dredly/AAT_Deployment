@@ -1,7 +1,7 @@
 from tkinter import N
 from flask import redirect, render_template, request, url_for
 from . import assessments
-from ..models import Assessment, QuestionT2
+from ..models import Assessment, QuestionT2, Module
 from .forms import QuestionForm, DeleteQuestionsForm
 from .. import db
 
@@ -9,7 +9,8 @@ from .. import db
 @assessments.route("/")
 def index():
     assessments = Assessment.query.all()
-    return render_template("index.html", assessments=assessments)
+    modules = Module.query.all()
+    return render_template("index.html", assessments=assessments, modules=modules)
 
 
 @assessments.route("/<int:id>")
@@ -29,11 +30,11 @@ def new_question(id):
     if request.method == "POST":
         question_text = request.form["question_text"]
         correct_answer = request.form["correct_answer"]
-        weighting = request.form["weighting"]
+        num_of_marks = request.form["num_of_marks"]
         new_question = QuestionT2(
             question_text=question_text,
             correct_answer=correct_answer,
-            weighting=weighting,
+            num_of_marks=num_of_marks,
             assessment_id=id,
         )
         db.session.add(new_question)
@@ -51,12 +52,12 @@ def edit_question(id, q_id):
     if request.method == "POST":
         question.question_text = form.question_text.data
         question.correct_answer = form.correct_answer.data
-        question.weighting = form.weighting.data
+        question.num_of_marks = form.num_of_marks.data
         db.session.commit()
         return redirect(url_for("assessments.show_assessment", id=id))
     form.question_text.data = question.question_text
     form.correct_answer.data = question.correct_answer
-    form.weighting.data = question.weighting
+    form.num_of_marks.data = question.num_of_marks
     return render_template("edit_question.html", assessment=assessment, form=form)
 
 
@@ -66,13 +67,13 @@ def delete_questions(id):
     questions = QuestionT2.query.filter_by(assessment_id=id).all()
     form = DeleteQuestionsForm()
     form.questions_to_delete.choices = [
-        (question.id, question.question_text[:15]) for question in questions
+        (question.q_t2_id, question.question_text[:20]) for question in questions
     ]
     if request.method == "POST":
         # Query which returns the questions that were selected for deletion
         for_deletion = [int(q) for q in form.questions_to_delete.data]
         questions_to_delete = QuestionT2.query.filter(
-            QuestionT2.id.in_(for_deletion)
+            QuestionT2.q_t2_id.in_(for_deletion)
         ).all()
         for question in questions_to_delete:
             db.session.delete(question)
