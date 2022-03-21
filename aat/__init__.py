@@ -2,7 +2,21 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from .models import db, login_manager, Assessment, QuestionT2, User, Role, Permission
+from .models import (
+    db,
+    login_manager,
+    Assessment,
+    QuestionT1,
+    QuestionT2,
+    Option,
+    Module,
+    TakesAssessment,
+    ResponseT1,
+    ResponseT2,
+    User,
+    Role,
+    Permission,
+)
 from .assessments import assessments
 from .auth import auth
 from .stats import stats
@@ -37,7 +51,13 @@ from . import routes
 admin = Admin(app=app, name="Admin Panel", template_mode="bootstrap3")
 admin.add_views(
     ModelView(Assessment, db.session),
+    ModelView(QuestionT1, db.session),
     ModelView(QuestionT2, db.session),
+    ModelView(Option, db.session),
+    ModelView(Module, db.session),
+    ModelView(TakesAssessment, db.session),
+    ModelView(ResponseT1, db.session),
+    ModelView(ResponseT2, db.session),
     ModelView(User, db.session),
     ModelView(Role, db.session),
 )
