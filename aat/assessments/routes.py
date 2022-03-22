@@ -2,7 +2,7 @@ from tkinter import N
 from flask import Response, redirect, render_template, request, url_for, abort, session 
 from . import assessments
 from ..models import Assessment, QuestionT2, Module, TakesAssessment, User, ResponseT2
-from .forms import QuestionForm, DeleteQuestionsForm, AnswerType2Form, TakeAssessmentForm
+from .forms import QuestionForm, DeleteQuestionsForm, AnswerType2Form
 from .. import db
 from flask_login import current_user
 
@@ -93,33 +93,32 @@ def new_assessment():
 
 @assessments.route("/assessment_summary/<int:assessment_id>", methods=['GET', 'POST'])
 def assessment_summary(assessment_id):
-    form = TakeAssessmentForm()
     assessment = Assessment.query.get_or_404(assessment_id)
     questions = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
     question_ids = []
     for question in questions: 
         question_ids.append(question.q_t2_id)
-    if request.method == 'POST':
-        taken_assessment = TakesAssessment(student_id=current_user.id, 
-             assessment_id=assessment.assessment_id)
-        db.session.add(taken_assessment)
-        db.session.commit()
-        first_question = question_ids[0]
-        session['user'] = current_user.id 
-        session['no_questions'] = len(question_ids)
-        session['questions'] = question_ids
-        session['assessment'] = assessment_id
-        session['takes_assessment_id'] = taken_assessment.takes_assessment_id
-        return redirect(url_for('assessments.answer_question', 
-                    question_id=first_question))
+    session['user'] = current_user.id 
+    session['questions'] = question_ids
+    session['no_questions'] = len(question_ids)
+    session['assessment'] = assessment_id  
     return render_template("assessment_summary.html", 
                 assessment=assessment,
-                form=form, 
-                questions=questions)
+                questions=questions,
+                question_ids=question_ids
+                )
 
-# @assessments.route("/start_assessment/<int:assessment_id", methods=['GET', 'POST'])
-# def start_assessment(assessment_id): 
-
+@assessments.route("/start_assessment/<int:assessment_id>", methods=['GET', 'POST'])
+def start_assessment(assessment_id):
+    assessment = Assessment.query.get_or_404(assessment_id)
+    taken_assessment = TakesAssessment(student_id=current_user.id, 
+             assessment_id=assessment.assessment_id) 
+    db.session.add(taken_assessment)
+    db.session.commit()
+    first_question = session['questions'][0] 
+    session['takes_assessment_id'] = taken_assessment.takes_assessment_id
+    return redirect(url_for('assessments.answer_question', 
+                    question_id=first_question))
 
 @assessments.route("/answer_question/<int:question_id>", methods=['GET', 'POST'])
 def answer_question(question_id): 

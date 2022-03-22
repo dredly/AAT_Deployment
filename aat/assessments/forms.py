@@ -27,6 +27,3 @@ class DeleteQuestionsForm(FlaskForm):
 class AnswerType2Form(FlaskForm): 
     answer = TextAreaField(validators=[DataRequired()])
     submit = SubmitField("Submit Answer")
-
-class TakeAssessmentForm(FlaskForm):
-    submit = SubmitField("Take Assessment")

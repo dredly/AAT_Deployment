@@ -2,14 +2,8 @@
 {% block content %}
 <h1>{{assessment.title}}</h1>
 
-{# <button type="button"><a href="{{ url_for('assessments.answer_question', assessment_id=assessment.assessment_id, question_ids=question_ids) }}">Submit Answer</a></button>
+<button type="button"><a href="{{ url_for('assessments.start_assessment', assessment_id=assessment.assessment_id) }}">Start Assessment</a></button>
 
-<button type="button"><a href="{{ url_for('assessments.answer_question', assessment_id=assessment.assessment_id, taken_assessment_id=taken_assessment.takes_assessment_id, question_ids=questions) }}">Start Assessment</a></button>
-#}
-<form method="POST" action="">
-    {{ form.csrf_token }}
-    <button type="submit" value="Start Assessment">Start Assessment</button>
-</form>
 
 
 {% endblock %}
