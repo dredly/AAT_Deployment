@@ -1,7 +1,9 @@
 {% extends("layout.html") %}
 {% block content %}
-<h1>Question Marked</h1>
+<h1>Result: {{ result }}</h1>
 
+<p>You answered: {{ response.response_content }}</p>
+<p>The correct answer was: {{ question.correct_answer }}</p>
 
 {% if session['questions']|length < 1 %}
     <button type="button"><a href="{{ url_for('index') }}">End Assessment</a></button>
