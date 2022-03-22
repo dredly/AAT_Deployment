@@ -4,4 +4,6 @@
 
 <p>Score: {{ result }}/{{ no_of_questions }}</p>
 
+<button type="button"><a href="{{ url_for('assessments.exit_assessment') }}">Return to Assessments</a></button>
+{{ session['past_questions'] }}
 {% endblock %}
