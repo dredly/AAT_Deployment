@@ -1,5 +1,5 @@
 from tkinter import N
-from flask import redirect, render_template, request, url_for, abort, session 
+from flask import Response, redirect, render_template, request, url_for, abort, session 
 from . import assessments
 from ..models import Assessment, QuestionT2, Module, TakesAssessment, User, ResponseT2
 from .forms import QuestionForm, DeleteQuestionsForm, AnswerType2Form, TakeAssessmentForm
@@ -106,6 +106,7 @@ def assessment_summary(assessment_id):
         db.session.commit()
         first_question = question_ids[0]
         session['user'] = current_user.id 
+        session['no_questions'] = len(question_ids)
         session['questions'] = question_ids
         session['assessment'] = assessment_id
         session['takes_assessment_id'] = taken_assessment.takes_assessment_id
@@ -115,6 +116,10 @@ def assessment_summary(assessment_id):
                 assessment=assessment,
                 form=form, 
                 questions=questions)
+
+# @assessments.route("/start_assessment/<int:assessment_id", methods=['GET', 'POST'])
+# def start_assessment(assessment_id): 
+
 
 @assessments.route("/answer_question/<int:question_id>", methods=['GET', 'POST'])
 def answer_question(question_id): 
@@ -157,11 +162,18 @@ def mark_answer(question_id):
                             )
 
 
-# @assessments.route("/take_assesssment/answer/<int:assessment_id>/<int:taken_assessment_id>/<question_ids>")
-# def mark_answer(assessment_id, taken_assessment_id, question_ids): 
-#     taken_assessment = TakesAssessment.query.get_or_404(taken_assessment_id)
-#     print(question_ids)
-#     return render_template("mark_answer.html", 
-#                 assessment_id=assessment_id, 
-#                 question_ids=question_ids,
-#                 taken_assessment=taken_assessment)
+@assessments.route("/results/<int:takes_assessment_id>")
+def results(takes_assessment_id): 
+    taken_assessment = TakesAssessment.query.get_or_404(takes_assessment_id)
+    all_responses = ResponseT2.query.filter_by(takes_assessment_id=takes_assessment_id).all()
+    assessment = Assessment.query.get_or_404(session.get('assessment'))
+    no_of_questions = session.pop('no_questions', None)
+    result = 0
+    for response in all_responses: 
+        if response.correct: 
+            result += 1
+    return render_template("results.html", taken_assessment=taken_assessment,
+                                no_of_questions=no_of_questions,
+                                assessment=assessment, 
+                                result=result
+                                )
