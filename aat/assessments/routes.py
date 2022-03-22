@@ -1,10 +1,11 @@
 from tkinter import N
-from flask import redirect, render_template, request, url_for, abort
+from flask import redirect, render_template, request, url_for, abort, session 
 from . import assessments
 from ..models import Assessment, QuestionT2, Module, TakesAssessment, User 
 from .forms import QuestionForm, DeleteQuestionsForm, AnswerType2Form, TakeAssessmentForm
 from .. import db
 from flask_login import current_user
+
 
 
 @assessments.route("/")
@@ -90,6 +91,37 @@ def new_assessment():
 
 # Linsey Routes:
 
+@assessments.route("/assessment_summary/<int:assessment_id>", methods=['GET', 'POST'])
+def assessment_summary(assessment_id):
+    form = TakeAssessmentForm()
+    assessment = Assessment.query.get_or_404(assessment_id)
+    questions = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+    question_ids = []
+    for question in questions: 
+        question_ids.append(question.q_t2_id)
+    if request.method == 'POST':
+        taken_assessment = TakesAssessment(student_id=current_user.id, 
+             assessment_id=assessment.assessment_id)
+        first_question = question_ids.pop(0)
+        print(first_question)
+        session['user'] = current_user.id 
+        session['questions'] = question_ids
+        session['assessment'] = assessment_id
+        session['takes_assessment_id'] = taken_assessment.takes_assessment_id
+        return redirect(url_for('assessments.answer_question', 
+                    question_id=first_question))
+    return render_template("assessment_summary.html", 
+                assessment=assessment,
+                form=form, 
+                questions=questions)
+
+@assessments.route("/answer_question/<int:question_id>")
+def answer_question(question_id): 
+    assessment = Assessment.query.get_or_404(session.get('assessment'))
+    question = QuestionT2.query.get_or_404(question_id)
+    return render_template("answer_question.html", question=question, assessment=assessment)
+
+
 # @assessments.route("/<username>/assessments")
 # def list_assessments(username): 
 #     user = User.query.filter_by(name=username).first()
@@ -97,72 +129,72 @@ def new_assessment():
 #         abort(404)
 #     assessments = user.assessments.order_by(Assessment.due_date.desc()).all()
 
-@assessments.route("/take_assessment/<int:id>", methods=['GET', 'POST'])
-def take_assessment(id): 
-    form = TakeAssessmentForm()
-    assessment = Assessment.query.get_or_404(id)
-    questions = QuestionT2.query.filter_by(assessment_id=id).all()
-    question_ids = []
-    for question in questions: 
-        question_ids.append(question.q_t2_id)
-    if request.method == 'POST':
-        print("Something worked")
-        taken_assessment = TakesAssessment(student_id=current_user.id, 
-            assessment_id=assessment.assessment_id)
-        db.session.add(taken_assessment)
-        db.session.commit()
-        print(question_ids)
-        return redirect(url_for('assessments.answer_question', 
-                    assessment_id=assessment.assessment_id,
-                    taken_assessment_id=taken_assessment.takes_assessment_id,
-                    question_ids=question_ids))
-    return render_template("assessment_summary.html", 
-                title="Complete Assessment", 
-                assessment=assessment, 
-                questions=question_ids, 
-                form=form)
+# @assessments.route("/take_assessment/<int:id>", methods=['GET', 'POST'])
+# def take_assessment(id): 
+#     form = TakeAssessmentForm()
+#     assessment = Assessment.query.get_or_404(id)
+#     questions = QuestionT2.query.filter_by(assessment_id=id).all()
+#     question_ids = []
+#     for question in questions: 
+#         question_ids.append(question.q_t2_id)
+#     if request.method == 'POST':
+#         print("Something worked")
+#         taken_assessment = TakesAssessment(student_id=current_user.id, 
+#             assessment_id=assessment.assessment_id)
+#         db.session.add(taken_assessment)
+#         db.session.commit()
+#         print(question_ids)
+#         return redirect(url_for('assessments.answer_question', 
+#                     assessment_id=assessment.assessment_id,
+#                     taken_assessment_id=taken_assessment.takes_assessment_id,
+#                     question_ids=question_ids))
+#     return render_template("assessment_summary.html", 
+#                 title="Complete Assessment", 
+#                 assessment=assessment, 
+#                 questions=question_ids, 
+#                 form=form)
 
 
-@assessments.route("/take_assessment/question/<int:assessment_id>/<int:taken_assessment_id>/<question_ids>", methods=['GET', 'POST'])
-def answer_question(assessment_id, taken_assessment_id, question_ids):
-    form = AnswerType2Form()
-    assessment = Assessment.query.get_or_404(assessment_id)
-    taken_assessment = TakesAssessment.query.get_or_404(taken_assessment_id)
-    if not isinstance(question_ids, list):
-        print("isn't a list")
-        list_version = question_ids.replace("[", "").replace("]", "").split(",")
-        question_numbers = [int(x) for x in list_version]
-        print(question_numbers)
-    else: 
-        print("is a list")
-        question_numbers = question_ids
-    if len(question_numbers) >= 1:
-        question_id = question_numbers.pop(0)
-    else: 
-        question_id = question_numbers[0]
-    question = QuestionT2.query.filter_by(q_t2_id=question_id).first()
-    if request.method == 'POST':
-        return render_template("mark_answer.html", 
-                assessment_id=assessment_id, 
-                question_ids=question_numbers,
-                taken_assessment=taken_assessment_id, 
-                question=question)
-        # return redirect(url_for("assessments.mark_answer", 
-        #         assessment_id=assessment_id, 
-        #         taken_assessment_id=taken_assessment.takes_assessment_id, 
-        #         question_ids=question_numbers))
-    return render_template("answer_question.html", 
-                question=question, 
-                assessment=assessment, 
-                form=form,  
-                question_ids=question_numbers,
-                taken_assessment=taken_assessment)
+# @assessments.route("/take_assessment/question/<int:assessment_id>/<int:taken_assessment_id>/<question_ids>", methods=['GET', 'POST'])
+# def answer_question(assessment_id, taken_assessment_id, question_ids):
+#     form = AnswerType2Form()
+#     assessment = Assessment.query.get_or_404(assessment_id)
+#     taken_assessment = TakesAssessment.query.get_or_404(taken_assessment_id)
+#     if not isinstance(question_ids, list):
+#         print("isn't a list")
+#         list_version = question_ids.replace("[", "").replace("]", "").split(",")
+#         question_numbers = [int(x) for x in list_version]
+#         print(question_numbers)
+#     else: 
+#         print("is a list")
+#         question_numbers = question_ids
+#     if len(question_numbers) >= 1:
+#         question_id = question_numbers.pop(0)
+#     else: 
+#         question_id = question_numbers[0]
+#     question = QuestionT2.query.filter_by(q_t2_id=question_id).first()
+#     if request.method == 'POST':
+#         return render_template("mark_answer.html", 
+#                 assessment_id=assessment_id, 
+#                 question_ids=question_numbers,
+#                 taken_assessment=taken_assessment_id, 
+#                 question=question)
+#         # return redirect(url_for("assessments.mark_answer", 
+#         #         assessment_id=assessment_id, 
+#         #         taken_assessment_id=taken_assessment.takes_assessment_id, 
+#         #         question_ids=question_numbers))
+#     return render_template("answer_question.html", 
+#                 question=question, 
+#                 assessment=assessment, 
+#                 form=form,  
+#                 question_ids=question_numbers,
+#                 taken_assessment=taken_assessment)
 
-@assessments.route("/take_assesssment/answer/<int:assessment_id>/<int:taken_assessment_id>/<question_ids>")
-def mark_answer(assessment_id, taken_assessment_id, question_ids): 
-    taken_assessment = TakesAssessment.query.get_or_404(taken_assessment_id)
-    print(question_ids)
-    return render_template("mark_answer.html", 
-                assessment_id=assessment_id, 
-                question_ids=question_ids,
-                taken_assessment=taken_assessment)
+# @assessments.route("/take_assesssment/answer/<int:assessment_id>/<int:taken_assessment_id>/<question_ids>")
+# def mark_answer(assessment_id, taken_assessment_id, question_ids): 
+#     taken_assessment = TakesAssessment.query.get_or_404(taken_assessment_id)
+#     print(question_ids)
+#     return render_template("mark_answer.html", 
+#                 assessment_id=assessment_id, 
+#                 question_ids=question_ids,
+#                 taken_assessment=taken_assessment)
