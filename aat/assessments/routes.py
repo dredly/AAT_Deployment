@@ -119,11 +119,19 @@ def assessment_summary(assessment_id):
 @assessments.route("/answer_question/<int:question_id>", methods=['GET', 'POST'])
 def answer_question(question_id): 
     form = AnswerType2Form()
+    assessment = Assessment.query.get_or_404(session.get('assessment'))
+    question = QuestionT2.query.get_or_404(question_id)
     if request.method == 'POST': 
         takes_assessment_id = session.get('takes_assessment_id')
+        given_answer = form.answer.data.strip()
+        if given_answer == question.correct_answer: 
+            result = True
+        else: 
+            result = False
         response = ResponseT2(takes_assessment_id=takes_assessment_id, 
                         t2_question_id=question_id,
-                        response_content=form.answer.data.strip()
+                        response_content=given_answer, 
+                        correct=result
                         )
         db.session.add(response)
         db.session.commit() 
@@ -134,9 +142,6 @@ def answer_question(question_id):
     current_questions = session.get('questions')
     current_questions.pop(0)
     session['questions'] = current_questions
-    assessment = Assessment.query.get_or_404(session.get('assessment'))
-    question = QuestionT2.query.get_or_404(question_id)
-
     return render_template("answer_question.html", 
                 question=question, 
                 assessment=assessment, 
@@ -147,13 +152,9 @@ def answer_question(question_id):
 def mark_answer(question_id): 
     question = QuestionT2.query.get_or_404(question_id)
     response = ResponseT2.query.get_or_404(session.get('current_response_id'))
-    if response.response_content == question.correct_answer: 
-        result = "Correct"
-    else: 
-        result = "Incorrect"
     return render_template("mark_answer.html", question=question, 
-                            response=response, 
-                            result=result)
+                            response=response,
+                            )
 
 
 # @assessments.route("/take_assesssment/answer/<int:assessment_id>/<int:taken_assessment_id>/<question_ids>")

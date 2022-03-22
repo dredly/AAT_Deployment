@@ -103,6 +103,7 @@ class ResponseT1(db.Model):
     )
     # --- Other Columns ---
     response_content = db.Column(db.Integer, nullable=False)
+    correct = db.Column(db.Boolean, nullable=False)
 
 
 class ResponseT2(db.Model):
@@ -115,6 +116,8 @@ class ResponseT2(db.Model):
     t2_question_id = db.Column(db.Integer, db.ForeignKey("QuestionT2.q_t2_id"), nullable=False)
     # --- Other Columns ---
     response_content = db.Column(db.Text, nullable=False)
+    correct = db.Column(db.Boolean, nullable=False)
+
 
 
 class User(UserMixin, db.Model):

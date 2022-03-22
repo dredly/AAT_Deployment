@@ -38,19 +38,14 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # Then simply make your own .env file with the same format
 # app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
 app.config["SECRET_KEY"] = "a secret key"
-# app.config["SESSION_TYPE"] = 'redis'
-print(app.config["SECRET_KEY"])
 
 app.register_blueprint(assessments, url_prefix="/assessments")
 app.register_blueprint(stats, url_prefix="/stats")
 app.register_blueprint(student_stats, url_prefix="/student-stats")
 app.register_blueprint(auth)
 
-# sess = Session()
-
 db.init_app(app)
 login_manager.init_app(app)
-# sess.init_app(app)
 
 from . import routes
 

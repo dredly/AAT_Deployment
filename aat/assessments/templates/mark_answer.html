@@ -1,6 +1,6 @@
 {% extends("layout.html") %}
 {% block content %}
-<h1>Result: {{ result }}</h1>
+<h1>Result: {% if response.correct %}Correct!{% else %}Incorrect{% endif %}</h1>
 
 <p>You answered: {{ response.response_content }}</p>
 <p>The correct answer was: {{ question.correct_answer }}</p>

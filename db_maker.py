@@ -95,6 +95,16 @@ with app.app_context():
         total_credits=120,
     )
 
+    # create some users 
+
+    jim = User(
+        id = 1,
+        name = 'Jim',
+        hashed_password = 'j',
+        is_admin = True,
+        role_id = 1,
+    )
+
     # Add assessments, questions, options and modules
     db.session.add(assessment1)
     db.session.add(assessment2)
@@ -118,6 +128,8 @@ with app.app_context():
     db.session.add(question_t2_3)
 
     db.session.add(module_1)
+
+    db.session.add(jim)
 
     db.session.commit()
 
