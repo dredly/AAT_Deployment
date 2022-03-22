@@ -8,6 +8,7 @@ from . import Permission
 def index():
     return render_template("landing_page.html")
 
+
 @app.route("/permissions")
 @permission_required(Permission.WRITE_ASSESSMENT)
 def for_lecturers_only():

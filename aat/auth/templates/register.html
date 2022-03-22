@@ -1,6 +1,4 @@
-{% extends "layout.html" %}
-
-{% block content %}
+{% extends "layout.html" %} {% block content %}
 <h1>Register page</h1>
 
 <form method="POST" action="">
@@ -12,6 +10,5 @@
         <li>{{ form.admin.label }} {{ form.admin }}</li>
         <li><input type="submit" value="Register"></li>
     </ul>
-    
 </form>
 {% endblock %}
