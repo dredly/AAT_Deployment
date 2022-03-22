@@ -102,7 +102,9 @@ def assessment_summary(assessment_id):
     if request.method == 'POST':
         taken_assessment = TakesAssessment(student_id=current_user.id, 
              assessment_id=assessment.assessment_id)
-        first_question = question_ids.pop(0)
+        db.session.add(taken_assessment)
+        db.session.commit()
+        first_question = question_ids[0]
         print(first_question)
         session['user'] = current_user.id 
         session['questions'] = question_ids
@@ -115,12 +117,27 @@ def assessment_summary(assessment_id):
                 form=form, 
                 questions=questions)
 
-@assessments.route("/answer_question/<int:question_id>")
+@assessments.route("/answer_question/<int:question_id>", methods=['GET', 'POST'])
 def answer_question(question_id): 
+    if request.method == 'POST': 
+        return redirect(url_for("assessments.mark_answer",
+                    question_id=question_id)
+                    )
+    current_questions = session.get('questions')
+    current_questions.pop(0)
+    session['questions'] = current_questions
     assessment = Assessment.query.get_or_404(session.get('assessment'))
     question = QuestionT2.query.get_or_404(question_id)
-    return render_template("answer_question.html", question=question, assessment=assessment)
+    form = AnswerType2Form()
+    return render_template("answer_question.html", 
+                question=question, 
+                assessment=assessment, 
+                form=form
+                )
 
+@assessments.route("/mark_answer/<int:question_id>", methods=['GET', 'POST'])
+def mark_answer(question_id): 
+    return render_template("mark_answer.html")
 
 # @assessments.route("/<username>/assessments")
 # def list_assessments(username): 

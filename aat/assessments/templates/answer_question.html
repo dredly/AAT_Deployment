@@ -6,11 +6,11 @@
 <p>Marks available: {{ question.num_of_marks }}</p>
 
 <p>Length of question list: {{ question_ids|length }}</p>
-{#}
+
 <form method="POST" action="">
     {{ form.csrf_token }}
     {{ form.answer }}
     <button type="submit" value="Submit Answer">Submit Answer</button>
 </form>
-#}
+
 {% endblock %}

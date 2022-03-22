@@ -3,11 +3,10 @@
 <h1>Question Marked</h1>
 
 
-{% if question_ids|length < 1 %}
+{% if session['questions']|length < 1 %}
     <button type="button"><a href="{{ url_for('index') }}">End Assessment</a></button>
-
 {% else %}
-    <button type="button"><a href="{{ url_for('assessments.answer_question', assessment_id=assessment_id, taken_assessment_id=taken_assessment.takes_assessment_id, question_ids=question_ids) }}">Next Question</a></button>
+    <button type="button"><a href="{{ url_for('assessments.answer_question', question_id=session['questions'][0]) }}" >Next Question</a></button>
 {% endif %}
 
 {% endblock %}

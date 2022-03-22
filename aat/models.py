@@ -90,6 +90,9 @@ class TakesAssessment(db.Model):
     response_t1 = db.relationship("ResponseT1", backref="takes_assessment", lazy=True)
     response_t2 = db.relationship("ResponseT2", backref="takes_assessment", lazy=True)
 
+    def __repr__(self): 
+        return f"Assessment Completion {self.takes_assessment_id}: <Student: {self.student_id}> <Assessment: {self.assessment_id}>"
+
 
 class ResponseT1(db.Model):
     __tablename__ = "ResponseT1"
