@@ -41,6 +41,9 @@ class QuestionT1(db.Model):
     # --- Other Columns ---
     num_of_marks = db.Column(db.Integer, nullable=False)
     question_text = db.Column(db.Text, nullable=False)
+    difficulty = db.Column(db.Integer, nullable=False)
+    feedback_if_correct = db.Column(db.Text, nullable=False)
+    feedback_if_wrong = db.Column(db.Text, nullable=False)
     # --- Relationships ---
     option = db.relationship("Option", backref="questiont1", lazy=True)
 
@@ -55,13 +58,16 @@ class QuestionT2(db.Model):
     # --- Other Columns ---
     num_of_marks = db.Column(db.Integer, nullable=False)
     question_text = db.Column(db.Text, nullable=False)
+    difficulty = db.Column(db.Integer, nullable=False)
+    feedback_if_correct = db.Column(db.Text, nullable=False)
+    feedback_if_wrong = db.Column(db.Text, nullable=False)
     correct_answer = db.Column(db.Text, nullable=False)
 
 
 class Option(db.Model):
     __tablename__ = "Option"
-    # --- Foreign Keys ---
     option_id = db.Column(db.Integer, primary_key=True)
+    # --- Foreign Keys ---
     q_t1_id = db.Column(db.Integer, db.ForeignKey("QuestionT1.q_t1_id"), nullable=False)
     # ---- Other Columns ---
     option_text = db.Column(db.Text, nullable=False)
