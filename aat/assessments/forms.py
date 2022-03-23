@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import TextAreaField, IntegerField, SubmitField, SelectMultipleField
 from wtforms.validators import DataRequired
-from ..models import QuestionT2, Assessment
+from ..models import Assessment
 
 
 class QuestionForm(FlaskForm):
@@ -11,7 +11,7 @@ class QuestionForm(FlaskForm):
     correct_answer = TextAreaField(
         "Enter the correct answer", validators=[DataRequired()]
     )
-    weighting = IntegerField("Select a weighting", validators=[DataRequired()])
+    num_of_marks = IntegerField("How many marks?", validators=[DataRequired()])
     submit = SubmitField("Add question")
 
 
