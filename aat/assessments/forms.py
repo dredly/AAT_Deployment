@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired
 from ..models import Assessment
 
 
-class QuestionForm(FlaskForm):
+class QuestionT2Form(FlaskForm):
     question_text = TextAreaField(
         "Enter question text", default="", validators=[DataRequired()]
     )
@@ -38,6 +38,7 @@ class DeleteQuestionsForm(FlaskForm):
     )
     submit = SubmitField("Delete selected questions")
 
-class AnswerType2Form(FlaskForm): 
+
+class AnswerType2Form(FlaskForm):
     answer = TextAreaField(validators=[DataRequired()])
     submit = SubmitField("Submit Answer")
