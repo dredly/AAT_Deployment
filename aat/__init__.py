@@ -2,13 +2,6 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-<<<<<<< HEAD
-from .models import db, QuestionT2, QuestionT1, AnswersT1
-from .assessments import assessments
-from .auth import auth
-from .stats import stats
-from .legendary_gamification import legendary_gamification
-=======
 from .models import (
     db,
     login_manager,
@@ -28,7 +21,6 @@ from .assessments import assessments
 from .auth import auth
 from .stats import stats
 from .student_stats import student_stats
->>>>>>> main
 
 # Admin
 from flask_admin import Admin
@@ -47,11 +39,8 @@ app.config["SECRET_KEY"] = "a secret key"
 
 app.register_blueprint(assessments, url_prefix="/assessments")
 app.register_blueprint(stats, url_prefix="/stats")
-<<<<<<< HEAD
 app.register_blueprint(legendary_gamification, url_prefix="/legendary_gamification")
-=======
 app.register_blueprint(student_stats, url_prefix="/student-stats")
->>>>>>> main
 app.register_blueprint(auth)
 
 db.init_app(app)
