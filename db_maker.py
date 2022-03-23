@@ -42,16 +42,25 @@ with app.app_context():
         assessment_id=1,
         num_of_marks=2,
         question_text="Which command do use use to view a particular commit?",
+        difficulty=1,
+        feedback_if_correct="Well done!",
+        feedback_if_wrong="Better luck next time :)",
     )
     question_t1_2 = QuestionT1(
         assessment_id=2,
         num_of_marks=5,
         question_text="What does git rebase do?",
+        difficulty=3,
+        feedback_if_correct="Well done!",
+        feedback_if_wrong="Better luck next time :)",
     )
     question_t1_3 = QuestionT1(
         assessment_id=2,
         num_of_marks=5,
         question_text="What does git stash do?",
+        difficulty=2,
+        feedback_if_correct="Well done!",
+        feedback_if_wrong="Better luck next time :)",
     )
 
     # Create some Options
@@ -72,18 +81,27 @@ with app.app_context():
         num_of_marks=5,
         question_text="What flag do you use to add a commit message?",
         correct_answer="-m",
+        difficulty=1,
+        feedback_if_correct="Well done!",
+        feedback_if_wrong="Better luck next time :)",
     )
     question_t2_2 = QuestionT2(
         assessment_id=1,
         num_of_marks=10,
         question_text="which command is used to upload your commits to a remote repository?",
         correct_answer="push",
+        difficulty=1,
+        feedback_if_correct="Well done!",
+        feedback_if_wrong="Better luck next time :)",
     )
     question_t2_3 = QuestionT2(
         assessment_id=3,
         num_of_marks=10,
         question_text="Which symbol is used to select by class using document.querySelector()?",
         correct_answer=".",
+        difficulty=2,
+        feedback_if_correct="Well done!",
+        feedback_if_wrong="Better luck next time :)",
     )
 
     # Create modules
