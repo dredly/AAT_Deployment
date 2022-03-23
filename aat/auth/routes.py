@@ -12,8 +12,9 @@ def login():
     form = LoginForm()
     if request.method == 'POST': 
         user = User.query.filter_by(name=form.name.data).first()
-        login_user(user)
-        return redirect(url_for('auth.logged_in'))
+        if user is not None and user.verify_password(form.password.data):
+            login_user(user)
+            return redirect(url_for('auth.logged_in'))
     return render_template("login.html", title="Login", form=form)
 
 
@@ -25,10 +26,12 @@ def register():
             teacher = User(name=form.name.data, password=form.password.data, is_admin=True)
             db.session.add(teacher)
             db.session.commit()
+            login_user(teacher)
         elif form.admin.data == False: 
             student = User(name=form.name.data, password=form.password.data, is_admin=False)
             db.session.add(student)
             db.session.commit()
+            login_user(student)
         return redirect(url_for('auth.registered'))
     return render_template("register.html", title="Register", form=form)
 
