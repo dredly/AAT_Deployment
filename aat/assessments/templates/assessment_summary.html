@@ -2,7 +2,7 @@
 {% block content %}
 <h1>{{assessment.title}}</h1>
 
-<button type="button"><a href="{{ url_for('assessments.start_assessment', assessment_id=assessment.assessment_id) }}">Start Assessment</a></button>
+<button type="button"><a href="{{ url_for('assessments.answer_question', question_id=first_question) }}">Start Assessment</a></button>
 
 
 

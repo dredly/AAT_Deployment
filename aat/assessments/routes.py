@@ -96,7 +96,6 @@ def test_response_model(assessment_id, question_id):
     return render_template("results.html", results=results)
 
 
-# Summarises details of assessment without starting a 'Takes Assessment' instance 
 @assessments.route("/assessment_summary/<int:assessment_id>", methods=['GET', 'POST'])
 def assessment_summary(assessment_id):
     assessment = Assessment.query.get_or_404(assessment_id)
@@ -111,34 +110,30 @@ def assessment_summary(assessment_id):
     session['past_questions'] = []
     session['no_questions'] = len(question_ids)
     session['assessment'] = assessment_id  
+    first_question = session['questions'][0] 
     return render_template("assessment_summary.html", 
                 assessment=assessment,
                 questions=questions,
-                question_ids=question_ids
+                question_ids=question_ids,
+                first_question=first_question
                 )
-
-## route to create TakesAssessment instance 
-@assessments.route("/start_assessment/<int:assessment_id>", methods=['GET', 'POST'])
-def start_assessment(assessment_id):
-    assessment = Assessment.query.get_or_404(assessment_id)
-    # taken_assessment = TakesAssessment(student_id=current_user.id, 
-    #          assessment_id=assessment.assessment_id) 
-    # db.session.add(taken_assessment)
-    # db.session.commit()
-    first_question = session['questions'][0] 
-    # session['takes_assessment_id'] = taken_assessment.takes_assessment_id
-    return redirect(url_for('assessments.answer_question', 
-                    question_id=first_question))
 
 @assessments.route("/answer_question/<int:question_id>", methods=['GET', 'POST'])
 def answer_question(question_id): 
-    # search for an existing response to this question in assessment
-    # existing = ResponseT2.query
-    form = AnswerType2Form()
+    form = AnswerType2Form(answer=None)
     assessment = Assessment.query.get_or_404(session.get('assessment'))
     question = QuestionT2.query.get_or_404(question_id)
+    if current_user.has_answered(question, assessment): 
+        if request.method == 'GET':
+            previous_response = current_user.t2_responses.filter_by(assessment_id=session.get('assessment')
+                                                        ).filter_by(t2_question_id=question_id
+                                                        ).first()
+            previous_given_answer = previous_response.response_content
+            form.answer.data = previous_given_answer
     if request.method == 'POST': 
-        # takes_assessment_id = session.get('takes_assessment_id')
+        if current_user.has_answered(question, assessment): 
+            current_user.remove_answer(question, assessment)
+            db.session.commit()
         given_answer = form.answer.data.strip()
         if given_answer == question.correct_answer: 
             result = True
@@ -152,7 +147,6 @@ def answer_question(question_id):
                         )
         db.session.add(response)
         db.session.commit() 
-        # session['current_response_id'] = response.response_t2_id
         return redirect(url_for("assessments.mark_answer",
                         question_id=question_id)
                         )
@@ -166,19 +160,18 @@ def answer_question(question_id):
                 form=form
                 )
 
-# #this will break everything until i add the unique constraint into the model 
-# @assessments.route("/previous_question")
-# def previous_question(): 
-#     next_question = session['past_questions'].pop(-1)
-#     prev_question = session['past_questions'].pop(-1)
-#     session['questions'].insert(0, next_question)
-#     session['questions'].insert(0, prev_question)
-#     # copy and overwrite existing session variables as otherwise insert would not remain permanent on next loaded page 
-#     copy_list_next = session['questions']
-#     copy_list_prev = session['past_questions']
-#     session['questions'] = copy_list_next
-#     session['past_questions'] = copy_list_prev
-#     return redirect(url_for('assessments.answer_question', question_id=session['questions'][0]))
+@assessments.route("/previous_question")
+def previous_question(): 
+    next_question = session['past_questions'].pop(-1)
+    prev_question = session['past_questions'].pop(-1)
+    session['questions'].insert(0, next_question)
+    session['questions'].insert(0, prev_question)
+    # copy and overwrite existing session variables as otherwise insert would not remain permanent on next loaded page 
+    copy_list_next = session['questions']
+    copy_list_prev = session['past_questions']
+    session['questions'] = copy_list_next
+    session['past_questions'] = copy_list_prev
+    return redirect(url_for('assessments.answer_question', question_id=session['questions'][0]))
 
 
 

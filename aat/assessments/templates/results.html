@@ -2,10 +2,9 @@
 {% block content %}
 <h1>Results of assessment</h1>
 
-<p>Score: {{ result }}/{{ possible_total }}</p>
+<p>Score: {{ result }} / {{ possible_total }}</p>
 
 <button type="button"><a href="{{ url_for('assessments.exit_assessment') }}">Return to Assessments</a></button>
-{{ session['past_questions'] }}
 
 
 {% endblock %}

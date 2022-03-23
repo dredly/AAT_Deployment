@@ -95,48 +95,6 @@ class Module(db.Model):
     assessment = db.relationship("Assessment", backref="module", lazy=True)
 
 
-# class TakesAssessment(db.Model):
-#     __tablename__ = "TakesAssessment"
-#     takes_assessment_id = db.Column(db.Integer, primary_key=True)
-#     # --- Foreign Keys ---
-#     student_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-#     assessment_id = db.Column(
-#         db.Integer, db.ForeignKey("Assessment.assessment_id"), nullable=False
-#     )
-#     # --- Relationships ---
-#     response_t1 = db.relationship("ResponseT1", backref="takes_assessment", lazy=True)
-#     response_t2 = db.relationship("ResponseT2", backref="takes_assessment", lazy=True)
-
-#     def __repr__(self): 
-#         return f"Assessment Completion {self.takes_assessment_id}: <Student: {self.student_id}> <Assessment: {self.assessment_id}>"
-
-
-# class ResponseT1(db.Model):
-#     __tablename__ = "ResponseT1"
-#     response_t1_id = db.Column(db.Integer, primary_key=True)
-#     # --- Foreign Keys ---
-#     takes_assessment_id = db.Column(
-#         db.Integer, db.ForeignKey("TakesAssessment.takes_assessment_id"), nullable=False
-#     )
-#     # --- Other Columns ---
-#     response_content = db.Column(db.Integer, nullable=False)
-#     correct = db.Column(db.Boolean, nullable=False)
-
-
-# class ResponseT2(db.Model):
-#     __tablename__ = "ResponseT2"
-#     response_t2_id = db.Column(db.Integer, primary_key=True)
-#     # --- Foreign Keys ---
-#     takes_assessment_id = db.Column(
-#         db.Integer, db.ForeignKey("TakesAssessment.takes_assessment_id"), nullable=False
-#     )
-#     t2_question_id = db.Column(db.Integer, db.ForeignKey("QuestionT2.q_t2_id"), nullable=False)
-#     # --- Other Columns ---
-#     response_content = db.Column(db.Text, nullable=False)
-#     correct = db.Column(db.Boolean, nullable=False)
-
-
-
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -187,9 +145,17 @@ class User(UserMixin, db.Model):
         if assessment.assessment_id is None: 
             return False 
         return self.t2_responses.filter_by(
-                                    question_id=question.q_t2_id
+                                    t2_question_id=question.q_t2_id
                                     ).filter_by(assessment_id=assessment.assessment_id
                                     ).first() is not None 
+
+    def remove_answer(self, question, assessment):
+        response = self.t2_responses.filter_by(
+                                        t2_question_id=question.q_t2_id
+                                        ).filter_by(assessment_id=assessment.assessment_id
+                                        ).first()
+        if response: 
+            db.session.delete(response)
 
     def __repr__(self):
         return f"User: {self.name}"
