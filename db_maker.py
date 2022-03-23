@@ -1,7 +1,9 @@
 from aat import db
 from aat import Role
 from aat import app
+
 from aat.models import *
+
 
 with app.app_context():
     db.drop_all()
@@ -111,6 +113,56 @@ with app.app_context():
         total_credits=120,
     )
 
+    # create some users 
+
+    jim = User(
+        id = 1,
+        name = 'Jim',
+        hashed_password = 'j',
+        is_admin = True,
+        role_id = 1,
+    )
+
+    kate = User(
+        id = 2,
+        name = 'Kate',
+        hashed_password = 'k',
+        is_admin = True,
+        role_id = 1,
+    )
+
+    al = User(
+        id = 3,
+        name = 'Al',
+        hashed_password = 'a',
+        is_admin = True,
+        role_id = 1,
+    )
+
+    first_response = ResponseT2(
+        user_id = 1, 
+        assessment_id = 1, 
+        t2_question_id = 1, 
+        response_content = '-m',
+        is_correct = True
+    )
+
+    second_response = ResponseT2(
+        user_id = 1, 
+        assessment_id = 1, 
+        t2_question_id = 2, 
+        response_content = 'push',
+        is_correct = True
+    )
+
+    third_response = ResponseT2(
+        user_id = 2, 
+        assessment_id = 1, 
+        t2_question_id = 1, 
+        response_content = '-m',
+        is_correct = True
+    )
+
     # Add assessments, questions, options and modules
     db.session.add(assessment1)
     db.session.add(assessment2)
@@ -135,4 +187,13 @@ with app.app_context():
 
     db.session.add(module_1)
 
+    db.session.add(jim)
+    db.session.add(kate)
+    db.session.add(al)
+
+    db.session.add(first_response)
+    db.session.add(second_response)
+    db.session.add(third_response)
+
     db.session.commit()
+

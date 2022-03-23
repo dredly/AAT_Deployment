@@ -1,7 +1,9 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, session
+# from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
+
 from .models import (
     db,
     login_manager,
@@ -10,8 +12,8 @@ from .models import (
     QuestionT2,
     Option,
     Module,
-    TakesAssessment,
-    ResponseT1,
+    # TakesAssessment,
+    # ResponseT1,
     ResponseT2,
     User,
     Role,
@@ -55,10 +57,15 @@ admin.add_views(
     AdminView(QuestionT2, db.session),
     AdminView(Option, db.session),
     AdminView(Module, db.session),
-    AdminView(TakesAssessment, db.session),
-    AdminView(ResponseT1, db.session),
+    # AdminView(TakesAssessment, db.session),
+    # AdminView(ResponseT1, db.session),
     AdminView(ResponseT2, db.session),
     AdminView(User, db.session),
     AdminView(Role, db.session),
 )
 # Now accessible through /admin/
+
+# Context Processor to make Permission variables available to templates 
+@app.context_processor 
+def inject_permissions(): 
+    return dict(Permission=Permission)

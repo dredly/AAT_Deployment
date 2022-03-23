@@ -28,8 +28,10 @@
 				>Student Stats</a
 			>
 		</li>
+		{# {% if current_user.can(Permission.ADMIN) %} #}
 		<li class="admin">
 			<a href="{{ url_for('admin.index') }}">Admin</a>
 		</li>
-	</ul>
+			{# {% endif %} #}
+</ul>
 </nav>
