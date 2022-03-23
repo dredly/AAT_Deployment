@@ -1,0 +1,12 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1>Edit question on {{assessment.title}}</h1>
+<form method="POST" action="">
+    {{ form.csrf_token }}
+    {{form.question_text.label}}{{form.question_text}}
+    {{form.correct_answer.label}}{{form.correct_answer}}
+    {{form.num_of_marks.label}}{{form.num_of_marks}}
+    {{form.submit}}
+</form>
+
+{% endblock %}

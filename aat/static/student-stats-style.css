@@ -1,0 +1,14 @@
+
+
+.content-block {
+	display: flex;
+	align-items: left;
+	vertical-align: bottom;
+	margin-bottom: auto;
+	margin-top: auto;
+}
+
+.content-block > p {
+	margin-bottom: auto;
+	margin-top: auto;
+}
