@@ -1,12 +1,12 @@
 {% extends("layout.html") %}
 {% block content %}
-<h1>Result: {% if response.correct %}Correct!{% else %}Incorrect{% endif %}</h1>
+<h1>Result: {% if response.is_correct %}Correct!{% else %}Incorrect{% endif %}</h1>
 
 <p>You answered: {{ response.response_content }}</p>
 <p>The correct answer was: {{ question.correct_answer }}</p>
 
 {% if session['questions']|length < 1 %}
-    <button type="button"><a href="{{ url_for('assessments.results', takes_assessment_id=session['takes_assessment_id'] ) }}">End Assessment</a></button>
+    <button type="button"><a href="{{ url_for('assessments.results', assessment_id=assessment.assessment_id ) }}">End Assessment</a></button>
 {% else %}
     <button type="button"><a href="{{ url_for('assessments.answer_question', question_id=session['questions'][0]) }}" >Next Question</a></button>
 {% endif %}

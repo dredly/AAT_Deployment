@@ -96,74 +96,75 @@ def test_response_model(assessment_id, question_id):
     return render_template("results.html", results=results)
 
 
-## Summarises details of assessment without starting a 'Takes Assessment' instance 
-# @assessments.route("/assessment_summary/<int:assessment_id>", methods=['GET', 'POST'])
-# def assessment_summary(assessment_id):
-#     assessment = Assessment.query.get_or_404(assessment_id)
-#     ## query to find all questions in assessment, so can be used to find their ID's and store these in session variable
-#     ## session variable is then accessed throughout the process to find questions and store their responses 
-#     questions = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
-#     question_ids = []
-#     for question in questions: 
-#         question_ids.append(question.q_t2_id)
-#     session['user'] = current_user.id 
-#     session['questions'] = question_ids
-#     session['past_questions'] = []
-#     session['no_questions'] = len(question_ids)
-#     session['assessment'] = assessment_id  
-#     return render_template("assessment_summary.html", 
-#                 assessment=assessment,
-#                 questions=questions,
-#                 question_ids=question_ids
-#                 )
+# Summarises details of assessment without starting a 'Takes Assessment' instance 
+@assessments.route("/assessment_summary/<int:assessment_id>", methods=['GET', 'POST'])
+def assessment_summary(assessment_id):
+    assessment = Assessment.query.get_or_404(assessment_id)
+    ## query to find all questions in assessment, so can be used to find their ID's and store these in session variable
+    ## session variable is then accessed throughout the process to find questions and store their responses 
+    questions = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+    question_ids = []
+    for question in questions: 
+        question_ids.append(question.q_t2_id)
+    session['user'] = current_user.id 
+    session['questions'] = question_ids
+    session['past_questions'] = []
+    session['no_questions'] = len(question_ids)
+    session['assessment'] = assessment_id  
+    return render_template("assessment_summary.html", 
+                assessment=assessment,
+                questions=questions,
+                question_ids=question_ids
+                )
 
-# ## route to create TakesAssessment instance 
-# @assessments.route("/start_assessment/<int:assessment_id>", methods=['GET', 'POST'])
-# def start_assessment(assessment_id):
-#     assessment = Assessment.query.get_or_404(assessment_id)
-#     taken_assessment = TakesAssessment(student_id=current_user.id, 
-#              assessment_id=assessment.assessment_id) 
-#     db.session.add(taken_assessment)
-#     db.session.commit()
-#     first_question = session['questions'][0] 
-#     session['takes_assessment_id'] = taken_assessment.takes_assessment_id
-#     return redirect(url_for('assessments.answer_question', 
-#                     question_id=first_question))
+## route to create TakesAssessment instance 
+@assessments.route("/start_assessment/<int:assessment_id>", methods=['GET', 'POST'])
+def start_assessment(assessment_id):
+    assessment = Assessment.query.get_or_404(assessment_id)
+    # taken_assessment = TakesAssessment(student_id=current_user.id, 
+    #          assessment_id=assessment.assessment_id) 
+    # db.session.add(taken_assessment)
+    # db.session.commit()
+    first_question = session['questions'][0] 
+    # session['takes_assessment_id'] = taken_assessment.takes_assessment_id
+    return redirect(url_for('assessments.answer_question', 
+                    question_id=first_question))
 
-# @assessments.route("/answer_question/<int:question_id>", methods=['GET', 'POST'])
-# def answer_question(question_id): 
-#     # search for an existing response to this question in assessment
-#     # existing = ResponseT2.query
-#     form = AnswerType2Form()
-#     assessment = Assessment.query.get_or_404(session.get('assessment'))
-#     question = QuestionT2.query.get_or_404(question_id)
-#     if request.method == 'POST': 
-#         takes_assessment_id = session.get('takes_assessment_id')
-#         given_answer = form.answer.data.strip()
-#         if given_answer == question.correct_answer: 
-#             result = True
-#         else: 
-#             result = False
-#         response = ResponseT2(takes_assessment_id=takes_assessment_id, 
-#                         t2_question_id=question_id,
-#                         response_content=given_answer, 
-#                         correct=result
-#                         )
-#         db.session.add(response)
-#         db.session.commit() 
-#         session['current_response_id'] = response.response_t2_id
-#         return redirect(url_for("assessments.mark_answer",
-#                         question_id=question_id)
-#                         )
-#     current_questions = session.get('questions')
-#     previous = current_questions.pop(0)
-#     session['past_questions'].append(previous)
-#     session['questions'] = current_questions
-#     return render_template("answer_question.html", 
-#                 question=question, 
-#                 assessment=assessment, 
-#                 form=form
-#                 )
+@assessments.route("/answer_question/<int:question_id>", methods=['GET', 'POST'])
+def answer_question(question_id): 
+    # search for an existing response to this question in assessment
+    # existing = ResponseT2.query
+    form = AnswerType2Form()
+    assessment = Assessment.query.get_or_404(session.get('assessment'))
+    question = QuestionT2.query.get_or_404(question_id)
+    if request.method == 'POST': 
+        # takes_assessment_id = session.get('takes_assessment_id')
+        given_answer = form.answer.data.strip()
+        if given_answer == question.correct_answer: 
+            result = True
+        else: 
+            result = False
+        response = ResponseT2(user_id=current_user.id, 
+                        assessment_id=assessment.assessment_id, 
+                        t2_question_id=question_id,
+                        response_content=given_answer, 
+                        is_correct=result
+                        )
+        db.session.add(response)
+        db.session.commit() 
+        # session['current_response_id'] = response.response_t2_id
+        return redirect(url_for("assessments.mark_answer",
+                        question_id=question_id)
+                        )
+    current_questions = session.get('questions')
+    previous = current_questions.pop(0)
+    session['past_questions'].append(previous)
+    session['questions'] = current_questions
+    return render_template("answer_question.html", 
+                question=question, 
+                assessment=assessment, 
+                form=form
+                )
 
 # #this will break everything until i add the unique constraint into the model 
 # @assessments.route("/previous_question")
@@ -181,37 +182,44 @@ def test_response_model(assessment_id, question_id):
 
 
 
-# @assessments.route("/mark_answer/<int:question_id>", methods=['GET', 'POST'])
-# def mark_answer(question_id): 
-#     question = QuestionT2.query.get_or_404(question_id)
-#     response = ResponseT2.query.get_or_404(session.get('current_response_id'))
-#     return render_template("mark_answer.html", question=question, 
-#                             response=response,
-#                             )
+@assessments.route("/mark_answer/<int:question_id>", methods=['GET', 'POST'])
+def mark_answer(question_id): 
+    question = QuestionT2.query.get_or_404(question_id)
+    assessment = Assessment.query.get_or_404(session.get('assessment'))
+    response = current_user.t2_responses.filter_by(assessment_id=session.get('assessment')).filter_by(t2_question_id=question_id).first()
+    return render_template("mark_answer.html", question=question, 
+                            response=response,
+                            assessment=assessment
+                            )
 
 
-# @assessments.route("/results/<int:takes_assessment_id>")
-# def results(takes_assessment_id): 
-#     taken_assessment = TakesAssessment.query.get_or_404(takes_assessment_id)
-#     all_responses = ResponseT2.query.filter_by(takes_assessment_id=takes_assessment_id).all()
-#     assessment = Assessment.query.get_or_404(session.get('assessment'))
-#     no_of_questions = session.pop('no_questions', None)
-#     result = 0
-#     for response in all_responses: 
-#         if response.correct: 
-#             result += 1
-#     return render_template("results.html", taken_assessment=taken_assessment,
-#                                 no_of_questions=no_of_questions,
-#                                 assessment=assessment, 
-#                                 result=result
-#                                 )
+@assessments.route("/results/<int:assessment_id>")
+def results(assessment_id): 
+    all_responses = current_user.t2_responses.filter_by(assessment_id=assessment_id).all()
+    assessment = Assessment.query.get_or_404(session.get('assessment'))
+    no_of_questions = session.pop('no_questions', None)
+    questions = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+    possible_total = 0
+    for question in questions: 
+        possible_total += question.num_of_marks
+    result = 0
+    for response in all_responses: 
+        if response.is_correct: 
+            answered_question = QuestionT2.query.filter_by(q_t2_id=response.t2_question_id).first()
+            result += answered_question.num_of_marks
+    return render_template("results.html", 
+                                no_of_questions=no_of_questions,
+                                assessment=assessment, 
+                                result=result, 
+                                possible_total=possible_total
+                                )
 
-# @assessments.route("/exit_assessment")
-# def exit_assessment():
-#     ## wipes all session variables and returns to assessment list 
-#     session.pop('user', None) 
-#     session.pop('questions', None) 
-#     session.pop('no_questions', None) 
-#     session.pop('assessment', None) 
-#     session.pop('takes_assessment_id', None)
-#     return redirect(url_for("assessments.index"))
+@assessments.route("/exit_assessment")
+def exit_assessment():
+    ## wipes all session variables and returns to assessment list 
+    session.pop('user', None) 
+    session.pop('questions', None) 
+    session.pop('no_questions', None) 
+    session.pop('assessment', None) 
+    session.pop('takes_assessment_id', None)
+    return redirect(url_for("assessments.index"))

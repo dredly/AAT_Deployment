@@ -13,9 +13,9 @@
 </form>
 
 <p>Questions remaining: {{ session['questions']|length }}</p>
-
+{#
 {% if session['past_questions']|length > 1 %}
 <button type="button"><a href="{{ url_for('assessments.previous_question') }}">Previous Question</a></button>
 {% endif %}
-
+#}
 {% endblock %}

@@ -124,7 +124,7 @@ with app.app_context():
     first_response = ResponseT2(
         user_id = 1, 
         assessment_id = 1, 
-        question_id = 1, 
+        t2_question_id = 1, 
         response_content = '-m',
         is_correct = True
     )
@@ -132,7 +132,7 @@ with app.app_context():
     second_response = ResponseT2(
         user_id = 1, 
         assessment_id = 1, 
-        question_id = 2, 
+        t2_question_id = 2, 
         response_content = 'push',
         is_correct = True
     )
@@ -140,7 +140,7 @@ with app.app_context():
     third_response = ResponseT2(
         user_id = 2, 
         assessment_id = 1, 
-        question_id = 1, 
+        t2_question_id = 1, 
         response_content = '-m',
         is_correct = True
     )

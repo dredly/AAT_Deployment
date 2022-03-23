@@ -14,7 +14,7 @@ class ResponseT2(db.Model):
     __tablename__ = "t2_responses"
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     assessment_id = db.Column(db.Integer, db.ForeignKey('Assessment.assessment_id'), primary_key=True)
-    question_id = db.Column(db.Integer, db.ForeignKey('QuestionT2.q_t2_id'), primary_key=True)
+    t2_question_id = db.Column(db.Integer, db.ForeignKey('QuestionT2.q_t2_id'), primary_key=True)
     response_content = db.Column(db.Text, nullable=False)
     is_correct = db.Column(db.Boolean, nullable=False)
 class Assessment(db.Model):
@@ -68,7 +68,7 @@ class QuestionT2(db.Model):
     question_text = db.Column(db.Text, nullable=False)
     correct_answer = db.Column(db.Text, nullable=False)
     responses = db.relationship('ResponseT2', 
-                                    foreign_keys=[ResponseT2.question_id],
+                                    foreign_keys=[ResponseT2.t2_question_id],
                                     backref=db.backref('question', lazy='joined'),
                                     lazy='dynamic', 
                                     cascade='all, delete-orphan'
@@ -181,10 +181,15 @@ class User(UserMixin, db.Model):
     def is_administrator(self):
         return self.can(Permission.ADMIN)
 
-    # def has_answered(question, assessment):
-    #     if question.q_t2_id is None: 
-    #         return False 
-    #     return self.t2_responses.filter_by(question_id)
+    def has_answered(self, question, assessment):
+        if question.q_t2_id is None: 
+            return False 
+        if assessment.assessment_id is None: 
+            return False 
+        return self.t2_responses.filter_by(
+                                    question_id=question.q_t2_id
+                                    ).filter_by(assessment_id=assessment.assessment_id
+                                    ).first() is not None 
 
     def __repr__(self):
         return f"User: {self.name}"
