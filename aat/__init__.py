@@ -21,7 +21,7 @@ from .models import (
 )
 from .assessments import assessments
 from .auth import auth
-from .stats import stats
+from .staff_stats import staff_stats
 from .student_stats import student_stats
 
 # Admin
@@ -40,7 +40,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "a secret key"
 
 app.register_blueprint(assessments, url_prefix="/assessments")
-app.register_blueprint(stats, url_prefix="/stats")
+app.register_blueprint(staff_stats, url_prefix="/staff-stats")
 app.register_blueprint(student_stats, url_prefix="/student-stats")
 app.register_blueprint(auth)
 

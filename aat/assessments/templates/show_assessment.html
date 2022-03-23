@@ -4,7 +4,7 @@
 {% for question in questions %}
 <h3>{{question.question_text}}</h3>
 <a href="{{url_for('assessments.edit_question', id=assessment.assessment_id, q_id=question.q_t2_id)}}">Edit question</a>
-<p>{{question.num_of_marks}} marks</p>
+<p>{{question.num_of_marks}} marks --- Difficulty = {{question.difficulty}}/3</p>
 <hr>
 {% endfor %}
 <a href="{{url_for('assessments.new_question', id=assessment.assessment_id)}}">Add a question</a>
