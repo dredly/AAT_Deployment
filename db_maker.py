@@ -105,6 +105,46 @@ with app.app_context():
         role_id = 1,
     )
 
+    kate = User(
+        id = 2,
+        name = 'Kate',
+        hashed_password = 'k',
+        is_admin = True,
+        role_id = 1,
+    )
+
+    al = User(
+        id = 3,
+        name = 'Al',
+        hashed_password = 'a',
+        is_admin = True,
+        role_id = 1,
+    )
+
+    first_response = ResponseT2(
+        user_id = 1, 
+        assessment_id = 1, 
+        question_id = 1, 
+        response_content = '-m',
+        is_correct = True
+    )
+
+    second_response = ResponseT2(
+        user_id = 1, 
+        assessment_id = 1, 
+        question_id = 2, 
+        response_content = 'push',
+        is_correct = True
+    )
+
+    third_response = ResponseT2(
+        user_id = 2, 
+        assessment_id = 1, 
+        question_id = 1, 
+        response_content = '-m',
+        is_correct = True
+    )
+
     # Add assessments, questions, options and modules
     db.session.add(assessment1)
     db.session.add(assessment2)
@@ -130,6 +170,12 @@ with app.app_context():
     db.session.add(module_1)
 
     db.session.add(jim)
+    db.session.add(kate)
+    db.session.add(al)
+
+    db.session.add(first_response)
+    db.session.add(second_response)
+    db.session.add(third_response)
 
     db.session.commit()
 

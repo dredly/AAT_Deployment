@@ -10,7 +10,13 @@ login_manager = LoginManager()
 
 # Format for model: primary key, then all foreign keys, then all other columns, then all relationships
 
-
+class ResponseT2(db.Model): 
+    __tablename__ = "t2_responses"
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    assessment_id = db.Column(db.Integer, db.ForeignKey('Assessment.assessment_id'), primary_key=True)
+    question_id = db.Column(db.Integer, db.ForeignKey('QuestionT2.q_t2_id'), primary_key=True)
+    response_content = db.Column(db.Text, nullable=False)
+    is_correct = db.Column(db.Boolean, nullable=False)
 class Assessment(db.Model):
     __tablename__ = "Assessment"
     assessment_id = db.Column(db.Integer, primary_key=True)
@@ -26,9 +32,14 @@ class Assessment(db.Model):
     # --- Relationships --- TODO: add more as tables are added to the db
     question_t1 = db.relationship("QuestionT1", backref="assessment", lazy=True)
     question_t2 = db.relationship("QuestionT2", backref="assessment", lazy=True)
-    takes_assessment = db.relationship(
-        "TakesAssessment", backref="assessment", lazy=True
-    )
+    responses_t2 = db.relationship("ResponseT2", foreign_keys=[ResponseT2.assessment_id],
+                                        backref=db.backref('assessment', lazy='joined'),
+                                        lazy='dynamic', 
+                                        cascade='all, delete-orphan'
+                                        )
+    # takes_assessment = db.relationship(
+    #     "TakesAssessment", backref="assessment", lazy=True
+    # )
 
 
 class QuestionT1(db.Model):
@@ -56,6 +67,12 @@ class QuestionT2(db.Model):
     num_of_marks = db.Column(db.Integer, nullable=False)
     question_text = db.Column(db.Text, nullable=False)
     correct_answer = db.Column(db.Text, nullable=False)
+    responses = db.relationship('ResponseT2', 
+                                    foreign_keys=[ResponseT2.question_id],
+                                    backref=db.backref('question', lazy='joined'),
+                                    lazy='dynamic', 
+                                    cascade='all, delete-orphan'
+                                    )
 
 
 class Option(db.Model):
@@ -78,45 +95,45 @@ class Module(db.Model):
     assessment = db.relationship("Assessment", backref="module", lazy=True)
 
 
-class TakesAssessment(db.Model):
-    __tablename__ = "TakesAssessment"
-    takes_assessment_id = db.Column(db.Integer, primary_key=True)
-    # --- Foreign Keys ---
-    student_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    assessment_id = db.Column(
-        db.Integer, db.ForeignKey("Assessment.assessment_id"), nullable=False
-    )
-    # --- Relationships ---
-    response_t1 = db.relationship("ResponseT1", backref="takes_assessment", lazy=True)
-    response_t2 = db.relationship("ResponseT2", backref="takes_assessment", lazy=True)
+# class TakesAssessment(db.Model):
+#     __tablename__ = "TakesAssessment"
+#     takes_assessment_id = db.Column(db.Integer, primary_key=True)
+#     # --- Foreign Keys ---
+#     student_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+#     assessment_id = db.Column(
+#         db.Integer, db.ForeignKey("Assessment.assessment_id"), nullable=False
+#     )
+#     # --- Relationships ---
+#     response_t1 = db.relationship("ResponseT1", backref="takes_assessment", lazy=True)
+#     response_t2 = db.relationship("ResponseT2", backref="takes_assessment", lazy=True)
 
-    def __repr__(self): 
-        return f"Assessment Completion {self.takes_assessment_id}: <Student: {self.student_id}> <Assessment: {self.assessment_id}>"
-
-
-class ResponseT1(db.Model):
-    __tablename__ = "ResponseT1"
-    response_t1_id = db.Column(db.Integer, primary_key=True)
-    # --- Foreign Keys ---
-    takes_assessment_id = db.Column(
-        db.Integer, db.ForeignKey("TakesAssessment.takes_assessment_id"), nullable=False
-    )
-    # --- Other Columns ---
-    response_content = db.Column(db.Integer, nullable=False)
-    correct = db.Column(db.Boolean, nullable=False)
+#     def __repr__(self): 
+#         return f"Assessment Completion {self.takes_assessment_id}: <Student: {self.student_id}> <Assessment: {self.assessment_id}>"
 
 
-class ResponseT2(db.Model):
-    __tablename__ = "ResponseT2"
-    response_t2_id = db.Column(db.Integer, primary_key=True)
-    # --- Foreign Keys ---
-    takes_assessment_id = db.Column(
-        db.Integer, db.ForeignKey("TakesAssessment.takes_assessment_id"), nullable=False
-    )
-    t2_question_id = db.Column(db.Integer, db.ForeignKey("QuestionT2.q_t2_id"), nullable=False)
-    # --- Other Columns ---
-    response_content = db.Column(db.Text, nullable=False)
-    correct = db.Column(db.Boolean, nullable=False)
+# class ResponseT1(db.Model):
+#     __tablename__ = "ResponseT1"
+#     response_t1_id = db.Column(db.Integer, primary_key=True)
+#     # --- Foreign Keys ---
+#     takes_assessment_id = db.Column(
+#         db.Integer, db.ForeignKey("TakesAssessment.takes_assessment_id"), nullable=False
+#     )
+#     # --- Other Columns ---
+#     response_content = db.Column(db.Integer, nullable=False)
+#     correct = db.Column(db.Boolean, nullable=False)
+
+
+# class ResponseT2(db.Model):
+#     __tablename__ = "ResponseT2"
+#     response_t2_id = db.Column(db.Integer, primary_key=True)
+#     # --- Foreign Keys ---
+#     takes_assessment_id = db.Column(
+#         db.Integer, db.ForeignKey("TakesAssessment.takes_assessment_id"), nullable=False
+#     )
+#     t2_question_id = db.Column(db.Integer, db.ForeignKey("QuestionT2.q_t2_id"), nullable=False)
+#     # --- Other Columns ---
+#     response_content = db.Column(db.Text, nullable=False)
+#     correct = db.Column(db.Boolean, nullable=False)
 
 
 
@@ -129,7 +146,15 @@ class User(UserMixin, db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
     # --- Relationships ---
     assessment = db.relationship("Assessment", backref="user", lazy=True)
-    takes_assessment = db.relationship("TakesAssessment", backref="user", lazy=True)
+    # takes_assessment = db.relationship("TakesAssessment", backref="user", lazy=True)
+    t2_responses = db.relationship('ResponseT2', 
+                                        foreign_keys=[ResponseT2.user_id], 
+                                        backref=db.backref('responding_student', lazy='joined'),
+                                        lazy='dynamic', 
+                                        # delete orphan - so if a user is deleted, 
+                                        # it deletes their orphaned relationships too
+                                        cascade='all, delete-orphan', 
+                                        )
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -155,6 +180,11 @@ class User(UserMixin, db.Model):
 
     def is_administrator(self):
         return self.can(Permission.ADMIN)
+
+    # def has_answered(question, assessment):
+    #     if question.q_t2_id is None: 
+    #         return False 
+    #     return self.t2_responses.filter_by(question_id)
 
     def __repr__(self):
         return f"User: {self.name}"

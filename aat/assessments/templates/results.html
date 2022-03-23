@@ -1,9 +1,17 @@
 {% extends("layout.html") %}
 {% block content %}
 <h1>Results of assessment</h1>
-
+{#
 <p>Score: {{ result }}/{{ no_of_questions }}</p>
 
 <button type="button"><a href="{{ url_for('assessments.exit_assessment') }}">Return to Assessments</a></button>
 {{ session['past_questions'] }}
+#}
+
+{% for response in results %}
+
+<h1>Result: {% if response.is_correct %}Correct!{% else %}Incorrect{% endif %}</h1>
+
+<p>You answered: {{ response.response_content }}</p>
+{% endfor %}
 {% endblock %}
