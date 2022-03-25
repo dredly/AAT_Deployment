@@ -10,6 +10,20 @@ with app.app_context():
     db.create_all()
     Role.insert_roles()
 
+    ###########
+    # MODULES #
+    ###########
+
+    db.session.add_all(
+        [
+            Module(
+                module_id=1,
+                title="Databases and Modelling",
+                total_credits=120,
+            )
+        ]
+    )
+
     ###############
     # ASSESSMENTS #
     ###############
@@ -128,20 +142,6 @@ with app.app_context():
         ]
     )
 
-    ###########
-    # MODULES #
-    ###########
-
-    db.session.add_all(
-        [
-            Module(
-                module_id=1,
-                title="Databases and Modelling",
-                total_credits=120,
-            )
-        ]
-    )
-
     #########
     # USERS #
     #########
@@ -150,21 +150,21 @@ with app.app_context():
             User(
                 id=1,
                 name="Jim",
-                hashed_password="j",
+                password="j",
                 is_admin=True,
                 role_id=1,
             ),
             User(
                 id=2,
                 name="Kate",
-                hashed_password="k",
+                password="k",
                 is_admin=True,
                 role_id=1,
             ),
             User(
                 id=3,
                 name="Al",
-                hashed_password="a",
+                password="a",
                 is_admin=True,
                 role_id=1,
             ),
