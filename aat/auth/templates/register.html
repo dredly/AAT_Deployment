@@ -2,13 +2,13 @@
 <h1>Register page</h1>
 
 <form method="POST" action="">
-	<ul>
-		<li>{{ form.name.label }} {{ form.name }}</li>
-		<li>{{ form.password.label }} {{ form.password }}</li>
-		<li>{{ form.password_check.label }} {{ form.password_check }}</li>
-		<li>{{ form.admin.label }} {{ form.admin }}</li>
-		<li>{{ form.csrf_token }}</li>
-		<li><input type="submit" value="Register" /></li>
-	</ul>
+    <ul>
+        {{ form.csrf_token }}
+        <li>{{ form.name.label }} {{ form.name }}</li>
+        <li>{{ form.password.label }} {{ form.password }}</li>
+        <li>{{ form.password_check.label }} {{ form.password_check }}</li>
+        <li>{{ form.admin.label }} {{ form.admin }}</li>
+        <li><input type="submit" value="Register"></li>
+    </ul>
 </form>
 {% endblock %}

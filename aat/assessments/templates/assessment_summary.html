@@ -1,0 +1,9 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1>{{assessment.title}}</h1>
+
+<button type="button"><a href="{{ url_for('assessments.answer_question', question_id=first_question) }}">Start Assessment</a></button>
+
+
+
+{% endblock %}

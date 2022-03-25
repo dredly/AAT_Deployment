@@ -6,12 +6,14 @@
 <a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
     <h2>{{ assessment.title }}</h2>
 </a>
+
+<button type="button"><a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Take Assessment</a></button> -->
+
 {% endfor %}
 
 <!-- Just used for viewing how data is displayed -->
 {% for module in modules %}
 <h2> {{ module.title }} {{module.total_credits}} </h2>
-
 
 {% endfor %}
 {% endblock %}

@@ -1,0 +1,21 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1>{{assessment.title}}</h1> 
+
+<p>{{ question.question_text }}</p>
+<p>Marks available: {{ question.num_of_marks }}</p>
+
+
+<form method="POST" action="">
+    {{ form.csrf_token }}
+    {{ form.answer }}
+    <button type="submit" value="Submit Answer">Submit Answer</button>
+</form>
+
+<p>Question {{ session['past_questions']|length }} of {{ session['no_questions'] }}</p>
+
+{% if session['past_questions']|length > 1 %}
+<button type="button"><a href="{{ url_for('assessments.previous_question') }}">Previous Question</a></button>
+{% endif %}
+
+{% endblock %}
