@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('legendary_gamification.static', filename='styles.css') }}">
+{% endblock styles %}
+
+{% block content %}
+    <div class="timer-container">
+        <h1 class="timer">10</h1>
+    </div>
+    <div class="time-bar-container">
+        <div class="red-bar"></div>
+        <div class="white-bar"></div>
+    </div>
+
+    <div class="question-megacontainer">
+        <div class="question-container">
+            <form action="" method="POST">
+                <h4>{{ question }}</h4>
+                <div class="question-options">
+                    <input type="radio" name="options" id="option1" value="0"> {{ options[0] }} </input><br>
+                    <input type="radio" name="options" id="option2" value="1"> {{ options[1] }} </input><br>
+                    <input type="radio" name="options" id="option3" value="2"> {{ options[2] }} </input><br>
+                    <input type="radio" name="options" id="option4" value="3"> {{ options[3] }} </input><br>
+                    <input type="submit" name="button" value="send" class='send-button'>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block scripts %}
+    <script src="{{ url_for('legendary_gamification.static', filename='easytimer.min.js') }}"></script>
+    <script src="{{ url_for('legendary_gamification.static', filename='scripts.js') }}"></script>
+{% endblock %}

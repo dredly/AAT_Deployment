@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('legendary_gamification.static', filename='styles.css') }}">
+{% endblock styles %}
+
+{% block content %}
+    <h1>Congratulations your good for nothing brain actually comprehended 1st grade python</h1>
+    <div class="reset-container">
+        <form action="" method="POST" class="end-assess-form">
+            <input type="submit" name="button" value="reset" class="reset-button">
+            <input type="submit" name="button" value="return" class="return-button">
+        </form>
+    </div>
+{% endblock content %}

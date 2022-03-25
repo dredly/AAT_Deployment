@@ -1,0 +1,188 @@
+body {
+    background-color: #2b2b2b;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: rgb(255, 255, 255);
+    margin-left: 20px;
+    text-align: center;
+}
+
+ul {
+    list-style: none;
+}
+
+nav a {
+    float: left;
+    color: #000000;
+    text-align: center;
+    padding: 14px 16px;
+    padding-top: 0px;
+    text-decoration: none;
+    font-size: 17px;
+    padding-left: 0;
+}
+
+nav {
+    background-color: rgb(240, 240, 240);
+    overflow: hidden;
+}
+
+.divider {
+    height: 18px;
+    border-top-style:ridge;
+    border-top-color: #003108;
+    border-top-width: 3px;
+}
+
+#leaderboard {
+    background-color: rgb(41, 41, 41);
+    color: #ffffff;
+    height: 470px;
+    width: auto;
+    margin-left: 20px;
+    margin-right: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.leader-title {
+    display: flex;
+    vertical-align: middle;
+
+}
+
+.leader-title h3 {
+    padding: 2px 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: auto;
+    text-align: center;
+    color: #000000;
+    vertical-align: middle;
+}
+
+.leaderboard-section {
+    margin: 20px;
+    background-color: rgb(9, 255, 0);
+    flex: 1;
+}
+
+.user-rank {
+    text-align: center;
+    border-bottom: 3px solid rgb(255, 255, 255);
+    font-size: 30px;
+}
+
+.content-container {
+    display: flex;
+    background-color: #d9ff00;
+    margin-left: 50px;
+    margin-right: 50px;
+    padding: 10px;
+    height: auto;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.content {
+    background-color: rgb(0, 0, 0);
+    width: 95%;
+    height: 88%;
+    display: flex;
+    flex-direction: row;
+    /* margin: 0 auto; */;
+}
+
+.collectables-section {
+    margin: 20px;
+    background-color: rgb(162, 0, 255);
+    flex: 1;
+    color: white;
+}
+
+.collect-title {
+    display: flex;
+    vertical-align: middle;
+}
+
+.collect-title h3 {
+    padding: 10px 0;
+    margin-right: auto;
+    margin-left: auto;
+    width: auto;
+    text-align: center;
+    color: #ffffff;
+    vertical-align: middle;
+}
+
+.rank-up-button-container {
+    display: flex;
+    text-align: center;
+    height: 470px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.time-bar-container {
+    padding: 0;
+    height: 20px;
+    background-color: #000000;
+    width: 700px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: solid;
+    border-width: 3px;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.red-bar {
+    background-color: green;
+    flex: 0;
+    height: 100%;
+}
+
+.white-bar {
+    flex: 2;
+}
+
+.question-megacontainer {
+    color: aliceblue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.send-button {
+    margin-top: 5px;
+}
+
+.reset-container {
+    text-align: center;
+}
+
+.end-assess-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.end-assess-form input{
+    width: 100px;
+}
+
+.achievements-junkyard {
+    background-color: aqua;
+    text-align: center;
+    margin-top: 10px;
+}
