@@ -135,10 +135,8 @@ class User(UserMixin, db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
     # --- Relationships ---
     assessment = db.relationship("Assessment", backref="user", lazy=True)
-    takes_assessment = db.relationship("TakesAssessment", backref="user", lazy=True)
     badge = db.relationship("Badge", backref="user", lazy=True)
     achievement = db.relationship("Achievement", backref="user", lazy=True)
-    # takes_assessment = db.relationship("TakesAssessment", backref="user", lazy=True)
     t2_responses = db.relationship('ResponseT2', 
                                         foreign_keys=[ResponseT2.user_id], 
                                         backref=db.backref('responding_student', lazy='joined'),
