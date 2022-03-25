@@ -20,7 +20,6 @@ with app.app_context():
                 title="Databases and Modelling",
                 total_credits=120,
             ),
-            # 2
             Module(  # 2
                 title="Advanced BennieScript",
                 total_credits=30,
@@ -182,6 +181,12 @@ with app.app_context():
             ),
             User(  # 3
                 name="Al",
+                password="a",
+                is_admin=True,
+                role_id=1,
+            ),
+            User(  # 4
+                name="a",
                 password="a",
                 is_admin=True,
                 role_id=1,

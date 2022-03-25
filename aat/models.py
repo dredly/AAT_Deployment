@@ -21,6 +21,9 @@ class Badge(db.Model):
     # --- Other Columns ---
     name = db.Column(db.String(20))
 
+    def __repr__(self):
+        return self.name
+
 
 class Achievement(db.Model):
     __tablename__ = "achievements"
@@ -29,6 +32,9 @@ class Achievement(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     # --- Other Columns ---
     name = db.Column(db.String(20))
+
+    def __repr__(self):
+        return self.name
 
 
 class ResponseT2(db.Model):
@@ -42,6 +48,9 @@ class ResponseT2(db.Model):
     )
     response_content = db.Column(db.Text, nullable=False)
     is_correct = db.Column(db.Boolean, nullable=False)
+
+    def __repr__(self):
+        return self.response_content
 
 
 class Assessment(db.Model):
@@ -69,6 +78,8 @@ class Assessment(db.Model):
     # takes_assessment = db.relationship(
     #     "TakesAssessment", backref="assessment", lazy=True
     # )
+    def __repr__(self):
+        return self.title
 
 
 class QuestionT1(db.Model):
@@ -86,6 +97,9 @@ class QuestionT1(db.Model):
     feedback_if_wrong = db.Column(db.Text, nullable=False)
     # --- Relationships ---
     option = db.relationship("Option", backref="questiont1", lazy=True)
+
+    def __repr__(self):
+        return self.question_text
 
 
 class QuestionT2(db.Model):
@@ -110,6 +124,9 @@ class QuestionT2(db.Model):
         cascade="all, delete-orphan",
     )
 
+    def __repr__(self):
+        return self.question_text
+
 
 class Option(db.Model):
     __tablename__ = "Option"
@@ -120,6 +137,9 @@ class Option(db.Model):
     option_text = db.Column(db.Text, nullable=False)
     is_correct = db.Column(db.Boolean, nullable=False, default=False)
 
+    def __repr__(self):
+        return self.option_text
+
 
 class Module(db.Model):
     __tablename__ = "Module"
@@ -129,6 +149,9 @@ class Module(db.Model):
     total_credits = db.Column(db.Integer, nullable=False)
     # --- Relationships ---
     assessment = db.relationship("Assessment", backref="module", lazy=True)
+
+    def __repr__(self):
+        return self.title
 
 
 class User(UserMixin, db.Model):
