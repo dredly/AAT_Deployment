@@ -16,11 +16,14 @@ from .models import (
     User,
     Role,
     Permission,
+    Achievement,
+    Badge,
 )
 from .assessments import assessments
 from .auth import auth
 from .stats import stats
 from .student_stats import student_stats
+from .legendary_gamification import legendary_gamification
 
 # Admin
 from flask_admin import Admin

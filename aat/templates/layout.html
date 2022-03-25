@@ -6,7 +6,9 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{% block title %}{% if title %}{{title}}{% else %}AAT{% endif %}{% endblock title %}
 		</title>
-		<link rel="stylesheet" href="{{url_for('static',filename='style.css')}}" />
+		{% block styles %}
+			<link rel="stylesheet" href="{{url_for('static',filename='style.css')}}" />
+		{% endblock styles %}
 		{% block extra_head %}{% endblock %}
 	</head>
 
@@ -14,9 +16,6 @@
 		{% include 'navbar.html' %}
 		{% block content %} {% endblock %} 
 		{% include 'footer.html' %}
-
-        {% block content %}
-        {% endblock %}
     
         {% block scripts %}
         {% endblock %}

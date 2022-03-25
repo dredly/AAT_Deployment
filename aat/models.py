@@ -1,4 +1,5 @@
 from email.policy import default
+from tkinter.tix import Tree
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
@@ -10,6 +11,28 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 
 # Format for model: primary key, then all foreign keys, then all other columns, then all relationships
+
+
+class Badge(db.Model):
+    __tablename__ = "badges"
+    badge_id = db.Column(db.Integer, primary_key=True)
+    # --- Foreign Keys ---
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False
+    )
+    # --- Other Columns ---
+    name = db.Column(db.String(20))
+
+
+class Achievement(db.Model):
+    __tablename__ = "achievements"
+    achievement_id = db.Column(db.Integer, primary_key=True)
+    # --- Foreign Keys ---
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False
+    )
+    # --- Other Columns ---
+    name = db.Column(db.String(20))
 
 
 class Assessment(db.Model):
@@ -124,6 +147,8 @@ class User(UserMixin, db.Model):
     # --- Relationships ---
     assessment = db.relationship("Assessment", backref="user", lazy=True)
     takes_assessment = db.relationship("TakesAssessment", backref="user", lazy=True)
+    badge = db.relationship("Badge", backref="user", lazy=True)
+    achievement = db.relationship("Achievement", backref="user", lazy=True)
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
