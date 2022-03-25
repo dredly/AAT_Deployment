@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask, session
+
 # from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 
@@ -67,7 +68,7 @@ admin.add_views(
 )
 # Now accessible through /admin/
 
-# Context Processor to make Permission variables available to templates 
-@app.context_processor 
-def inject_permissions(): 
+# Context Processor to make Permission variables available to templates
+@app.context_processor
+def inject_permissions():
     return dict(Permission=Permission)

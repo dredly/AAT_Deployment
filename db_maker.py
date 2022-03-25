@@ -16,11 +16,15 @@ with app.app_context():
 
     db.session.add_all(
         [
-            Module(
-                module_id=1,
+            Module(  # 1
                 title="Databases and Modelling",
                 total_credits=120,
-            )
+            ),
+            # 2
+            Module(  # 2
+                title="Advanced BennieScript",
+                total_credits=30,
+            ),
         ]
     )
 
@@ -29,7 +33,7 @@ with app.app_context():
     ###############
     db.session.add_all(
         [
-            Assessment(
+            Assessment(  # 1
                 module_id=1,
                 lecturer_id=1,
                 title="Git Basics",
@@ -38,7 +42,7 @@ with app.app_context():
                 num_of_credits=12,
                 is_summative=True,
             ),
-            Assessment(
+            Assessment(  # 2
                 module_id=1,
                 lecturer_id=2,
                 title="Advanced Git",
@@ -47,7 +51,7 @@ with app.app_context():
                 num_of_credits=10,
                 is_summative=True,
             ),
-            Assessment(
+            Assessment(  # 3
                 module_id=1,
                 lecturer_id=3,
                 title="DOM Manipulation in JS",
@@ -55,6 +59,14 @@ with app.app_context():
                 time_limit=60 * 60 * 20,
                 num_of_credits=0,
                 is_summative=False,
+            ),
+            Assessment(  # 4
+                module_id=2,
+                lecturer_id=1,
+                title="Woof",
+                due_date=None,
+                num_of_credits=10,
+                is_summative=True,
             ),
         ]
     )
@@ -64,7 +76,7 @@ with app.app_context():
     #####################
     db.session.add_all(
         [
-            QuestionT1(
+            QuestionT1(  # 1
                 assessment_id=1,
                 num_of_marks=2,
                 question_text="Which command do use use to view a particular commit?",
@@ -72,7 +84,7 @@ with app.app_context():
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
             ),
-            QuestionT1(
+            QuestionT1(  # 2
                 assessment_id=2,
                 num_of_marks=5,
                 question_text="What does git rebase do?",
@@ -80,7 +92,7 @@ with app.app_context():
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
             ),
-            QuestionT1(
+            QuestionT1(  # 3
                 assessment_id=2,
                 num_of_marks=5,
                 question_text="What does git stash do?",
@@ -96,14 +108,14 @@ with app.app_context():
     ###########
     db.session.add_all(
         [
-            Option(q_t1_id=1, option_text="checkout", is_correct=True),
-            Option(q_t1_id=1, option_text="reset"),
-            Option(q_t1_id=1, option_text="commit"),
-            Option(q_t1_id=2, option_text="wrong answer"),
-            Option(q_t1_id=2, option_text="right answer", is_correct=True),
-            Option(q_t1_id=3, option_text="wrong answer"),
-            Option(q_t1_id=3, option_text="right answer", is_correct=True),
-            Option(q_t1_id=3, option_text="another wrong answer"),
+            Option(q_t1_id=1, option_text="checkout", is_correct=True),  # 1
+            Option(q_t1_id=1, option_text="reset"),  # 2
+            Option(q_t1_id=1, option_text="commit"),  # 3
+            Option(q_t1_id=2, option_text="wrong answer"),  # 4
+            Option(q_t1_id=2, option_text="right answer", is_correct=True),  # 5
+            Option(q_t1_id=3, option_text="wrong answer"),  # 6
+            Option(q_t1_id=3, option_text="right answer", is_correct=True),  # 7
+            Option(q_t1_id=3, option_text="another wrong answer"),  # 8
         ]
     )
 
@@ -112,7 +124,7 @@ with app.app_context():
     #####################
     db.session.add_all(
         [
-            QuestionT2(
+            QuestionT2(  # 1
                 assessment_id=1,
                 num_of_marks=5,
                 question_text="What flag do you use to add a commit message?",
@@ -121,7 +133,7 @@ with app.app_context():
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
             ),
-            QuestionT2(
+            QuestionT2(  # 2
                 assessment_id=1,
                 num_of_marks=10,
                 question_text="which command is used to upload your commits to a remote repository?",
@@ -130,7 +142,7 @@ with app.app_context():
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
             ),
-            QuestionT2(
+            QuestionT2(  # 3
                 assessment_id=3,
                 num_of_marks=10,
                 question_text="Which symbol is used to select by class using document.querySelector()?",
@@ -138,6 +150,15 @@ with app.app_context():
                 difficulty=2,
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
+            ),
+            QuestionT2(  # 4
+                assessment_id=4,
+                num_of_marks=5,
+                question_text="Bark?",
+                correct_answer="Bark!",
+                difficulty=3,
+                feedback_if_correct="WOOF!",
+                feedback_if_wrong="GRRRRRRRRRR",
             ),
         ]
     )
@@ -147,22 +168,19 @@ with app.app_context():
     #########
     db.session.add_all(
         [
-            User(
-                id=1,
+            User(  # 1
                 name="Jim",
                 password="j",
                 is_admin=True,
                 role_id=1,
             ),
-            User(
-                id=2,
+            User(  # 2
                 name="Kate",
                 password="k",
                 is_admin=True,
                 role_id=1,
             ),
-            User(
-                id=3,
+            User(  # 3
                 name="Al",
                 password="a",
                 is_admin=True,
@@ -177,21 +195,21 @@ with app.app_context():
 
     db.session.add_all(
         [
-            ResponseT2(
+            ResponseT2(  # 1
                 user_id=1,
                 assessment_id=1,
                 t2_question_id=1,
                 response_content="-m",
-                is_correct=True,
+                is_correct=True,  # Don't think we need this?
             ),
-            ResponseT2(
+            ResponseT2(  # 2
                 user_id=1,
                 assessment_id=1,
                 t2_question_id=2,
                 response_content="push",
                 is_correct=True,
             ),
-            ResponseT2(
+            ResponseT2(  # 3
                 user_id=2,
                 assessment_id=1,
                 t2_question_id=1,
