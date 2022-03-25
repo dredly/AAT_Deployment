@@ -13,7 +13,6 @@ with app.app_context():
     ###########
     # MODULES #
     ###########
-
     db.session.add_all(
         [
             Module(  # 1
@@ -197,7 +196,6 @@ with app.app_context():
     #####################
     # RESPONSES: TYPE 2 #
     #####################
-
     db.session.add_all(
         [
             ResponseT2(  # 1
