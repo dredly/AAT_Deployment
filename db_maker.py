@@ -127,15 +127,20 @@ with app.app_context():
             Option(q_t1_id=1, option_text="commit"),  # 3
             Option(q_t1_id=2, option_text="wrong answer"),  # 4
             Option(q_t1_id=2, option_text="right answer", is_correct=True),  # 5
-            Option(q_t1_id=3, option_text="wrong answer"),  # 6
-            Option(q_t1_id=3, option_text="right answer", is_correct=True),  # 7
-            Option(q_t1_id=3, option_text="another wrong answer"),  # 8
-            Option(q_t1_id=4, option_text="12"),
-            Option(q_t1_id=4, option_text="10", is_correct=True),
-            Option(q_t1_id=4, option_text="100"),
-            Option(q_t1_id=5, option_text="Super Quick Lunch"),
-            Option(q_t1_id=5, option_text="Standard Query Language", is_correct=True),
-            Option(q_t1_id=5, option_text="Why did I choose the databases module?????"),
+            Option(q_t1_id=2, option_text="also the wrong answer"),  # 6
+            Option(q_t1_id=3, option_text="wrong answer"),  # 7
+            Option(q_t1_id=3, option_text="right answer", is_correct=True),  # 8
+            Option(q_t1_id=3, option_text="another wrong answer"),  # 9
+            Option(q_t1_id=4, option_text="12"),  # 10
+            Option(q_t1_id=4, option_text="10", is_correct=True),  # 10
+            Option(q_t1_id=4, option_text="100"),  # 10
+            Option(q_t1_id=5, option_text="Super Quick Lunch"),  # 10
+            Option(
+                q_t1_id=5, option_text="Standard Query Language", is_correct=True
+            ),  # 10
+            Option(
+                q_t1_id=5, option_text="Why did I choose the databases module?????"
+            ),  # 10
         ]
     )
 
