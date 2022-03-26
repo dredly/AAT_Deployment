@@ -1,7 +1,7 @@
 from flask import request, redirect, url_for, render_template
 from .forms import QuestionT2Form, QuestionT1Form
 from .forms import QuestionT2Form, FilterForm
-from ..models import QuestionT1, QuestionT2
+from ..models import QuestionT1, QuestionT2, Option
 from . import questions
 from .. import db
 
@@ -40,26 +40,29 @@ def new_question_t1():
     form = QuestionT1Form()
     if request.method == "POST":
         question_text = request.form["question_text"]
-        correct_answer = request.form["correct_answer"]
-        option_a = request.form["option_a"]
-        option_b = request.form["option_b"]
-        option_c = request.form["option_c"]
+        option_a_text = request.form["option_a"]
+        option_b_text = request.form["option_b"]
+        option_c_text = request.form["option_c"]
         num_of_marks = request.form["num_of_marks"]
         difficulty = request.form["difficulty"]
         feedback_if_correct = request.form["feedback_if_correct"]
         feedback_if_wrong = request.form["feedback_if_wrong"]
         new_question = QuestionT1(
             question_text=question_text,
-            correct_answer=correct_answer,
-            option_a=option_a,
-            option_b=option_b,
-            option_c=option_c,
             num_of_marks=num_of_marks,
             difficulty=difficulty,
             feedback_if_correct=feedback_if_correct,
             feedback_if_wrong=feedback_if_wrong,
         )
         db.session.add(new_question)
+        option_a = Option(
+            q_t1_id=new_question.q_t1_id, option_text=option_a_text, is_correct=True
+        )
+        option_b = Option(q_t1_id=new_question.q_t1_id, option_text=option_b_text)
+        option_c = Option(q_t1_id=new_question.q_t1_id, option_text=option_c_text)
+        db.session.add(option_a)
+        db.session.add(option_b)
+        db.session.add(option_c)
         db.session.commit()
         return redirect(url_for("questions.index"))
     return render_template("new_question_t1.html", form=form)

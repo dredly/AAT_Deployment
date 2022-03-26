@@ -13,9 +13,6 @@ class QuestionT1Form(FlaskForm):
     question_text = TextAreaField(
         "Enter question text", default="", validators=[DataRequired()]
     )
-    correct_answer = TextAreaField(
-        "Enter the correct answer", validators=[DataRequired()]
-    )
     option_a = TextAreaField("Please enter option a", validators=[DataRequired()])
     option_b = TextAreaField("Please enter option b", validators=[DataRequired()])
     option_c = TextAreaField("Please enter option c", validators=[DataRequired()])
