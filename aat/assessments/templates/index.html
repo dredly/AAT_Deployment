@@ -1,19 +1,33 @@
-{% extends("layout.html") %}
-
+{% extends("layout.html") %} 
 {% block content %}
-<h1>All assessments here</h1>
-{% for assessment in assessments %}
-<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
-    <h2>{{ assessment.title }}</h2>
-</a>
+	<h1>All assessments here</h1>
+	{% for assessment in assessments %}
+		<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
+			<h2>{{ assessment.title }}</h2>
+		</a>
+		<button type="button">
+			<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Take Assessment</a>
+		</button>
+	{% endfor %}
 
-<button type="button"><a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Take Assessment</a></button> -->
-
-{% endfor %}
-
-<!-- Just used for viewing how data is displayed -->
-{% for module in modules %}
-<h2> {{ module.title }} {{module.total_credits}} </h2>
-<button type="button"><a href="{{ url_for('assessments.new_assessment') }}">Create Assessment</a></button>
-{% endfor %}
+	<!-- Just used for viewing how data is displayed -->
+	{# Rich: I did some testing of the database relations here #}
+	<hr />
+	<h2>Modules</h2>
+	{% for module in modules %}
+		<h3>{{ module.title }} {{module.total_credits}}</h3>
+		{% for assessment in module.assessment %}
+			<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
+				<p>{{assessment.title}}</p>
+			</a>
+			<ul>
+				{% for question in assessment.question_t1 %}
+					<li>{{question}}</li>
+				{% endfor %} 
+				{% for question in assessment.question_t2 %}
+					<li>{{question}}</li>
+				{% endfor %} 
+			</ul>
+		{% endfor %} 
+	{% endfor %} 
 {% endblock %}
