@@ -86,6 +86,7 @@ def edit_assessment(id):
     form = EditAssessmentForm()
     if request.method == "POST":
         assessment.title = form.title.data
+        assessment.module_id = form.module_id.data
         assessment.due_date = form.due_date.data
         assessment.num_of_credits = form.num_of_credits.data
         assessment.time_limit = form.time_limit.data
@@ -93,6 +94,7 @@ def edit_assessment(id):
         db.session.commit()
         return redirect(url_for("assessments.index"))
     form.title.data = assessment.title
+    form.module_id.data = assessment.module_id
     form.due_date.data = assessment.due_date
     form.num_of_credits.data = assessment.num_of_credits
     form.time_limit.data = math.floor(int(assessment.time_limit) / 60)
