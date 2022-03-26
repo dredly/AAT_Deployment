@@ -32,7 +32,7 @@ class AssessmentForm(FlaskForm):
     )
     due_date = DateField(
         "Enter the due date", format='%Y-%m-%d')
-    num_of_credits = IntegerField("How many credits?", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
+    num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     is_summative = BooleanField()
     submit = SubmitField("Add Assessment")
@@ -47,8 +47,8 @@ class EditAssessmentForm(FlaskForm):
     )
     due_date = DateField(
         "Enter the due date", format='%Y-%m-%d')
-    num_of_credits = IntegerField("How many credits?", validators=[DataRequired()])
-    time_limit = IntegerField("Enter time limit in minutes")
+    num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
+    time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     is_summative = BooleanField()
     submit = SubmitField("Edit Assessment")
 
