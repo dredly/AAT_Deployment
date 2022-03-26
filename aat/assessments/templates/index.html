@@ -31,7 +31,6 @@
 	<h1>Modules</h1>
 	{% for module in modules %}
 		<h2>{{ module.title }} {{module.total_credits}}</h2>
-		<h3>Summative Assessments</h3>
 		{% for assessment in module.assessment %}
 			<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
 				<h4>{{assessment.title}}</p>
@@ -57,7 +56,7 @@
 			</ul> -->
 		{% endfor %} 
 	{% endfor %} 
-	<h3> Formative Assessments </h3>
+	<h2> Other Assessments </h2>
 			{% for assessment in assessments %}
 				{% if assessment.module is none %}
 					<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
