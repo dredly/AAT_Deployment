@@ -2,6 +2,11 @@
 
 {% block content %}
 <h1>Here are all the questions ever</h1>
+<h3>Filter questions</h3>
+<form action="">
+    {{ form.filter.label }}{{ form.filter }}
+    {{form.submit}}
+</form>
 <h3>Add a new question</h3>
 <a href="{{url_for('questions.new_question_t1')}}"><button>Type 1</button></a>
 <a href="{{url_for('questions.new_question_t2')}}"><button>Type 2</button></a>

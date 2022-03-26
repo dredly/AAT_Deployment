@@ -1,14 +1,35 @@
 from flask import request, redirect, url_for, render_template
 from .forms import QuestionT2Form, QuestionT1Form
+from .forms import QuestionT2Form, FilterForm
 from ..models import QuestionT1, QuestionT2
 from . import questions
 from .. import db
 
-# TODO: add filtering with query strings
+
 @questions.route("/")
 def index():
-    questions = QuestionT1.query.all() + QuestionT2.query.all()
-    return render_template("questions_index.html", questions=questions)
+    form = FilterForm()
+    filter = request.args.get("filter", "all")
+    if request.method == "POST":
+        filter = request.form["filter"]
+        return redirect(url_for("questions.index", filter=filter))
+    if filter == "type1":
+        questions = QuestionT1.query.all()
+    elif filter == "type2":
+        questions = QuestionT2.query.all()
+    elif filter == "floating":
+        questions = (
+            QuestionT1.query.filter(QuestionT1.assessment_id.is_(None)).all()
+            + QuestionT2.query.filter(QuestionT2.assessment_id.is_(None)).all()
+        )
+    elif filter == "assigned":
+        questions = (
+            QuestionT1.query.filter(QuestionT1.assessment_id.isnot(None)).all()
+            + QuestionT2.query.filter(QuestionT2.assessment_id.isnot(None)).all()
+        )
+    else:
+        questions = QuestionT1.query.all() + QuestionT2.query.all()
+    return render_template("questions_index.html", questions=questions, form=form)
 
 
 # --- Type 1 routes ---
