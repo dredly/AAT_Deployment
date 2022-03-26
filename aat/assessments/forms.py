@@ -35,7 +35,7 @@ class AssessmentForm(FlaskForm):
     num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     is_summative = BooleanField()
-    submit = SubmitField("Add Assessment")
+    submit = SubmitField("Create Assessment")
 
 class DeleteAssessmentForm(FlaskForm):
     submit = SubmitField("Confirm")
@@ -50,5 +50,5 @@ class EditAssessmentForm(FlaskForm):
     num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     is_summative = BooleanField()
-    submit = SubmitField("Edit Assessment")
+    submit = SubmitField("Done")
 
