@@ -66,7 +66,7 @@ def new_assessment():
         new_assessment = Assessment(
             title=title,
             due_date=due_date,
-            time_limit=time_limit,
+            time_limit=int(time_limit) * 60,
             num_of_credits=num_of_credits,
             is_summative=is_summative,
             lecturer_id=lecturer_id
