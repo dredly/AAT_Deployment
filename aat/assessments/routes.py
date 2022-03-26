@@ -1,7 +1,8 @@
+import math
 from flask import Response, redirect, render_template, request, url_for, abort, session
 from . import assessments
 from ..models import Assessment, QuestionT2, Module, User, ResponseT2
-from .forms import DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm
+from .forms import DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm
 from .. import db
 from flask_login import current_user
 
@@ -45,6 +46,7 @@ def delete_questions(id):
         return redirect(url_for("assessments.show_assessment", id=id))
     return render_template("delete_questions.html", assessment=assessment, form=form)
 
+# ---------------------------------  CRUD For Assessments ---------------------------------------
 
 @assessments.route("/assessment/new", methods=["GET", "POST"])
 def new_assessment():
@@ -76,6 +78,27 @@ def new_assessment():
         return redirect(url_for("assessments.index"))
     return render_template("new_assessment.html", form=form)
 
+@assessments.route("/<int:id>/edit_assessment", methods=["GET", "POST"])
+def edit_assessment(id):
+    assessment = Assessment.query.get_or_404(id)
+    form = EditAssessmentForm()
+    if request.method == "POST":
+        assessment.title = form.title.data
+        assessment.due_date = form.due_date.data
+        assessment.num_of_credits = form.num_of_credits.data
+        assessment.time_limit = form.time_limit.data
+        assessment.is_summative = form.is_summative.data
+        db.session.commit()
+        return redirect(url_for("assessments.index"))
+    form.title.data = assessment.title
+    form.due_date.data = assessment.due_date
+    form.num_of_credits.data = assessment.num_of_credits
+    form.time_limit.data = math.floor(int(assessment.time_limit) / 60)
+    form.is_summative.data = assessment.is_summative
+    return render_template("edit_assessments.html", form=form, assessment=assessment, id=id)
+    
+
+
 @assessments.route("/<int:id>/delete_assessment", methods=["GET", "POST"])
 def delete_assessment(id):
     assessment = Assessment.query.get_or_404(id)
@@ -90,6 +113,11 @@ def delete_assessment(id):
             request.form['cancel']
             return redirect(url_for("assessments.index"))
     return render_template("delete_assessment.html", assessment=assessment, form=form, id=id)
+
+
+# ---------------------------------  End Of CRUD For Assessments ---------------------------------------
+
+
 
 
 ## example of how to filter response table

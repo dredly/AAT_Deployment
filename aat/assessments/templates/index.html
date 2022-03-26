@@ -7,6 +7,9 @@
 		</a>
 		{% if current_user.can(Permission.WRITE_ASSESSMENT) %}
 		<button type="button">
+			<a href="{{ url_for('assessments.edit_assessment', id=assessment.assessment_id) }}">Edit Assessment</a>
+		</button>
+		<button type="button">
 			<a href="{{ url_for('assessments.delete_assessment', id=assessment.assessment_id) }}">Delete Assessment</a>
 		</button>
 		{% endif %}	

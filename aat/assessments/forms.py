@@ -42,3 +42,15 @@ class AssessmentForm(FlaskForm):
 class DeleteAssessmentForm(FlaskForm):
     submit = SubmitField("Confirm")
     cancel = SubmitField("Cancel")
+
+class EditAssessmentForm(FlaskForm):
+    title = TextAreaField(
+        "Enter Title", default="", validators=[DataRequired()]
+    )
+    due_date = DateField(
+        "Enter the due date", format='%Y-%m-%d')
+    num_of_credits = IntegerField("How many credits?", validators=[DataRequired()])
+    time_limit = IntegerField("Enter time limit in minutes")
+    is_summative = BooleanField()
+    submit = SubmitField("Edit Assessment")
+
