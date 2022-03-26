@@ -1,7 +1,7 @@
 from flask import Response, redirect, render_template, request, url_for, abort, session
 from . import assessments
 from ..models import Assessment, QuestionT2, Module, User, ResponseT2
-from .forms import QuestionT2Form, DeleteQuestionsForm, AnswerType2Form
+from .forms import DeleteQuestionsForm, AnswerType2Form
 from .. import db
 from flask_login import current_user
 
@@ -23,56 +23,8 @@ def show_assessment(id):
     )
 
 
-@assessments.route("/<int:id>/new_question_t2", methods=["GET", "POST"])
-def new_question(id):
-    assessment = Assessment.query.get_or_404(id)
-    form = QuestionT2Form()
-    if request.method == "POST":
-        question_text = request.form["question_text"]
-        correct_answer = request.form["correct_answer"]
-        num_of_marks = request.form["num_of_marks"]
-        difficulty = request.form["difficulty"]
-        feedback_if_correct = request.form["feedback_if_correct"]
-        feedback_if_wrong = request.form["feedback_if_wrong"]
-        new_question = QuestionT2(
-            question_text=question_text,
-            correct_answer=correct_answer,
-            num_of_marks=num_of_marks,
-            assessment_id=id,
-            difficulty=difficulty,
-            feedback_if_correct=feedback_if_correct,
-            feedback_if_wrong=feedback_if_wrong,
-        )
-        db.session.add(new_question)
-        db.session.commit()
-        return redirect(url_for("assessments.show_assessment", id=id))
-
-    return render_template("new_question_t2.html", assessment=assessment, form=form)
-
-
-@assessments.route("/<int:id>/edit_question_t2/<int:q_id>", methods=["GET", "POST"])
-def edit_question(id, q_id):
-    assessment = Assessment.query.get_or_404(id)
-    question = QuestionT2.query.get_or_404(q_id)
-    form = QuestionT2Form()
-    if request.method == "POST":
-        question.question_text = form.question_text.data
-        question.correct_answer = form.correct_answer.data
-        question.num_of_marks = form.num_of_marks.data
-        question.difficulty = form.difficulty.data
-        question.feedback_if_correct = form.feedback_if_correct.data
-        question.feedback_if_wrong = form.feedback_if_wrong.data
-        db.session.commit()
-        return redirect(url_for("assessments.show_assessment", id=id))
-    form.question_text.data = question.question_text
-    form.correct_answer.data = question.correct_answer
-    form.num_of_marks.data = question.num_of_marks
-    form.difficulty.data = question.difficulty
-    form.feedback_if_correct.data = question.feedback_if_correct
-    form.feedback_if_wrong.data = question.feedback_if_wrong
-    return render_template("edit_question_t2.html", assessment=assessment, form=form)
-
-
+# Matt ---> You  could probably adapt this for your assessment CRUD
+# as it will let you remove multiple questions from an assessment.
 @assessments.route("/<int:id>/delete_questions", methods=["GET", "POST"])
 def delete_questions(id):
     assessment = Assessment.query.get_or_404(id)

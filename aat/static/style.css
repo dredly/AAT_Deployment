@@ -47,3 +47,21 @@ footer {
 	text-align: center;
 	width: 100%;
 }
+
+/* FORMS */
+.inline-label{
+	margin-right: 1rem;
+}
+
+.form-container {
+	margin-left: 3rem;
+	margin-top: 1rem;
+	margin-bottom: 2rem;
+	width: fit-content;
+	padding: 1rem;
+	border: 2px solid rgb(17, 16, 19);
+}
+
+.form-container h1 {
+	margin: 0;
+}

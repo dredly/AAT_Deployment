@@ -3,11 +3,12 @@
 <h1>{{assessment.title}}</h1>
 {% for question in questions %}
 <h3>{{question.question_text}}</h3>
-<a href="{{url_for('assessments.edit_question', id=assessment.assessment_id, q_id=question.q_t2_id)}}">Edit question</a>
+{% if current_user.can(Permission.WRITE_ASSESSMENT) %}
+<button class="delete-button">Delete Question</button>
+{% endif %}
 <p>{{question.num_of_marks}} marks --- Difficulty = {{question.difficulty}}/3</p>
 <hr>
 {% endfor %}
-<a href="{{url_for('assessments.new_question', id=assessment.assessment_id)}}">Add a question</a>
 {% if questions %}
 <a href="{{url_for('assessments.delete_questions', id=assessment.assessment_id)}}">Delete Questions</a>
 {% endif %}
