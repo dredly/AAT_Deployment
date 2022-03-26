@@ -1,6 +1,27 @@
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, IntegerField, IntegerRangeField, SubmitField
+from wtforms import (
+    TextAreaField,
+    IntegerField,
+    IntegerRangeField,
+    SubmitField,
+    SelectField,
+)
 from wtforms.validators import DataRequired
+
+
+class FilterForm(FlaskForm):
+    filter = SelectField(
+        "Filter questions by:",
+        choices=[
+            ("all", "Show all"),
+            ("type1", "Type 1 (multiple choice)"),
+            ("type2", "Type 2 (written answer)"),
+            ("floating", "Unassigned"),
+            ("assigned", "Assigned"),
+        ],
+        validators=[DataRequired()],
+    )
+    submit = SubmitField("Update")
 
 
 class QuestionT2Form(FlaskForm):
