@@ -1,6 +1,7 @@
 from flask import request, redirect, url_for, render_template
+from .forms import QuestionT2Form, QuestionT1Form
 from .forms import QuestionT2Form, FilterForm
-from ..models import QuestionT1, QuestionT2
+from ..models import QuestionT1, QuestionT2, Option
 from . import questions
 from .. import db
 
@@ -36,12 +37,66 @@ def index():
 
 @questions.route("/type1/new", methods=["GET", "POST"])
 def new_question_t1():
-    return "Add a type 1 question here"
+    form = QuestionT1Form()
+    if request.method == "POST":
+        question_text = request.form["question_text"]
+        option_a_text = request.form["option_a"]
+        option_b_text = request.form["option_b"]
+        option_c_text = request.form["option_c"]
+        num_of_marks = request.form["num_of_marks"]
+        difficulty = request.form["difficulty"]
+        feedback_if_correct = request.form["feedback_if_correct"]
+        feedback_if_wrong = request.form["feedback_if_wrong"]
+        new_question = QuestionT1(
+            question_text=question_text,
+            num_of_marks=num_of_marks,
+            difficulty=difficulty,
+            feedback_if_correct=feedback_if_correct,
+            feedback_if_wrong=feedback_if_wrong,
+        )
+        db.session.add(new_question)
+        found_question = QuestionT1.query.filter(
+            QuestionT1.question_text == new_question.question_text
+        ).first()
+        option_a = Option(
+            q_t1_id=found_question.q_t1_id, option_text=option_a_text, is_correct=True
+        )
+        option_b = Option(q_t1_id=found_question.q_t1_id, option_text=option_b_text)
+        option_c = Option(q_t1_id=found_question.q_t1_id, option_text=option_c_text)
+        db.session.add(option_a)
+        db.session.add(option_b)
+        db.session.add(option_c)
+        db.session.commit()
+        return redirect(url_for("questions.index"))
+    return render_template("new_question_t1.html", form=form)
 
 
 @questions.route("/type1/<int:id>/edit", methods=["GET", "POST"])
 def edit_question_t1(id):
-    return "Edit a type 1 question here"
+    question = QuestionT1.query.get_or_404(id)
+    options = Option.query.filter_by(q_t1_id=id).all()
+    form = QuestionT1Form()
+    if request.method == "POST":
+        question.question_text = form.question_text.data
+        options[0].option_text = form.option_a.data
+        options[1].option_text = form.option_b.data
+        options[2].option_text = form.option_c.data
+        question.num_of_marks = form.num_of_marks.data
+        question.difficulty = form.difficulty.data
+        question.feedback_if_correct = form.feedback_if_correct.data
+        question.feedback_if_wrong = form.feedback_if_wrong.data
+        db.session.commit()
+        return redirect(url_for("questions.index", id=id))
+    form.question_text.data = question.question_text
+    form.num_of_marks.data = question.num_of_marks
+    form.difficulty.data = question.difficulty
+    form.feedback_if_correct.data = question.feedback_if_correct
+    form.feedback_if_wrong.data = question.feedback_if_wrong
+
+    form.option_a.data = options[0]
+    form.option_b.data = options[1]
+    form.option_c.data = options[2]
+    return render_template("edit_question_t1.html", form=form)
 
 
 # --- Type 2 routes ---
@@ -83,7 +138,7 @@ def edit_question_t2(id):
         question.feedback_if_correct = form.feedback_if_correct.data
         question.feedback_if_wrong = form.feedback_if_wrong.data
         db.session.commit()
-        return redirect(url_for("assessments.show_assessment", id=id))
+        return redirect(url_for("questions.index", id=id))
     form.question_text.data = question.question_text
     form.correct_answer.data = question.correct_answer
     form.num_of_marks.data = question.num_of_marks
