@@ -24,24 +24,56 @@
 	</button>
 	{% endif %}	
 
-	<!-- Just used for viewing how data is displayed -->
-	<!-- {# Rich: I did some testing of the database relations here #}
+	<!-- {# Rich: I did some testing of the database relations here #} -->
 	<hr />
-	<h2>Modules</h2>
+
+	<!-- [Matt]: Alternative view of the Assessments page with summative and formative assessments  -->
+	<h1>Modules</h1>
 	{% for module in modules %}
-		<h3>{{ module.title }} {{module.total_credits}}</h3>
+		<h2>{{ module.title }} {{module.total_credits}}</h2>
+		<h3>Summative Assessments</h3>
 		{% for assessment in module.assessment %}
 			<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
-				<p>{{assessment.title}}</p>
+				<h4>{{assessment.title}}</p>
 			</a>
-			<ul>
+			{% if current_user.can(Permission.WRITE_ASSESSMENT) %}
+				<button type="button">
+					<a href="{{ url_for('assessments.edit_assessment', id=assessment.assessment_id) }}">Edit Assessment</a>
+				</button>
+				<button type="button">
+					<a href="{{ url_for('assessments.delete_assessment', id=assessment.assessment_id) }}">Delete Assessment</a>
+				</button>
+			{% endif %}	
+				<button type="button">
+					<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Take Assessment</a>
+				</button>
+			<!-- <ul>
 				{% for question in assessment.question_t1 %}
 					<li>{{question}}</li>
 				{% endfor %} 
 				{% for question in assessment.question_t2 %}
 					<li>{{question}}</li>
 				{% endfor %} 
-			</ul>
+			</ul> -->
 		{% endfor %} 
-	{% endfor %}  -->
+	{% endfor %} 
+	<h3> Formative Assessments </h3>
+			{% for assessment in assessments %}
+				{% if assessment.module is none %}
+					<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
+						<h4>{{ assessment.title }}</h2>
+					</a>
+					{% if current_user.can(Permission.WRITE_ASSESSMENT) %}
+						<button type="button">
+							<a href="{{ url_for('assessments.edit_assessment', id=assessment.assessment_id) }}">Edit Assessment</a>
+						</button>
+						<button type="button">
+							<a href="{{ url_for('assessments.delete_assessment', id=assessment.assessment_id) }}">Delete Assessment</a>
+						</button>
+					{% endif %}	
+						<button type="button">
+							<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Take Assessment</a>
+						</button>
+				{% endif %}
+			{% endfor %}
 {% endblock %}
