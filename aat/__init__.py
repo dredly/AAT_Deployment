@@ -22,6 +22,7 @@ from .models import (
     Badge,
 )
 from .assessments import assessments
+from .questions import questions
 from .auth import auth
 from .staff_stats import staff_stats
 from .student_stats import student_stats
@@ -43,6 +44,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "a secret key"
 
 app.register_blueprint(assessments, url_prefix="/assessments")
+app.register_blueprint(questions, url_prefix="/questions")
 app.register_blueprint(legendary_gamification, url_prefix="/legendary_gamification")
 app.register_blueprint(staff_stats, url_prefix="/staff-stats")
 app.register_blueprint(student_stats, url_prefix="/student-stats")
