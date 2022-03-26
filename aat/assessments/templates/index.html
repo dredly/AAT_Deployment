@@ -5,12 +5,11 @@
 		<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
 			<h2>{{ assessment.title }}</h2>
 		</a>
+		{% if current_user.can(Permission.WRITE_ASSESSMENT) %}
 		<button type="button">
-			<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Edit Assessment</a>
+			<a href="{{ url_for('assessments.delete_assessment', id=assessment.assessment_id) }}">Delete Assessment</a>
 		</button>
-		<button type="button">
-			<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Delete Assessment</a>
-		</button>
+		{% endif %}	
 		<button type="button">
 			<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Take Assessment</a>
 		</button>

@@ -38,3 +38,7 @@ class AssessmentForm(FlaskForm):
     time_limit = IntegerField("Enter time limit in minutes")
     is_summative = BooleanField()
     submit = SubmitField("Add Assessment")
+
+class DeleteAssessmentForm(FlaskForm):
+    submit = SubmitField("Confirm")
+    cancel = SubmitField("Cancel")

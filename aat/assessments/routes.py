@@ -1,7 +1,7 @@
 from flask import Response, redirect, render_template, request, url_for, abort, session
 from . import assessments
 from ..models import Assessment, QuestionT2, Module, User, ResponseT2
-from .forms import DeleteQuestionsForm, AnswerType2Form, AssessmentForm
+from .forms import DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm
 from .. import db
 from flask_login import current_user
 
@@ -75,6 +75,21 @@ def new_assessment():
         db.session.commit()
         return redirect(url_for("assessments.index"))
     return render_template("new_assessment.html", form=form)
+
+@assessments.route("/<int:id>/delete_assessment", methods=["GET", "POST"])
+def delete_assessment(id):
+    assessment = Assessment.query.get_or_404(id)
+    form = DeleteAssessmentForm()
+    if request.method == "POST":
+        try: 
+            request.form['submit']
+            db.session.delete(assessment)
+            db.session.commit()
+            return redirect(url_for("assessments.index"))
+        except:
+            request.form['cancel']
+            return redirect(url_for("assessments.index"))
+    return render_template("delete_assessment.html", assessment=assessment, form=form, id=id)
 
 
 ## example of how to filter response table
