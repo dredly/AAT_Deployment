@@ -59,6 +59,7 @@ def new_assessment():
         due_date = request.form["due_date"]
         time_limit = request.form["time_limit"]
         num_of_credits = request.form["num_of_credits"]
+        module_id = request.form["module_id"]
         try:
             is_summative_1 = request.form["is_summative"]
         except:
@@ -71,7 +72,8 @@ def new_assessment():
             time_limit=int(time_limit) * 60,
             num_of_credits=num_of_credits,
             is_summative=is_summative,
-            lecturer_id=lecturer_id
+            lecturer_id=lecturer_id,
+            module_id=module_id
         )
         db.session.add(new_assessment)
         db.session.commit()

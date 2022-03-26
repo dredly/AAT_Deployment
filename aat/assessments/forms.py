@@ -30,6 +30,7 @@ class AssessmentForm(FlaskForm):
     title = TextAreaField(
         "Enter Title", default="", validators=[DataRequired()]
     )
+    module_id= IntegerField("Enter module ID",validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     due_date = DateField(
         "Enter the due date", format='%Y-%m-%d')
     num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
