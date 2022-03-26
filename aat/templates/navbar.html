@@ -17,10 +17,10 @@
 		</li>
 		{% else %}
 		<li>
-			<a href="{{ url_for('auth.logout') }}">Log Out</a>
+			<a href="{{ url_for('auth.logout') }}">Log Out {{current_user.name}}</a>
 		</li>
 		<li>
-			<a href="{{ url_for('legendary_gamification.achievements') }}"></a>
+			<a href="{{ url_for('legendary_gamification.achievements') }}">Achievements</a>
 		</li>
 		{% endif %}
 		<li>

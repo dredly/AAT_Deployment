@@ -1,13 +1,36 @@
 from . import student_stats
 from flask import render_template
+from flask_login import current_user
+
+# MODELS
+from ..models import (
+    Module,
+    Assessment,
+    QuestionT1,
+    QuestionT2,
+    Option,
+    User,
+    ResponseT2,
+)
 
 
 @student_stats.route("/")
 def course_view():
+    if not current_user.is_authenticated:
+        return render_template("please_log_in.html")
+    student_id = current_user.id
+    modules = Module.query.all()
+    return render_template("testing.html", modules=modules)
+
+
+@student_stats.route("/old_route/")
+def old_course_view():
     """
     Queries StudentAnswers table (using student_id)
     Makes [...]
     """
+    if not current_user.is_authenticated:
+        return render_template("please_log_in.html")
     try:
         # This value would come from Logged In user.
         student_id = 1

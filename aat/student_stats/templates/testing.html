@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h1>Welcome {{current_user.name}}. Let's see how you have done.</h1>
+    <h2>Modules</h2>
+    {% for module in modules %}
+        <p>{{module}}</p>
+        <ul>
+            {% for assessment in module.assessment %}
+                <li>{{assessment}}</li>
+                <ul>
+                    {% for question in assessment.question_t1 %}
+                        <li>{{question}}</li>
+                    {% endfor %} 
+                    {% for question in assessment.question_t2 %}
+                        <li>{{question}}</li>
+                    {% endfor %} 
+                </ul>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+{% endblock content %}

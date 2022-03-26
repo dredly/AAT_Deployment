@@ -1,5 +1,3 @@
-from email.policy import default
-from tkinter.tix import Tree
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
@@ -209,7 +207,7 @@ class User(UserMixin, db.Model):
             self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
             .filter_by(assessment_id=assessment.assessment_id)
             .first()
-            is not None
+            iws not None
         )
 
     def remove_answer(self, question, assessment):

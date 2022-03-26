@@ -205,7 +205,7 @@ with app.app_context():
                 assessment_id=1,
                 t2_question_id=1,
                 response_content="-m",
-                is_correct=True,  # Don't think we need this?
+                is_correct=True,
             ),
             ResponseT2(  # 2
                 user_id=1,
