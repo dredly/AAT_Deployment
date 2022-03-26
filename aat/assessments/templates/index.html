@@ -17,10 +17,12 @@
 			<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Take Assessment</a>
 		</button>
 	{% endfor %}
+	{% if current_user.can(Permission.WRITE_ASSESSMENT) %}
  <h1> Create Assessments here</h1>
 	<button type="button">
 		<a href="{{ url_for('assessments.new_assessment') }}">Create Assessment</a>
 	</button>
+	{% endif %}	
 
 	<!-- Just used for viewing how data is displayed -->
 	<!-- {# Rich: I did some testing of the database relations here #}
