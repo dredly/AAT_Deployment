@@ -40,6 +40,11 @@ def new_question_t1():
     return "Add a type 1 question here"
 
 
+@questions.route("/type1/<int:id>", methods=["GET", "POST"])
+def show_question_t1(id):
+    return "Show a type 1 question here"
+
+
 @questions.route("/type1/<int:id>/edit", methods=["GET", "POST"])
 def edit_question_t1(id):
     return "Edit a type 1 question here"
@@ -70,6 +75,12 @@ def new_question_t2():
         db.session.commit()
         return redirect(url_for("questions.index"))
     return render_template("new_question_t2.html", form=form)
+
+
+@questions.route("/type2/<int:id>", methods=["GET", "POST"])
+def show_question_t2(id):
+    question = QuestionT2.query.get_or_404(id)
+    return render_template("show_question_t2.html", question=question)
 
 
 @questions.route("/type2/<int:id>/edit", methods=["GET", "POST"])

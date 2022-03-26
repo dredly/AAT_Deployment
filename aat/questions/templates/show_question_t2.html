@@ -1,0 +1,7 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1>{{ question.question_text }}</h1>
+{% if question.assessment_id %}
+<p>Assigned to assessment <strong>{{question.assessment.title}}</strong></p>
+{% endif %}
+{% endblock %}
