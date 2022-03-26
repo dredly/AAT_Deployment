@@ -6,12 +6,22 @@
 			<h2>{{ assessment.title }}</h2>
 		</a>
 		<button type="button">
+			<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Edit Assessment</a>
+		</button>
+		<button type="button">
+			<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Delete Assessment</a>
+		</button>
+		<button type="button">
 			<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Take Assessment</a>
 		</button>
 	{% endfor %}
+ <h1> Create Assessments here</h1>
+	<button type="button">
+		<a href="{{ url_for('assessments.new_assessment') }}">Create Assessment</a>
+	</button>
 
 	<!-- Just used for viewing how data is displayed -->
-	{# Rich: I did some testing of the database relations here #}
+	<!-- {# Rich: I did some testing of the database relations here #}
 	<hr />
 	<h2>Modules</h2>
 	{% for module in modules %}
@@ -29,5 +39,5 @@
 				{% endfor %} 
 			</ul>
 		{% endfor %} 
-	{% endfor %} 
+	{% endfor %}  -->
 {% endblock %}

@@ -1,10 +1,14 @@
+from xmlrpc.client import Boolean, DateTime
 from flask_wtf import FlaskForm
+from wtforms.fields import DateField
 from wtforms import (
     TextAreaField,
     IntegerField,
     SubmitField,
     SelectMultipleField,
     IntegerRangeField,
+    BooleanField,
+    DateTimeField
 )
 from wtforms.validators import DataRequired
 
@@ -22,3 +26,15 @@ class DeleteQuestionsForm(FlaskForm):
 class AnswerType2Form(FlaskForm):
     answer = TextAreaField(validators=[DataRequired()])
     submit = SubmitField("Submit Answer")
+
+class AssessmentForm(FlaskForm):
+    
+    title = TextAreaField(
+        "Enter Title", default="", validators=[DataRequired()]
+    )
+    due_date = DateField(
+        "Enter the due date", format='%Y-%m-%d')
+    num_of_credits = IntegerField("How many credits?", validators=[DataRequired()])
+    time_limit = IntegerField("Enter time in seconds", validators=[DataRequired()])
+    is_summative = BooleanField()
+    submit = SubmitField("Add Assessment")

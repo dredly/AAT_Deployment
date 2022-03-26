@@ -1,6 +1,9 @@
 {% extends("layout.html") %}
 {% block content %}
 <h1>{{assessment.title}}</h1>
+{% if current_user.can(Permission.WRITE_ASSESSMENT) %}
+
+{% endif %}
 {% for question in questions %}
 <h3>{{question.question_text}}</h3>
 {% if current_user.can(Permission.WRITE_ASSESSMENT) %}

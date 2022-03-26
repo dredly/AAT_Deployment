@@ -1,7 +1,7 @@
 from flask import Response, redirect, render_template, request, url_for, abort, session
 from . import assessments
 from ..models import Assessment, QuestionT2, Module, User, ResponseT2
-from .forms import DeleteQuestionsForm, AnswerType2Form
+from .forms import DeleteQuestionsForm, AnswerType2Form, AssessmentForm
 from .. import db
 from flask_login import current_user
 
@@ -46,9 +46,35 @@ def delete_questions(id):
     return render_template("delete_questions.html", assessment=assessment, form=form)
 
 
-@assessments.route("/new")
+@assessments.route("/assessment/new", methods=["GET", "POST"])
 def new_assessment():
-    return render_template("new_assessment.html")
+    form = AssessmentForm()
+    is_summative_1 = ""
+    if request.method == "POST":
+        lecturer_id = session["user"]
+        is_summative = False
+        title = request.form["title"]
+        due_date = request.form["due_date"]
+        time_limit = request.form["time_limit"]
+        num_of_credits = request.form["num_of_credits"]
+        try:
+            is_summative_1 = request.form["is_summative"]
+        except:
+                pass
+        if is_summative_1 == "y":
+            is_summative = True
+        new_assessment = Assessment(
+            title=title,
+            due_date=due_date,
+            time_limit=time_limit,
+            num_of_credits=num_of_credits,
+            is_summative=is_summative,
+            lecturer_id=lecturer_id
+        )
+        db.session.add(new_assessment)
+        db.session.commit()
+        return redirect(url_for("assessments.index"))
+    return render_template("new_assessment.html", form=form)
 
 
 ## example of how to filter response table
