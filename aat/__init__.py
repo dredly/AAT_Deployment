@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask, session
+
 # from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 
@@ -12,17 +13,19 @@ from .models import (
     QuestionT2,
     Option,
     Module,
-    # TakesAssessment,
     # ResponseT1,
     ResponseT2,
     User,
     Role,
     Permission,
+    Achievement,
+    Badge,
 )
 from .assessments import assessments
 from .auth import auth
 from .staff_stats import staff_stats
 from .student_stats import student_stats
+from .legendary_gamification import legendary_gamification
 
 # Admin
 from flask_admin import Admin
@@ -40,6 +43,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "a secret key"
 
 app.register_blueprint(assessments, url_prefix="/assessments")
+app.register_blueprint(legendary_gamification, url_prefix="/legendary_gamification")
 app.register_blueprint(staff_stats, url_prefix="/staff-stats")
 app.register_blueprint(student_stats, url_prefix="/student-stats")
 app.register_blueprint(auth)
@@ -57,7 +61,6 @@ admin.add_views(
     AdminView(QuestionT2, db.session),
     AdminView(Option, db.session),
     AdminView(Module, db.session),
-    # AdminView(TakesAssessment, db.session),
     # AdminView(ResponseT1, db.session),
     AdminView(ResponseT2, db.session),
     AdminView(User, db.session),
@@ -65,7 +68,7 @@ admin.add_views(
 )
 # Now accessible through /admin/
 
-# Context Processor to make Permission variables available to templates 
-@app.context_processor 
-def inject_permissions(): 
+# Context Processor to make Permission variables available to templates
+@app.context_processor
+def inject_permissions():
     return dict(Permission=Permission)
