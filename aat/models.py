@@ -65,7 +65,7 @@ class Assessment(db.Model):
     title = db.Column(db.String(120), nullable=False)
     due_date = db.Column(db.String(10))
     time_limit = db.Column(db.Integer)  # Time limit in seconds
-    num_of_credits = db.Column(db.Integer, nullable=False, default=0)
+    num_of_credits = db.Column(db.Integer, nullable=True, default=0)
     is_summative = db.Column(db.Boolean, nullable=True, default=False, server_default="False")
     # --- Relationships --- TODO: add more as tables are added to the db
     question_t1 = db.relationship("QuestionT1", backref="assessment", lazy=True)

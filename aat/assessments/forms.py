@@ -1,14 +1,12 @@
-from xmlrpc.client import Boolean, DateTime
 from flask_wtf import FlaskForm
 from wtforms.fields import DateField
+from wtforms.validators import NumberRange
 from wtforms import (
     TextAreaField,
     IntegerField,
     SubmitField,
     SelectMultipleField,
-    IntegerRangeField,
     BooleanField,
-    DateTimeField
 )
 from wtforms.validators import DataRequired
 
@@ -34,8 +32,8 @@ class AssessmentForm(FlaskForm):
     )
     due_date = DateField(
         "Enter the due date", format='%Y-%m-%d')
-    num_of_credits = IntegerField("How many credits?", validators=[DataRequired()])
-    time_limit = IntegerField("Enter time limit in minutes")
+    num_of_credits = IntegerField("How many credits?", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
+    time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     is_summative = BooleanField()
     submit = SubmitField("Add Assessment")
 
