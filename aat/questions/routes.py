@@ -55,11 +55,14 @@ def new_question_t1():
             feedback_if_wrong=feedback_if_wrong,
         )
         db.session.add(new_question)
+        found_question = QuestionT1.query.filter(
+            QuestionT1.question_text == new_question.question_text
+        ).first()
         option_a = Option(
-            q_t1_id=new_question.q_t1_id, option_text=option_a_text, is_correct=True
+            q_t1_id=found_question.q_t1_id, option_text=option_a_text, is_correct=True
         )
-        option_b = Option(q_t1_id=new_question.q_t1_id, option_text=option_b_text)
-        option_c = Option(q_t1_id=new_question.q_t1_id, option_text=option_c_text)
+        option_b = Option(q_t1_id=found_question.q_t1_id, option_text=option_b_text)
+        option_c = Option(q_t1_id=found_question.q_t1_id, option_text=option_c_text)
         db.session.add(option_a)
         db.session.add(option_b)
         db.session.add(option_c)
@@ -71,25 +74,28 @@ def new_question_t1():
 @questions.route("/type1/<int:id>/edit", methods=["GET", "POST"])
 def edit_question_t1(id):
     question = QuestionT1.query.get_or_404(id)
+    options = Option.query.filter_by(q_t1_id=id).all()
     form = QuestionT1Form()
     if request.method == "POST":
         question.question_text = form.question_text.data
-        question.correct_answer = form.correct_answer.data
-        question.option_a = form.option_a.data
-        question.option_b = form.option_b.data
-        question.option_c = form.option_c.data
+        options[0].option_text = form.option_a.data
+        options[1].option_text = form.option_b.data
+        options[2].option_text = form.option_c.data
         question.num_of_marks = form.num_of_marks.data
         question.difficulty = form.difficulty.data
         question.feedback_if_correct = form.feedback_if_correct.data
         question.feedback_if_wrong = form.feedback_if_wrong.data
         db.session.commit()
-        return redirect(url_for("assessments.show_assessment", id=id))
+        return redirect(url_for("questions.index", id=id))
     form.question_text.data = question.question_text
-    form.correct_answer.data = question.correct_answer
     form.num_of_marks.data = question.num_of_marks
     form.difficulty.data = question.difficulty
     form.feedback_if_correct.data = question.feedback_if_correct
     form.feedback_if_wrong.data = question.feedback_if_wrong
+
+    form.option_a.data = options[0]
+    form.option_b.data = options[1]
+    form.option_c.data = options[2]
     return render_template("edit_question_t1.html", form=form)
 
 
@@ -132,7 +138,7 @@ def edit_question_t2(id):
         question.feedback_if_correct = form.feedback_if_correct.data
         question.feedback_if_wrong = form.feedback_if_wrong.data
         db.session.commit()
-        return redirect(url_for("assessments.show_assessment", id=id))
+        return redirect(url_for("questions.index", id=id))
     form.question_text.data = question.question_text
     form.correct_answer.data = question.correct_answer
     form.num_of_marks.data = question.num_of_marks
