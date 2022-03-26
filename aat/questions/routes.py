@@ -9,6 +9,7 @@ from .. import db
 def index():
     form = FilterForm()
     filter = request.args.get("filter", "all")
+    form.filter.data = filter
     if request.method == "POST":
         filter = request.form["filter"]
         return redirect(url_for("questions.index", filter=filter))
