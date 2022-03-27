@@ -19,10 +19,14 @@ def index():
 @assessments.route("/<int:id>")
 def show_assessment(id):
     assessment = Assessment.query.get_or_404(id)
+    try:
+        current_date = datetime.datetime.strptime(assessment.due_date, '%Y-%m-%d').strftime('%d/%m/%Y')
+    except:
+        current_date = None
     # TODO make a combined list of T1 and T2 questions and order by their question index
     questions = QuestionT2.query.filter_by(assessment_id=id).all()
     return render_template(
-        "show_assessment.html", assessment=assessment, questions=questions
+        "show_assessment.html", assessment=assessment, questions=questions, current_date=current_date
     )
 
 
