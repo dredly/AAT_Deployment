@@ -54,3 +54,7 @@ class EditAssessmentForm(FlaskForm):
     is_summative = BooleanField()
     submit = SubmitField("Done")
 
+class RemoveQuestionForm(FlaskForm):
+    submit = SubmitField("Remove")
+    cancel = SubmitField("Cancel")
+
