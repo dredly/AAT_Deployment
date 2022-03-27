@@ -15,9 +15,11 @@
 
 {% if question.q_t1_id %}
 <a href="{{url_for('questions.show_question_t1', id=question.q_t1_id)}}">View question details</a>
+<button>Add to Assessment</button>
 {% endif %}
 {% if question.q_t2_id %}
 <a href="{{url_for('questions.show_question_t2', id=question.q_t2_id)}}">View question details</a>
+<button>Add to Assessment</button>
 {% endif %}
 {% endfor %}
 
