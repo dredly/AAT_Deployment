@@ -14,9 +14,11 @@
 <h2>{{ question.question_text }}</h2>
 <p>{{question.num_of_marks}} marks. --- Difficulty = {{question.difficulty}}/3</p>
 {% if question.q_t1_id %}
+<a href="{{url_for('questions.show_question_t1', id=question.q_t1_id)}}">View question details</a>
 <a href="{{url_for('questions.edit_question_t1', id=question.q_t1_id)}}">Edit question details</a>
 {% endif %}
 {% if question.q_t2_id %}
+<a href="{{url_for('questions.show_question_t2', id=question.q_t2_id)}}">View question details</a>
 <a href="{{url_for('questions.edit_question_t2', id=question.q_t2_id)}}">Edit question details</a>
 {% endif %}
 {% endfor %}

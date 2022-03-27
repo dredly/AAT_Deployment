@@ -39,15 +39,6 @@ nav li a {
 	text-decoration: none;
 }
 
-/* FOOTER */
-footer {
-	padding: 0.8rem 0;
-	/* position:fixed; */
-	/* bottom:0px; */
-	text-align: center;
-	width: 100%;
-}
-
 /* FORMS */
 .inline-label{
 	margin-right: 1rem;
@@ -66,6 +57,7 @@ footer {
 	margin: 0;
 }
 
+<<<<<<< HEAD
 /* WARNING MESSAGE  */
 
 .warning{
@@ -150,3 +142,22 @@ footer {
 	background-color:red ;
 
 }
+=======
+/* Other */
+
+.delete-button {
+	background-color: red;
+	color: white;
+}
+
+/* FOOTER */
+footer {
+	padding: 0.8rem 0;
+	/* position:fixed; */
+	/* bottom:0px; */
+	text-align: center;
+	width: 100%;
+}
+
+
+>>>>>>> main
