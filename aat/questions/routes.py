@@ -158,3 +158,8 @@ def edit_question_t2(id):
     form.feedback_if_correct.data = question.feedback_if_correct
     form.feedback_if_wrong.data = question.feedback_if_wrong
     return render_template("edit_question_t2.html", form=form)
+
+
+@questions.route("/type2/<int:id>/delete", methods=["GET", "POST"])
+def delete_question_t2(id):
+    return "Delete form will go here"
