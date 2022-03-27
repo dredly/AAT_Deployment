@@ -10,6 +10,7 @@ from .. import db
 def index():
     form = FilterForm()
     filter = request.args.get("filter", "all")
+    form.filter.data = filter
     if request.method == "POST":
         filter = request.form["filter"]
         return redirect(url_for("questions.index", filter=filter))
@@ -71,6 +72,11 @@ def new_question_t1():
     return render_template("new_question_t1.html", form=form)
 
 
+@questions.route("/type1/<int:id>", methods=["GET", "POST"])
+def show_question_t1(id):
+    return "Show a type 1 question here"
+
+
 @questions.route("/type1/<int:id>/edit", methods=["GET", "POST"])
 def edit_question_t1(id):
     question = QuestionT1.query.get_or_404(id)
@@ -126,6 +132,12 @@ def new_question_t2():
     return render_template("new_question_t2.html", form=form)
 
 
+@questions.route("/type2/<int:id>", methods=["GET", "POST"])
+def show_question_t2(id):
+    question = QuestionT2.query.get_or_404(id)
+    return render_template("show_question_t2.html", question=question)
+
+
 @questions.route("/type2/<int:id>/edit", methods=["GET", "POST"])
 def edit_question_t2(id):
     question = QuestionT2.query.get_or_404(id)
@@ -146,3 +158,8 @@ def edit_question_t2(id):
     form.feedback_if_correct.data = question.feedback_if_correct
     form.feedback_if_wrong.data = question.feedback_if_wrong
     return render_template("edit_question_t2.html", form=form)
+
+
+@questions.route("/type2/<int:id>/delete", methods=["GET", "POST"])
+def delete_question_t2(id):
+    return "Delete form will go here"
