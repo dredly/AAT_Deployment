@@ -1,6 +1,5 @@
 from datetime import datetime
 from email.policy import default
-from tkinter.tix import Tree
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
