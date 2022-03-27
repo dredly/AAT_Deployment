@@ -121,6 +121,11 @@ def edit_question_t1(id):
     return render_template("edit_question_t1.html", form=form)
 
 
+@questions.route("/type1/<int:id>/delete", methods=["GET", "POST"])
+def delete_question_t1(id):
+    return "Delete form will go here"
+
+
 # --- Type 2 routes ---
 
 

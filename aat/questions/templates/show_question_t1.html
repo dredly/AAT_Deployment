@@ -1,0 +1,20 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1>{{ question.question_text }}</h1>
+<a href="{{url_for('questions.edit_question_t1', id=question.q_t1_id)}}"><button>Edit details</button></a>
+<a href="{{url_for('questions.delete_question_t1', id=question.q_t1_id)}}"><button class="delete-button">Delete
+        question</button></a>
+{% if question.assessment_id %}
+<p>Assigned to assessment <strong>{{question.assessment.title}}</strong></p>
+{% else %}
+<p>Not assigned</p>
+{% endif %}
+<p>Difficulty: {{question.difficulty}}/3</p>
+<p>Number of marks: {{question.num_of_marks}}</p>
+<h4>Correct answer</h4>
+<p>{{question.correct_answer}}</p>
+<h4>Feedback if correct</h4>
+<p>{{question.feedback_if_correct}}</p>
+<h4>Feedback if wrong</h4>
+<p>{{question.feedback_if_wrong}}</p>
+{% endblock %}
