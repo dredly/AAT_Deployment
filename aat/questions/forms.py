@@ -66,3 +66,7 @@ class QuestionT2Form(FlaskForm):
         validators=[DataRequired()],
     )
     submit = SubmitField("Add question")
+
+
+class DeleteForm(FlaskForm):
+    submit = SubmitField("Yes, delete")
