@@ -1,6 +1,5 @@
 from flask import request, redirect, url_for, render_template
-from .forms import QuestionT2Form, QuestionT1Form
-from .forms import QuestionT2Form, FilterForm
+from .forms import QuestionT1Form, QuestionT2Form, FilterForm, DeleteForm
 from ..models import QuestionT1, QuestionT2, Option
 from . import questions
 from .. import db
@@ -162,4 +161,10 @@ def edit_question_t2(id):
 
 @questions.route("/type2/<int:id>/delete", methods=["GET", "POST"])
 def delete_question_t2(id):
-    return "Delete form will go here"
+    question = QuestionT2.query.get_or_404(id)
+    form = DeleteForm()
+    if request.method == "POST":
+        db.session.delete(question)
+        db.session.commit()
+        return redirect(url_for("questions.index"))
+    return render_template("delete_question_t2.html", question=question, form=form)
