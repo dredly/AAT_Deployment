@@ -1,35 +1,10 @@
 {% extends("layout.html") %} 
 {% block content %}
-	<!-- <h1>All assessments here</h1>
-	{% for assessment in assessments %}
-		<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
-			<h2>{{ assessment.title }}</h2>
-		</a> -->
-		<!-- 		Commented out to avoid permission issues in development -->
-		<!-- {% if current_user.can(Permission.WRITE_ASSESSMENT) %} -->
-		<!-- <button type="button">
-			<a href="{{ url_for('assessments.edit_assessment', id=assessment.assessment_id) }}">Edit Assessment</a>
-		</button>
-		<button type="button">
-			<a href="{{ url_for('assessments.delete_assessment', id=assessment.assessment_id) }}">Delete Assessment</a>
-		</button> -->
-		<!-- {% endif %}	 -->
-		<!-- <button type="button">
-			<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Take Assessment</a>
-		</button>
-	{% endfor %} -->
-	<!-- 		Commented out to avoid permission issues in development -->
-	<!-- {% if current_user.can(Permission.WRITE_ASSESSMENT) %} -->
  <h1> Create Assessments here</h1>
 	<button type="button" class="Create_Button" role="button">
 		<a href="{{ url_for('assessments.new_assessment') }}" class="Button_Link">Create Assessment</a>
 	</button>
-	<!-- {% endif %}	 -->
-
-	<!-- {# Rich: I did some testing of the database relations here #} -->
 	<hr />
-
-	<!-- [Matt]: Alternative view of the Assessments page with summative and formative assessments  -->
 	<h1>Modules</h1>
 	{% for module in modules %}
 		<h2>{{ module.title }} {{module.total_credits}}</h2>
@@ -53,14 +28,6 @@
 				</button>
 		</div>
 		</div>
-			<!-- <ul>
-				{% for question in assessment.question_t1 %}
-					<li>{{question}}</li>
-				{% endfor %} 
-				{% for question in assessment.question_t2 %}
-					<li>{{question}}</li>
-				{% endfor %} 
-			</ul> -->
 		{% endif %}	
 		{% endfor %} 
 	{% endfor %} 
