@@ -38,7 +38,7 @@
         <div class = "Assessment_Edit_Children">
             <h3>{{question}}</h3>
                 {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
-                    <button class="remove_button" class="Assessment_Edit_Child">Remove Question</button>
+                <a href="{{url_for('assessments.remove_question_t1', id3=question.q_t1_id, id=assessment.assessment_id)}}"><button class="delete-button" class="Assessment_Edit_Child">Remove Question</a>
                 {% endif %}
         </div>
         {% endfor %}

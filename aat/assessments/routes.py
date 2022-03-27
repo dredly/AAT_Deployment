@@ -2,7 +2,7 @@ import math
 from stringprep import in_table_d2
 from flask import Response, redirect, render_template, request, url_for, abort, session
 from . import assessments
-from ..models import Assessment, QuestionT2, Module, User, ResponseT2
+from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2
 from .forms import DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, RemoveQuestionForm
 from .. import db
 from flask_login import current_user
@@ -119,9 +119,20 @@ def delete_assessment(id):
             return redirect(url_for("assessments.index"))
     return render_template("delete_assessment.html", assessment=assessment, form=form, id=id)
 
-@assessments.route("/<int:id>/edit_assessment/remove/<int:id2>", methods=["GET", "POST"])
+@assessments.route("/<int:id>/edit_assessment/remove/t2/<int:id2>", methods=["GET", "POST"])
 def remove_question_t2(id, id2):
     question = QuestionT2.query.get_or_404(id2)
+    assessment = Assessment.query.get_or_404(id)
+    form = RemoveQuestionForm()
+    if request.method == "POST" and form.is_submitted:
+        question.assessment_id = None
+        db.session.commit()
+        return redirect(url_for("assessments.edit_assessment", id=id))
+    return render_template("remove_question.html", question=question, form=form, assessment=assessment)
+
+@assessments.route("/<int:id>/edit_assessment/remove/t1/<int:id3>", methods=["GET", "POST"])
+def remove_question_t1(id, id3):
+    question = QuestionT1.query.get_or_404(id3)
     assessment = Assessment.query.get_or_404(id)
     form = RemoveQuestionForm()
     if request.method == "POST" and form.is_submitted:
