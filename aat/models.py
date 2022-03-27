@@ -62,7 +62,7 @@ class Assessment(db.Model):
     lecturer_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     # --- Other Columns ---
     title = db.Column(db.String(120), nullable=False)
-    due_date = db.Column(db.String(10))
+    due_date = db.Column(db.DateTime())
     time_limit = db.Column(db.Integer)  # Time limit in seconds
     num_of_credits = db.Column(db.Integer, nullable=True, default=0)
     is_summative = db.Column(db.Boolean, nullable=True, default=False, server_default="False")

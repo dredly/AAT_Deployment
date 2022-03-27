@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import math
 from stringprep import in_table_d2
 from flask import Response, redirect, render_template, request, url_for, abort, session
@@ -20,7 +20,7 @@ def index():
 def show_assessment(id):
     assessment = Assessment.query.get_or_404(id)
     try:
-        current_date = datetime.datetime.strptime(assessment.due_date, '%Y-%m-%d').strftime('%d/%m/%Y')
+        current_date = assessment.due_date.strftime("%d/%m/%Y")
     except:
         current_date = None
     # TODO make a combined list of T1 and T2 questions and order by their question index
@@ -62,7 +62,11 @@ def new_assessment():
         lecturer_id = session["user"]
         is_summative = False
         title = request.form["title"]
-        due_date = request.form["due_date"]
+        total_date = request.form["due_date"]
+        year = int(total_date[:4])
+        month = int(total_date[5:7])
+        day = int(total_date[8:10])
+        due_date = datetime(year, month, day)
         time_limit = request.form["time_limit"]
         num_of_credits = request.form["num_of_credits"]
         module_id = request.form["module_id"]
@@ -93,7 +97,11 @@ def edit_assessment(id):
     if request.method == "POST":
         assessment.title = form.title.data
         assessment.module_id = form.module_id.data
-        assessment.due_date = request.form["due_date"]
+        total_date = request.form["due_date"]
+        year = int(total_date[:4])
+        month = int(total_date[5:7])
+        day = int(total_date[8:10])
+        assessment.due_date = datetime(year, month, day)
         assessment.num_of_credits = form.num_of_credits.data
         assessment.time_limit = form.time_limit.data
         assessment.is_summative = form.is_summative.data
@@ -101,17 +109,14 @@ def edit_assessment(id):
         return redirect(url_for("assessments.index"))
     form.title.data = assessment.title
     form.module_id.data = assessment.module_id
-    try:
-        current_date = datetime.datetime.strptime(assessment.due_date, '%Y-%m-%d').strftime('%d/%m/%Y')
-    except:
-        current_date = None
+    form.due_date.data = assessment.due_date
     form.num_of_credits.data = assessment.num_of_credits
     try:
         form.time_limit.data = math.floor(int(assessment.time_limit) / 60)
     except:
         form.time_limit.data = None
     form.is_summative.data = assessment.is_summative
-    return render_template("edit_assessments.html", form=form, assessment=assessment, id=id, current_date=current_date)
+    return render_template("edit_assessments.html", form=form, assessment=assessment, id=id)
     
 
 
