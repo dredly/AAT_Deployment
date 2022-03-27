@@ -83,7 +83,7 @@ def new_assessment():
         )
         db.session.add(new_assessment)
         db.session.commit()
-        return redirect(url_for("assessments.index"))
+        return redirect(url_for("assessments.add_questions"))
     return render_template("new_assessment.html", form=form, )
 
 @assessments.route("/<int:id>/edit_assessment", methods=["GET", "POST"])
