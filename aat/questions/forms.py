@@ -5,6 +5,7 @@ from wtforms import (
     IntegerRangeField,
     SubmitField,
     SelectField,
+    RadioField,
 )
 from wtforms.validators import DataRequired
 
@@ -16,6 +17,11 @@ class QuestionT1Form(FlaskForm):
     option_a = TextAreaField("Please enter option a", validators=[DataRequired()])
     option_b = TextAreaField("Please enter option b", validators=[DataRequired()])
     option_c = TextAreaField("Please enter option c", validators=[DataRequired()])
+    correct_option = RadioField(
+        "Correct Option",
+        choices=[(0, "option a"), (1, "option b"), (2, "option c")],
+        validators=[DataRequired()],
+    )
     num_of_marks = IntegerField("How many marks?", validators=[DataRequired()])
     difficulty = IntegerRangeField("Select a difficulty from 1 to 3 (1 being easiest)")
     feedback_if_correct = TextAreaField(
