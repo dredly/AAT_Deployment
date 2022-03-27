@@ -78,16 +78,19 @@ def new_question_t1():
 
 @questions.route("/type1/<int:id>", methods=["GET", "POST"])
 def show_question_t1(id):
-    return "Show a type 1 question here"
+    question = QuestionT1.query.get_or_404(id)
+    options = Option.query.filter_by(q_t1_id=id).all()
+    return render_template("show_question_t1.html", question=question, options=options)
 
 
 @questions.route("/type1/<int:id>/edit", methods=["GET", "POST"])
 def edit_question_t1(id):
     question = QuestionT1.query.get_or_404(id)
     options = Option.query.filter_by(q_t1_id=id).all()
-    correct_option = Option.query.filter(
-        Option.q_t1_id == id and Option.is_correct
-    ).first()
+    correct_option = (
+        Option.query.filter_by(q_t1_id=id).filter(Option.is_correct.is_(True)).first()
+    )
+
     form = QuestionT1Form()
     if request.method == "POST":
         question.question_text = form.question_text.data
@@ -112,7 +115,7 @@ def edit_question_t1(id):
     form.difficulty.data = question.difficulty
     form.feedback_if_correct.data = question.feedback_if_correct
     form.feedback_if_wrong.data = question.feedback_if_wrong
-    form.correct_option.default = options.index(correct_option)
+    form.correct_option.data = str(options.index(correct_option))
 
     form.option_a.data = options[0]
     form.option_b.data = options[1]
