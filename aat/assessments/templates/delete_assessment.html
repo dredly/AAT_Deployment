@@ -1,6 +1,6 @@
 {% extends("layout.html") %}
 {% block content %}
-<h1> Are you sure you want to delete {{assessment.title}}</h1>
+<h1 class="warning"> Are you sure you want to delete {{assessment.title}} ?</h1>
 
 <form method="POST" action="">
     {{ form.csrf_token}}

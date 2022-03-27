@@ -66,6 +66,12 @@ footer {
 	margin: 0;
 }
 
+/* WARNING MESSAGE  */
+
+.warning{
+	color: red;
+}
+
 /* BUTTONS */
 
 /* Create Assessment Button */
@@ -123,4 +129,24 @@ footer {
 .Assessment_Index_Text{
 	text-decoration: none;
 	color: black;
+}
+.Assessment_Edit_Parent{
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+}
+.Assessment_Edit_Children{
+	display: flex;
+	align-items:center;
+	justify-items: flex-start;
+	justify-content: space-between;
+	margin-right: 5vw;
+}
+.Assessment_Edit_Child{
+	display: flex;
+	flex-wrap: wrap;
+	max-width: 6vw;
+	padding-bottom: .5vh;
+	background-color:red ;
+
 }
