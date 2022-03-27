@@ -39,6 +39,15 @@ nav li a {
 	text-decoration: none;
 }
 
+/* FOOTER */
+footer {
+	padding: 0.8rem 0;
+	/* position:fixed; */
+	/* bottom:0px; */
+	text-align: center;
+	width: 100%;
+}
+
 /* FORMS */
 .inline-label{
 	margin-right: 1rem;
@@ -57,7 +66,6 @@ nav li a {
 	margin: 0;
 }
 
-<<<<<<< HEAD
 /* WARNING MESSAGE  */
 
 .warning{
@@ -122,6 +130,8 @@ nav li a {
 	text-decoration: none;
 	color: black;
 }
+
+/* EDIT_ASSESSMENT.html */
 .Assessment_Edit_Parent{
 	display: flex;
 	justify-content: space-between;
@@ -142,7 +152,6 @@ nav li a {
 	background-color:red ;
 
 }
-=======
 /* Other */
 
 .delete-button {
@@ -158,6 +167,3 @@ footer {
 	text-align: center;
 	width: 100%;
 }
-
-
->>>>>>> main
