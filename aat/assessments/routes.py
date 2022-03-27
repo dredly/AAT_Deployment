@@ -97,9 +97,10 @@ def edit_assessment(id):
         return redirect(url_for("assessments.index"))
     form.title.data = assessment.title
     form.module_id.data = assessment.module_id
-    current_date = datetime.datetime.strptime(assessment.due_date, '%Y-%m-%d').strftime('%d/%m/%Y')
-    
-    print(current_date)
+    try:
+        current_date = datetime.datetime.strptime(assessment.due_date, '%Y-%m-%d').strftime('%d/%m/%Y')
+    except:
+        current_date = None
     form.num_of_credits.data = assessment.num_of_credits
     try:
         form.time_limit.data = math.floor(int(assessment.time_limit) / 60)
