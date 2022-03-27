@@ -3,7 +3,7 @@ from stringprep import in_table_d2
 from flask import Response, redirect, render_template, request, url_for, abort, session
 from . import assessments
 from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2
-from .forms import DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, RemoveQuestionForm
+from .forms import AddQuestionFilterForm, DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, RemoveQuestionForm
 from .. import db
 from flask_login import current_user
 
@@ -79,7 +79,7 @@ def new_assessment():
         db.session.add(new_assessment)
         db.session.commit()
         return redirect(url_for("assessments.index"))
-    return render_template("new_assessment.html", form=form)
+    return render_template("new_assessment.html", form=form, )
 
 @assessments.route("/<int:id>/edit_assessment", methods=["GET", "POST"])
 def edit_assessment(id):
@@ -144,6 +144,31 @@ def remove_question_t1(id, id3):
         return redirect(url_for("assessments.edit_assessment", id=id))
     return render_template("remove_question.html", question=question, form=form, assessment=assessment)
 
+@assessments.route("/add_questions")
+def add_questions():
+    form = AddQuestionFilterForm()
+    filter = request.args.get("filter", "all")
+    form.filter.data = filter
+    if request.method == "POST":
+        filter = request.form["filter"]
+        return redirect(url_for("questions.index", filter=filter))
+    if filter == "type1":
+        questions = QuestionT1.query.all()
+    elif filter == "type2":
+        questions = QuestionT2.query.all()
+    elif filter == "floating":
+        questions = (
+            QuestionT1.query.filter(QuestionT1.assessment_id.is_(None)).all()
+            + QuestionT2.query.filter(QuestionT2.assessment_id.is_(None)).all()
+        )
+    elif filter == "assigned":
+        questions = (
+            QuestionT1.query.filter(QuestionT1.assessment_id.isnot(None)).all()
+            + QuestionT2.query.filter(QuestionT2.assessment_id.isnot(None)).all()
+        )
+    else:
+        questions = QuestionT1.query.all() + QuestionT2.query.all()
+    return render_template("add_questions.html", questions=questions, form=form)
 
 # ---------------------------------  End Of CRUD For Assessments ---------------------------------------
 

@@ -39,8 +39,7 @@
         {{form.submit}}
     </form>
 </div>
-<!-- For viewing how add questions function would work -->
-<h3>Add a new question</h3>
-<a href="{{url_for('questions.new_question_t1')}}"><button>Type 1</button></a>
-<a href="{{url_for('questions.new_question_t2')}}"><button>Type 2</button></a>
+<!-- Needs Assessment to already be created to add a question to it otherwise there is no id?? -->
+<h3>Add Questions Below</h3>
+<a href="{{url_for('assessments.add_questions')}}"><button>Add Questions</button></a>
 {% endblock %}
