@@ -43,6 +43,7 @@ def new_question_t1():
         option_a_text = request.form["option_a"]
         option_b_text = request.form["option_b"]
         option_c_text = request.form["option_c"]
+        correct_option = request.form["correct_option"]
         num_of_marks = request.form["num_of_marks"]
         difficulty = request.form["difficulty"]
         feedback_if_correct = request.form["feedback_if_correct"]
@@ -58,11 +59,15 @@ def new_question_t1():
         found_question = QuestionT1.query.filter(
             QuestionT1.question_text == new_question.question_text
         ).first()
-        option_a = Option(
-            q_t1_id=found_question.q_t1_id, option_text=option_a_text, is_correct=True
-        )
+        option_a = Option(q_t1_id=found_question.q_t1_id, option_text=option_a_text)
         option_b = Option(q_t1_id=found_question.q_t1_id, option_text=option_b_text)
         option_c = Option(q_t1_id=found_question.q_t1_id, option_text=option_c_text)
+        if correct_option == "a":
+            option_a.is_correct = True
+        elif correct_option == "b":
+            option_b.is_correct = True
+        elif correct_option == "c":
+            option_c.is_correct = True
         db.session.add(option_a)
         db.session.add(option_b)
         db.session.add(option_c)
@@ -73,19 +78,32 @@ def new_question_t1():
 
 @questions.route("/type1/<int:id>", methods=["GET", "POST"])
 def show_question_t1(id):
-    return "Show a type 1 question here"
+    question = QuestionT1.query.get_or_404(id)
+    options = Option.query.filter_by(q_t1_id=id).all()
+    return render_template("show_question_t1.html", question=question, options=options)
 
 
 @questions.route("/type1/<int:id>/edit", methods=["GET", "POST"])
 def edit_question_t1(id):
     question = QuestionT1.query.get_or_404(id)
     options = Option.query.filter_by(q_t1_id=id).all()
+    correct_option = (
+        Option.query.filter_by(q_t1_id=id).filter(Option.is_correct.is_(True)).first()
+    )
+
     form = QuestionT1Form()
     if request.method == "POST":
         question.question_text = form.question_text.data
         options[0].option_text = form.option_a.data
         options[1].option_text = form.option_b.data
         options[2].option_text = form.option_c.data
+        correct_option_index = int(form.correct_option.data)
+        for i in range(len(options)):
+            if i == correct_option_index:
+                options[i].is_correct = True
+            else:
+                options[i].is_correct = False
+
         question.num_of_marks = form.num_of_marks.data
         question.difficulty = form.difficulty.data
         question.feedback_if_correct = form.feedback_if_correct.data
@@ -97,11 +115,17 @@ def edit_question_t1(id):
     form.difficulty.data = question.difficulty
     form.feedback_if_correct.data = question.feedback_if_correct
     form.feedback_if_wrong.data = question.feedback_if_wrong
+    form.correct_option.data = str(options.index(correct_option))
 
     form.option_a.data = options[0]
     form.option_b.data = options[1]
     form.option_c.data = options[2]
     return render_template("edit_question_t1.html", form=form)
+
+
+@questions.route("/type1/<int:id>/delete", methods=["GET", "POST"])
+def delete_question_t1(id):
+    return "Delete form will go here"
 
 
 # --- Type 2 routes ---
