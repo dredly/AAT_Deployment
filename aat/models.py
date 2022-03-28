@@ -84,7 +84,7 @@ class Tag(db.Model):
     __tablename__ = "Tag"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
-
+    # --- Relationships ---
     question_t1 = db.relationship("QuestionT1", backref="tag", lazy=True)
     question_t2 = db.relationship("QuestionT2", backref="tag", lazy=True)
 
@@ -156,7 +156,7 @@ class Module(db.Model):
     title = db.Column(db.String(120), unique=True, nullable=False)
     total_credits = db.Column(db.Integer, nullable=False)
     # --- Relationships ---
-    assessment = db.relationship("Assessment", backref="module", lazy=True)
+    assessments = db.relationship("Assessment", backref="module", lazy=True)
 
     def __repr__(self):
         return self.title
@@ -170,7 +170,7 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
     # --- Relationships ---
-    assessment = db.relationship("Assessment", backref="user", lazy=True)
+    assessments = db.relationship("Assessment", backref="user", lazy=True)
     badge = db.relationship("Badge", backref="user", lazy=True)
     achievement = db.relationship("Achievement", backref="user", lazy=True)
     t2_responses = db.relationship(
