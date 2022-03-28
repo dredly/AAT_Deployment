@@ -33,10 +33,13 @@ def course_view():
         )
         sum_of_possible_marks += response.question.num_of_marks
 
+    if sum_of_total_marks == 0:
+        return render_template("no_questions_answered.html")
+
     overall_results = (sum_of_total_marks, sum_of_possible_marks)
     # How many marks
     # Each question
-    return render_template("testing.html", overall_results=overall_results)
+    return render_template("student_stats_home.html", overall_results=overall_results)
 
 
 @student_stats.route("/old_route/")

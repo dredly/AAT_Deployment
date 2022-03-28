@@ -1,12 +1,12 @@
 {% extends 'layout.html' %}
 {% block content %}
-    <h1>Welcome {{current_user.name}}. Let's see how you have done.</h1>
+    <h1>Welcome "{{current_user.name}}". Let's see how you have done.</h1>
     <h2>
         Overall Marks
     </h2>
     <p>{{overall_results.0}}/{{overall_results.1}}
     ({{ "%.2d" |
-	format((overall_results.0/overall_results.1)*100)}}%)</p>
+    format((overall_results.0/overall_results.1)*100)}}%)</p>
     <h2>Responses</h2>
     {% for response in current_user.t2_responses %}
         <h3>Module: {{response.assessment.module}}</h3>
@@ -33,5 +33,6 @@
             {% endfor %}
         </ul>
     {% endfor %}
+
     
 {% endblock content %}
