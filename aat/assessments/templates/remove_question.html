@@ -1,0 +1,11 @@
+{% extends("layout.html") %}
+
+{% block content %}
+<form method="POST" action="">
+    <p>Are you sure you want to remove this question?</p>
+    {{ form.csrf_token }}
+    {{ form.submit(class='delete-button') }}
+</form>
+<a href="{{url_for('assessments.edit_assessment', id=assessment.assessment_id)}}"><button>Cancel</button></a>
+
+{% endblock %}

@@ -68,6 +68,38 @@ with app.app_context():
                 num_of_credits=10,
                 is_summative=True,
             ),
+            Assessment(  # 5
+                module_id=2,
+                lecturer_id=1,
+                title="Formative Assessment",
+                due_date=None,
+                time_limit=60 * 60 * 30,
+                num_of_credits=12,
+                is_summative=False,
+            ),
+            Assessment(  # 6
+                lecturer_id=2,
+                title="No Module Summative",
+                due_date=None,
+                time_limit=60 * 60 * 45,
+                num_of_credits=10,
+                is_summative=True,
+            ),
+            Assessment(  # 7
+                lecturer_id=3,
+                title="No module Formative",
+                due_date=None,
+                time_limit=60 * 60 * 20,
+                num_of_credits=40,
+                is_summative=False,
+            ),
+            Assessment(  # 8
+                lecturer_id=1,
+                title=" A title",
+                due_date=None,
+                num_of_credits=10,
+                is_summative=True,
+            ),
         ]
     )
 

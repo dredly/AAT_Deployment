@@ -1,9 +1,10 @@
+from datetime import datetime
 from email.policy import default
-from tkinter.tix import Tree
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
 from flask_login import LoginManager
+
 
 # First trying to get it working without model inheritance
 
@@ -76,14 +77,14 @@ class Assessment(db.Model):
     __tablename__ = "Assessment"
     assessment_id = db.Column(db.Integer, primary_key=True)
     # --- Foreign Keys --- CONTAINS PLACEHOLDERS
-    module_id = db.Column(db.Integer, db.ForeignKey("Module.module_id"), nullable=False)
+    module_id = db.Column(db.Integer, db.ForeignKey("Module.module_id"))
     lecturer_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     # --- Other Columns ---
     title = db.Column(db.String(120), nullable=False)
-    due_date = db.Column(db.DateTime)
+    due_date = db.Column(db.DateTime())
     time_limit = db.Column(db.Integer)  # Time limit in seconds
-    num_of_credits = db.Column(db.Integer, nullable=False, default=0)
-    is_summative = db.Column(db.Boolean, nullable=False, default=False)
+    num_of_credits = db.Column(db.Integer, nullable=True, default=0)
+    is_summative = db.Column(db.Boolean, nullable=True, default=False, server_default="False")
     # --- Relationships --- TODO: add more as tables are added to the db
     question_t1 = db.relationship("QuestionT1", backref="assessment", lazy=True)
     question_t2 = db.relationship("QuestionT2", backref="assessment", lazy=True)
