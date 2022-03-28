@@ -14,7 +14,7 @@
 <h4>Question options:</h4>
 {%for option in options%}
 <p>{{option.option_text}}
-    {%if option.is_correct%} Correct!
+    {%if option.is_correct%} - This is the correct answer.
 
     {% endif%}</p>
 {%endfor%}
