@@ -44,6 +44,7 @@ def new_question_t1():
         option_b_text = request.form["option_b"]
         option_c_text = request.form["option_c"]
         correct_option = request.form["correct_option"]
+        print(correct_option)
         num_of_marks = request.form["num_of_marks"]
         difficulty = request.form["difficulty"]
         feedback_if_correct = request.form["feedback_if_correct"]
@@ -62,11 +63,11 @@ def new_question_t1():
         option_a = Option(q_t1_id=found_question.q_t1_id, option_text=option_a_text)
         option_b = Option(q_t1_id=found_question.q_t1_id, option_text=option_b_text)
         option_c = Option(q_t1_id=found_question.q_t1_id, option_text=option_c_text)
-        if correct_option == "a":
+        if correct_option == "0":
             option_a.is_correct = True
-        elif correct_option == "b":
+        elif correct_option == "1":
             option_b.is_correct = True
-        elif correct_option == "c":
+        elif correct_option == "2":
             option_c.is_correct = True
         db.session.add(option_a)
         db.session.add(option_b)
