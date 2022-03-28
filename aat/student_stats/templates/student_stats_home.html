@@ -33,7 +33,7 @@
                 format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
         {% endfor %}
     {% endfor %}
-
+    <a href="{{ url_for('student_stats.download')}}">Download CSV</a>
     <hr>
     <h2>Responses</h2>
  
@@ -45,7 +45,8 @@
         <p>Response: {{response.response_content}} (Marks: {{response.is_correct}})</p>
     
     {% endfor %}
- 
+    
+
 
     <script>
         const correct = '{{overall_results["sum_of_marks_awarded"]}}';
