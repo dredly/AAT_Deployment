@@ -1,15 +1,20 @@
 {% extends("layout.html") %}
+
 {% block content %}
+
 <h1>{{assessment.title}}</h1>
+
 <h2> Module ID:{{assessment.module_id}}</h2>
 <h2> Lecturer_ID:{{assessment.lecturer_id}}</h2>
 <h2> Due Date:{{current_date}}</h2>
 <h2> Total Credits:{{assessment.num_of_credits}}</h2>
 <h2> Time_Limit: {{assessment.time_limit}}s </h2>
 <h2> Summative?: {{assessment.is_summative}}</h2>
+
 {% for question in questions %}
-<h3>{{question.question_text}}</h3>
-<p>{{question.num_of_marks}} marks --- Difficulty = {{question.difficulty}}/3</p>
-<hr>
+    <h3>{{question.question_text}}</h3>
+    <p>{{question.num_of_marks}} marks --- Difficulty = {{question.difficulty}}/3</p>
+    <hr>
 {% endfor %}
+
 {% endblock %}

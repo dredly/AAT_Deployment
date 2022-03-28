@@ -26,17 +26,16 @@ class AnswerType2Form(FlaskForm):
     answer = TextAreaField(validators=[DataRequired()])
     submit = SubmitField("Submit Answer")
 
+
+# CRUD Assessment forms
+
 class AssessmentForm(FlaskForm):
-    
-    title = TextAreaField(
-        "Enter Title", default="", validators=[DataRequired()]
-    )
+    title = TextAreaField("Enter Title", default="", validators=[DataRequired()])
     module_id= IntegerField("Enter module ID",validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
-    due_date = DateField(
-        "Enter the due date", format='%Y-%m-%d')
+    due_date = DateField("Enter the due date", format='%Y-%m-%d')
     num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
-    is_summative = BooleanField()
+    is_summative = BooleanField("Select if Assessment is summative")
     submit = SubmitField("Create Assessment")
 
 class DeleteAssessmentForm(FlaskForm):
@@ -44,21 +43,20 @@ class DeleteAssessmentForm(FlaskForm):
     cancel = SubmitField("Cancel")
 
 class EditAssessmentForm(FlaskForm):
-    title = TextAreaField(
-        "Enter Title", default="", validators=[DataRequired()]
-    )
+    title = TextAreaField("Enter Title", default="", validators=[DataRequired()])
     module_id= IntegerField("Enter module ID",validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
-    due_date = DateField(
-        "Enter the due date", format='%Y-%m-%d')
+    due_date = DateField("Enter the due date", format='%Y-%m-%d')
     num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
-    is_summative = BooleanField()
+    is_summative = BooleanField("Select if Assessment is summative")
     submit = SubmitField("Done")
 
 class RemoveQuestionForm(FlaskForm):
     submit = SubmitField("Remove")
     cancel = SubmitField("Cancel")
 
+# Taken from Questions.forms 
+# Will be removed at a later date from page.
 class AddQuestionFilterForm(FlaskForm):
     filter = SelectField(
         "Filter questions by:",

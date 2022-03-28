@@ -75,7 +75,7 @@ footer {
 /* BUTTONS */
 
 /* Create Assessment Button */
-.Create_Button {
+.Create_Assessment_Button {
   border-radius: 4px;
   box-shadow: rgba(0, 0, 0, .1) 0 2px 4px 0;
   box-sizing: border-box;
@@ -91,20 +91,20 @@ footer {
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
+  margin: .5;
 }
 
-.Create_Button:hover {
+.Create_Assessment_Button:hover {
   box-shadow: rgba(0, 0, 0, .15) 0 3px 9px 0;
   background-color: #8ABD91;
-  border: 1px solid #8ABD91;
 }
 
 @media (min-width: 768px) {
-  .Create_Button {
+  .Create_Assessment_Button {
     padding: 10px 30px;
   }
 }
-.Button_Link{
+.Create_Assessment_Link{
 	text-decoration: none;
 	color: black;
 }

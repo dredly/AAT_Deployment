@@ -157,6 +157,8 @@ def remove_question_t1(id, id3):
         return redirect(url_for("assessments.edit_assessment", id=id))
     return render_template("remove_question.html", question=question, form=form, assessment=assessment)
 
+
+# No longer required | removed at later date
 @assessments.route("/add_questions")
 def add_questions():
     form = AddQuestionFilterForm()
