@@ -84,9 +84,7 @@ class QuestionT1(db.Model):
     __tablename__ = "QuestionT1"
     q_t1_id = db.Column(db.Integer, primary_key=True)
     # --- Foreign Keys ---
-    assessment_id = db.Column(
-        db.Integer, db.ForeignKey("Assessment.assessment_id"), nullable=False
-    )
+    assessment_id = db.Column(db.Integer, db.ForeignKey("Assessment.assessment_id"))
     # --- Other Columns ---
     num_of_marks = db.Column(db.Integer, nullable=False)
     question_text = db.Column(db.Text, nullable=False)
@@ -104,9 +102,7 @@ class QuestionT2(db.Model):
     __tablename__ = "QuestionT2"
     q_t2_id = db.Column(db.Integer, primary_key=True)
     # --- Foreign Keys ---
-    assessment_id = db.Column(
-        db.Integer, db.ForeignKey("Assessment.assessment_id"), nullable=False
-    )
+    assessment_id = db.Column(db.Integer, db.ForeignKey("Assessment.assessment_id"))
     # --- Other Columns ---
     num_of_marks = db.Column(db.Integer, nullable=False)
     question_text = db.Column(db.Text, nullable=False)

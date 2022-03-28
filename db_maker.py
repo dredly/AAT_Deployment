@@ -13,7 +13,6 @@ with app.app_context():
     ###########
     # MODULES #
     ###########
-
     db.session.add_all(
         [
             Module(  # 1
@@ -75,6 +74,7 @@ with app.app_context():
     #####################
     db.session.add_all(
         [
+            # Questions on assignments
             QuestionT1(  # 1
                 assessment_id=1,
                 num_of_marks=2,
@@ -99,6 +99,21 @@ with app.app_context():
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
             ),
+            # Floating Questions
+            QuestionT1(  # 4
+                num_of_marks=5,
+                question_text="What is the initial capacity of an array list?",
+                difficulty=1,
+                feedback_if_correct="Well done!",
+                feedback_if_wrong="Better luck next time :)",
+            ),
+            QuestionT1(  # 5
+                num_of_marks=5,
+                question_text="What does SQL stand for?",
+                difficulty=1,
+                feedback_if_correct="Well done!",
+                feedback_if_wrong="Better luck next time :)",
+            ),
         ]
     )
 
@@ -112,9 +127,20 @@ with app.app_context():
             Option(q_t1_id=1, option_text="commit"),  # 3
             Option(q_t1_id=2, option_text="wrong answer"),  # 4
             Option(q_t1_id=2, option_text="right answer", is_correct=True),  # 5
-            Option(q_t1_id=3, option_text="wrong answer"),  # 6
-            Option(q_t1_id=3, option_text="right answer", is_correct=True),  # 7
-            Option(q_t1_id=3, option_text="another wrong answer"),  # 8
+            Option(q_t1_id=2, option_text="also the wrong answer"),  # 6
+            Option(q_t1_id=3, option_text="wrong answer"),  # 7
+            Option(q_t1_id=3, option_text="right answer", is_correct=True),  # 8
+            Option(q_t1_id=3, option_text="another wrong answer"),  # 9
+            Option(q_t1_id=4, option_text="12"),  # 10
+            Option(q_t1_id=4, option_text="10", is_correct=True),  # 11
+            Option(q_t1_id=4, option_text="100"),  # 12
+            Option(q_t1_id=5, option_text="Super Quick Lunch"),  # 13
+            Option(
+                q_t1_id=5, option_text="Standard Query Language", is_correct=True
+            ),  # 14
+            Option(
+                q_t1_id=5, option_text="Why did I choose the databases module?????"
+            ),  # 15
         ]
     )
 
@@ -122,6 +148,7 @@ with app.app_context():
     # QUESTIONS: TYPE 2 #
     #####################
     db.session.add_all(
+        # Questions on assignments
         [
             QuestionT2(  # 1
                 assessment_id=1,
@@ -158,6 +185,31 @@ with app.app_context():
                 difficulty=3,
                 feedback_if_correct="WOOF!",
                 feedback_if_wrong="GRRRRRRRRRR",
+            ),
+            # Floating Questions
+            QuestionT2(  # 5
+                num_of_marks=10,
+                question_text="Why didn't the eagles take the ring to Mordor?",
+                correct_answer="Dunno",
+                difficulty=3,
+                feedback_if_correct="Thats's right!",
+                feedback_if_wrong="WRONG",
+            ),
+            QuestionT2(  # 6
+                num_of_marks=4,
+                question_text="What year was the Norman invasion?",
+                correct_answer="1066",
+                difficulty=1,
+                feedback_if_correct="Indeed it was!",
+                feedback_if_wrong="WRONG!!!",
+            ),
+            QuestionT2(  # 7
+                num_of_marks=5,
+                question_text="What does JSON stand for?",
+                correct_answer="JavaScript Object Notation",
+                difficulty=2,
+                feedback_if_correct="Yup!",
+                feedback_if_wrong="nope that's wrong",
             ),
         ]
     )
@@ -197,7 +249,6 @@ with app.app_context():
     #####################
     # RESPONSES: TYPE 2 #
     #####################
-
     db.session.add_all(
         [
             ResponseT2(  # 1

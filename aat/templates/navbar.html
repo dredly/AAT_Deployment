@@ -8,6 +8,9 @@
 		<li>
 			<a href="{{ url_for('assessments.index') }}">Assessments</a>
 		</li>
+		<li>
+			<a href="{{ url_for('questions.index') }}">Questions</a>
+		</li>
 		{% if not current_user.is_authenticated %}
 		<li>
 			<a href="{{ url_for('auth.login') }}">Login</a>
@@ -27,14 +30,12 @@
 			<a href="{{ url_for('staff_stats.index') }}">Staff Stats</a>
 		</li>
 		<li>
-			<a href="{{ url_for('student_stats.course_view') }}"
-				>Student Stats</a
-			>
+			<a href="{{ url_for('student_stats.course_view') }}">Student Stats</a>
 		</li>
 		{# {% if current_user.can(Permission.ADMIN) %} #}
 		<li class="admin">
 			<a href="{{ url_for('admin.index') }}">Admin</a>
 		</li>
-			{# {% endif %} #}
-</ul>
+		{# {% endif %} #}
+	</ul>
 </nav>
