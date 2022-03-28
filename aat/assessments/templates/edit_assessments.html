@@ -1,0 +1,58 @@
+{% extends("layout.html") %}
+
+{% block content %}
+
+
+<div class="form-container">
+    <h1>Edit {{assessment.title}}</h1>
+    <form method="POST" action="">
+        {{ form.csrf_token }}
+        <div>
+            <div>{{form.title.label}}</div>{{form.title}}
+        </div>
+        <div>
+            <div>{{form.module_id.label}}</div>{{form.module_id}}
+        </div>
+        <div>
+            <div>{{form.due_date.label}}</div>{{form.due_date}}
+        </div>
+        <div>
+            <div>{{form.time_limit.label}}</div>{{form.time_limit}}
+        </div>
+        <div>
+            <div>{{form.num_of_credits.label}}</div>{{form.num_of_credits}}
+        </div>
+        <div>
+            <div>{{form.is_summative.label}}</div>{{form.is_summative}}
+        </div>
+        {{form.submit}}
+    </form>
+</div>
+
+<h2>{{assessment.title}} Questions</h2>
+
+<div class = "Assessment_Edit_Parent">
+
+    {% for question in assessment.question_t1 %}
+        <div class = "Assessment_Edit_Children">
+            <h3>{{question}}</h3>
+                {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
+                <a href="{{url_for('assessments.remove_question_t1', id3=question.q_t1_id, id=assessment.assessment_id)}}"><button class="delete-button" class="Assessment_Edit_Child">Remove Question</a>
+                {% endif %}
+        </div>
+    {% endfor %}
+
+    {% for question in assessment.question_t2 %}   
+        <div class = "Assessment_Edit_Children">
+            <h3>{{question}}</h3>
+                    {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
+                    <a href="{{url_for('assessments.remove_question_t2', id2=question.q_t2_id, id=assessment.assessment_id)}}"><button class="delete-button" class="Assessment_Edit_Child">Remove Question</a>
+                    {% endif %}
+        </div>
+    {% endfor %} 
+</div>
+
+<!--[Matt] To Do, add routes to assesment  -->
+<h1>Add a question</h1>
+<a href="{{url_for('assessments.add_questions')}}"><button>Add Question</button></a>
+{% endblock %}

@@ -1,33 +1,67 @@
 {% extends("layout.html") %} 
 {% block content %}
-	<h1>All assessments here</h1>
-	{% for assessment in assessments %}
-		<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
-			<h2>{{ assessment.title }}</h2>
-		</a>
-		<button type="button">
-			<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}">Take Assessment</a>
-		</button>
-	{% endfor %}
 
-	<!-- Just used for viewing how data is displayed -->
-	{# Rich: I did some testing of the database relations here #}
+ <h1> Create Assessments here</h1>
+
+	<button type="button" class="Create_Assessment_Button" role="button">
+		<a href="{{ url_for('assessments.new_assessment') }}" class="Create_Assessment_Link">Create Assessment</a>
+	</button>
+
 	<hr />
-	<h2>Modules</h2>
+
+	<h1>Modules</h1>
+
 	{% for module in modules %}
-		<h3>{{ module.title }} {{module.total_credits}}</h3>
+		<h2>{{ module.title }} {{module.total_credits}}</h2>
 		{% for assessment in module.assessment %}
-			<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
-				<p>{{assessment.title}}</p>
-			</a>
-			<ul>
-				{% for question in assessment.question_t1 %}
-					<li>{{question}}</li>
-				{% endfor %} 
-				{% for question in assessment.question_t2 %}
-					<li>{{question}}</li>
-				{% endfor %} 
-			</ul>
+			{% if assessment.is_summative %}
+				<div class = "Assessment_Index_Parent">
+					<div class = "Assessment_Index_Children">
+						<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}" >
+							<h3>{{assessment.title}}</h4>
+						</a>
+						<!-- Commented out for development -->
+						<!-- {% if current_user.can(Permission.WRITE_ASSESSMENT) %} -->
+							<button type="button" class = "Assessment_Index_Child">
+								<a href="{{ url_for('assessments.edit_assessment', id=assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
+							</button>
+							<button type="button" class = "Assessment_Index_Child">
+								<a href="{{ url_for('assessments.delete_assessment', id=assessment.assessment_id) }}"class="Assessment_Index_Text">Delete Assessment</a>
+							</button>
+						<!-- {% endif %}	 -->
+							<button type="button" class = "Assessment_Index_Child">
+								<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}" class="Assessment_Index_Text">Take Assessment</a>
+							</button>
+					</div>
+				</div>
+			{% endif %}	
 		{% endfor %} 
 	{% endfor %} 
+
+	<hr />
+
+	<h1> Other Assessments </h1>
+			{% for assessment in assessments %}
+				{% if assessment.module is none %}
+					<div class = "Assessment_Index_Parent">
+						<div class = "Assessment_Index_Children">
+							<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}">
+								<h4>{{ assessment.title }}</h2>
+							</a>
+							<!-- Commented out for development -->
+							<!-- {% if current_user.can(Permission.WRITE_ASSESSMENT) %} -->
+								<button type="button" class = "Assessment_Index_Child">
+									<a href="{{ url_for('assessments.edit_assessment', id=assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
+								</button>
+								<button type="button" class = "Assessment_Index_Child">
+									<a href="{{ url_for('assessments.delete_assessment', id=assessment.assessment_id) }}" class="Assessment_Index_Text">Delete Assessment</a>
+								</button>
+							<!-- {% endif %}	 -->
+								<button type="button" class = "Assessment_Index_Child">
+									<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}" class="Assessment_Index_Text">Take Assessment</a>
+								</button>
+						</div>
+					</div>
+				{% endif %}
+			{% endfor %}
 {% endblock %}

@@ -39,6 +39,15 @@ nav li a {
 	text-decoration: none;
 }
 
+/* FOOTER */
+footer {
+	padding: 0.8rem 0;
+	/* position:fixed; */
+	/* bottom:0px; */
+	text-align: center;
+	width: 100%;
+}
+
 /* FORMS */
 .inline-label{
 	margin-right: 1rem;
@@ -57,6 +66,92 @@ nav li a {
 	margin: 0;
 }
 
+/* WARNING MESSAGE  */
+
+.warning{
+	color: red;
+}
+
+/* BUTTONS */
+
+/* Create Assessment Button */
+.Create_Assessment_Button {
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, .1) 0 2px 4px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  font-family: "Akzidenz Grotesk BQ Medium", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  outline: none;
+  outline: 0;
+  padding: 10px 25px;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  margin: .5;
+}
+
+.Create_Assessment_Button:hover {
+  box-shadow: rgba(0, 0, 0, .15) 0 3px 9px 0;
+  background-color: #8ABD91;
+}
+
+@media (min-width: 768px) {
+  .Create_Assessment_Button {
+    padding: 10px 30px;
+  }
+}
+.Create_Assessment_Link{
+	text-decoration: none;
+	color: black;
+}
+
+/* EDIT DELETE TAKE ASSESSMENT BUTTONS ON INDEX */
+.Assessment_Index_Parent{
+	display: flex;
+	justify-content: space-between;
+}
+.Assessment_Index_Children{
+	display: flex;
+	align-items: center;
+}
+.Assessment_Index_Child{
+	display: flex;
+	margin-left: 2vw;
+	flex-wrap: wrap;
+	max-width: 10vw;
+	padding-bottom: .5vh;
+
+}
+.Assessment_Index_Text{
+	text-decoration: none;
+	color: black;
+}
+
+/* EDIT_ASSESSMENT.html */
+.Assessment_Edit_Parent{
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+}
+.Assessment_Edit_Children{
+	display: flex;
+	align-items:center;
+	justify-items: flex-start;
+	justify-content: space-between;
+	margin-right: 5vw;
+}
+.Assessment_Edit_Child{
+	display: flex;
+	flex-wrap: wrap;
+	max-width: 6vw;
+	padding-bottom: .5vh;
+	background-color:red ;
+
+}
 /* Other */
 
 .delete-button {
@@ -72,5 +167,3 @@ footer {
 	text-align: center;
 	width: 100%;
 }
-
-
