@@ -132,7 +132,9 @@ class QuestionT1(db.Model):
     feedback_if_correct = db.Column(db.Text, nullable=False)
     feedback_if_wrong = db.Column(db.Text, nullable=False)
     # --- Relationships ---
-    option = db.relationship("Option", backref="questiont1", lazy=True)
+    option = db.relationship(
+        "Option", backref="questiont1", lazy=True, cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return self.question_text
