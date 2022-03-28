@@ -1,6 +1,6 @@
 from . import student_stats
-from flask import render_template
 from flask_login import current_user
+from flask import render_template, redirect, url_for
 
 # MODELS
 from ..models import (
@@ -17,7 +17,7 @@ from ..models import (
 @student_stats.route("/")
 def course_view():
     if not current_user.is_authenticated:
-        return render_template("please_log_in.html")
+        return redirect(url_for("auth.login"))
     student_id = current_user.id
     modules = Module.query.all()
     return render_template("testing.html", modules=modules)

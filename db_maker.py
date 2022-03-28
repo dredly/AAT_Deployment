@@ -237,11 +237,24 @@ with app.app_context():
                 is_admin=True,
                 role_id=1,
             ),
+            # made one letter accounts for ease of logging in as different roles (student=s, lecturer=l, admin=a)
             User(  # 4
+                name="s",
+                password="s",
+                is_admin=True,
+                role_id=1,
+            ),
+            User(  # 5
+                name="l",
+                password="l",
+                is_admin=True,
+                role_id=2,
+            ),
+            User(  # 6
                 name="a",
                 password="a",
                 is_admin=True,
-                role_id=1,
+                role_id=3,
             ),
         ]
     )
