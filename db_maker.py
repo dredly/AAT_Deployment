@@ -132,15 +132,15 @@ with app.app_context():
             Option(q_t1_id=3, option_text="right answer", is_correct=True),  # 8
             Option(q_t1_id=3, option_text="another wrong answer"),  # 9
             Option(q_t1_id=4, option_text="12"),  # 10
-            Option(q_t1_id=4, option_text="10", is_correct=True),  # 10
-            Option(q_t1_id=4, option_text="100"),  # 10
-            Option(q_t1_id=5, option_text="Super Quick Lunch"),  # 10
+            Option(q_t1_id=4, option_text="10", is_correct=True),  # 11
+            Option(q_t1_id=4, option_text="100"),  # 12
+            Option(q_t1_id=5, option_text="Super Quick Lunch"),  # 13
             Option(
                 q_t1_id=5, option_text="Standard Query Language", is_correct=True
-            ),  # 10
+            ),  # 14
             Option(
                 q_t1_id=5, option_text="Why did I choose the databases module?????"
-            ),  # 10
+            ),  # 15
         ]
     )
 
@@ -187,7 +187,7 @@ with app.app_context():
                 feedback_if_wrong="GRRRRRRRRRR",
             ),
             # Floating Questions
-            QuestionT2(  # 4
+            QuestionT2(  # 5
                 num_of_marks=10,
                 question_text="Why didn't the eagles take the ring to Mordor?",
                 correct_answer="Dunno",
@@ -195,7 +195,7 @@ with app.app_context():
                 feedback_if_correct="Thats's right!",
                 feedback_if_wrong="WRONG",
             ),
-            QuestionT2(  # 4
+            QuestionT2(  # 6
                 num_of_marks=4,
                 question_text="What year was the Norman invasion?",
                 correct_answer="1066",
@@ -203,7 +203,7 @@ with app.app_context():
                 feedback_if_correct="Indeed it was!",
                 feedback_if_wrong="WRONG!!!",
             ),
-            QuestionT2(  # 4
+            QuestionT2(  # 7
                 num_of_marks=5,
                 question_text="What does JSON stand for?",
                 correct_answer="JavaScript Object Notation",
