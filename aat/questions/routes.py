@@ -126,7 +126,13 @@ def edit_question_t1(id):
 
 @questions.route("/type1/<int:id>/delete", methods=["GET", "POST"])
 def delete_question_t1(id):
-    return "Delete form will go here"
+    question = QuestionT1.query.get_or_404(id)
+    form = DeleteForm()
+    if request.method == "POST":
+        db.session.delete(question)
+        db.session.commit()
+        return redirect(url_for("questions.index"))
+    return render_template("delete_question_t1.html", question=question, form=form)
 
 
 # --- Type 2 routes ---
