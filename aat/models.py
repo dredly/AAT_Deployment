@@ -16,10 +16,11 @@ login_manager = LoginManager()
 class Badge(db.Model):
     __tablename__ = "badges"
     badge_id = db.Column(db.Integer, primary_key=True)
-    # --- Foreign Keys ---
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    # --- Relationships ---
+    awarded_badge = db.relationship("Awarded_Badge", backref="badge", lazy=True)
     # --- Other Columns ---
     name = db.Column(db.String(20))
+    description = db.Column(db.Text)
 
     def __repr__(self):
         return self.name
@@ -28,13 +29,31 @@ class Badge(db.Model):
 class Achievement(db.Model):
     __tablename__ = "achievements"
     achievement_id = db.Column(db.Integer, primary_key=True)
-    # --- Foreign Keys ---
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    # --- Relationships ---
+    awarded_achievement = db.relationship("Awarded_Achievement", backref="achievement", lazy=True)
     # --- Other Columns ---
     name = db.Column(db.String(20))
+    description = db.Column(db.Text)
 
     def __repr__(self):
         return self.name
+
+
+class Awarded_Badge(db.Model):
+    __tablename__ = "awarded_badges"
+    id = db.Column(db.Integer, primary_key=True)
+    # --- Foreign Keys ---
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    # --- Other Columns ---
+    badge_id = db.Column(db.Integer, db.ForeignKey("badges.badge_id"), nullable=False)
+
+
+class Awarded_Achievement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    # --- Foreign Keys ---
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    # --- Other Columns ---
+    achievement_id = db.Column(db.Integer, db.ForeignKey("achievements.achievement_id"), nullable=False)
 
 
 class ResponseT2(db.Model):
@@ -159,8 +178,8 @@ class User(UserMixin, db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
     # --- Relationships ---
     assessment = db.relationship("Assessment", backref="user", lazy=True)
-    badge = db.relationship("Badge", backref="user", lazy=True)
-    achievement = db.relationship("Achievement", backref="user", lazy=True)
+    awarded_badge = db.relationship("Awarded_Badge", backref="user", lazy=True)
+    awarded_achievement = db.relationship("Awarded_Achievement", backref="user", lazy=True)
     t2_responses = db.relationship(
         "ResponseT2",
         foreign_keys=[ResponseT2.user_id],
