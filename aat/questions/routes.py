@@ -1,8 +1,16 @@
 from flask import request, redirect, url_for, render_template
 from .forms import QuestionT1Form, QuestionT2Form, FilterForm, DeleteForm
 from ..models import QuestionT1, QuestionT2, Option
+from ..decorators import permission_required
+from .. import Permission
 from . import questions
 from .. import db
+
+# Comment this out if you want to disable auth for question routes
+@questions.before_request
+@permission_required(Permission.WRITE_ASSESSMENT)
+def require_permission():
+    pass
 
 
 @questions.route("/")
