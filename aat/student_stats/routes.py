@@ -19,8 +19,24 @@ def course_view():
     if not current_user.is_authenticated:
         return redirect(url_for("auth.login"))
     student_id = current_user.id
-    modules = Module.query.all()
-    return render_template("testing.html", modules=modules)
+
+    sum_of_total_marks = 0
+    sum_of_possible_marks = 0
+
+    for response in current_user.t2_responses:
+        print(f"Module: {response.assessment.module}")
+        print(f"Assessment: {response.assessment}")
+        print(f"{response.question} ({response.question.num_of_marks})")
+        print(f"> {response.response_content} ({response.is_correct})")
+        sum_of_total_marks += (
+            response.question.num_of_marks if response.is_correct else 0
+        )
+        sum_of_possible_marks += response.question.num_of_marks
+
+    overall_results = (sum_of_total_marks, sum_of_possible_marks)
+    # How many marks
+    # Each question
+    return render_template("testing.html", overall_results=overall_results)
 
 
 @student_stats.route("/old_route/")

@@ -1,6 +1,21 @@
 {% extends 'layout.html' %}
 {% block content %}
     <h1>Welcome {{current_user.name}}. Let's see how you have done.</h1>
+    <h2>
+        Overall Marks
+    </h2>
+    <p>{{overall_results.0}}/{{overall_results.1}}
+    ({{ "%.2d" |
+	format((overall_results.0/overall_results.1)*100)}}%)</p>
+    <h2>Responses</h2>
+    {% for response in current_user.t2_responses %}
+        <h3>Module: {{response.assessment.module}}</h3>
+        <h4>Assessment: {{response.assessment}}</h4>
+        <p>Question: {{response.question}} (Marks: {{response.question.num_of_marks}})</p>
+        <p>Response: {{response.response_content}} (Marks: {{response.is_correct}})</p>
+    {% endfor %}
+    
+    <hr>
     <h2>Modules</h2>
     {% for module in modules %}
         <p>{{module}}</p>
@@ -18,4 +33,5 @@
             {% endfor %}
         </ul>
     {% endfor %}
+    
 {% endblock content %}
