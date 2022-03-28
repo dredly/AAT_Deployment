@@ -107,11 +107,24 @@ class Assessment(db.Model):
         return self.title
 
 
+class Tag(db.Model):
+    __tablename__ = "Tag"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    # --- Relationships ---
+    question_t1 = db.relationship("QuestionT1", backref="tag", lazy=True)
+    question_t2 = db.relationship("QuestionT2", backref="tag", lazy=True)
+
+    def __repr__(self):
+        return self.name
+
+
 class QuestionT1(db.Model):
     __tablename__ = "QuestionT1"
     q_t1_id = db.Column(db.Integer, primary_key=True)
     # --- Foreign Keys ---
     assessment_id = db.Column(db.Integer, db.ForeignKey("Assessment.assessment_id"))
+    tag_id = db.Column(db.Integer, db.ForeignKey("Tag.id"))
     # --- Other Columns ---
     num_of_marks = db.Column(db.Integer, nullable=False)
     question_text = db.Column(db.Text, nullable=False)
@@ -130,6 +143,7 @@ class QuestionT2(db.Model):
     q_t2_id = db.Column(db.Integer, primary_key=True)
     # --- Foreign Keys ---
     assessment_id = db.Column(db.Integer, db.ForeignKey("Assessment.assessment_id"))
+    tag_id = db.Column(db.Integer, db.ForeignKey("Tag.id"))
     # --- Other Columns ---
     num_of_marks = db.Column(db.Integer, nullable=False)
     question_text = db.Column(db.Text, nullable=False)
@@ -169,7 +183,7 @@ class Module(db.Model):
     title = db.Column(db.String(120), unique=True, nullable=False)
     total_credits = db.Column(db.Integer, nullable=False)
     # --- Relationships ---
-    assessment = db.relationship("Assessment", backref="module", lazy=True)
+    assessments = db.relationship("Assessment", backref="module", lazy=True)
 
     def __repr__(self):
         return self.title
@@ -183,7 +197,8 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
     # --- Relationships ---
-    assessment = db.relationship("Assessment", backref="user", lazy=True)
+
+    assessments = db.relationship("Assessment", backref="user", lazy=True)
     awarded_badge = db.relationship("Awarded_Badge", backref="user", lazy=True)
     awarded_achievement = db.relationship(
         "Awarded_Achievement", backref="user", lazy=True

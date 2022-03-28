@@ -102,6 +102,12 @@ with app.app_context():
             ),
         ]
     )
+    #######
+    # TAG #
+    #######
+    db.session.add_all(
+        [Tag(name="abstract"), Tag(name="boolean"), Tag(name="computational")]
+    )
 
     #####################
     # QUESTIONS: TYPE 1 #
@@ -111,6 +117,7 @@ with app.app_context():
             # Questions on assignments
             QuestionT1(  # 1
                 assessment_id=1,
+                tag_id=1,
                 num_of_marks=2,
                 question_text="Which command do use use to view a particular commit?",
                 difficulty=1,
@@ -186,6 +193,7 @@ with app.app_context():
         [
             QuestionT2(  # 1
                 assessment_id=1,
+                tag_id=1,
                 num_of_marks=5,
                 question_text="What flag do you use to add a commit message?",
                 correct_answer="-m",
