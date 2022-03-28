@@ -1,13 +1,92 @@
 from . import student_stats
-from flask import render_template
+from flask_login import current_user
+from flask import render_template, redirect, url_for
+from sqlalchemy import func
+
+# MODELS
+from ..models import (
+    Module,
+    Assessment,
+    QuestionT1,
+    QuestionT2,
+    Option,
+    User,
+    ResponseT2,
+)
 
 
 @student_stats.route("/")
 def course_view():
+    if not current_user.is_authenticated:
+        return redirect(url_for("auth.login"))
+
+    query = ResponseT2.query.filter_by(user_id=current_user.id).all()
+    for i in query:
+        print(i)
+
+    student_id = current_user.id
+
+    # GET SUM OF QUESTIONS FOR EACH ASSESSMENT
+    assessment_marks_dict = {}
+
+    for response in current_user.t2_responses:
+        if response.assessment not in assessment_marks_dict:
+            assessment_marks_dict[response.assessment] = {
+                "marks_awarded": response.question.num_of_marks
+                if response.is_correct
+                else 0,
+                "marks_possible": response.question.num_of_marks,
+            }
+        else:
+            assessment_marks_dict[response.assessment]["marks_awarded"] += (
+                response.question.num_of_marks if response.is_correct else 0
+            )
+            assessment_marks_dict[response.assessment][
+                "marks_possible"
+            ] += response.question.num_of_marks
+
+    # ADD THAT TO THE MODULE DICT
+    module_dict = {}
+
+    for module in Module.query.all():
+        for assessment, data in assessment_marks_dict.items():
+            if assessment.module_id == module.module_id:
+                module_dict[module] = {assessment: data}
+
+    print(module_dict)
+
+    sum_of_marks_awarded = 0
+    sum_of_marks_possible = 0
+
+    for module in module_dict:
+        for assessment, data in assessment_marks_dict.items():
+            sum_of_marks_awarded += data["marks_awarded"]
+            sum_of_marks_possible += data["marks_possible"]
+
+    if sum_of_marks_possible == 0:
+        return render_template("no_questions_answered.html")
+
+    overall_results = {
+        "sum_of_marks_awarded": sum_of_marks_awarded,
+        "sum_of_marks_possible": sum_of_marks_possible,
+    }
+    # How many marks
+    # Each question
+    return render_template(
+        "student_stats_home.html",
+        overall_results=overall_results,
+        module_dict=module_dict,
+    )
+
+
+@student_stats.route("/old_route/")
+def old_course_view():
     """
     Queries StudentAnswers table (using student_id)
     Makes [...]
     """
+    if not current_user.is_authenticated:
+        return render_template("please_log_in.html")
     try:
         # This value would come from Logged In user.
         student_id = 1

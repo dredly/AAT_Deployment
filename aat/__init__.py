@@ -9,6 +9,7 @@ from .models import (
     db,
     login_manager,
     Assessment,
+    Tag,
     QuestionT1,
     QuestionT2,
     Option,
@@ -59,6 +60,7 @@ from . import routes
 admin = Admin(app=app, name="Admin Panel", template_mode="bootstrap3")
 admin.add_views(
     AdminView(Assessment, db.session),
+    AdminView(Tag, db.session),
     AdminView(QuestionT1, db.session),
     AdminView(QuestionT2, db.session),
     AdminView(Option, db.session),
