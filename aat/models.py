@@ -203,7 +203,7 @@ class User(UserMixin, db.Model):
             self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
             .filter_by(assessment_id=assessment.assessment_id)
             .first()
-            iws not None
+            is not None
         )
 
     def remove_answer(self, question, assessment):
