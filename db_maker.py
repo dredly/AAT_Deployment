@@ -327,6 +327,28 @@ with app.app_context():
                 response_content="-m",
                 is_correct=True,
             ),
+            # RESPONSES for Student "s"
+            ResponseT2(  # 4
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=1,
+                response_content="-m",
+                is_correct=True,
+            ),
+            ResponseT2(  # 5
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=2,
+                response_content="adad",
+                is_correct=False,
+            ),
+            ResponseT2(  # 6
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=3,
+                response_content=".",
+                is_correct=True,
+            ),
         ]
     )
 
@@ -338,38 +360,38 @@ with app.app_context():
             Badge(
                 badge_id=1,
                 name="A Worthy Challenge",
-                description="Dethrones the Top of the Leaderboard with the 'Ace' badge"
+                description="Dethrones the Top of the Leaderboard with the 'Ace' badge",
             ),
             Badge(
                 badge_id=2,
                 name="Troublemaker",
-                description="Dethrone the Top of Leaderboard with the 'Untouchable' badge"
+                description="Dethrone the Top of Leaderboard with the 'Untouchable' badge",
             ),
             Badge(
                 badge_id=3,
                 name="Ace",
-                description="Stay at the top of the leaderboard for a month"
+                description="Stay at the top of the leaderboard for a month",
             ),
             Badge(
                 badge_id=4,
                 name="Untouchable",
-                description="Stay at the top of the leaderboard for a week"
+                description="Stay at the top of the leaderboard for a week",
             ),
             Badge(
                 badge_id=5,
                 name="Loyalty",
-                description="Keep returning to practice for 7 weeks"
+                description="Keep returning to practice for 7 weeks",
             ),
             Badge(
                 badge_id=6,
                 name="Clandestine",
-                description="Attempt an exercise after midnight"
+                description="Attempt an exercise after midnight",
             ),
             Badge(
                 badge_id=7,
                 name="Brobdingnagian",
-                description="Achieve very high stat numbers"
-            )
+                description="Achieve very high stat numbers",
+            ),
         ]
     )
 
@@ -379,95 +401,69 @@ with app.app_context():
     db.session.add_all(
         [
             Achievement(
-                achievement_id=1,
-                name="A Star is Born",
-                description="Create an account"
+                achievement_id=1, name="A Star is Born", description="Create an account"
             ),
             Achievement(
                 achievement_id=2,
                 name="Salutations!",
-                description="Solve the classic 'Hello, World!' question"
+                description="Solve the classic 'Hello, World!' question",
             ),
             Achievement(
                 achievement_id=3,
                 name="Snaking my way downtown",
-                description="Get 5 questions wrong in a row"
+                description="Get 5 questions wrong in a row",
             ),
             Achievement(
                 achievement_id=4,
                 name="Would you like some py?",
-                description="Solve your first python problem"
+                description="Solve your first python problem",
             ),
             Achievement(
                 achievement_id=5,
                 name="It's sort-a-cool",
-                description="Solve a sorting problem"
+                description="Solve a sorting problem",
             ),
             Achievement(
                 achievement_id=6,
                 name="Primal Power",
-                description="Solve a primes question"
+                description="Solve a primes question",
             ),
             Achievement(
                 achievement_id=7,
                 name="Laddie up the Ladders",
-                description="Reach the top of the leaderboard"
+                description="Reach the top of the leaderboard",
             ),
             Achievement(
                 achievement_id=8,
                 name="Time waits for no man",
-                description="Solve 10 assessments rapidly"
+                description="Solve 10 assessments rapidly",
             ),
             Achievement(
                 achievement_id=9,
                 name="...That's it?",
-                description="Complete rapid-fire questions with under 5 seconds spent on each question"
+                description="Complete rapid-fire questions with under 5 seconds spent on each question",
             ),
             Achievement(
                 achievement_id=10,
                 name="Inception",
-                description="Solve a recursive problem"
+                description="Solve a recursive problem",
             ),
         ]
     )
 
     db.session.add_all(
         [
-            Awarded_Badge(
-                id=1,
-                user_id=1,
-                badge_id=1
-            ),
-            Awarded_Badge(
-                id=2,
-                user_id=2,
-                badge_id=2
-            ),
-            Awarded_Badge(
-                id=3,
-                user_id=3,
-                badge_id=5
-            )
+            Awarded_Badge(id=1, user_id=1, badge_id=1),
+            Awarded_Badge(id=2, user_id=2, badge_id=2),
+            Awarded_Badge(id=3, user_id=3, badge_id=5),
         ]
     )
 
     db.session.add_all(
         [
-            Awarded_Achievement(
-                id=1,
-                user_id=3,
-                achievement_id=6
-            ),
-            Awarded_Achievement(
-                id=2,
-                user_id=1,
-                achievement_id=4
-            ),
-            Awarded_Achievement(
-                id=3,
-                user_id=4,
-                achievement_id=9
-            )
+            Awarded_Achievement(id=1, user_id=3, achievement_id=6),
+            Awarded_Achievement(id=2, user_id=1, achievement_id=4),
+            Awarded_Achievement(id=3, user_id=4, achievement_id=9),
         ]
     )
 
