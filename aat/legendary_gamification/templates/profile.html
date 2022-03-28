@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+
+
+{% block content %}
+    <div class="mega-container">
+        <div class="status">
+            <h2>Step up or I will set the Duolingo Bird on you :)</h2>
+        </div>
+
+        <h1>Your Badges</h1>
+        {% for badge in badges %}
+            <div class="badge-container">
+                <div class="badge-name">
+                    <h3>{{ badge.name }}</h3>
+                </div>
+                <div class="badge-description">
+                    {{ badge.description }}
+                </div>
+            </div>
+        {% endfor %}
+
+        <h1>Your Achievements</h1>
+        {% for achievement in achievements %}
+        <div class="achievement-container">
+            <div class="achievement-name">
+                <h3>{{ achievement.name }}</h3>
+            </div>
+            <div class="achievement-description">
+                {{ achievement.description }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock content %}

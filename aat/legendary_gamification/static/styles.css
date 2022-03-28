@@ -186,3 +186,19 @@ nav {
     text-align: center;
     margin-top: 10px;
 }
+
+.mega-container > div{
+    margin: 10px;
+    display: flex;
+    flex-direction: row;
+}
+
+.badge-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.achievement-container {
+    display: flex;
+    flex-direction: column;
+}
