@@ -20,7 +20,7 @@
 		</li>
 		{% else %}
 		<li>
-			<a href="{{ url_for('auth.logout') }}">Log Out {{current_user.name}}</a>
+			<a href="{{ url_for('auth.logout') }}">Log Out User "{{current_user.name}}"</a>
 		</li>
 		<li>
 			<a href="{{ url_for('legendary_gamification.achievements') }}">Achievements</a>
@@ -31,6 +31,18 @@
 		</li>
 		<li>
 			<a href="{{ url_for('student_stats.course_view') }}">Student Stats</a>
+		</li>
+		<!-- STATS -->
+		<li>
+			<a href="
+			{% if not current_user.is_authenticated %}
+				{{ url_for('auth.login') }}
+			{% elif current_user.role_id==2 %} 
+				{{ url_for('student_stats.course_view') }}
+			{% else %}
+				{{ url_for('staff_stats.index') }}
+			{% endif %}"
+			>StatsFromContext</a>
 		</li>
 		{# {% if current_user.can(Permission.ADMIN) %} #}
 		<li class="admin">
