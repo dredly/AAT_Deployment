@@ -327,6 +327,28 @@ with app.app_context():
                 response_content="-m",
                 is_correct=True,
             ),
+            # RESPONSES for Student "s"
+            ResponseT2(  # 4
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=1,
+                response_content="-m",
+                is_correct=True,
+            ),
+            ResponseT2(  # 5
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=2,
+                response_content="adad",
+                is_correct=False,
+            ),
+            ResponseT2(  # 6
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=3,
+                response_content=".",
+                is_correct=True,
+            ),
         ]
     )
 
