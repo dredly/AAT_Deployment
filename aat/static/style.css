@@ -67,6 +67,11 @@ footer {
 }
 /* --------------------CRUD ASSESSMENTS BELOW WILL MOVE TO SEPERATE FILE SOON---------------------------------- */
 
+.block_contents{
+	margin-left: 1vw;
+	margin-right: 1vw;
+}
+
 /* WARNING MESSAGE  */
 
 .warning{
@@ -111,9 +116,13 @@ footer {
 }
 
 /* EDIT DELETE TAKE ASSESSMENT BUTTONS ON INDEX */
+.module_title{
+	padding-left: 1vw;
+}
 .Assessment_Index_Parent{
 	display: flex;
 	justify-content: space-between;
+	padding-left: 1vw;
 }
 .Assessment_Index_Children{
 	display: flex;
@@ -192,8 +201,8 @@ footer {
 /* FOOTER */
 footer {
 	padding: 0.8rem 0;
-	/* position:fixed; */
-	/* bottom:0px; */
+	position:fixed;
+	bottom:0px;
 	text-align: center;
 	width: 100%;
 }
