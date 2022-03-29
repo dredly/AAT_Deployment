@@ -65,6 +65,7 @@ footer {
 .form-container h1 {
 	margin: 0;
 }
+/* --------------------CRUD ASSESSMENTS BELOW WILL MOVE TO SEPERATE FILE SOON---------------------------------- */
 
 /* WARNING MESSAGE  */
 
@@ -152,6 +153,35 @@ footer {
 	background-color:red ;
 
 }
+
+.show_assessment_title{
+	display: flex;
+	justify-content: center;
+}
+.show_assessment_parent{
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+}
+
+.show_assessment_children{
+	display: flex;
+	justify-content: space-between;
+	max-width: 70vw;
+	margin: 10px auto;
+}
+.show_assessment_child{
+	display: flex;
+	flex-wrap: nowrap;
+	margin-left: 2vw;
+}
+
+/* ----------------------------------------------------- END OF CRUD ASSESSMENTS ------------------------------------------------ */
+
+
+
+
+
 /* Other */
 
 .delete-button {

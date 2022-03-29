@@ -2,15 +2,22 @@
 
 {% block content %}
 
-<h1>{{assessment.title}}</h1>
+<h1 class="show_assessment_title">{{assessment.title}}</h1>
+<div class="show_assessment_parent">
 
-<h2> Module ID:{{assessment.module_id}}</h2>
-<h2> Lecturer_ID:{{assessment.lecturer_id}}</h2>
-<h2> Due Date:{{current_date}}</h2>
-<h2> Total Credits:{{assessment.num_of_credits}}</h2>
-<h2> Time Limit (mins): {{time_limit_minutes}} </h2>
-<h2> Type: {{assessment_type}}</h2>
+    <div class="show_assessment_children">
+        <h2 class="show_assessment_child"> Module ID: {{assessment.module_id}}</h2>
+        <h2 class="show_assessment_child"> Lecturer_ID: {{assessment.lecturer_id}}</h2>
+        <h2 class="show_assessment_child"> Due Date: {{current_date}}</h2>
+    </div>      
 
+    <div class="show_assessment_children">
+        <h2 class="show_assessment_child"> Total Credits: {{assessment.num_of_credits}}</h2>
+        <h2 class="show_assessment_child"> Time Limit (mins): {{time_limit_minutes}} </h2>
+        <h2 class="show_assessment_child"> Type: {{assessment_type}}</h2>
+    </div>  
+    
+</div>
 {% for question in questions %}
     <h3>{{question.question_text}}</h3>
     <p>{{question.num_of_marks}} marks --- Difficulty = {{question.difficulty}}/3</p>
