@@ -20,13 +20,21 @@ def index():
 def show_assessment(id):
     assessment = Assessment.query.get_or_404(id)
     try:
+        time_limit_minutes = math.floor(int(assessment.time_limit) / 60)
+    except:
+        time_limit_minutes = None
+    try:
         current_date = assessment.due_date.strftime("%d/%m/%Y")
     except:
         current_date = None
+    if assessment.is_summative == False:
+        assessment_type = "Formative"
+    elif assessment.is_summative == True:
+        assessment_type = "Summative"
     # TODO make a combined list of T1 and T2 questions and order by their question index
     questions = QuestionT2.query.filter_by(assessment_id=id).all()
     return render_template(
-        "show_assessment.html", assessment=assessment, questions=questions, current_date=current_date
+        "show_assessment.html", assessment=assessment, questions=questions, current_date=current_date, time_limit_minutes=time_limit_minutes, assessment_type=assessment_type
     )
 
 
