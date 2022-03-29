@@ -69,7 +69,6 @@ def course_view():
 
     for module in Module.query.all():
         for assessment, data in assessment_marks.items():
-            print(module_dict)
             if assessment.module_id == module.module_id:
                 if module not in module_dict:
                     module_dict[module] = {assessment: data}
@@ -83,6 +82,8 @@ def course_view():
         for assessment, data in assessment_marks.items():
             sum_of_marks_awarded += data["marks_awarded"]
             sum_of_marks_possible += data["marks_possible"]
+            # module_dict[module]["marks_awarded"] += data["marks_awarded"]
+            # module_dict[module]["marks_possible"] += data["marks_possible"]
 
     if sum_of_marks_possible == 0:
         return render_template("no_questions_answered.html")
@@ -92,10 +93,25 @@ def course_view():
         "sum_of_marks_possible": sum_of_marks_possible,
     }
 
+    module_totals = {}
+
+    for module, module_details in module_dict.items():
+        module_totals[module.title] = {"marks_awarded": 0, "marks_possible": 0}
+        for assessment, assessment_details in module_details.items():
+            module_totals[module.title]["marks_awarded"] += assessment_details[
+                "marks_awarded"
+            ]
+            module_totals[module.title]["marks_possible"] += assessment_details[
+                "marks_possible"
+            ]
+
+    print(f"{module_totals=}")
+
     return render_template(
         "student_stats_course_view.html",
         overall_results=overall_results,
         module_dict=module_dict,
+        module_totals=module_totals,
     )
 
 
@@ -220,6 +236,7 @@ def assessment_view(assessment_id=0):
             if response.question not in assessment_marks:
                 assessment_marks[response.question] = {
                     "answer_given": response.chosen_option,
+                    "is_correct": response.is_correct,
                     "marks_awarded": response.question.num_of_marks
                     if response.is_correct
                     else 0,
@@ -258,6 +275,7 @@ def assessment_view(assessment_id=0):
                 assessment_marks[response.question] = {
                     "answer_given": response.response_content,
                     "correct_answer": response.question.correct_answer,
+                    "is_correct": response.is_correct,
                     "marks_awarded": response.question.num_of_marks
                     if response.is_correct
                     else 0,

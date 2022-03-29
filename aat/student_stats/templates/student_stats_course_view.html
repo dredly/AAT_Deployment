@@ -29,9 +29,15 @@
     <h2>Modules</h2>
     <ul>
         {% for module, assessments in module_dict.items() %}
-            <li>
-                
-            <p><a href="{{url_for('student_stats.module_view', module_id=module.module_id)}}"><b>{{module}}</b></a></p>
+            <li> 
+            <p><a href="{{url_for('student_stats.module_view', module_id=module.module_id)}}"><b>{{module}}:</b></a> 
+                {% for module_total_title, module_total_numbers in module_totals.items() %}
+                    {% if module_total_title == module.title %}
+                        {{module_total_numbers["marks_awarded"]}}/{{module_total_numbers["marks_possible"]}} ({{ "%.2d" |
+                        format((module_total_numbers["marks_awarded"]/module_total_numbers["marks_possible"])*100)}}%)
+                    {% endif %}
+                {% endfor %}            
+            </p>
             <ul>
             {% for assessment, marks in assessments.items() %}
                 <li>
