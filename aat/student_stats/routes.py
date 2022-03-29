@@ -5,6 +5,7 @@ from sqlalchemy import func
 from io import StringIO
 import csv
 from flask import make_response
+from werkzeug.exceptions import NotFound
 
 # MODELS
 from ..models import (
@@ -66,14 +67,104 @@ def course_view():
         "sum_of_marks_awarded": sum_of_marks_awarded,
         "sum_of_marks_possible": sum_of_marks_possible,
     }
-    # How many marks
-    # Each question
+
     return render_template(
-        "student_stats_home.html",
+        "student_stats_course_view.html",
         overall_results=overall_results,
         module_dict=module_dict,
     )
 
+
+@student_stats.route("/module/")
+@student_stats.route("/module/<int:module_id>")
+def module_view(module_id=0):
+    # Checks if logged in
+    if not current_user.is_authenticated:
+        return redirect(url_for("auth.login"))
+
+    # Module Error Handling
+    if Module.query.filter_by(module_id=module_id).first() is None:
+        return redirect(url_for("student_stats.module_not_found", module_id=module_id))
+
+    module_details = {
+        "module_id": module_id,
+        "module_name": Module.query.filter_by(module_id=module_id).first(),
+    }
+
+    # GET SUM OF QUESTIONS FOR EACH ASSESSMENT
+    assessment_marks_dict = {}
+
+    for response in current_user.t2_responses:
+        if response.assessment.module_id == module_id:
+            if response.assessment not in assessment_marks_dict:
+                assessment_marks_dict[response.assessment] = {
+                    "marks_awarded": response.question.num_of_marks
+                    if response.is_correct
+                    else 0,
+                    "marks_possible": response.question.num_of_marks,
+                }
+            else:
+                assessment_marks_dict[response.assessment]["marks_awarded"] += (
+                    response.question.num_of_marks if response.is_correct else 0
+                )
+                assessment_marks_dict[response.assessment][
+                    "marks_possible"
+                ] += response.question.num_of_marks
+
+    # ADD THAT TO THE MODULE DICT
+    module_dict = {module_id: assessment_marks_dict}
+
+    sum_of_marks_awarded = 0
+    sum_of_marks_possible = 0
+
+    for module in module_dict:
+        for assessment, data in assessment_marks_dict.items():
+            sum_of_marks_awarded += data["marks_awarded"]
+            sum_of_marks_possible += data["marks_possible"]
+
+    if sum_of_marks_possible == 0:
+        return render_template("no_questions_answered.html")
+
+    overall_results = {
+        "sum_of_marks_awarded": sum_of_marks_awarded,
+        "sum_of_marks_possible": sum_of_marks_possible,
+    }
+
+    return render_template(
+        "student_stats_module_view.html",
+        overall_results=overall_results,
+        module_dict=module_dict,
+        module_id=module_id,
+    )
+
+
+######################
+# EXCEPTION HANDLING #
+######################
+@student_stats.route("/module/not-found/<int:module_id>")
+def module_not_found(module_id):
+    # Make list of modules the logged in user does take:
+    return render_template(
+        "exception_handling/module_not_found.html",
+        module_id=module_id,
+        list_of_modules=sorted(
+            list(
+                set(
+                    [
+                        response.assessment.module
+                        for response in current_user.t2_responses
+                    ]
+                )
+            ),
+            key=lambda x: x.module_id,
+            reverse=False,
+        ),
+    )
+
+
+################
+# DOWNLOAD CSV #
+################
 
 # Download a .csv
 # https://stackoverflow.com/questions/26997679/writing-a-csv-from-flask-framework

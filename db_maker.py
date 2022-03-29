@@ -25,6 +25,10 @@ with app.app_context():
                 title="Advanced BennieScript",
                 total_credits=30,
             ),
+            Module(  # 3
+                title="Jinjavitus",
+                total_credits=80,
+            ),
         ]
     )
 
@@ -100,13 +104,27 @@ with app.app_context():
                 num_of_credits=10,
                 is_summative=True,
             ),
+            Assessment(  # 9
+                module_id=3,
+                lecturer_id=1,
+                title="Tuesday Trauma",
+                due_date=None,
+                num_of_credits=20,
+                is_summative=True,
+            ),
         ]
     )
     #######
     # TAG #
     #######
     db.session.add_all(
-        [Tag(name="abstract"), Tag(name="boolean"), Tag(name="computational")]
+        [
+            Tag(name="abstract"),
+            Tag(name="boolean"),
+            Tag(name="computational"),
+            Tag(name="decimal"),
+            Tag(name="environments"),
+        ]
     )
 
     #####################
@@ -189,8 +207,8 @@ with app.app_context():
     # QUESTIONS: TYPE 2 #
     #####################
     db.session.add_all(
-        # Questions on assignments
         [
+            # Questions (with Assessments)
             QuestionT2(  # 1
                 assessment_id=1,
                 tag_id=1,
@@ -252,6 +270,52 @@ with app.app_context():
                 difficulty=2,
                 feedback_if_correct="Yup!",
                 feedback_if_wrong="nope that's wrong",
+            ),
+            # More Questions (with Assessments)
+            QuestionT2(  # 8
+                assessment_id=9,
+                num_of_marks=5,
+                question_text="1 When is a door not a door",
+                correct_answer="When it's a jar",
+                difficulty=3,
+                feedback_if_correct="Truth incarnate",
+                feedback_if_wrong="YOU SUCK",
+            ),
+            QuestionT2(  # 9
+                assessment_id=9,
+                num_of_marks=5,
+                question_text="2 When is a door not a door",
+                correct_answer="When it's a jar",
+                difficulty=3,
+                feedback_if_correct="Truth incarnate",
+                feedback_if_wrong="YOU SUCK",
+            ),
+            QuestionT2(  # 10
+                assessment_id=9,
+                num_of_marks=5,
+                question_text="3 When is a door not a door",
+                correct_answer="When it's a jar",
+                difficulty=3,
+                feedback_if_correct="Truth incarnate",
+                feedback_if_wrong="YOU SUCK",
+            ),
+            QuestionT2(  # 11
+                assessment_id=9,
+                num_of_marks=5,
+                question_text="4 When is a door not a door",
+                correct_answer="When it's a jar",
+                difficulty=3,
+                feedback_if_correct="Truth incarnate",
+                feedback_if_wrong="YOU SUCK",
+            ),
+            QuestionT2(  # 12
+                assessment_id=9,
+                num_of_marks=5,
+                question_text="5 When is a door not a door",
+                correct_answer="When it's a jar",
+                difficulty=3,
+                feedback_if_correct="Truth incarnate",
+                feedback_if_wrong="YOU SUCK",
             ),
         ]
     )
@@ -348,6 +412,48 @@ with app.app_context():
                 t2_question_id=3,
                 response_content=".",
                 is_correct=True,
+            ),
+            ResponseT2(  # 7
+                user_id=4,
+                assessment_id=4,
+                t2_question_id=4,
+                response_content="Bark!",
+                is_correct=True,
+            ),
+            ResponseT2(  # 8
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=8,
+                response_content="When it's a jar",
+                is_correct=True,
+            ),
+            ResponseT2(  # 9
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=9,
+                response_content="When it's a jar",
+                is_correct=False,
+            ),
+            ResponseT2(  # 10
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=10,
+                response_content="When it's a jar",
+                is_correct=True,
+            ),
+            ResponseT2(  # 11
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=11,
+                response_content="Huh?",
+                is_correct=False,
+            ),
+            ResponseT2(  # 11
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=12,
+                response_content="Didn't I answer this already?",
+                is_correct=False,
             ),
         ]
     )
