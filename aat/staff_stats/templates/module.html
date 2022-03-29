@@ -1,0 +1,7 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1>{{module_title}}</h1>
+{%for assessment in lecturersAssessments%}
+<h2>{{assessment}}</a></h2>
+{%endfor%}
+{% endblock %}
