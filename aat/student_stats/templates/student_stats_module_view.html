@@ -8,6 +8,7 @@
 {% endblock extra_head %}
 {% block content %}
     <h1>Welcome "{{current_user.name}}". Let's see how you have done.</h1>
+    <h2>Module View: Module ID {{module_id}}</h2>
     <h2>
         Overall Marks
     </h2>
@@ -28,24 +29,25 @@
     {% for module, assessments in module_dict.items() %}
         <p><b>{{module}}</b></p>
         {% for assessment, marks in assessments.items() %}
-            <p>{{assessment}}</p>
+            <p><a href="{{url_for('student_stats.assessment_view', assessment_id=assessment.assessment_id )}}">{{assessment}}</a></p>
             <p>{{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
                 format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
         {% endfor %}
     {% endfor %}
-
+    <a href="{{ url_for('student_stats.download')}}">Download CSV</a>
     <hr>
     <h2>Responses</h2>
  
     {% for response in current_user.t2_responses %}
-        
-        <h3>Module: {{response.assessment.module}}</h3>
-        <h4>Assessment: {{response.assessment}}</h4>
-        <p>Question: {{response.question}} (Marks: {{response.question.num_of_marks}})</p>
-        <p>Response: {{response.response_content}} (Marks: {{response.is_correct}})</p>
-    
+        {% if response.assessment.module.module_id == module_id %}
+            <h4>Assessment: {{response.assessment}}</h4>
+            <p>Question: {{response.question}} (Marks: {{response.question.num_of_marks}})</p>
+            <p>Response: {{response.response_content}} (Marks: {{response.is_correct}})</p>
+        {% endif %}
     {% endfor %}
- 
+    
+    <!-- Be able to move to other modules? -->
+
 
     <script>
         const correct = '{{overall_results["sum_of_marks_awarded"]}}';

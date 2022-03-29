@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, session
+from flask import Flask, session, render_template
 
 # from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
@@ -36,6 +36,13 @@ from .views import AdminView
 load_dotenv()
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+# Error handling
+# - Rich: I would rather have put  this in errors.py but getting circular errors
+#       (I mean, it works but still, not ideal)
+def page_not_found(e):
+    return render_template("error_handling/404.html"), 404
+
+
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "aat.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -50,6 +57,7 @@ app.register_blueprint(legendary_gamification, url_prefix="/legendary_gamificati
 app.register_blueprint(staff_stats, url_prefix="/staff-stats")
 app.register_blueprint(student_stats, url_prefix="/student-stats")
 app.register_blueprint(auth)
+app.register_error_handler(404, page_not_found)
 
 db.init_app(app)
 login_manager.init_app(app)

@@ -1,8 +1,16 @@
 from flask import request, redirect, url_for, render_template
 from .forms import QuestionT1Form, QuestionT2Form, FilterForm, DeleteForm
 from ..models import QuestionT1, QuestionT2, Option
+from ..decorators import permission_required
+from .. import Permission
 from . import questions
 from .. import db
+
+# Comment this out if you want to disable auth for question routes
+@questions.before_request
+@permission_required(Permission.WRITE_ASSESSMENT)
+def require_permission():
+    pass
 
 
 @questions.route("/")
@@ -44,6 +52,7 @@ def new_question_t1():
         option_b_text = request.form["option_b"]
         option_c_text = request.form["option_c"]
         correct_option = request.form["correct_option"]
+        print(correct_option)
         num_of_marks = request.form["num_of_marks"]
         difficulty = request.form["difficulty"]
         feedback_if_correct = request.form["feedback_if_correct"]
@@ -62,11 +71,11 @@ def new_question_t1():
         option_a = Option(q_t1_id=found_question.q_t1_id, option_text=option_a_text)
         option_b = Option(q_t1_id=found_question.q_t1_id, option_text=option_b_text)
         option_c = Option(q_t1_id=found_question.q_t1_id, option_text=option_c_text)
-        if correct_option == "a":
+        if correct_option == "0":
             option_a.is_correct = True
-        elif correct_option == "b":
+        elif correct_option == "1":
             option_b.is_correct = True
-        elif correct_option == "c":
+        elif correct_option == "2":
             option_c.is_correct = True
         db.session.add(option_a)
         db.session.add(option_b)
@@ -125,7 +134,13 @@ def edit_question_t1(id):
 
 @questions.route("/type1/<int:id>/delete", methods=["GET", "POST"])
 def delete_question_t1(id):
-    return "Delete form will go here"
+    question = QuestionT1.query.get_or_404(id)
+    form = DeleteForm()
+    if request.method == "POST":
+        db.session.delete(question)
+        db.session.commit()
+        return redirect(url_for("questions.index"))
+    return render_template("delete_question_t1.html", question=question, form=form)
 
 
 # --- Type 2 routes ---

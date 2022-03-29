@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<link
+	rel="stylesheet"
+	href="{{url_for('static',filename='student-stats-style.css')}}"
+/>
+{% endblock extra_head %}
+{% block content %}
+    <h1>Welcome "{{current_user.name}}". Let's see how you have done.</h1>
+    <h2>Assessment View</h2>
+    <h2>
+        Overall Marks
+    </h2>
+    <p>{{overall_results["sum_of_marks_awarded"]}}/{{overall_results["sum_of_marks_possible"]}}
+    ({{ "%.2d" |
+    format((overall_results["sum_of_marks_awarded"]/overall_results["sum_of_marks_possible"])*100)}}%)</p>
+
+    <div class="content-block">
+        <div
+            class="chart-container"
+            style="position: relative; height: 20vh; margin-bottom: 12rem"
+        >
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+
+    <h2>Results</h2>
+
+    {% for assessment, marks in assessment_marks_dict.items() %}
+        <p>{{assessment}}</p>
+        <p>{{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
+            format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
+    {% endfor %}
+    <a href="{{ url_for('student_stats.download')}}">Download CSV</a>
+    <hr>
+    <h2>Responses</h2>
+ 
+    {% for response in current_user.t2_responses %}
+    <ul>
+        {% if response.assessment.assessment_id == assessment_id %}
+            <li>
+                <p>Question: {{response.question}} (Marks: {{response.question.num_of_marks}})</p>
+                <p>Response: {{response.response_content}} {% if response.is_correct %}(Y){% else %}(N){% endif %}</p>
+            </li>
+        {% endif %}
+    </ul>
+    {% endfor %}
+    
+
+
+    <script>
+        const correct = '{{overall_results["sum_of_marks_awarded"]}}';
+        const incorrect = '{{overall_results["sum_of_marks_possible"]-overall_results["sum_of_marks_awarded"]}}';
+    
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [
+                    {
+                        label: 'Course View',
+                        data: [correct, incorrect],
+                        backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)'],
+                        hoverOffset: 4,
+                    },
+                ],
+            },
+        });
+    </script>
+{% endblock content %}
