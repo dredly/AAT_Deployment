@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms.fields import DateField
+from wtforms.fields import DateField, RadioField
 from wtforms.validators import NumberRange
 from wtforms import (
     TextAreaField,
@@ -21,6 +21,9 @@ class DeleteQuestionsForm(FlaskForm):
     )
     submit = SubmitField("Delete selected questions")
 
+class AnswerType1Form(FlaskForm):
+    chosen_option = RadioField('Answer Options')
+    submit = SubmitField("Submit Answer")
 
 class AnswerType2Form(FlaskForm):
     answer = TextAreaField(validators=[DataRequired()])
@@ -36,7 +39,7 @@ class AssessmentForm(FlaskForm):
     num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     is_summative = BooleanField("Select if Assessment is summative")
-    submit = SubmitField("Create Assessment")
+    submit = SubmitField("Add Questions")
 
 class DeleteAssessmentForm(FlaskForm):
     submit = SubmitField("Confirm")
@@ -55,19 +58,8 @@ class RemoveQuestionForm(FlaskForm):
     submit = SubmitField("Remove")
     cancel = SubmitField("Cancel")
 
-# Taken from Questions.forms 
-# Will be removed at a later date from page.
-class AddQuestionFilterForm(FlaskForm):
-    filter = SelectField(
-        "Filter questions by:",
-        choices=[
-            ("all", "Show all"),
-            ("type1", "Type 1 (multiple choice)"),
-            ("type2", "Type 2 (written answer)"),
-            ("floating", "Unassigned"),
-            ("assigned", "Assigned"),
-        ],
-        validators=[DataRequired()],
-    )
-    submit = SubmitField("Update")
+class AddQuestionToAssessmentForm(FlaskForm):
+    add = SubmitField(label="Add to Assessment")
 
+class FinishForm(FlaskForm):
+    finish = SubmitField(label="Finish")

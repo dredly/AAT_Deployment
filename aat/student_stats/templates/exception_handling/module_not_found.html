@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <p>Module ID {{ module_id }} is not found.</p>
+    <p>Did you mean these?</p>
+    <ul>
+        {% for module in list_of_modules %}
+            <li>
+                <a href="{{url_for('student_stats.module_view', module_id=module.module_id)}}">
+                    {{ module.module_id }}: {{ module.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock content %}

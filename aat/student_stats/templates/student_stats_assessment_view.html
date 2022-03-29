@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<link
+	rel="stylesheet"
+	href="{{url_for('static',filename='student-stats-style.css')}}"
+/>
+{% endblock extra_head %}
+{% block content %}
+    <h1>Welcome "{{current_user.name}}". Let's see how you have done.</h1>
+    <p>
+        <a href="{{url_for('student_stats.course_view')}}">
+            Course View
+        </a> 
+        > 
+        <a href="{{url_for('student_stats.module_view', module_id=module_id)}}">
+            Module View
+        </a>
+         > Assessment View
+    </p>
+    <h2>Assessment: {{assessment_details["assessment_name"]}}</h2>
+    <h2>
+        Overall Marks
+    </h2>
+    <p>{{overall_results["sum_of_marks_awarded"]}}/{{overall_results["sum_of_marks_possible"]}}
+    ({{ "%.2d" |
+    format((overall_results["sum_of_marks_awarded"]/overall_results["sum_of_marks_possible"])*100)}}%)</p>
+
+    <div class="content-block">
+        <div
+            class="chart-container"
+            style="position: relative; height: 20vh; margin-bottom: 12rem"
+        >
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+
+    <h2>Questions</h2>
+    <ul>
+    {% for question, marks in assessment_marks.items() %}
+        <div class="question_container {% if marks.is_correct %}correct_answer{% else %}incorrect_answer{% endif %}">
+            <li>
+                <p><b>Question: {{question}}</b></p>
+            </li>
+            <ul>
+                <li>
+                    <p>Answer Given: {{marks.answer_given}}</p>
+                </li>
+                <li>
+                    <p>Corrent Answer: {{marks.correct_answer}}</p>
+                </li>
+                <li>
+                    <p>Feedback Given: {{marks.feedback_given}}</p>
+                </li>
+                <li>
+                    <p>Mark: {{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.1d" |
+                        format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
+                </li>
+            </ul>
+        </div>
+    {% endfor %}
+</ul>
+    <h2>Download</h2>
+    <p><a href="{{ url_for('student_stats.download')}}">Download CSV</a></p>
+    
+
+
+    <script>
+        const correct = '{{overall_results["sum_of_marks_awarded"]}}';
+        const incorrect = '{{overall_results["sum_of_marks_possible"]-overall_results["sum_of_marks_awarded"]}}';
+    
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [
+                    {
+                        label: 'Course View',
+                        data: [correct, incorrect],
+                        backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)'],
+                        hoverOffset: 4,
+                    },
+                ],
+            },
+        });
+    </script>
+{% endblock content %}

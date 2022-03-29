@@ -5,13 +5,6 @@
 <!-- Adapted Add question page from Type 1 and Type 2 Questions -->
 <h1>Add Questions to your assessment</h1>
 
-<h3>Filter questions</h3>
-
-<form action="">
-    {{ form.filter.label }}{{ form.filter }}
-    {{form.submit}}
-</form>
-
 <h3>Add a new question</h3>
 
 <a href="{{url_for('questions.new_question_t1')}}"><button>Type 1</button></a>
@@ -19,16 +12,16 @@
 
 {% for question in questions %}
     <h2>{{ question.question_text }}</h2>
-
-    {% if question.q_t1_id %}
-        <a href="{{url_for('questions.show_question_t1', id=question.q_t1_id)}}">View question details</a>
-        <button>Add to Assessment</button>
-    {% endif %}
-
-    {% if question.q_t2_id %}
-        <a href="{{url_for('questions.show_question_t2', id=question.q_t2_id)}}">View question details</a>
-        <button>Add to Assessment</button>
-    {% endif %}
+    <form method="POST" action="">
+        {{ addQuestionForm.csrf_token}}
+        {{ addQuestionForm.add}}
+    </form>
+   
 {% endfor %}
+
+<form method="POST" action="">
+    {{ form.csrf_token}}
+    {{ form.finish}}
+</form>
 
 {% endblock %}

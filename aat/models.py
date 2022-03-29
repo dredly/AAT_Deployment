@@ -60,6 +60,24 @@ class Awarded_Achievement(db.Model):
     )
 
 
+class ResponseT1(db.Model):
+    __tablename__ = "t1_responses"
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    assessment_id = db.Column(
+        db.Integer, db.ForeignKey("Assessment.assessment_id"), primary_key=True
+    )
+    t1_question_id = db.Column(
+        db.Integer, db.ForeignKey("QuestionT1.q_t1_id"), primary_key=True
+    )
+    selected_option = db.Column(
+        db.Integer, db.ForeignKey("Option.option_id"), primary_key=True
+    )
+    is_correct = db.Column(db.Boolean, nullable=False)
+
+    def __repr__(self):
+        return self.selected_option
+
+
 class ResponseT2(db.Model):
     __tablename__ = "t2_responses"
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
@@ -93,6 +111,13 @@ class Assessment(db.Model):
     # --- Relationships --- TODO: add more as tables are added to the db
     question_t1 = db.relationship("QuestionT1", backref="assessment", lazy=True)
     question_t2 = db.relationship("QuestionT2", backref="assessment", lazy=True)
+    responses_t1 = db.relationship(
+        "ResponseT1",
+        foreign_keys=[ResponseT1.assessment_id],
+        backref=db.backref("assessment", lazy="joined"),
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
     responses_t2 = db.relationship(
         "ResponseT2",
         foreign_keys=[ResponseT2.assessment_id],
@@ -100,9 +125,7 @@ class Assessment(db.Model):
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
-    # takes_assessment = db.relationship(
-    #     "TakesAssessment", backref="assessment", lazy=True
-    # )
+
     def __repr__(self):
         return self.title
 
@@ -134,6 +157,13 @@ class QuestionT1(db.Model):
     # --- Relationships ---
     option = db.relationship(
         "Option", backref="questiont1", lazy=True, cascade="all, delete-orphan"
+    )
+    responses = db.relationship(
+        "ResponseT1",
+        foreign_keys=[ResponseT1.t1_question_id],
+        backref=db.backref("question", lazy="joined"),
+        lazy="dynamic",
+        cascade="all, delete-orphan",
     )
 
     def __repr__(self):
@@ -173,6 +203,14 @@ class Option(db.Model):
     # ---- Other Columns ---
     option_text = db.Column(db.Text, nullable=False)
     is_correct = db.Column(db.Boolean, nullable=False, default=False)
+    # ---- Relationships ----
+    responses_selected_in = db.relationship(
+        "ResponseT1",
+        foreign_keys=[ResponseT1.selected_option],
+        backref=db.backref("chosen_option", lazy="joined"),
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self):
         return self.option_text
@@ -204,6 +242,15 @@ class User(UserMixin, db.Model):
     awarded_badge = db.relationship("Awarded_Badge", backref="user", lazy=True)
     awarded_achievement = db.relationship(
         "Awarded_Achievement", backref="user", lazy=True
+    )
+    t1_responses = db.relationship(
+        "ResponseT1",
+        foreign_keys=[ResponseT1.user_id],
+        backref=db.backref("responding_student", lazy="joined"),
+        lazy="dynamic",
+        # delete orphan - so if a user is deleted,
+        # it deletes their orphaned relationships too
+        cascade="all, delete-orphan",
     )
     t2_responses = db.relationship(
         "ResponseT2",
@@ -240,24 +287,44 @@ class User(UserMixin, db.Model):
     def is_administrator(self):
         return self.can(Permission.ADMIN)
 
-    def has_answered(self, question, assessment):
-        if question.q_t2_id is None:
-            return False
+    # TODO amend to account for type 1 or 2 questions
+    def has_answered(self, type, question, assessment):
         if assessment.assessment_id is None:
             return False
-        return (
-            self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
-            .filter_by(assessment_id=assessment.assessment_id)
-            .first()
-            is not None
-        )
+        if type == 1:  # q_t1_id
+            if question.q_t1_id is None:
+                return False
+            return (
+                self.t1_responses.filter_by(t1_question_id=question.q_t1_id)
+                .filter_by(assessment_id=assessment.assessment_id)
+                .first()
+                is not None
+            )
+        elif type == 2:
+            if question.q_t2_id is None:
+                return False
+            if assessment.assessment_id is None:
+                return False
+            return (
+                self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
+                .filter_by(assessment_id=assessment.assessment_id)
+                .first()
+                is not None
+            )
 
-    def remove_answer(self, question, assessment):
-        response = (
-            self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
-            .filter_by(assessment_id=assessment.assessment_id)
-            .first()
-        )
+    def remove_answer(self, type, question, assessment):
+        if type == 1:
+            response = (
+                self.t1_responses.filter_by(t1_question_id=question.q_t1_id)
+                .filter_by(assessment_id=assessment.assessment_id)
+                .first()
+            )
+        elif type == 2:
+            response = (
+                self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
+                .filter_by(assessment_id=assessment.assessment_id)
+                .first()
+            )
         if response:
             db.session.delete(response)
 

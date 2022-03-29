@@ -1,10 +1,12 @@
 from datetime import datetime
 import math
+import random 
 from stringprep import in_table_d2
 from flask import Response, redirect, render_template, request, url_for, abort, session
 from . import assessments
-from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2
-from .forms import AddQuestionFilterForm, DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, RemoveQuestionForm
+
+from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT2, ResponseT1, Option
+from .forms import AddQuestionToAssessmentForm, DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, FinishForm, RemoveQuestionForm
 from .. import db
 from flask_login import current_user
 
@@ -20,13 +22,21 @@ def index():
 def show_assessment(id):
     assessment = Assessment.query.get_or_404(id)
     try:
+        time_limit_minutes = math.floor(int(assessment.time_limit) / 60)
+    except:
+        time_limit_minutes = None
+    try:
         current_date = assessment.due_date.strftime("%d/%m/%Y")
     except:
         current_date = None
+    if assessment.is_summative == False:
+        assessment_type = "Formative"
+    elif assessment.is_summative == True:
+        assessment_type = "Summative"
     # TODO make a combined list of T1 and T2 questions and order by their question index
-    questions = QuestionT2.query.filter_by(assessment_id=id).all()
+    questions = QuestionT1.query.filter_by(assessment_id=id).all() + QuestionT2.query.filter_by(assessment_id=id).all()
     return render_template(
-        "show_assessment.html", assessment=assessment, questions=questions, current_date=current_date
+        "show_assessment.html", assessment=assessment, questions=questions, current_date=current_date, time_limit_minutes=time_limit_minutes, assessment_type=assessment_type
     )
 
 
@@ -56,8 +66,10 @@ def delete_questions(id):
 
 @assessments.route("/assessment/new", methods=["GET", "POST"])
 def new_assessment():
+    session.pop("assessment_edit", None)
     form = AssessmentForm()
     is_summative_1 = ""
+    session["user"] = current_user.id 
     if request.method == "POST":
         lecturer_id = session["user"]
         is_summative = False
@@ -87,21 +99,29 @@ def new_assessment():
         )
         db.session.add(new_assessment)
         db.session.commit()
-        return redirect(url_for("assessments.add_questions"))
-    return render_template("new_assessment.html", form=form, )
+        id = new_assessment.assessment_id
+        session["assessment_add"]= id
+        return redirect(url_for("assessments.add_questions", id=id))
+    return render_template("new_assessment.html", form=form )
 
 @assessments.route("/<int:id>/edit_assessment", methods=["GET", "POST"])
 def edit_assessment(id):
+    session.pop("assessment_add", None)
     assessment = Assessment.query.get_or_404(id)
     form = EditAssessmentForm()
+    session["assessment_edit"] = id
+    print(id)
     if request.method == "POST":
         assessment.title = form.title.data
         assessment.module_id = form.module_id.data
-        total_date = request.form["due_date"]
-        year = int(total_date[:4])
-        month = int(total_date[5:7])
-        day = int(total_date[8:10])
-        assessment.due_date = datetime(year, month, day)
+        try:
+            total_date = request.form["due_date"]
+            year = int(total_date[:4])
+            month = int(total_date[5:7])
+            day = int(total_date[8:10])
+            assessment.due_date = datetime(year, month, day)
+        except:
+            assessment.due_date = None  
         assessment.num_of_credits = form.num_of_credits.data
         assessment.time_limit = form.time_limit.data
         assessment.is_summative = form.is_summative.data
@@ -144,7 +164,7 @@ def remove_question_t2(id, id2):
         question.assessment_id = None
         db.session.commit()
         return redirect(url_for("assessments.edit_assessment", id=id))
-    return render_template("remove_question.html", question=question, form=form, assessment=assessment)
+    return render_template("remove_question.html", question=question, form=form, assessment=assessment, id=id)
 
 @assessments.route("/<int:id>/edit_assessment/remove/t1/<int:id3>", methods=["GET", "POST"])
 def remove_question_t1(id, id3):
@@ -158,32 +178,36 @@ def remove_question_t1(id, id3):
     return render_template("remove_question.html", question=question, form=form, assessment=assessment)
 
 
-# No longer required | removed at later date
-@assessments.route("/add_questions")
-def add_questions():
-    form = AddQuestionFilterForm()
-    filter = request.args.get("filter", "all")
-    form.filter.data = filter
-    if request.method == "POST":
-        filter = request.form["filter"]
-        return redirect(url_for("questions.index", filter=filter))
-    if filter == "type1":
-        questions = QuestionT1.query.all()
-    elif filter == "type2":
-        questions = QuestionT2.query.all()
-    elif filter == "floating":
-        questions = (
+
+@assessments.route("/add_questions/<int:id>", methods=["GET", "POST"])
+def add_questions(id):
+    if session.get("assessment_add") != None:
+        id = session.get("assessment_add")
+        print(session.get("assessment_add"))
+    elif session.get("assessment_edit") != None:
+        id = session.get("assessment_edit")
+        print(session.get("assessment_edit"))
+    form=FinishForm()
+    addQuestionForm = AddQuestionToAssessmentForm()
+    questions = (
             QuestionT1.query.filter(QuestionT1.assessment_id.is_(None)).all()
             + QuestionT2.query.filter(QuestionT2.assessment_id.is_(None)).all()
         )
-    elif filter == "assigned":
-        questions = (
-            QuestionT1.query.filter(QuestionT1.assessment_id.isnot(None)).all()
-            + QuestionT2.query.filter(QuestionT2.assessment_id.isnot(None)).all()
-        )
-    else:
-        questions = QuestionT1.query.all() + QuestionT2.query.all()
-    return render_template("add_questions.html", questions=questions, form=form)
+    for question in questions:
+        if addQuestionForm.validate_on_submit() and addQuestionForm.add.data:
+            question.assessment_id = id
+            db.session.commit()
+            return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form)   
+
+    if form.validate_on_submit() and form.finish.data:
+        if session.get("assessment_edit") != None:
+            session.pop("assessment_edit", None)
+            return redirect(url_for("assessments.edit_assessment", id=id))
+        elif session.get("assessment_add") != None:
+            session.pop("assessment_add", None)
+            return redirect(url_for("assessments.index"))
+            
+    return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form)
 
 # ---------------------------------  End Of CRUD For Assessments ---------------------------------------
 
@@ -206,66 +230,127 @@ def assessment_summary(assessment_id):
     assessment = Assessment.query.get_or_404(assessment_id)
     ## query to find all questions in assessment, so can be used to find their ID's and store these in session variable
     ## session variable is then accessed throughout the process to find questions and store their responses
-    questions = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+    questions_t1 = QuestionT1.query.filter_by(assessment_id=assessment_id).all()
+    questions_t2 = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
     question_ids = []
-    for question in questions:
-        question_ids.append(question.q_t2_id)
+    print(question_ids)
+    for question in questions_t1:
+        print("now adding type 1...")
+        question_info = (1, question.q_t1_id)
+        question_ids.append(question_info)
+        print(question_info)
+    for question in questions_t2:
+        print("now adding type 2...")
+        question_info = (2, question.q_t2_id)
+        question_ids.append(question_info)
+        print(question_info)
+    random.shuffle(question_ids)
+    print(question_ids)
     session["user"] = current_user.id
     session["questions"] = question_ids
     session["past_questions"] = []
     session["no_questions"] = len(question_ids)
     session["assessment"] = assessment_id
-    first_question = session["questions"][0]
+    first_question = session["questions"][0][0]
+    first_question_type = session["questions"][0][0]
+    first_question_id = session["questions"][0][1]
     return render_template(
         "assessment_summary.html",
         assessment=assessment,
-        questions=questions,
+        questions_t1=questions_t1,
+        questions_t2=questions_t2,
         question_ids=question_ids,
         first_question=first_question,
+        type=first_question_type,
+        first_question_id=first_question_id
     )
 
 
-@assessments.route("/answer_question/<int:question_id>", methods=["GET", "POST"])
-def answer_question(question_id):
-    form = AnswerType2Form(answer=None)
+@assessments.route("/answer_question/<int:type>/<int:question_id>", methods=["GET", "POST"])
+def answer_question(type, question_id):
+    ## find question to be answered 
     assessment = Assessment.query.get_or_404(session.get("assessment"))
-    question = QuestionT2.query.get_or_404(question_id)
-    if current_user.has_answered(question, assessment):
+    if type == 1: 
+        question = QuestionT1.query.get_or_404(question_id)
+        form = AnswerType1Form()
+        # QuestionT1.query.filter_by(assessment_id=id).all()
+        form.chosen_option.choices = [(option.option_id, option.option_text) for option in Option.query.filter_by(q_t1_id=question_id).all() ]
+    elif type == 2: 
+        question = QuestionT2.query.get_or_404(question_id)
+        form = AnswerType2Form(answer=None)
+
+    ## check if there's a previous answer to prepopulate 
+    if current_user.has_answered(type, question, assessment):
         if request.method == "GET":
-            previous_response = (
-                current_user.t2_responses.filter_by(
+            # TODO test this works on radio fields 
+            if type == 1: 
+                previous_response = (
+                current_user.t1_responses.filter_by(
                     assessment_id=session.get("assessment")
                 )
-                .filter_by(t2_question_id=question_id)
+                .filter_by(t1_question_id=question_id)
                 .first()
-            )
-            previous_given_answer = previous_response.response_content
-            form.answer.data = previous_given_answer
+                )
+                # find id of option chosen 
+                selected_option_id = previous_response.selected_option 
+                # then set default of form 
+                form.chosen_option.default = selected_option_id
+                # then run form.process()
+                form.process()
+            elif type == 2: 
+                previous_response = (
+                    current_user.t2_responses.filter_by(
+                        assessment_id=session.get("assessment")
+                    )
+                    .filter_by(t2_question_id=question_id)
+                    .first()
+                )
+                previous_given_answer = previous_response.response_content
+                form.answer.data = previous_given_answer
+    
+    ## actions to take on a post method - i.e. when user submits an answer to their question
     if request.method == "POST":
-        if current_user.has_answered(question, assessment):
-            current_user.remove_answer(question, assessment)
+        ## if changing / resubmitting answer, ensures no duplicate responses by deleting the old
+        if current_user.has_answered(type, question, assessment):
+            current_user.remove_answer(type, question, assessment)
             db.session.commit()
-        given_answer = form.answer.data.strip()
-        if given_answer == question.correct_answer:
-            result = True
-        else:
-            result = False
-        response = ResponseT2(
-            user_id=current_user.id,
-            assessment_id=assessment.assessment_id,
-            t2_question_id=question_id,
-            response_content=given_answer,
-            is_correct=result,
-        )
+        if type == 1:
+            given_answer = Option.query.filter_by(option_id=form.chosen_option.data).first()
+            if given_answer.is_correct:
+                result = True
+            else: 
+                result = False 
+            response = ResponseT1(
+                user_id=current_user.id,
+                assessment_id=assessment.assessment_id,
+                t1_question_id=question_id,
+                selected_option=given_answer.option_id,
+                is_correct=result,
+            )
+        elif type == 2: 
+            given_answer = form.answer.data.strip()
+            if given_answer == question.correct_answer:
+                result = True
+            else:
+                result = False
+            # TODO make responsive to type1 also 
+            response = ResponseT2(
+                user_id=current_user.id,
+                assessment_id=assessment.assessment_id,
+                t2_question_id=question_id,
+                response_content=given_answer,
+                is_correct=result,
+            )
         db.session.add(response)
         db.session.commit()
-        return redirect(url_for("assessments.mark_answer", question_id=question_id))
+        return redirect(url_for("assessments.mark_answer", type=type, question_id=question_id))
     current_questions = session.get("questions")
     previous = current_questions.pop(0)
+    # TODO change these session variables so they store the tuples not ids 
     session["past_questions"].append(previous)
     session["questions"] = current_questions
     return render_template(
-        "answer_question.html", question=question, assessment=assessment, form=form
+        "answer_question.html", question=question, assessment=assessment, form=form, type=type
     )
 
 
@@ -281,19 +366,27 @@ def previous_question():
     session["questions"] = copy_list_next
     session["past_questions"] = copy_list_prev
     return redirect(
-        url_for("assessments.answer_question", question_id=session["questions"][0])
+        url_for("assessments.answer_question", type=session["questions"][0][0], question_id=session["questions"][0][1])
     )
 
 
-@assessments.route("/mark_answer/<int:question_id>", methods=["GET", "POST"])
-def mark_answer(question_id):
-    question = QuestionT2.query.get_or_404(question_id)
+@assessments.route("/mark_answer/<int:type>/<int:question_id>", methods=["GET", "POST"])
+def mark_answer(type, question_id):
     assessment = Assessment.query.get_or_404(session.get("assessment"))
-    response = (
-        current_user.t2_responses.filter_by(assessment_id=session.get("assessment"))
-        .filter_by(t2_question_id=question_id)
+    if type == 1: 
+        question = QuestionT1.query.get_or_404(question_id)
+        response = (
+        current_user.t1_responses.filter_by(assessment_id=session.get("assessment"))
+        .filter_by(t1_question_id=question_id)
         .first()
     )
+    elif type == 2: 
+        question = QuestionT2.query.get_or_404(question_id)
+        response = (
+            current_user.t2_responses.filter_by(assessment_id=session.get("assessment"))
+            .filter_by(t2_question_id=question_id)
+            .first()
+        )
     return render_template(
         "mark_answer.html", question=question, response=response, assessment=assessment
     )
