@@ -14,7 +14,7 @@
 	{% for module in modules %}
 		<h2>{{ module.title }} {{module.total_credits}}</h2>
 		{% for assessment in module.assessments %}
-			{% if assessment.is_summative %}
+			{# {% if assessment.is_summative %} #}
 				<div class = "Assessment_Index_Parent">
 					<div class = "Assessment_Index_Children">
 						<a href="{{ url_for('assessments.show_assessment', id=assessment.assessment_id) }}" >
@@ -34,7 +34,7 @@
 							</button>
 					</div>
 				</div>
-			{% endif %}	
+			{# {% endif %}	#}
 		{% endfor %} 
 	{% endfor %} 
 

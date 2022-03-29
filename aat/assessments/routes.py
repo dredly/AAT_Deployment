@@ -6,7 +6,7 @@ from flask import Response, redirect, render_template, request, url_for, abort, 
 from . import assessments
 
 from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT2, ResponseT1, Option
-from .forms import AddQuestionToAssessmentForm, DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, FinishForm, RemoveQuestionForm
+from .forms import AddQuestionToAssessmentForm, DeleteQuestionsForm, AnswerType1Form, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, FinishForm, RemoveQuestionForm
 from .. import db
 from flask_login import current_user
 
@@ -212,6 +212,14 @@ def add_questions(id):
 # ---------------------------------  End Of CRUD For Assessments ---------------------------------------
 
 
+# ----------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------
+# ---------------------------------  Start of TAKE ASSESSMENT  ---------------------------------------
+# ----------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------
+
 
 
 ## example of how to filter response table
@@ -228,6 +236,7 @@ def test_response_model(assessment_id, question_id):
 @assessments.route("/assessment_summary/<int:assessment_id>", methods=["GET", "POST"])
 def assessment_summary(assessment_id):
     assessment = Assessment.query.get_or_404(assessment_id)
+    session["is_summative"] = assessment.is_summative  
     ## query to find all questions in assessment, so can be used to find their ID's and store these in session variable
     ## session variable is then accessed throughout the process to find questions and store their responses
     questions_t1 = QuestionT1.query.filter_by(assessment_id=assessment_id).all()
@@ -328,8 +337,8 @@ def answer_question(type, question_id):
                 is_correct=result,
             )
         elif type == 2: 
-            given_answer = form.answer.data.strip()
-            if given_answer == question.correct_answer:
+            given_answer = form.answer.data.strip().lower()
+            if given_answer == question.correct_answer.lower():
                 result = True
             else:
                 result = False
@@ -343,10 +352,23 @@ def answer_question(type, question_id):
             )
         db.session.add(response)
         db.session.commit()
-        return redirect(url_for("assessments.mark_answer", type=type, question_id=question_id))
+        if session['is_summative']:
+            if len(session['questions']) < 1: 
+                return redirect(url_for("assessments.results", 
+                    assessment_id=assessment.assessment_id
+                    ))
+            else: 
+                return redirect(url_for("assessments.answer_question", 
+                    type=session['questions'][0][0], 
+                    question_id=session['questions'][0][1]
+                ))
+        else: 
+            return redirect(url_for("assessments.mark_answer", 
+                type=type, 
+                question_id=question_id
+            ))
     current_questions = session.get("questions")
     previous = current_questions.pop(0)
-    # TODO change these session variables so they store the tuples not ids 
     session["past_questions"].append(previous)
     session["questions"] = current_questions
     return render_template(
@@ -375,36 +397,56 @@ def mark_answer(type, question_id):
     assessment = Assessment.query.get_or_404(session.get("assessment"))
     if type == 1: 
         question = QuestionT1.query.get_or_404(question_id)
-        response = (
+        # Option.query.filter_by(q_t1_id=question_id).all()
+        right_answer = Option.query.filter_by(q_t1_id=question.q_t1_id).filter_by(is_correct=True).first()
+        chosen_option = (
         current_user.t1_responses.filter_by(assessment_id=session.get("assessment"))
         .filter_by(t1_question_id=question_id)
         .first()
-    )
+        )
+        response = Option.query.filter_by(option_id=chosen_option.selected_option).first()
+        print(response)
     elif type == 2: 
         question = QuestionT2.query.get_or_404(question_id)
+        right_answer = question.correct_answer
         response = (
             current_user.t2_responses.filter_by(assessment_id=session.get("assessment"))
             .filter_by(t2_question_id=question_id)
             .first()
         )
     return render_template(
-        "mark_answer.html", question=question, response=response, assessment=assessment
+        "mark_answer.html", 
+        question=question, 
+        response=response, 
+        assessment=assessment, 
+        right_answer=right_answer, 
+        type=type
     )
 
 
 @assessments.route("/results/<int:assessment_id>")
 def results(assessment_id):
-    all_responses = current_user.t2_responses.filter_by(
+    t1_responses = current_user.t1_responses.filter_by(
+        assessment_id=assessment_id
+    ).all()
+    t2_responses = current_user.t2_responses.filter_by(
         assessment_id=assessment_id
     ).all()
     assessment = Assessment.query.get_or_404(session.get("assessment"))
     no_of_questions = session.pop("no_questions", None)
-    questions = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+    questions = QuestionT1.query.filter_by(assessment_id=assessment_id).all(
+        ) + QuestionT2.query.filter_by(assessment_id=assessment_id).all()
     possible_total = 0
     for question in questions:
         possible_total += question.num_of_marks
     result = 0
-    for response in all_responses:
+    for response in t1_responses:
+        if response.is_correct:
+            answered_question = QuestionT1.query.filter_by(
+                q_t1_id=response.t1_question_id
+            ).first()
+            result += answered_question.num_of_marks
+    for response in t2_responses:
         if response.is_correct:
             answered_question = QuestionT2.query.filter_by(
                 q_t2_id=response.t2_question_id
