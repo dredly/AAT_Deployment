@@ -4,8 +4,9 @@ import random
 from stringprep import in_table_d2
 from flask import Response, redirect, render_template, request, url_for, abort, session
 from . import assessments
-from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT1, Option
-from .forms import AddQuestionFilterForm, AnswerType1Form, DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, RemoveQuestionForm
+
+from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT2, ResponseT1, Option
+from .forms import AddQuestionToAssessmentForm, DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, FinishForm, RemoveQuestionForm
 from .. import db
 from flask_login import current_user
 
@@ -21,13 +22,21 @@ def index():
 def show_assessment(id):
     assessment = Assessment.query.get_or_404(id)
     try:
+        time_limit_minutes = math.floor(int(assessment.time_limit) / 60)
+    except:
+        time_limit_minutes = None
+    try:
         current_date = assessment.due_date.strftime("%d/%m/%Y")
     except:
         current_date = None
+    if assessment.is_summative == False:
+        assessment_type = "Formative"
+    elif assessment.is_summative == True:
+        assessment_type = "Summative"
     # TODO make a combined list of T1 and T2 questions and order by their question index
     questions = QuestionT1.query.filter_by(assessment_id=id).all() + QuestionT2.query.filter_by(assessment_id=id).all()
     return render_template(
-        "show_assessment.html", assessment=assessment, questions=questions, current_date=current_date
+        "show_assessment.html", assessment=assessment, questions=questions, current_date=current_date, time_limit_minutes=time_limit_minutes, assessment_type=assessment_type
     )
 
 
@@ -57,6 +66,7 @@ def delete_questions(id):
 
 @assessments.route("/assessment/new", methods=["GET", "POST"])
 def new_assessment():
+    session.pop("assessment_edit", None)
     form = AssessmentForm()
     is_summative_1 = ""
     session["user"] = current_user.id 
@@ -89,21 +99,29 @@ def new_assessment():
         )
         db.session.add(new_assessment)
         db.session.commit()
-        return redirect(url_for("assessments.add_questions"))
-    return render_template("new_assessment.html", form=form, )
+        id = new_assessment.assessment_id
+        session["assessment_add"]= id
+        return redirect(url_for("assessments.add_questions", id=id))
+    return render_template("new_assessment.html", form=form )
 
 @assessments.route("/<int:id>/edit_assessment", methods=["GET", "POST"])
 def edit_assessment(id):
+    session.pop("assessment_add", None)
     assessment = Assessment.query.get_or_404(id)
     form = EditAssessmentForm()
+    session["assessment_edit"] = id
+    print(id)
     if request.method == "POST":
         assessment.title = form.title.data
         assessment.module_id = form.module_id.data
-        total_date = request.form["due_date"]
-        year = int(total_date[:4])
-        month = int(total_date[5:7])
-        day = int(total_date[8:10])
-        assessment.due_date = datetime(year, month, day)
+        try:
+            total_date = request.form["due_date"]
+            year = int(total_date[:4])
+            month = int(total_date[5:7])
+            day = int(total_date[8:10])
+            assessment.due_date = datetime(year, month, day)
+        except:
+            assessment.due_date = None  
         assessment.num_of_credits = form.num_of_credits.data
         assessment.time_limit = form.time_limit.data
         assessment.is_summative = form.is_summative.data
@@ -146,7 +164,7 @@ def remove_question_t2(id, id2):
         question.assessment_id = None
         db.session.commit()
         return redirect(url_for("assessments.edit_assessment", id=id))
-    return render_template("remove_question.html", question=question, form=form, assessment=assessment)
+    return render_template("remove_question.html", question=question, form=form, assessment=assessment, id=id)
 
 @assessments.route("/<int:id>/edit_assessment/remove/t1/<int:id3>", methods=["GET", "POST"])
 def remove_question_t1(id, id3):
@@ -160,32 +178,36 @@ def remove_question_t1(id, id3):
     return render_template("remove_question.html", question=question, form=form, assessment=assessment)
 
 
-# No longer required | removed at later date
-@assessments.route("/add_questions")
-def add_questions():
-    form = AddQuestionFilterForm()
-    filter = request.args.get("filter", "all")
-    form.filter.data = filter
-    if request.method == "POST":
-        filter = request.form["filter"]
-        return redirect(url_for("questions.index", filter=filter))
-    if filter == "type1":
-        questions = QuestionT1.query.all()
-    elif filter == "type2":
-        questions = QuestionT2.query.all()
-    elif filter == "floating":
-        questions = (
+
+@assessments.route("/add_questions/<int:id>", methods=["GET", "POST"])
+def add_questions(id):
+    if session.get("assessment_add") != None:
+        id = session.get("assessment_add")
+        print(session.get("assessment_add"))
+    elif session.get("assessment_edit") != None:
+        id = session.get("assessment_edit")
+        print(session.get("assessment_edit"))
+    form=FinishForm()
+    addQuestionForm = AddQuestionToAssessmentForm()
+    questions = (
             QuestionT1.query.filter(QuestionT1.assessment_id.is_(None)).all()
             + QuestionT2.query.filter(QuestionT2.assessment_id.is_(None)).all()
         )
-    elif filter == "assigned":
-        questions = (
-            QuestionT1.query.filter(QuestionT1.assessment_id.isnot(None)).all()
-            + QuestionT2.query.filter(QuestionT2.assessment_id.isnot(None)).all()
-        )
-    else:
-        questions = QuestionT1.query.all() + QuestionT2.query.all()
-    return render_template("add_questions.html", questions=questions, form=form)
+    for question in questions:
+        if addQuestionForm.validate_on_submit() and addQuestionForm.add.data:
+            question.assessment_id = id
+            db.session.commit()
+            return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form)   
+
+    if form.validate_on_submit() and form.finish.data:
+        if session.get("assessment_edit") != None:
+            session.pop("assessment_edit", None)
+            return redirect(url_for("assessments.edit_assessment", id=id))
+        elif session.get("assessment_add") != None:
+            session.pop("assessment_add", None)
+            return redirect(url_for("assessments.index"))
+            
+    return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form)
 
 # ---------------------------------  End Of CRUD For Assessments ---------------------------------------
 

@@ -54,5 +54,5 @@
 
 <!--[Matt] To Do, add routes to assesment  -->
 <h1>Add a question</h1>
-<a href="{{url_for('assessments.add_questions')}}"><button>Add Question</button></a>
+<a href="{{url_for('assessments.add_questions', id=assessment.assessment_id)}}"><button>Add Question</button></a>
 {% endblock %}

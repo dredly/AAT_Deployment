@@ -8,8 +8,8 @@
 <h2> Lecturer_ID:{{assessment.lecturer_id}}</h2>
 <h2> Due Date:{{current_date}}</h2>
 <h2> Total Credits:{{assessment.num_of_credits}}</h2>
-<h2> Time_Limit: {{assessment.time_limit}}s </h2>
-<h2> Summative?: {{assessment.is_summative}}</h2>
+<h2> Time Limit (mins): {{time_limit_minutes}} </h2>
+<h2> Type: {{assessment_type}}</h2>
 
 {% for question in questions %}
     <h3>{{question.question_text}}</h3>
