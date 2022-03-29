@@ -366,6 +366,29 @@ with app.app_context():
     )
 
     #####################
+    # RESPONSES: TYPE 1 #
+    #####################
+
+    db.session.add_all(
+        [
+            ResponseT1(  # 1
+                user_id=1,
+                assessment_id=1,
+                t1_question_id=1,
+                selected_option=1,
+                is_correct=True,
+            ),
+            ResponseT1(  # 2
+                user_id=1,
+                assessment_id=2,
+                t1_question_id=2,
+                selected_option=5,
+                is_correct=True,
+            ),
+        ]
+    )
+
+    #####################
     # RESPONSES: TYPE 2 #
     #####################
     db.session.add_all(
