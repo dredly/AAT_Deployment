@@ -4,6 +4,34 @@
 <h1> Module: {{module_title}}</h1>
 <h3>Your Assessments:</h3>
 {%for assessment in lecturersAssessments%}
-<h2>{{assessment}}</h2>
+{% set assessmentId = assessment.assessment_id %}
+<h2>{{assessment}}
+    {%if assessment.is_summative == 1%}
+        (Summative)
+    {%else%}
+        (Formative)
+    {%endif%}
+    <!--number of credits: {{assessment.num_of_credits}}. -->
+    Assessment id: {{assessment.assessment_id}}
+</h2>
+
+    <h3>T1 Questions:</h3>
+    {%for question in questionT1s%}
+        {%if question.assessment_id == assessmentId%}
+            <p>{{question.q_t1_id}}. {{question.question_text}}</p>
+            <p>Correct Answers:  Wrong Answers:  </p>
+        {%else%}
+        {%endif%}
+    {%endfor%}
+
+    
+    <h3>T2 Questions:</h3>
+    {%for question in questionT2s%}
+        {%if question.assessment_id == assessmentId%}
+            <p>{{question.q_t2_id}}. {{question.question_text}}</p>
+            <p>Correct Answers: {{t2Correct.get(question.q_t2_id)}} Wrong Answers: {{t2Wrong.get(question.q_t2_id)}}  </p>
+            {%endif%}
+    {%endfor%}
+
 {%endfor%}
 {% endblock %}
