@@ -1,9 +1,9 @@
-from email.policy import default
-from tkinter.tix import Tree
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
 from flask_login import LoginManager
+
 
 # First trying to get it working without model inheritance
 
@@ -16,10 +16,11 @@ login_manager = LoginManager()
 class Badge(db.Model):
     __tablename__ = "badges"
     badge_id = db.Column(db.Integer, primary_key=True)
-    # --- Foreign Keys ---
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    # --- Relationships ---
+    awarded_badge = db.relationship("Awarded_Badge", backref="badge", lazy=True)
     # --- Other Columns ---
     name = db.Column(db.String(20))
+    description = db.Column(db.Text)
 
     def __repr__(self):
         return self.name
@@ -28,14 +29,53 @@ class Badge(db.Model):
 class Achievement(db.Model):
     __tablename__ = "achievements"
     achievement_id = db.Column(db.Integer, primary_key=True)
-    # --- Foreign Keys ---
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    # --- Relationships ---
+    awarded_achievement = db.relationship(
+        "Awarded_Achievement", backref="achievement", lazy=True
+    )
     # --- Other Columns ---
     name = db.Column(db.String(20))
+    description = db.Column(db.Text)
 
     def __repr__(self):
         return self.name
 
+
+class Awarded_Badge(db.Model):
+    __tablename__ = "awarded_badges"
+    id = db.Column(db.Integer, primary_key=True)
+    # --- Foreign Keys ---
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    # --- Other Columns ---
+    badge_id = db.Column(db.Integer, db.ForeignKey("badges.badge_id"), nullable=False)
+
+
+class Awarded_Achievement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    # --- Foreign Keys ---
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    # --- Other Columns ---
+    achievement_id = db.Column(
+        db.Integer, db.ForeignKey("achievements.achievement_id"), nullable=False
+    )
+
+
+class ResponseT1(db.Model):
+    __tablename__ = "t1_responses"
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    assessment_id = db.Column(
+        db.Integer, db.ForeignKey("Assessment.assessment_id"), primary_key=True
+    )
+    t1_question_id = db.Column(
+        db.Integer, db.ForeignKey("QuestionT1.q_t1_id"), primary_key=True
+    )
+    selected_option = db.Column(
+        db.Integer, db.ForeignKey("Option.option_id"), primary_key=True
+    )
+    is_correct = db.Column(db.Boolean, nullable=False)
+
+    def __repr__(self):
+        return self.selected_option
 
 class ResponseT2(db.Model):
     __tablename__ = "t2_responses"
@@ -57,17 +97,26 @@ class Assessment(db.Model):
     __tablename__ = "Assessment"
     assessment_id = db.Column(db.Integer, primary_key=True)
     # --- Foreign Keys --- CONTAINS PLACEHOLDERS
-    module_id = db.Column(db.Integer, db.ForeignKey("Module.module_id"), nullable=False)
+    module_id = db.Column(db.Integer, db.ForeignKey("Module.module_id"))
     lecturer_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     # --- Other Columns ---
     title = db.Column(db.String(120), nullable=False)
-    due_date = db.Column(db.DateTime)
+    due_date = db.Column(db.DateTime())
     time_limit = db.Column(db.Integer)  # Time limit in seconds
-    num_of_credits = db.Column(db.Integer, nullable=False, default=0)
-    is_summative = db.Column(db.Boolean, nullable=False, default=False)
+    num_of_credits = db.Column(db.Integer, nullable=True, default=0)
+    is_summative = db.Column(
+        db.Boolean, nullable=True, default=False, server_default="False"
+    )
     # --- Relationships --- TODO: add more as tables are added to the db
     question_t1 = db.relationship("QuestionT1", backref="assessment", lazy=True)
     question_t2 = db.relationship("QuestionT2", backref="assessment", lazy=True)
+    responses_t1 = db.relationship(
+        "ResponseT1",
+        foreign_keys=[ResponseT1.assessment_id],
+        backref=db.backref("assessment", lazy="joined"),
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
     responses_t2 = db.relationship(
         "ResponseT2",
         foreign_keys=[ResponseT2.assessment_id],
@@ -75,11 +124,21 @@ class Assessment(db.Model):
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
-    # takes_assessment = db.relationship(
-    #     "TakesAssessment", backref="assessment", lazy=True
-    # )
+    
     def __repr__(self):
         return self.title
+
+
+class Tag(db.Model):
+    __tablename__ = "Tag"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    # --- Relationships ---
+    question_t1 = db.relationship("QuestionT1", backref="tag", lazy=True)
+    question_t2 = db.relationship("QuestionT2", backref="tag", lazy=True)
+
+    def __repr__(self):
+        return self.name
 
 
 class QuestionT1(db.Model):
@@ -87,6 +146,7 @@ class QuestionT1(db.Model):
     q_t1_id = db.Column(db.Integer, primary_key=True)
     # --- Foreign Keys ---
     assessment_id = db.Column(db.Integer, db.ForeignKey("Assessment.assessment_id"))
+    tag_id = db.Column(db.Integer, db.ForeignKey("Tag.id"))
     # --- Other Columns ---
     num_of_marks = db.Column(db.Integer, nullable=False)
     question_text = db.Column(db.Text, nullable=False)
@@ -94,7 +154,16 @@ class QuestionT1(db.Model):
     feedback_if_correct = db.Column(db.Text, nullable=False)
     feedback_if_wrong = db.Column(db.Text, nullable=False)
     # --- Relationships ---
-    option = db.relationship("Option", backref="questiont1", lazy=True)
+    option = db.relationship(
+        "Option", backref="questiont1", lazy=True, cascade="all, delete-orphan"
+    )
+    responses = db.relationship(
+        "ResponseT1",
+        foreign_keys=[ResponseT1.t1_question_id],
+        backref=db.backref("question", lazy="joined"),
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self):
         return self.question_text
@@ -105,6 +174,7 @@ class QuestionT2(db.Model):
     q_t2_id = db.Column(db.Integer, primary_key=True)
     # --- Foreign Keys ---
     assessment_id = db.Column(db.Integer, db.ForeignKey("Assessment.assessment_id"))
+    tag_id = db.Column(db.Integer, db.ForeignKey("Tag.id"))
     # --- Other Columns ---
     num_of_marks = db.Column(db.Integer, nullable=False)
     question_text = db.Column(db.Text, nullable=False)
@@ -132,6 +202,14 @@ class Option(db.Model):
     # ---- Other Columns ---
     option_text = db.Column(db.Text, nullable=False)
     is_correct = db.Column(db.Boolean, nullable=False, default=False)
+    # ---- Relationships ----
+    responses_selected_in = db.relationship(
+        "ResponseT1",
+        foreign_keys=[ResponseT1.selected_option],
+        backref=db.backref("chosen_option", lazy="joined"),
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self):
         return self.option_text
@@ -144,7 +222,7 @@ class Module(db.Model):
     title = db.Column(db.String(120), unique=True, nullable=False)
     total_credits = db.Column(db.Integer, nullable=False)
     # --- Relationships ---
-    assessment = db.relationship("Assessment", backref="module", lazy=True)
+    assessments = db.relationship("Assessment", backref="module", lazy=True)
 
     def __repr__(self):
         return self.title
@@ -158,9 +236,21 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
     # --- Relationships ---
-    assessment = db.relationship("Assessment", backref="user", lazy=True)
-    badge = db.relationship("Badge", backref="user", lazy=True)
-    achievement = db.relationship("Achievement", backref="user", lazy=True)
+
+    assessments = db.relationship("Assessment", backref="user", lazy=True)
+    awarded_badge = db.relationship("Awarded_Badge", backref="user", lazy=True)
+    awarded_achievement = db.relationship(
+        "Awarded_Achievement", backref="user", lazy=True
+    )
+    t1_responses = db.relationship(
+        "ResponseT1",
+        foreign_keys=[ResponseT1.user_id],
+        backref=db.backref("responding_student", lazy="joined"),
+        lazy="dynamic",
+        # delete orphan - so if a user is deleted,
+        # it deletes their orphaned relationships too
+        cascade="all, delete-orphan",
+    )
     t2_responses = db.relationship(
         "ResponseT2",
         foreign_keys=[ResponseT2.user_id],
@@ -196,24 +286,44 @@ class User(UserMixin, db.Model):
     def is_administrator(self):
         return self.can(Permission.ADMIN)
 
-    def has_answered(self, question, assessment):
-        if question.q_t2_id is None:
-            return False
+    # TODO amend to account for type 1 or 2 questions 
+    def has_answered(self, type, question, assessment):
         if assessment.assessment_id is None:
             return False
-        return (
-            self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
-            .filter_by(assessment_id=assessment.assessment_id)
-            .first()
-            is not None
-        )
+        if type == 1: # q_t1_id
+            if question.q_t1_id is None:
+                return False
+            return (
+                self.t1_responses.filter_by(t1_question_id=question.q_t1_id)
+                .filter_by(assessment_id=assessment.assessment_id)
+                .first()
+                is not None
+            )
+        elif type == 2: 
+            if question.q_t2_id is None:
+                return False
+            if assessment.assessment_id is None:
+                return False
+            return (
+                self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
+                .filter_by(assessment_id=assessment.assessment_id)
+                .first()
+                is not None
+            )
 
-    def remove_answer(self, question, assessment):
-        response = (
-            self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
-            .filter_by(assessment_id=assessment.assessment_id)
-            .first()
-        )
+    def remove_answer(self, type, question, assessment):
+        if type == 1: 
+            response = (
+                self.t1_responses.filter_by(t1_question_id=question.q_t1_id)
+                .filter_by(assessment_id=assessment.assessment_id)
+                .first()
+            )
+        elif type == 2:
+            response = (
+                self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
+                .filter_by(assessment_id=assessment.assessment_id)
+                .first()
+            )
         if response:
             db.session.delete(response)
 

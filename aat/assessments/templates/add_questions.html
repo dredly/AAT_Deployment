@@ -1,0 +1,27 @@
+{% extends("layout.html") %}
+
+{% block content %}
+
+<!-- Adapted Add question page from Type 1 and Type 2 Questions -->
+<h1>Add Questions to your assessment</h1>
+
+<h3>Add a new question</h3>
+
+<a href="{{url_for('questions.new_question_t1')}}"><button>Type 1</button></a>
+<a href="{{url_for('questions.new_question_t2')}}"><button>Type 2</button></a>
+
+{% for question in questions %}
+    <h2>{{ question.question_text }}</h2>
+    <form method="POST" action="">
+        {{ addQuestionForm.csrf_token}}
+        {{ addQuestionForm.add}}
+    </form>
+   
+{% endfor %}
+
+<form method="POST" action="">
+    {{ form.csrf_token}}
+    {{ form.finish}}
+</form>
+
+{% endblock %}

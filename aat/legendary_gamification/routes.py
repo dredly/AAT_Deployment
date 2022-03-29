@@ -1,6 +1,8 @@
 from flask import render_template, request, redirect
+import flask_login
 from . import legendary_gamification
 from werkzeug.exceptions import BadRequestKeyError
+from ..models import Achievement, Awarded_Achievement, Awarded_Badge, Badge
 
 questions = ["How do you print things in python",
              "How do you declare a function in python",
@@ -75,3 +77,18 @@ def rapid_fire():
         return render_template("fire.html", question=questions[question_counter], options=options[question_counter], question_counter=question_counter)
     except IndexError:
         return redirect("rapid-fire-victory-royale")
+
+
+@legendary_gamification.route("/profile-page")
+def profile():
+    badges = []
+    achievements = []
+    awarded_badges = Awarded_Badge.query.filter_by(id=flask_login.current_user.id).all()
+    awarded_achievements = Awarded_Achievement.query.filter_by(id=flask_login.current_user.id).all()
+    for awards in awarded_badges:
+        badge = Badge.query.filter_by(badge_id=awards.badge_id).first()
+        badges.append(badge)
+    for awards in awarded_achievements:
+        achievement = Achievement.query.filter_by(achievement_id=awards.achievement_id).first()
+        achievements.append(achievement)
+    return render_template("profile.html", badges=badges, achievements=achievements)
