@@ -60,6 +60,21 @@ class Awarded_Achievement(db.Model):
     )
 
 
+class ResponseT1(db.Model):
+    __tablename__ = "t1_responses"
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    assessment_id = db.Column(
+        db.Integer, db.ForeignKey("Assessment.assessment_id"), primary_key=True
+    )
+    t1_question_id = db.Column(
+        db.Integer, db.ForeignKey("QuestionT1.q_t1_id"), primary_key=True
+    )
+    selected_option = db.Column(db.Integer, nullable=False)
+    is_correct = db.Column(db.Boolean, nullable=False)
+
+    def __repr__(self):
+        return self.selected_option
+
 class ResponseT2(db.Model):
     __tablename__ = "t2_responses"
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
@@ -205,6 +220,15 @@ class User(UserMixin, db.Model):
     awarded_achievement = db.relationship(
         "Awarded_Achievement", backref="user", lazy=True
     )
+    t1_responses = db.relationship(
+        "ResponseT1",
+        foreign_keys=[ResponseT1.user_id],
+        backref=db.backref("responding_student", lazy="joined"),
+        lazy="dynamic",
+        # delete orphan - so if a user is deleted,
+        # it deletes their orphaned relationships too
+        cascade="all, delete-orphan",
+    )
     t2_responses = db.relationship(
         "ResponseT2",
         foreign_keys=[ResponseT2.user_id],
@@ -240,17 +264,30 @@ class User(UserMixin, db.Model):
     def is_administrator(self):
         return self.can(Permission.ADMIN)
 
-    def has_answered(self, question, assessment):
-        if question.q_t2_id is None:
-            return False
+    # TODO amend to account for type 1 or 2 questions 
+    def has_answered(self, type, question, assessment):
         if assessment.assessment_id is None:
             return False
-        return (
-            self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
-            .filter_by(assessment_id=assessment.assessment_id)
-            .first()
-            is not None
-        )
+        if type == 1: # q_t1_id
+            if question.q_t1_id is None:
+                return False
+            return (
+                self.t1_responses.filter_by(t1_question_id=question.q_t1_id)
+                .filter_by(assessment_id=assessment.assessment_id)
+                .first()
+                is not None
+            )
+        elif type == 2: 
+            if question.q_t2_id is None:
+                return False
+            if assessment.assessment_id is None:
+                return False
+            return (
+                self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
+                .filter_by(assessment_id=assessment.assessment_id)
+                .first()
+                is not None
+            )
 
     def remove_answer(self, question, assessment):
         response = (

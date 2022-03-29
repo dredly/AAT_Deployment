@@ -3,7 +3,7 @@ import math
 from stringprep import in_table_d2
 from flask import Response, redirect, render_template, request, url_for, abort, session
 from . import assessments
-from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2
+from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT1
 from .forms import AddQuestionFilterForm, DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, RemoveQuestionForm
 from .. import db
 from flask_login import current_user
@@ -58,6 +58,7 @@ def delete_questions(id):
 def new_assessment():
     form = AssessmentForm()
     is_summative_1 = ""
+    session["user"] = current_user.id 
     if request.method == "POST":
         lecturer_id = session["user"]
         is_summative = False
@@ -230,9 +231,10 @@ def answer_question(question_id):
     form = AnswerType2Form(answer=None)
     assessment = Assessment.query.get_or_404(session.get("assessment"))
     question = QuestionT2.query.get_or_404(question_id)
-    if current_user.has_answered(question, assessment):
+    if current_user.has_answered(2, question, assessment):
         if request.method == "GET":
             previous_response = (
+                # TODO make responsive to both types of questions here too 
                 current_user.t2_responses.filter_by(
                     assessment_id=session.get("assessment")
                 )
@@ -242,7 +244,8 @@ def answer_question(question_id):
             previous_given_answer = previous_response.response_content
             form.answer.data = previous_given_answer
     if request.method == "POST":
-        if current_user.has_answered(question, assessment):
+        # TODO create a has answered for type 1 as well 
+        if current_user.has_answered(2, question, assessment):
             current_user.remove_answer(question, assessment)
             db.session.commit()
         given_answer = form.answer.data.strip()
@@ -250,6 +253,7 @@ def answer_question(question_id):
             result = True
         else:
             result = False
+        # TODO make responsive to type1 also 
         response = ResponseT2(
             user_id=current_user.id,
             assessment_id=assessment.assessment_id,
@@ -262,6 +266,7 @@ def answer_question(question_id):
         return redirect(url_for("assessments.mark_answer", question_id=question_id))
     current_questions = session.get("questions")
     previous = current_questions.pop(0)
+    # TODO change these session variables so they store the tuples not ids 
     session["past_questions"].append(previous)
     session["questions"] = current_questions
     return render_template(
