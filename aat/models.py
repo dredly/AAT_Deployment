@@ -77,6 +77,7 @@ class ResponseT1(db.Model):
     def __repr__(self):
         return self.selected_option
 
+
 class ResponseT2(db.Model):
     __tablename__ = "t2_responses"
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
@@ -124,7 +125,7 @@ class Assessment(db.Model):
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
-    
+
     def __repr__(self):
         return self.title
 
@@ -286,11 +287,11 @@ class User(UserMixin, db.Model):
     def is_administrator(self):
         return self.can(Permission.ADMIN)
 
-    # TODO amend to account for type 1 or 2 questions 
+    # TODO amend to account for type 1 or 2 questions
     def has_answered(self, type, question, assessment):
         if assessment.assessment_id is None:
             return False
-        if type == 1: # q_t1_id
+        if type == 1:  # q_t1_id
             if question.q_t1_id is None:
                 return False
             return (
@@ -299,7 +300,7 @@ class User(UserMixin, db.Model):
                 .first()
                 is not None
             )
-        elif type == 2: 
+        elif type == 2:
             if question.q_t2_id is None:
                 return False
             if assessment.assessment_id is None:
@@ -312,7 +313,7 @@ class User(UserMixin, db.Model):
             )
 
     def remove_answer(self, type, question, assessment):
-        if type == 1: 
+        if type == 1:
             response = (
                 self.t1_responses.filter_by(t1_question_id=question.q_t1_id)
                 .filter_by(assessment_id=assessment.assessment_id)

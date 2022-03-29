@@ -8,7 +8,17 @@
 {% endblock extra_head %}
 {% block content %}
     <h1>Welcome "{{current_user.name}}". Let's see how you have done.</h1>
-    <h2>Assessment View</h2>
+    <p>
+        <a href="{{url_for('student_stats.course_view')}}">
+            Course View
+        </a> 
+        > 
+        <a href="{{url_for('student_stats.module_view', module_id=module_id)}}">
+            Module View
+        </a>
+         > Assessment View
+    </p>
+    <h2>Assessment: {{assessment_details["assessment_name"]}}</h2>
     <h2>
         Overall Marks
     </h2>
@@ -25,20 +35,38 @@
         </div>
     </div>
 
-    <h2>Results</h2>
-
-    {% for assessment, marks in assessment_marks_dict.items() %}
-        <p>{{assessment}}</p>
-        <p>{{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
-            format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
+    <h2>Questions</h2>
+    <ul>
+    {% for question, marks in assessment_marks.items() %}
+        <li>
+            <p>Question: {{question}}</p>
+        </li>
+        <ul>
+            <li>
+                <p>Answer Given: {{marks.answer_given}}</p>
+            </li>
+            <li>
+                <p>Corrent Answer: {{marks.correct_answer}}</p>
+            </li>
+            <li>
+                <p>Feedback Given: {{marks.feedback_given}}</p>
+            </li>
+            <li>
+                <p>{{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
+                    format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
+            </li>
+        </ul>
     {% endfor %}
-    <a href="{{ url_for('student_stats.download')}}">Download CSV</a>
+</ul>
+    <h2>Download</h2>
+    <p><a href="{{ url_for('student_stats.download')}}">Download CSV</a></p>
+    {#
     <hr>
     <h2>Responses</h2>
  
     {% for response in current_user.t2_responses %}
     <ul>
-        {% if response.assessment.assessment_id == assessment_id %}
+        {% if response.assessment.assessment_id == assessment_details["assessment_id"] %}
             <li>
                 <p>Question: {{response.question}} (Marks: {{response.question.num_of_marks}})</p>
                 <p>Response: {{response.response_content}} {% if response.is_correct %}(Y){% else %}(N){% endif %}</p>
@@ -46,7 +74,7 @@
         {% endif %}
     </ul>
     {% endfor %}
-    
+    #}
 
 
     <script>

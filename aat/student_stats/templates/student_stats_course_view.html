@@ -8,7 +8,8 @@
 {% endblock extra_head %}
 {% block content %}
     <h1>Welcome "{{current_user.name}}". Let's see how you have done.</h1>
-    <h2>Course View</h2>
+    <p>Course View</p>
+    <h2>Course: Computer Science</h2>
     <h2>
         Overall Marks
     </h2>
@@ -25,7 +26,7 @@
         </div>
     </div>
 
-    <h2>Results</h2>
+    <h2>Modules</h2>
     <ul>
         {% for module, assessments in module_dict.items() %}
             <li>
@@ -43,7 +44,7 @@
         {% endfor %}
     </ul>
     <h2>Download</h2>
-    <a href="{{ url_for('student_stats.download')}}">Download CSV</a>
+    <p><a href="{{ url_for('student_stats.download')}}">Download CSV</a></p>
     {#
     <hr>
     <h2>Responses</h2>
