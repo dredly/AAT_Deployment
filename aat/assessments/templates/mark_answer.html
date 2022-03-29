@@ -16,7 +16,7 @@
 {% else %}
 <button type="button">
 	<a
-		href="{{ url_for('assessments.answer_question', question_id=session['questions'][0]) }}"
+		href="{{ url_for('assessments.answer_question', type=session['questions'][0][0], question_id=session['questions'][0][1]) }}"
 		>Next Question</a
 	>
 </button>

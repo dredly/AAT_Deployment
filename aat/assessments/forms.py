@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms.fields import DateField
+from wtforms.fields import DateField, RadioField
 from wtforms.validators import NumberRange
 from wtforms import (
     TextAreaField,
@@ -21,6 +21,9 @@ class DeleteQuestionsForm(FlaskForm):
     )
     submit = SubmitField("Delete selected questions")
 
+class AnswerType1Form(FlaskForm):
+    chosen_option = RadioField('Answer Options')
+    submit = SubmitField("Submit Answer")
 
 class AnswerType2Form(FlaskForm):
     answer = TextAreaField(validators=[DataRequired()])

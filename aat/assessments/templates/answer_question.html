@@ -5,7 +5,12 @@
 <p>Marks available: {{ question.num_of_marks }}</p>
 
 <form method="POST" action="">
-	{{ form.csrf_token }} {{ form.answer }}
+	{{ form.csrf_token }} 
+	{% if type == 1%}
+	{{ form.chosen_option }}
+	{% elif type == 2 %}
+	{{ form.answer }}
+	{% endif %}
 	<button type="submit" value="Submit Answer">Submit Answer</button>
 </form>
 

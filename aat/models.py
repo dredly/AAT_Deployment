@@ -69,7 +69,9 @@ class ResponseT1(db.Model):
     t1_question_id = db.Column(
         db.Integer, db.ForeignKey("QuestionT1.q_t1_id"), primary_key=True
     )
-    selected_option = db.Column(db.Integer, nullable=False)
+    selected_option = db.Column(
+        db.Integer, db.ForeignKey("Option.option_id"), primary_key=True
+    )
     is_correct = db.Column(db.Boolean, nullable=False)
 
     def __repr__(self):
@@ -200,6 +202,14 @@ class Option(db.Model):
     # ---- Other Columns ---
     option_text = db.Column(db.Text, nullable=False)
     is_correct = db.Column(db.Boolean, nullable=False, default=False)
+    # ---- Relationships ----
+    responses_selected_in = db.relationship(
+        "ResponseT1",
+        foreign_keys=[ResponseT1.selected_option],
+        backref=db.backref("chosen_option", lazy="joined"),
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self):
         return self.option_text
@@ -301,12 +311,19 @@ class User(UserMixin, db.Model):
                 is not None
             )
 
-    def remove_answer(self, question, assessment):
-        response = (
-            self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
-            .filter_by(assessment_id=assessment.assessment_id)
-            .first()
-        )
+    def remove_answer(self, type, question, assessment):
+        if type == 1: 
+            response = (
+                self.t1_responses.filter_by(t1_question_id=question.q_t1_id)
+                .filter_by(assessment_id=assessment.assessment_id)
+                .first()
+            )
+        elif type == 2:
+            response = (
+                self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
+                .filter_by(assessment_id=assessment.assessment_id)
+                .first()
+            )
         if response:
             db.session.delete(response)
 
