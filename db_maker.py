@@ -176,9 +176,9 @@ with app.app_context():
         ]
     )
 
-    ###########
-    # OPTIONS #
-    ###########
+    #################################
+    # OPTIONS (FOR TYPE 1 QUESTIONS #
+    #################################
     db.session.add_all(
         [
             Option(q_t1_id=1, option_text="checkout", is_correct=True),  # 1
@@ -380,6 +380,20 @@ with app.app_context():
             ),
             ResponseT1(  # 2
                 user_id=1,
+                assessment_id=2,
+                t1_question_id=2,
+                selected_option=5,
+                is_correct=True,
+            ),
+            ResponseT1(  # 1
+                user_id=4,
+                assessment_id=1,
+                t1_question_id=1,
+                selected_option=1,
+                is_correct=True,
+            ),
+            ResponseT1(  # 2
+                user_id=4,
                 assessment_id=2,
                 t1_question_id=2,
                 selected_option=5,
