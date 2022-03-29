@@ -397,7 +397,6 @@ def mark_answer(type, question_id):
     assessment = Assessment.query.get_or_404(session.get("assessment"))
     if type == 1: 
         question = QuestionT1.query.get_or_404(question_id)
-        # Option.query.filter_by(q_t1_id=question_id).all()
         right_answer = Option.query.filter_by(q_t1_id=question.q_t1_id).filter_by(is_correct=True).first()
         chosen_option = (
         current_user.t1_responses.filter_by(assessment_id=session.get("assessment"))
@@ -426,19 +425,27 @@ def mark_answer(type, question_id):
 
 @assessments.route("/results/<int:assessment_id>")
 def results(assessment_id):
+    assessment = Assessment.query.get_or_404(session.get("assessment"))
+    no_of_questions = session.pop("no_questions", None)
+
+    # ----- Find all the responses given during assessment session 
     t1_responses = current_user.t1_responses.filter_by(
         assessment_id=assessment_id
     ).all()
     t2_responses = current_user.t2_responses.filter_by(
         assessment_id=assessment_id
     ).all()
-    assessment = Assessment.query.get_or_404(session.get("assessment"))
-    no_of_questions = session.pop("no_questions", None)
+
+    # ----- find all questions asked 
     questions = QuestionT1.query.filter_by(assessment_id=assessment_id).all(
         ) + QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+
+    # ----- find possible total marks 
     possible_total = 0
     for question in questions:
         possible_total += question.num_of_marks
+
+    # ----- find actual result achieved 
     result = 0
     for response in t1_responses:
         if response.is_correct:
@@ -452,12 +459,51 @@ def results(assessment_id):
                 q_t2_id=response.t2_question_id
             ).first()
             result += answered_question.num_of_marks
+    # ---- 1. create list of numbers representing indexes 
+    no_questions = [i for i in range(0, no_of_questions)]
+
+    # ---- 2. create lists to store relevant variables to be entered into template 
+    ordered_questions = []
+    given_answers = []
+    correct_answers = []
+    is_correct = []
+
+    # ---- 3. iterate over the index list 
+    for idx in no_questions: 
+        current_question = session["past_questions"][idx]
+        if current_question[0] == 1: 
+            q = QuestionT1.query.filter_by(q_t1_id=current_question[1]).first()
+            related_response = current_user.t1_responses.filter_by(assessment_id=assessment.assessment_id
+                ).filter_by(t1_question_id=q.q_t1_id
+                ).first()
+            answer_content = Option.query.filter_by(option_id=related_response.selected_option).first().option_text
+            correct_answer = Option.query.filter_by(q_t1_id=q.q_t1_id).filter_by(is_correct=True).first().option_text
+            correct_test = related_response.is_correct 
+        elif current_question[0] == 2:
+            q = QuestionT2.query.filter_by(q_t2_id=current_question[1]).first()
+            related_response = current_user.t2_responses.filter_by(assessment_id=assessment.assessment_id
+            ).filter_by(t2_question_id=q.q_t2_id
+            ).first()
+            answer_content = related_response.response_content
+            correct_answer = q.correct_answer 
+            correct_test = related_response.is_correct
+        
+        ordered_questions.append(q)
+        given_answers.append(answer_content)
+        correct_answers.append(correct_answer)
+        is_correct.append(correct_test)
+    print("Ordered questions are: ", str(ordered_questions))
     return render_template(
         "results.html",
-        no_of_questions=no_of_questions,
+        no_questions=no_questions,
         assessment=assessment,
         result=result,
         possible_total=possible_total,
+        ordered_questions=ordered_questions,
+        given_answers=given_answers,
+        correct_answers=correct_answers,
+        is_correct=is_correct 
+
     )
 
 

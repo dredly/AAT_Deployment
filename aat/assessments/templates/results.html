@@ -4,6 +4,24 @@
 
 <p>Score: {{ result }} / {{ possible_total }}</p>
 
+<h2>Questions</h2>
+
+{% for i in no_questions %}
+<p>{{ i + 1 }}. {{ ordered_questions[i].question_text }}</p>
+<p>Your answer: {{ given_answers[i] }}</p>
+<p>Correct answer: {{ correct_answers[i] }}</p>
+<p>Total points: {% if is_correct[i] == True%}{{ ordered_questions[i].num_of_marks }}{% else %}0{% endif %}/{{ ordered_questions[i].num_of_marks }}</p>
+<h3>Feedback</h3>
+{% if is_correct[i] == True%}
+    {{ ordered_questions[i].feedback_if_correct }}
+{% else %}
+    {{ ordered_questions[i].feedback_if_wrong }}
+{% endif %}
+
+<hr>
+
+{% endfor %}
+
 <button type="button"><a href="{{ url_for('assessments.exit_assessment') }}">Return to Assessments</a></button>
 
 

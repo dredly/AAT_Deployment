@@ -10,6 +10,15 @@
 	<p>The correct answer was: {{ question.correct_answer }}</p>
 {% endif %}
 
+<h2>Feedback</h2>
+<p>
+	{% if response.is_correct %}
+	{{ question.feedback_if_correct }}
+	{% else %}
+	{{ question.feedback_if_wrong }}
+	{% endif %}
+</p>
+
 {% if session['questions']|length < 1 %}
 <button type="button">
 	<a
