@@ -35,8 +35,7 @@ def index():
             moduleId = assessment.module_id
             for module in Modules:
                 print(module)
-                if moduleId == module.module_id:
-                    if module.title not in lecturersModules:
+                if moduleId == module.module_id and module.title not in lecturersModules:
                         lecturersModules.append(module.title)
     print(lecturersAssessments)
     print(lecturersModules)
@@ -53,12 +52,14 @@ def test():
 def module(Module_title):
     user = User.query.filter_by(name = current_user.name).first()
     user_id = user.id
+    module = Module.query.filter_by(title = Module_title).first()
+    moduleId = module.module_id
 
     Assessments = Assessment.query.all()
 
     lecturersAssessments = []
     for assessment in Assessments:
-        if assessment.lecturer_id == user_id and assessment.module_id != None:
+        if assessment.lecturer_id == user_id and assessment.module_id == moduleId:
             lecturersAssessments.append(assessment)
     return render_template("module.html", module_title = Module_title, lecturersAssessments = lecturersAssessments )
 

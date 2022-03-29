@@ -1,7 +1,9 @@
 {% extends("layout.html") %}
 {% block content %}
-<h1>{{module_title}}</h1>
+<a href="{{ url_for('staff_stats.index') }}">BACK</a>
+<h1> Module: {{module_title}}</h1>
+<h3>Your Assessments:</h3>
 {%for assessment in lecturersAssessments%}
-<h2>{{assessment}}</a></h2>
+<h2>{{assessment}}</h2>
 {%endfor%}
 {% endblock %}
