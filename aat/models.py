@@ -108,6 +108,13 @@ class Assessment(db.Model):
     # --- Relationships --- TODO: add more as tables are added to the db
     question_t1 = db.relationship("QuestionT1", backref="assessment", lazy=True)
     question_t2 = db.relationship("QuestionT2", backref="assessment", lazy=True)
+    responses_t1 = db.relationship(
+        "ResponseT1",
+        foreign_keys=[ResponseT1.assessment_id],
+        backref=db.backref("assessment", lazy="joined"),
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
     responses_t2 = db.relationship(
         "ResponseT2",
         foreign_keys=[ResponseT2.assessment_id],
@@ -115,9 +122,7 @@ class Assessment(db.Model):
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
-    # takes_assessment = db.relationship(
-    #     "TakesAssessment", backref="assessment", lazy=True
-    # )
+    
     def __repr__(self):
         return self.title
 
@@ -149,6 +154,13 @@ class QuestionT1(db.Model):
     # --- Relationships ---
     option = db.relationship(
         "Option", backref="questiont1", lazy=True, cascade="all, delete-orphan"
+    )
+    responses = db.relationship(
+        "ResponseT1",
+        foreign_keys=[ResponseT1.t1_question_id],
+        backref=db.backref("question", lazy="joined"),
+        lazy="dynamic",
+        cascade="all, delete-orphan",
     )
 
     def __repr__(self):
