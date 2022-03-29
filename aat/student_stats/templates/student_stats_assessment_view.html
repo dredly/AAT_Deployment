@@ -26,25 +26,25 @@
     </div>
 
     <h2>Results</h2>
-    {% for module, assessments in module_dict.items() %}
-        <p><b>{{module}}</b></p>
-        {% for assessment, marks in assessments.items() %}
-            <p>{{assessment}}</p>
-            <p>{{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
-                format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
-        {% endfor %}
+
+    {% for assessment, marks in assessment_marks_dict.items() %}
+        <p>{{assessment}}</p>
+        <p>{{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
+            format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
     {% endfor %}
     <a href="{{ url_for('student_stats.download')}}">Download CSV</a>
     <hr>
     <h2>Responses</h2>
  
     {% for response in current_user.t2_responses %}
-        
-        <h3>Module: {{response.assessment.module}}</h3>
-        <h4>Assessment: {{response.assessment}}</h4>
-        <p>Question: {{response.question}} (Marks: {{response.question.num_of_marks}})</p>
-        <p>Response: {{response.response_content}} (Marks: {{response.is_correct}})</p>
-    
+    <ul>
+        {% if response.assessment.assessment_id == assessment_id %}
+            <li>
+                <p>Question: {{response.question}} (Marks: {{response.question.num_of_marks}})</p>
+                <p>Response: {{response.response_content}} {% if response.is_correct %}(Y){% else %}(N){% endif %}</p>
+            </li>
+        {% endif %}
+    </ul>
     {% endfor %}
     
 

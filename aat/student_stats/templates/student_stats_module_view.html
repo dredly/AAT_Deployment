@@ -29,7 +29,7 @@
     {% for module, assessments in module_dict.items() %}
         <p><b>{{module}}</b></p>
         {% for assessment, marks in assessments.items() %}
-            <p>{{assessment}}</p>
+            <p><a href="{{url_for('student_stats.assessment_view', assessment_id=assessment.assessment_id )}}">{{assessment}}</a></p>
             <p>{{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
                 format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
         {% endfor %}

@@ -18,7 +18,9 @@ from ..models import (
     ResponseT2,
 )
 
-
+###############
+# COURSE VIEW #
+###############
 @student_stats.route("/")
 def course_view():
     # Checks if logged in
@@ -73,6 +75,11 @@ def course_view():
         overall_results=overall_results,
         module_dict=module_dict,
     )
+
+
+###############
+# MODULE VIEW #
+###############
 
 
 @student_stats.route("/module/")
@@ -138,6 +145,74 @@ def module_view(module_id=0):
     )
 
 
+###################
+# ASSESSMENT VIEW #
+###################
+
+
+@student_stats.route("/assessment/")
+@student_stats.route("/assessment/<int:assessment_id>")
+def assessment_view(assessment_id=0):
+    # Checks if logged in
+    if not current_user.is_authenticated:
+        return redirect(url_for("auth.login"))
+
+    # Assessment Error Handling
+    if Assessment.query.filter_by(assessment_id=assessment_id).first() is None:
+        return redirect(
+            url_for("student_stats.module_not_found", assessment_id=assessment_id)
+        )
+
+    assessment_details = {
+        "assessment_id": assessment_id,
+        "assessment_name": Assessment.query.filter_by(
+            assessment_id=assessment_id
+        ).first(),
+    }
+
+    # GET SUM OF QUESTIONS FOR EACH ASSESSMENT
+    assessment_marks_dict = {}
+
+    for response in current_user.t2_responses:
+        if response.assessment.assessment_id == assessment_id:
+            if response.assessment not in assessment_marks_dict:
+                assessment_marks_dict[response.assessment] = {
+                    "marks_awarded": response.question.num_of_marks
+                    if response.is_correct
+                    else 0,
+                    "marks_possible": response.question.num_of_marks,
+                }
+            else:
+                assessment_marks_dict[response.assessment]["marks_awarded"] += (
+                    response.question.num_of_marks if response.is_correct else 0
+                )
+                assessment_marks_dict[response.assessment][
+                    "marks_possible"
+                ] += response.question.num_of_marks
+
+    sum_of_marks_awarded = 0
+    sum_of_marks_possible = 0
+
+    for assessment, data in assessment_marks_dict.items():
+        sum_of_marks_awarded += data["marks_awarded"]
+        sum_of_marks_possible += data["marks_possible"]
+
+    if sum_of_marks_possible == 0:
+        return render_template("no_questions_answered.html")
+
+    overall_results = {
+        "sum_of_marks_awarded": sum_of_marks_awarded,
+        "sum_of_marks_possible": sum_of_marks_possible,
+    }
+
+    return render_template(
+        "student_stats_assessment_view.html",
+        overall_results=overall_results,
+        assessment_marks_dict=assessment_marks_dict,
+        assessment_id=assessment_id,
+    )
+
+
 ######################
 # EXCEPTION HANDLING #
 ######################
@@ -160,6 +235,11 @@ def module_not_found(module_id):
             reverse=False,
         ),
     )
+
+
+@student_stats.route("/assessment/not-found/<int:assessment_id>")
+def assessment_not_found(assessment_id):
+    return "TODO"
 
 
 ################
