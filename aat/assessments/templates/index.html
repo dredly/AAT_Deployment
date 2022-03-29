@@ -13,6 +13,9 @@
 
 	{% for module in modules %}
 		<h2>{{ module.title }} {{module.total_credits}}</h2>
+		<button type="button" class = "Assessment_Index_Child">
+			<a href="{{ url_for('assessments.view_module', module_id=module.module_id) }}" class="Assessment_Index_Text">View Module Breakdown</a>
+		</button>
 		{% for assessment in module.assessments %}
 			{# {% if assessment.is_summative %} #}
 				<div class = "Assessment_Index_Parent">
@@ -32,6 +35,7 @@
 							<button type="button" class = "Assessment_Index_Child">
 								<a href="{{ url_for('assessments.assessment_summary', assessment_id=assessment.assessment_id) }}" class="Assessment_Index_Text">Take Assessment</a>
 							</button>
+							
 					</div>
 				</div>
 			{# {% endif %}	#}

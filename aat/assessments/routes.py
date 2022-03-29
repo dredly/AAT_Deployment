@@ -17,6 +17,24 @@ def index():
     modules = Module.query.all()
     return render_template("index.html", assessments=assessments, modules=modules)
 
+@assessments.route("/view_module/<int:module_id>")
+def view_module(module_id): 
+    module = Module.query.filter_by(module_id=module_id).first()
+    assessments = Assessment.query.filter_by(module_id=module.module_id).all()
+    summatives = []
+    formatives = []
+    for assessment in assessments:
+        if assessment.is_summative: 
+            summatives.append(assessment)
+        else: 
+            formatives.append(assessment)
+    return render_template("view_module.html", 
+        module=module, 
+        assessments=assessments,
+        summatives=summatives,
+        formatives=formatives
+        )
+
 
 @assessments.route("/<int:id>")
 def show_assessment(id):
