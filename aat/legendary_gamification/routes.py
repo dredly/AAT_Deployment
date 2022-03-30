@@ -1,4 +1,5 @@
 from flask import render_template, request, redirect
+from flask_login import current_user
 import flask_login
 from . import legendary_gamification
 from werkzeug.exceptions import BadRequestKeyError
@@ -20,13 +21,31 @@ question_counter = 0
 
 @legendary_gamification.route("/achievements", methods=["GET", "POST"])
 def achievements():
+    badges = []
+    achievements = []
+    award_badges = Awarded_Badge.query.filter_by(user_id=current_user.id).all()
+    print(current_user.id)
+    # for awards in award_badges:
+    #     print(awards.badge_id)
+    print(award_badges)
+    award_achievements = Awarded_Achievement.query.filter_by(user_id=current_user.id).all()
+    print(award_achievements)
+    for awards in award_badges:
+        badge = Badge.query.filter_by(badge_id=awards.badge_id).first()
+        badges.append(badge)
+        print("Added")
+    for awards in award_achievements:
+        achievement = Achievement.query.filter_by(achievement_id=awards.achievement_id).first()
+        achievements.append(achievement)
+    for badge in badges:
+        print(badge.name)
     with open("aat/legendary_gamification/ranks.txt", 'r') as f:
         lines_ranks = f.readlines()
     with open("aat/legendary_gamification/awards.txt", 'r') as f:
         lines_achievements = f.readlines()
     if request.method == "POST":
         return redirect("rapid-fire")
-    return render_template("achievements.html", ranks=sorted(lines_ranks), awards=lines_achievements)
+    return render_template("achievements.html", ranks=sorted(lines_ranks), awards=lines_achievements, badges=badges, achievements=achievements)
 
 
 @legendary_gamification.route("/correctement")
@@ -83,12 +102,20 @@ def rapid_fire():
 def profile():
     badges = []
     achievements = []
-    awarded_badges = Awarded_Badge.query.filter_by(id=flask_login.current_user.id).all()
-    awarded_achievements = Awarded_Achievement.query.filter_by(id=flask_login.current_user.id).all()
-    for awards in awarded_badges:
+    award_badges = Awarded_Badge.query.filter_by(user_id=current_user.id).all()
+    print(current_user.id)
+    # for awards in award_badges:
+    #     print(awards.badge_id)
+    print(award_badges)
+    award_achievements = Awarded_Achievement.query.filter_by(user_id=current_user.id).all()
+    print(award_achievements)
+    for awards in award_badges:
         badge = Badge.query.filter_by(badge_id=awards.badge_id).first()
         badges.append(badge)
-    for awards in awarded_achievements:
+        print("Added")
+    for awards in award_achievements:
         achievement = Achievement.query.filter_by(achievement_id=awards.achievement_id).first()
         achievements.append(achievement)
+    for badge in badges:
+        print(badge.name)
     return render_template("profile.html", badges=badges, achievements=achievements)
