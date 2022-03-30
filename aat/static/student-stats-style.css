@@ -13,3 +13,19 @@
 	margin-top: auto;
 }
 
+.correct_answer{
+	background: rgba(54, 162, 235,0.8);
+}
+
+.incorrect_answer{
+	background: rgba(255, 99, 132,0.8);
+}
+
+.question_container{
+	padding: 0.8rem;
+	margin: 0.8rem 0;
+}
+
+.question_container>li{
+	list-style: none;
+}	
