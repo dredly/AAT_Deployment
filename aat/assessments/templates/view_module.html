@@ -1,0 +1,34 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1>{{module.title}}</h1>
+
+<section class="summary-page summative">
+    <h2>Summative Assessments</h2>
+    <small><em><b>Please note: summative assessments can only be completed once.</b></em></small>
+    {% for summative_assessment in summatives %}
+        <div class="assessment-instance">
+            <h3>{{ summative_assessment.title }}</h3>
+            <p>Must be completed by: <b class="date">{{ summative_assessment.due_date }}</b></p>
+            <button type="button" class = "Assessment_Index_Child">
+                <a href="{{ url_for('assessments.assessment_summary', assessment_id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">Take Assessment</a>
+            </button>
+        </div>
+        <hr>
+    {% endfor %}
+</section>
+
+<section class="summary-page formative">
+    <h2>Formative Assessments</h2>
+    {% for formative_assessment in formatives %}
+        <div class="assessment-instance">
+            <h3>{{ formative_assessment.title }}</h3>
+            <button type="button" class = "Assessment_Index_Child">
+                <a href="{{ url_for('assessments.assessment_summary', assessment_id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">Take Assessment</a>
+            </button>
+        </div>
+        <hr>
+    {% endfor %}
+</section>
+
+
+{% endblock %}
