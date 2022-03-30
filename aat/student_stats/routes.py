@@ -6,6 +6,7 @@ from io import StringIO
 import csv
 from flask import make_response
 from werkzeug.exceptions import NotFound
+from .. import db
 
 # MODELS
 from ..models import (
@@ -18,6 +19,11 @@ from ..models import (
     ResponseT2,
 )
 
+#### QUERY ####
+# db.session.query(func.avg(QuestionT2.num_of_marks)).filter_by(assessment_id=1))
+# db.session.query(func.avg(QuestionT2.num_of_marks)).filter_by(assessment_id=1).all()
+
+
 ###############
 # COURSE VIEW #
 ###############
@@ -29,6 +35,13 @@ def course_view():
 
     # GET SUM OF QUESTIONS FOR EACH ASSESSMENT
     assessment_marks = {}
+
+    # Let's try to to get the average of all marks
+    # SUM OF CORRECT RESPONSE
+    # sum_of_correct_responses
+
+    # val = ()
+    # print(f"{db.session.query(func.sum(ResponseT2.question.num_of_marks)).all()}")
 
     ## T1_responses
     for response in current_user.t1_responses:
@@ -104,8 +117,6 @@ def course_view():
             module_totals[module.title]["marks_possible"] += assessment_details[
                 "marks_possible"
             ]
-
-    print(f"{module_totals=}")
 
     return render_template(
         "student_stats_course_view.html",
@@ -241,6 +252,7 @@ def assessment_view(assessment_id=0):
                     if response.is_correct
                     else 0,
                     "marks_possible": response.question.num_of_marks,
+                    "difficulty": response.question.difficulty,
                 }
                 # Check what correct answer was
                 for option in Option.query.filter_by(
@@ -280,8 +292,8 @@ def assessment_view(assessment_id=0):
                     if response.is_correct
                     else 0,
                     "marks_possible": response.question.num_of_marks,
+                    "difficulty": response.question.difficulty,
                 }
-                print(assessment_marks)
                 # Feedback given:
                 if response.is_correct:
                     assessment_marks[response.question][
@@ -291,14 +303,8 @@ def assessment_view(assessment_id=0):
                     assessment_marks[response.question][
                         "feedback_given"
                     ] = response.question.feedback_if_wrong
-            else:
-                # Rich: Unsure this step happens at a question level
-                assessment_marks[response.question]["marks_awarded"] += (
-                    response.question.num_of_marks if response.is_correct else 0
-                )
-                assessment_marks[response.question][
-                    "marks_possible"
-                ] += response.question.num_of_marks
+
+    # Average difficulty
 
     sum_of_marks_awarded = 0
     sum_of_marks_possible = 0

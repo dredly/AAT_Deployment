@@ -6,8 +6,11 @@
 	href="{{url_for('static',filename='student-stats-style.css')}}"
 />
 {% endblock extra_head %}
+{% block title %}
+    Student | Assessment View
+{% endblock title %}
 {% block content %}
-    <h1>Welcome "{{current_user.name}}". Let's see how you have done.</h1>
+<h1>Student Stats for {{current_user.name}} | Assessment View for {{assessment_details["assessment_name"]}}</h1>
     <p>
         <a href="{{url_for('student_stats.course_view')}}">
             Course View
@@ -51,6 +54,9 @@
                 </li>
                 <li>
                     <p>Feedback Given: {{marks.feedback_given}}</p>
+                </li>
+                <li>
+                    <p>Difficulty: {{marks.difficulty}}</p>
                 </li>
                 <li>
                     <p>Mark: {{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.1d" |
