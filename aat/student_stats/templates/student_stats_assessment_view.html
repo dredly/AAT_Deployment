@@ -41,7 +41,7 @@
     <h2>Questions</h2>
     <ul>
     {% for question, marks in assessment_marks.items() %}
-        <div class="question_container {% if marks.is_correct %}correct_answer{% else %}incorrect_answer{% endif %}">
+        <div class="student_stats_container {% if marks.is_correct %}correct_answer{% else %}incorrect_answer{% endif %}">
             <li>
                 <p><b>Question: {{question}}</b></p>
             </li>

@@ -38,16 +38,17 @@
     <ul>
     {% for module, assessments in module_dict.items() %}
         {% for assessment, marks in assessments.items() %}
-            <li>
-                <p>
-                    <a href="{{url_for('student_stats.assessment_view', assessment_id=assessment.assessment_id )}}">
-                        {{assessment}}:
-                    </a> 
-                    {{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
-                        format((marks.marks_awarded/marks.marks_possible)*100)}}%)
-                </p>
-         
-            </li>
+            <div class="student_stats_container {% if marks.marks_awarded/marks.marks_possible >= 0.5 %} correct_answer {% else %} incorrect_answer {% endif %}">
+                <li>
+                    <p>
+                        <a href="{{url_for('student_stats.assessment_view', assessment_id=assessment.assessment_id )}}">
+                            {{assessment}}:
+                        </a>
+                        {{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
+                            format((marks.marks_awarded/marks.marks_possible)*100)}}%)
+                    </p>
+                </li>
+            </div>
         {% endfor %}
     {% endfor %}
 </ul>
