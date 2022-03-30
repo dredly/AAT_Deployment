@@ -13,6 +13,19 @@ login_manager = LoginManager()
 # Format for model: primary key, then all foreign keys, then all other columns, then all relationships
 
 
+class Challenge(db.Model):
+    __tablename__ = "challenges"
+    challenge_id = db.Column(db.Integer, primary_key=True)
+    from_user = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    to_user = db.Column(db.Integer, nullable=False)
+
+
+class Tier(db.Model):
+    __tablename__ = "tiers"
+    tier_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(10), nullable=False)
+    level = db.Column(db.Integer, nullable=False)
+
 class Badge(db.Model):
     __tablename__ = "badges"
     badge_id = db.Column(db.Integer, primary_key=True)
@@ -39,7 +52,6 @@ class Achievement(db.Model):
 
     def __repr__(self):
         return self.name
-
 
 class Awarded_Badge(db.Model):
     __tablename__ = "awarded_badges"
@@ -261,6 +273,7 @@ class User(UserMixin, db.Model):
     awarded_achievement = db.relationship(
         "Awarded_Achievement", backref="user", lazy=True
     )
+    challenge_from = db.relationship("Challenge", foreign_keys='Challenge.from_user', backref="users", lazy='dynamic')
     t1_responses = db.relationship(
         "ResponseT1",
         foreign_keys=[ResponseT1.user_id],

@@ -1,9 +1,11 @@
-from flask import render_template, request, redirect
+from flask import copy_current_request_context, render_template, request, redirect
 from flask_login import current_user
 import flask_login
+
+from aat.legendary_gamification.forms import ChallengeForm
 from . import legendary_gamification
 from werkzeug.exceptions import BadRequestKeyError
-from ..models import Achievement, Awarded_Achievement, Awarded_Badge, Badge
+from ..models import Achievement, Awarded_Achievement, Awarded_Badge, Badge, Challenge, User
 
 questions = ["How do you print things in python",
              "How do you declare a function in python",
@@ -23,29 +25,48 @@ question_counter = 0
 def achievements():
     badges = []
     achievements = []
+    all_users = User.query.all()
     award_badges = Awarded_Badge.query.filter_by(user_id=current_user.id).all()
-    print(current_user.id)
     # for awards in award_badges:
     #     print(awards.badge_id)
-    print(award_badges)
     award_achievements = Awarded_Achievement.query.filter_by(user_id=current_user.id).all()
-    print(award_achievements)
     for awards in award_badges:
         badge = Badge.query.filter_by(badge_id=awards.badge_id).first()
         badges.append(badge)
-        print("Added")
     for awards in award_achievements:
         achievement = Achievement.query.filter_by(achievement_id=awards.achievement_id).first()
         achievements.append(achievement)
-    for badge in badges:
-        print(badge.name)
+    
+    in_challenges = Challenge.query.with_entities(Challenge.from_user, Challenge.to_user).filter_by(to_user=current_user.id).all()
+    out_challenges = Challenge.query.with_entities(Challenge.from_user, Challenge.to_user).filter_by(from_user=current_user.id).all()
+    in_users = []
+    out_users = []
+
+
+    print(in_challenges)
+    print(out_challenges)
+    for challenge in in_challenges:
+        user_from = User.query.filter_by(id=challenge[0]).first()
+        in_users.append(user_from.name)
+    for challenge in out_challenges:
+        user_to = User.query.filter_by(id=challenge[1]).first()
+        out_users.append(user_to.name)
+
+    print(in_users)
+    print(out_users)
+    challenge = ChallengeForm()
+
     with open("aat/legendary_gamification/ranks.txt", 'r') as f:
         lines_ranks = f.readlines()
     with open("aat/legendary_gamification/awards.txt", 'r') as f:
         lines_achievements = f.readlines()
     if request.method == "POST":
         return redirect("rapid-fire")
-    return render_template("achievements.html", ranks=sorted(lines_ranks), awards=lines_achievements, badges=badges, achievements=achievements)
+    return render_template(
+        "achievements.html", ranks=sorted(lines_ranks), awards=lines_achievements, badges=badges,
+        achievements=achievements, incoming_challenges=in_users, outgoing_challenges=out_users, challenge=challenge,
+        all_users=all_users
+        )
 
 
 @legendary_gamification.route("/correctement")

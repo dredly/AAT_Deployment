@@ -1,5 +1,3 @@
-from pydoc import describe
-from unicodedata import name
 from aat import db
 from aat import Role
 from aat import app
@@ -612,6 +610,27 @@ with app.app_context():
             Awarded_Achievement(id=2, user_id=1, achievement_id=4),
             Awarded_Achievement(id=3, user_id=2, achievement_id=9),
             Awarded_Achievement(id=4, user_id=3, achievement_id=9),
+        ]
+    )
+
+
+    db.session.add_all(
+        [
+            Tier(tier_id=1, name="Bronze", level=1),
+            Tier(tier_id=2, name="Silver", level=2),
+            Tier(tier_id=3, name="Gold", level=3),
+            Tier(tier_id=4, name="Emerald", level=4),
+            Tier(tier_id=5, name="Ruby", level=5),
+            Tier(tier_id=6, name="Diamond", level=6)
+        ]
+    )
+
+    db.session.add_all(
+        [
+            Challenge(challenge_id=1, from_user=1, to_user=3),
+            Challenge(challenge_id=2, from_user=1, to_user=2),
+            Challenge(challenge_id=3, from_user=2, to_user=1),
+            Challenge(challenge_id=4, from_user=2, to_user=3),
         ]
     )
 

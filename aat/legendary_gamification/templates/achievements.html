@@ -46,42 +46,53 @@
                 {% endfor %}
                 <div class="pie-container">
                     <div class="pie-information">
-                        <div class="pie" style="--p:{{(badges|length + achievements|length) * 10}};--b:20px;--c:rgb(43, 255, 0);">{{ (badges|length + achievements|length) * 10 }}%</div>
+                        {% if current_user.tier == "Gold" %}
+                            <div class="pie" style="--p:{{ ((badges|length + achievements|length)/16 * 100) }};--b:20px;--c:rgb(43, 255, 0);">{{ ((badges|length + achievements|length)/16 * 100) }}%</div>
+                            <p>{{ badges|length + achievements|length }} out of 16 rewards unlocked!</p>
+                        {% else %}
+                        <div class="pie" style="--p:{{ ((badges|length + achievements|length)/10 * 100) }};--b:20px;--c:rgb(43, 255, 0);">{{ ((badges|length + achievements|length)/10 * 100) }}%</div>
                         <p>{{ badges|length + achievements|length }} out of 10 rewards unlocked!</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="achievements-junkyard">
-            {% for i in range(awards | length) %}
-            <div class="award-bar">
-                <h4 id="award-description">
-                    {{ awards[i] }}
-                </h4>
-            </div>
-            {% endfor %}
         </div>
     </div>
     
 
-        <div class="ranks-rapid">
-                <div class="ranks-content">
-                    <div class="rankup-container">
-                        <div class="pie" style="--p:90;--b:20px;--c:rgb(0, 217, 255);">90%</div>
-                        <div class="rank-up-button-container">
-                            <h3>You are one test away from ranking up!</h3>
-                            <form action="" method='POST'>
-                                <input type="submit" name="rank-up-test-button" value="Take Rank Up Test">
-                            </form>
-                        </div>
-                    </div>
-                    <div class="rapid-fire-test-container">
-                        <h3>Take practice tests to prepare for your next challenge</h3>
-                        <form action="" method='POST'>
-                            <input type="submit" name="rank-up-test-button" value="Practice Rapid Fire Tests">
-                        </form>
-                    </div>
+    <div class="ranks-rapid">
+        <div class="ranks-content">
+            <div class="rankup-container">
+                <div class="pie" style="--p:90;--b:20px;--c:rgb(0, 217, 255);">90%</div>
+                <div class="rank-up-button-container">
+                    <h3>You are one test away from ranking up!</h3>
+                    <form action="" method='POST'>
+                        <input type="submit" name="rank-up-test-button" value="Take Rank Up Test">
+                    </form>
                 </div>
+            </div>
+            <div class="rapid-fire-test-container">
+                <h3>Take practice tests to prepare for your next challenge</h3>
+                <form action="" method='POST'>
+                    <input type="submit" name="rank-up-test-button" value="Practice Rapid Fire Tests">
+                </form>
+            </div>
         </div>
+    </div>
+
+    <div class="challenges-container">
+        <div class="challenge-creator">
+            <form action="" method="POST">
+                <select name="Users" id="">
+                    {% for user in all_users %}
+                        <option value="{{ user.id }}" selected>{{ user.name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        <div class="challenge-notification">
+
+        </div>
+    </div>
 
 {% endblock content %}
