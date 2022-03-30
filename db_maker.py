@@ -176,9 +176,9 @@ with app.app_context():
         ]
     )
 
-    ###########
-    # OPTIONS #
-    ###########
+    #################################
+    # OPTIONS (FOR TYPE 1 QUESTIONS #
+    #################################
     db.session.add_all(
         [
             Option(q_t1_id=1, option_text="checkout", is_correct=True),  # 1
@@ -344,10 +344,11 @@ with app.app_context():
                 role_id=1,
             ),
             # made one letter accounts for ease of logging in as different roles (student=s, lecturer=l, admin=a)
+            # NOTE: is_admin must be set to false, otherwise role will be overriden and User will be given lecturer role 
             User(  # 4
                 name="s",
                 password="s",
-                is_admin=True,
+                is_admin=False,
                 role_id=1,
             ),
             User(  # 5
@@ -359,7 +360,7 @@ with app.app_context():
             User(  # 6
                 name="a",
                 password="a",
-                is_admin=True,
+                is_admin=False,
                 role_id=3,
             ),
         ]
@@ -380,6 +381,20 @@ with app.app_context():
             ),
             ResponseT1(  # 2
                 user_id=1,
+                assessment_id=2,
+                t1_question_id=2,
+                selected_option=5,
+                is_correct=True,
+            ),
+            ResponseT1(  # 1
+                user_id=4,
+                assessment_id=1,
+                t1_question_id=1,
+                selected_option=1,
+                is_correct=True,
+            ),
+            ResponseT1(  # 2
+                user_id=4,
                 assessment_id=2,
                 t1_question_id=2,
                 selected_option=5,
