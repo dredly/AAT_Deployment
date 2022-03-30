@@ -330,12 +330,14 @@ with app.app_context():
                 password="j",
                 is_admin=True,
                 role_id=1,
+                tier="Silver"
             ),
             User(  # 2
                 name="Kate",
                 password="k",
                 is_admin=True,
                 role_id=1,
+                tier="Gold"
             ),
             User(  # 3
                 name="Al",
