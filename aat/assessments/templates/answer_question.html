@@ -11,7 +11,17 @@
 	{% elif type == 2 %}
 	{{ form.answer }}
 	{% endif %}
-	<button type="submit" value="Submit Answer">Submit Answer</button>
+	<button type="submit" value="Submit Answer">
+		{% if session['is_summative'] %}
+			{% if session['questions']|length < 1 %}
+			Submit and End Assessment 
+			{% else %}
+			Next Question
+			{% endif %}
+		{% else %}
+		Submit and Mark Answer
+		{% endif %}
+	</button>
 </form>
 
 <p>
@@ -19,10 +29,13 @@
 	session['no_questions'] }}
 </p>
 
-{% if session['past_questions']|length > 1 %}
-<button type="button">
-	<a href="{{ url_for('assessments.previous_question') }}"
-		>Previous Question</a
-	>
-</button>
-{% endif %} {% endblock %}
+{% if session['is_summative'] %}
+	{% if session['past_questions']|length > 1 %}
+	<button type="button">
+		<a href="{{ url_for('assessments.previous_question') }}"
+			>Previous Question</a
+		>
+	</button>
+	{% endif %} 
+{% endif %}
+{% endblock %}

@@ -1,8 +1,6 @@
 venv/
 __pycache__
 aat/models.py
-ranks.txt
-awards.txt
 .env
 __pycache__
 *.db

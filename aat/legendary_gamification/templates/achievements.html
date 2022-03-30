@@ -5,7 +5,8 @@
 {% endblock styles %}
 
 {% block content %}
-    <h1>Achievements</h1>
+    <h1>Your Progress</h1>
+    <h2>Tier - {{ current_user.tier }}</h2>
     <div class="content-container">
         <div class="content">
             <div class="leaderboard-section">
@@ -26,13 +27,28 @@
 
             <div class="collectables-section">
                 <div class="collect-title">
-                    <h3>Your Achievements</h3>
+                    <h3>Your Rewards</h3>
                 </div>
-                <div class="rank-up-button-container">
-                    <h3>You are one test away from ranking up!</h3>
-                    <form action="" method='POST'>
-                        <input type="submit" name="rank-up-test-button" value="Take Rank Up Test!">
-                    </form>
+                <div class="divider"></div>
+                {% for badge in badges %}
+                    <div class="badge-container">
+                        <div class="badge-details">
+                            <p><strong style="font-size: larger;">{{ badge.name }}</strong> - {{ badge.description }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% for achievement in achievements %}
+                    <div class="achievement-container">
+                        <div class="achievement-details">
+                            <p><strong style="font-size: larger;">{{ achievement.name }}</strong> - {{ achievement.description }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="pie-container">
+                    <div class="pie-information">
+                        <div class="pie" style="--p:{{(badges|length + achievements|length) * 10}};--b:20px;--c:rgb(43, 255, 0);">{{ (badges|length + achievements|length) * 10 }}%</div>
+                        <p>{{ badges|length + achievements|length }} out of 10 rewards unlocked!</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -46,5 +62,26 @@
             {% endfor %}
         </div>
     </div>
+    
+
+        <div class="ranks-rapid">
+                <div class="ranks-content">
+                    <div class="rankup-container">
+                        <div class="pie" style="--p:90;--b:20px;--c:rgb(0, 217, 255);">90%</div>
+                        <div class="rank-up-button-container">
+                            <h3>You are one test away from ranking up!</h3>
+                            <form action="" method='POST'>
+                                <input type="submit" name="rank-up-test-button" value="Take Rank Up Test">
+                            </form>
+                        </div>
+                    </div>
+                    <div class="rapid-fire-test-container">
+                        <h3>Take practice tests to prepare for your next challenge</h3>
+                        <form action="" method='POST'>
+                            <input type="submit" name="rank-up-test-button" value="Practice Rapid Fire Tests">
+                        </form>
+                    </div>
+                </div>
+        </div>
 
 {% endblock content %}

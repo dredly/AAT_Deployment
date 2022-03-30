@@ -330,12 +330,14 @@ with app.app_context():
                 password="j",
                 is_admin=True,
                 role_id=1,
+                tier="Silver"
             ),
             User(  # 2
                 name="Kate",
                 password="k",
                 is_admin=True,
                 role_id=1,
+                tier="Gold"
             ),
             User(  # 3
                 name="Al",
@@ -344,10 +346,11 @@ with app.app_context():
                 role_id=1,
             ),
             # made one letter accounts for ease of logging in as different roles (student=s, lecturer=l, admin=a)
+            # NOTE: is_admin must be set to false, otherwise role will be overriden and User will be given lecturer role
             User(  # 4
                 name="s",
                 password="s",
-                is_admin=True,
+                is_admin=False,
                 role_id=1,
             ),
             User(  # 5
@@ -359,7 +362,7 @@ with app.app_context():
             User(  # 6
                 name="a",
                 password="a",
-                is_admin=True,
+                is_admin=False,
                 role_id=3,
             ),
         ]
@@ -503,7 +506,7 @@ with app.app_context():
             Badge(
                 badge_id=1,
                 name="A Worthy Challenge",
-                description="Dethrones the Top of the Leaderboard with the 'Ace' badge",
+                description="Dethrone the Top of the Leaderboard with the 'Ace' badge",
             ),
             Badge(
                 badge_id=2,
@@ -597,16 +600,18 @@ with app.app_context():
     db.session.add_all(
         [
             Awarded_Badge(id=1, user_id=1, badge_id=1),
-            Awarded_Badge(id=2, user_id=2, badge_id=2),
+            Awarded_Badge(id=2, user_id=2, badge_id=3),
             Awarded_Badge(id=3, user_id=3, badge_id=5),
+            Awarded_Badge(id=4, user_id=2, badge_id=2),
         ]
     )
 
     db.session.add_all(
         [
-            Awarded_Achievement(id=1, user_id=3, achievement_id=6),
+            Awarded_Achievement(id=1, user_id=2, achievement_id=6),
             Awarded_Achievement(id=2, user_id=1, achievement_id=4),
-            Awarded_Achievement(id=3, user_id=4, achievement_id=9),
+            Awarded_Achievement(id=3, user_id=2, achievement_id=9),
+            Awarded_Achievement(id=4, user_id=3, achievement_id=9),
         ]
     )
 
