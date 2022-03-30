@@ -308,3 +308,60 @@ nav {
     flex-direction: row;
     /* margin: 0 auto; */;
 }
+
+.challenges-container {
+    display: flex;
+    background-color: #ffffff;
+    margin-left: 50px;
+    margin-right: 50px;
+    padding: 10px;
+    height: auto;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.challenges-content {
+    background-color: rgb(255, 255, 255);
+    width: 95%;
+    height: 88%;
+    display: flex;
+    flex-direction: row;
+    /* margin: 0 auto; */;
+}
+
+.challenge-creator {
+    margin: 20px;
+    background-color: rgb(255, 255, 255);
+    flex: 1;
+    border: 3px solid black;
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+    height: 150px;
+}
+
+.challenge-notification {
+    margin: 20px;
+    background-color: rgb(255, 255, 255);
+    flex: 1;
+    border: 3px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.challenge-creator form * {
+    margin-bottom: 5px;
+}
+
+.incoming-challenges {
+    text-align: center;
+}
+
+.outgoing-challenges {
+    text-align: center;
+}

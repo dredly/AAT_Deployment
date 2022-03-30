@@ -67,31 +67,65 @@
                 <div class="rank-up-button-container">
                     <h3>You are one test away from ranking up!</h3>
                     <form action="" method='POST'>
-                        <input type="submit" name="rank-up-test-button" value="Take Rank Up Test">
+                        <input type="submit" name="button" value="Take Rank Up Test">
                     </form>
                 </div>
             </div>
             <div class="rapid-fire-test-container">
                 <h3>Take practice tests to prepare for your next challenge</h3>
                 <form action="" method='POST'>
-                    <input type="submit" name="rank-up-test-button" value="Practice Rapid Fire Tests">
+                    <input type="submit" name="button" value="Practice Rapid Fire Tests">
                 </form>
             </div>
         </div>
     </div>
 
     <div class="challenges-container">
-        <div class="challenge-creator">
-            <form action="" method="POST">
-                <select name="Users" id="">
-                    {% for user in all_users %}
-                        <option value="{{ user.id }}" selected>{{ user.name }}</option>
+        <div class="challenges-content">
+            <div class="challenge-creator">
+                <h2>Challenge someone to a quiz</h2>
+                <form action="" method="POST">
+                    {{ challenge.difficulty.label }} {{ challenge.difficulty }}
+                    <div class="user-question">
+                        {{ challenge.challengee.label }}
+                        <select name="Users" id="">
+                            {% for user in all_users %}
+                                <option value="{{ user.id }}" selected>{{ user.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <input type="submit" name="button" value="Challenge User">
+                </form>
+            </div>
+            <div class="challenge-notification">
+                <h2>Your Challenges</h2>
+                <div class="incoming-challenges">
+                <h3>Incoming Challenges</h3>
+                {% if incoming_challenges|length > 0 %}
+                    <form action="" method="POST">
+                        {% for i in range(incoming_challenges|length) %}
+                            <div class="challenge-options">
+                                <p style="display: inline;">{{ incoming_challenges[i][1] }}</p>
+                                <input type="radio" name="accept_options" id="option{{i}}" value="{{ challenge_ids[i] }}"></input>
+                            </div>
+                        {% endfor %}
+                        <input type="submit" name="accept_challenge_button" value="Accept Challenge">
+                    </form>
+                {% else %}
+                    <p>You have no incoming challenges</p>
+                {% endif %}
+                </div>
+                <div class="outgoing-challenges">
+                <h3>Outgoing Challenges</h3>
+                {% if outgoing_challenges|length > 0 %}
+                    {% for user in outgoing_challenges %}
+                        <p>{{ user[1] }}</p>
                     {% endfor %}
-                </select>
-            </form>
-        </div>
-        <div class="challenge-notification">
-
+                {% else %}
+                    <p>You have no outgoing challenges</p>
+                {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 

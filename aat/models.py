@@ -18,7 +18,14 @@ class Challenge(db.Model):
     challenge_id = db.Column(db.Integer, primary_key=True)
     from_user = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     to_user = db.Column(db.Integer, nullable=False)
+    active = db.Column(db.Integer, default=0)
+    difficulty = db.Column(db.Integer, default=0)
 
+
+# class ActiveChallenge(db.Model):
+#     __tablename__ = "active_challenges"
+#     challenge_id = db.Column(db.Integer, primary_key=True)
+#     questiont1_id = db.Column(db.Integer, )
 
 class Tier(db.Model):
     __tablename__ = "tiers"

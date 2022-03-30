@@ -1,7 +1,7 @@
 from flask import copy_current_request_context, render_template, request, redirect
 from flask_login import current_user
 import flask_login
-
+from aat import db
 from aat.legendary_gamification.forms import ChallengeForm
 from . import legendary_gamification
 from werkzeug.exceptions import BadRequestKeyError
@@ -37,20 +37,24 @@ def achievements():
         achievement = Achievement.query.filter_by(achievement_id=awards.achievement_id).first()
         achievements.append(achievement)
     
-    in_challenges = Challenge.query.with_entities(Challenge.from_user, Challenge.to_user).filter_by(to_user=current_user.id).all()
+    in_challenges = Challenge.query.with_entities(Challenge.from_user, Challenge.to_user, Challenge.challenge_id).filter_by(to_user=current_user.id, active=0).all()
     out_challenges = Challenge.query.with_entities(Challenge.from_user, Challenge.to_user).filter_by(from_user=current_user.id).all()
     in_users = []
     out_users = []
+    challenge_ids = []
 
 
     print(in_challenges)
     print(out_challenges)
     for challenge in in_challenges:
         user_from = User.query.filter_by(id=challenge[0]).first()
-        in_users.append(user_from.name)
+        in_users.append((user_from.id, user_from.name))
+        challenge_ids.append(challenge[2])
     for challenge in out_challenges:
         user_to = User.query.filter_by(id=challenge[1]).first()
-        out_users.append(user_to.name)
+        out_users.append((user_to.id, user_to.name))
+
+
 
     print(in_users)
     print(out_users)
@@ -61,12 +65,43 @@ def achievements():
     with open("aat/legendary_gamification/awards.txt", 'r') as f:
         lines_achievements = f.readlines()
     if request.method == "POST":
-        return redirect("rapid-fire")
+        try:
+            choice = request.form['button']
+        except:
+            pass
+
+        try:
+            choice = request.form["accept_challenge_button"]
+            print(choice)
+        except:
+            pass
+        if choice == "Practice Rapid Fire Tests" or choice == "Take Rank Up Test":
+            return redirect("rapid-fire")
+        elif choice == "Challenge User":
+            challenge_details = Challenge(from_user=current_user.id, to_user=int(request.form.get("Users")))
+            db.session.add(challenge_details)
+            db.session.commit()
+            return redirect("redirect-page-achievement")
+        elif choice == "Accept Challenge":
+            try:
+                chosen_challenge = request.form['accept_options']
+            except BadRequestKeyError:
+                pass
+            challenge_active = Challenge.query.filter_by(challenge_id=chosen_challenge).first()
+            challenge_active.active = 1
+            db.session.add(challenge_active)
+            db.session.commit()
+            return redirect("redirect-page-achievement")
     return render_template(
         "achievements.html", ranks=sorted(lines_ranks), awards=lines_achievements, badges=badges,
         achievements=achievements, incoming_challenges=in_users, outgoing_challenges=out_users, challenge=challenge,
-        all_users=all_users
+        all_users=all_users, challenge_ids=challenge_ids
         )
+
+
+@legendary_gamification.route("/redirect-page-achievement")
+def refresh():
+    return redirect("achievements")
 
 
 @legendary_gamification.route("/correctement")

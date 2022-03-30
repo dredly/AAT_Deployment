@@ -12,3 +12,4 @@ class QuestionForm(FlaskForm):
 
 class ChallengeForm(FlaskForm):
     difficulty = SelectField("Difficulty", choices=[1, 2, 3])
+    challengee = SelectField("User to challenge", choices=[])
