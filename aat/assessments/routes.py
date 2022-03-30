@@ -183,10 +183,8 @@ def remove_question_t1(id, id3):
 def add_questions(id):
     if session.get("assessment_add") != None:
         id = session.get("assessment_add")
-        print(session.get("assessment_add"))
     elif session.get("assessment_edit") != None:
         id = session.get("assessment_edit")
-        print(session.get("assessment_edit"))
     form=FinishForm()
     addQuestionForm = AddQuestionToAssessmentForm()
     questions = (
@@ -197,7 +195,7 @@ def add_questions(id):
         if addQuestionForm.validate_on_submit() and addQuestionForm.add.data:
             question.assessment_id = id
             db.session.commit()
-            return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form)   
+            return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form))
 
     if form.validate_on_submit() and form.finish.data:
         if session.get("assessment_edit") != None:
