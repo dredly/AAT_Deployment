@@ -70,6 +70,7 @@ footer {
 .block_contents{
 	margin-left: 1vw;
 	margin-right: 1vw;
+	padding-bottom: 2vh;
 }
 
 /* WARNING MESSAGE  */
@@ -131,7 +132,7 @@ footer {
 .Assessment_Index_Child{
 	display: flex;
 	margin-left: 2vw;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	max-width: 10vw;
 	padding-bottom: .5vh;
 
@@ -200,8 +201,7 @@ footer {
 
 /* FOOTER */
 footer {
-	padding: 0.8rem 0;
-	position:fixed;
+	position:static;
 	bottom:0px;
 	text-align: center;
 	width: 100%;
