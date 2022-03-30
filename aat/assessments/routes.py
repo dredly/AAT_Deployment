@@ -6,7 +6,7 @@ from flask import Response, redirect, render_template, request, url_for, abort, 
 from . import assessments
 
 from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT2, ResponseT1, Option
-from .forms import AddQuestionToAssessmentForm, DeleteQuestionsForm, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, FinishForm, RemoveQuestionForm
+from .forms import AddQuestionToAssessmentForm, DeleteQuestionsForm, AnswerType1Form, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, FinishForm, RemoveQuestionForm
 from .. import db
 from flask_login import current_user
 
