@@ -38,15 +38,12 @@
             <li>
                 <p>
                     <a href="{{url_for('student_stats.assessment_view', assessment_id=assessment.assessment_id )}}">
-                        {{assessment}}
-                    </a>
+                        {{assessment}}:
+                    </a> 
+                    {{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
+                        format((marks.marks_awarded/marks.marks_possible)*100)}}%)
                 </p>
-            <ul>
-                <li>
-                    <p>{{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
-                        format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
-                </li>
-            </ul>
+         
             </li>
         {% endfor %}
     {% endfor %}

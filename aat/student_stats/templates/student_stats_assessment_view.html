@@ -38,43 +38,31 @@
     <h2>Questions</h2>
     <ul>
     {% for question, marks in assessment_marks.items() %}
-        <li>
-            <p>Question: {{question}}</p>
-        </li>
-        <ul>
+        <div class="question_container {% if marks.is_correct %}correct_answer{% else %}incorrect_answer{% endif %}">
             <li>
-                <p>Answer Given: {{marks.answer_given}}</p>
+                <p><b>Question: {{question}}</b></p>
             </li>
-            <li>
-                <p>Corrent Answer: {{marks.correct_answer}}</p>
-            </li>
-            <li>
-                <p>Feedback Given: {{marks.feedback_given}}</p>
-            </li>
-            <li>
-                <p>{{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
-                    format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
-            </li>
-        </ul>
+            <ul>
+                <li>
+                    <p>Answer Given: {{marks.answer_given}}</p>
+                </li>
+                <li>
+                    <p>Corrent Answer: {{marks.correct_answer}}</p>
+                </li>
+                <li>
+                    <p>Feedback Given: {{marks.feedback_given}}</p>
+                </li>
+                <li>
+                    <p>Mark: {{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.1d" |
+                        format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
+                </li>
+            </ul>
+        </div>
     {% endfor %}
 </ul>
     <h2>Download</h2>
     <p><a href="{{ url_for('student_stats.download')}}">Download CSV</a></p>
-    {#
-    <hr>
-    <h2>Responses</h2>
- 
-    {% for response in current_user.t2_responses %}
-    <ul>
-        {% if response.assessment.assessment_id == assessment_details["assessment_id"] %}
-            <li>
-                <p>Question: {{response.question}} (Marks: {{response.question.num_of_marks}})</p>
-                <p>Response: {{response.response_content}} {% if response.is_correct %}(Y){% else %}(N){% endif %}</p>
-            </li>
-        {% endif %}
-    </ul>
-    {% endfor %}
-    #}
+    
 
 
     <script>
