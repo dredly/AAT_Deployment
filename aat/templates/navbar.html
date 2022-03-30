@@ -37,7 +37,7 @@
 			<a href="
 			{% if not current_user.is_authenticated %}
 				{{ url_for('auth.login') }}
-			{% elif current_user.role_id==2 %} 
+			{% elif current_user.role_id==1 %} 
 				{{ url_for('student_stats.course_view') }}
 			{% else %}
 				{{ url_for('staff_stats.index') }}
