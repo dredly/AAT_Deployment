@@ -79,6 +79,13 @@ class ResponseT1(db.Model):
 
 
 class ResponseT2(db.Model):
+    ###
+    # Response models adapted from code used to represent 'Followers'
+    # Flask Web Development, 2nd Edition by Miguel Grinberg 
+    # https://learning.oreilly.com/library/view/flask-web-development/9781491991725/ch13.html 
+    # Particular sections used include: 
+    # ------ Chapter 12: Followers 
+    ###
     __tablename__ = "t2_responses"
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     assessment_id = db.Column(
@@ -230,10 +237,20 @@ class Module(db.Model):
 
 
 class User(UserMixin, db.Model):
+    ###
+    # User and Role Models, and their included methods, adapted from 
+    # Flask Web Development, 2nd Edition by Miguel Grinberg 
+    # https://learning.oreilly.com/library/view/flask-web-development/9781491991725/ch13.html 
+    # Particular sections used include: 
+    # ------ Chapter 8: User Authentication 
+    # ------ Chapter 9: User Roles 
+    ###
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), unique=True, nullable=False)
     hashed_password = db.Column(db.String(128))
+    # If is_admin is set to True, any given role will be overridden to give max access
+    # (i.e. the User will be given a lecturer role)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
     # --- Relationships ---
@@ -263,6 +280,8 @@ class User(UserMixin, db.Model):
     )
 
     def __init__(self, **kwargs):
+        # If is_admin is set to True, any given role will be overridden to give max access
+        # (i.e. the User will be given a lecturer role)
         super(User, self).__init__(**kwargs)
         if self.role is None:
             if self.is_admin:
@@ -287,7 +306,6 @@ class User(UserMixin, db.Model):
     def is_administrator(self):
         return self.can(Permission.ADMIN)
 
-    # TODO amend to account for type 1 or 2 questions
     def has_answered(self, type, question, assessment):
         if assessment.assessment_id is None:
             return False
@@ -341,6 +359,14 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 class Role(db.Model):
+    ###
+    # User and Role Models, and their included methods, adapted from 
+    # Flask Web Development, 2nd Edition by Miguel Grinberg 
+    # https://learning.oreilly.com/library/view/flask-web-development/9781491991725/ch13.html 
+    # Particular sections used include: 
+    # ------ Chapter 8: User Authentication 
+    # ------ Chapter 9: User Roles 
+    ###
     __tablename__ = "roles"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)

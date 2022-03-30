@@ -344,10 +344,11 @@ with app.app_context():
                 role_id=1,
             ),
             # made one letter accounts for ease of logging in as different roles (student=s, lecturer=l, admin=a)
+            # NOTE: is_admin must be set to false, otherwise role will be overriden and User will be given lecturer role 
             User(  # 4
                 name="s",
                 password="s",
-                is_admin=True,
+                is_admin=False,
                 role_id=1,
             ),
             User(  # 5
@@ -359,7 +360,7 @@ with app.app_context():
             User(  # 6
                 name="a",
                 password="a",
-                is_admin=True,
+                is_admin=False,
                 role_id=3,
             ),
         ]

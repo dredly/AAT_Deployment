@@ -309,7 +309,6 @@ def answer_question(type, question_id):
     ## check if there's a previous answer to prepopulate 
     if current_user.has_answered(type, question, assessment):
         if request.method == "GET":
-            # TODO test this works on radio fields 
             if type == 1: 
                 previous_response = (
                 current_user.t1_responses.filter_by(
@@ -360,7 +359,6 @@ def answer_question(type, question_id):
                 result = True
             else:
                 result = False
-            # TODO make responsive to type1 also 
             response = ResponseT2(
                 user_id=current_user.id,
                 assessment_id=assessment.assessment_id,
