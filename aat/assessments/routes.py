@@ -13,6 +13,8 @@ from flask_login import current_user
 
 @assessments.route("/")
 def index():
+    if not current_user.is_authenticated:
+        return redirect(url_for("auth.login"))
     assessments = Assessment.query.all()
     modules = Module.query.all()
     return render_template("index.html", assessments=assessments, modules=modules)
@@ -253,12 +255,18 @@ def test_response_model(assessment_id, question_id):
 
 @assessments.route("/assessment_summary/<int:assessment_id>", methods=["GET", "POST"])
 def assessment_summary(assessment_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for("auth.login"))
     assessment = Assessment.query.get_or_404(assessment_id)
+    if assessment is None: 
+        return redirect(url_for("assessments"))
     session["is_summative"] = assessment.is_summative  
     ## query to find all questions in assessment, so can be used to find their ID's and store these in session variable
     ## session variable is then accessed throughout the process to find questions and store their responses
     questions_t1 = QuestionT1.query.filter_by(assessment_id=assessment_id).all()
     questions_t2 = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+    if len(questions_t1) == 0 and len(questions_t2) == 0: 
+        return redirect(url_for("assessments.empty_assessment"))
     question_ids = []
     print(question_ids)
     for question in questions_t1:
@@ -532,3 +540,12 @@ def exit_assessment():
     session.pop("assessment", None)
     session.pop("takes_assessment_id", None)
     return redirect(url_for("assessments.index"))
+
+
+# ----------------------------------------------------------------------------------------------------
+# ---------------------------------  Start of TAKE ASSESSMENT  ---------------------------------------
+# ----------------------------------------------------------------------------------------------------
+
+@assessments.route("/empty_assessment")
+def empty_assessment():
+    return render_template("empty_assessment.html")
