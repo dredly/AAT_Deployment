@@ -25,7 +25,44 @@ def view_module(module_id):
     assessments = Assessment.query.filter_by(module_id=module.module_id).all()
     summatives = []
     formatives = []
+    marks_achieved = dict()
     for assessment in assessments:
+
+        #---> calculate marks available 
+        qs = QuestionT1.query.filter_by(assessment_id=assessment.assessment_id).all(
+        ) + QuestionT2.query.filter_by(assessment_id=assessment.assessment_id).all()
+        marks_av = 0
+        for q in qs: 
+            marks_av += q.num_of_marks 
+
+        # ---> check if user has responded to assessment 
+        if current_user.has_taken(assessment): 
+            t1_responses = current_user.t1_responses.filter_by(
+            assessment_id=assessment.assessment_id
+            ).all()
+            t2_responses = current_user.t2_responses.filter_by(
+                assessment_id=assessment.assessment_id
+            ).all()
+
+            # ---> find what user's result was 
+            result = 0
+            for response in t1_responses:
+                if response.is_correct:
+                    answered_question = QuestionT1.query.filter_by(
+                        q_t1_id=response.t1_question_id
+                    ).first()
+                    result += answered_question.num_of_marks
+            for response in t2_responses:
+                if response.is_correct:
+                    answered_question = QuestionT2.query.filter_by(
+                        q_t2_id=response.t2_question_id
+                    ).first()
+                    result += answered_question.num_of_marks
+        else: 
+            result = 0
+    
+        marks_achieved[assessment.title] = f"{result}/{marks_av}"
+
         if assessment.is_summative: 
             summatives.append(assessment)
         else: 
@@ -34,7 +71,8 @@ def view_module(module_id):
         module=module, 
         assessments=assessments,
         summatives=summatives,
-        formatives=formatives
+        formatives=formatives,
+        marks_achieved=marks_achieved
         )
 
 

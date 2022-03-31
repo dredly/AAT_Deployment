@@ -310,9 +310,15 @@ class User(UserMixin, db.Model):
     def has_taken(self, assessment):
         if assessment.assessment_id is None: 
             return False 
-        return self.t1_responses.filter_by(assessment_id=assessment.assessment_id
-            ) is not None or self.t2_responses.filter_by(assessment_id=assessment.assessment_id
-            ) is not None 
+
+        type_1s = self.t1_responses.filter_by(assessment_id=assessment.assessment_id
+            ).all()
+        type_2s= self.t2_responses.filter_by(assessment_id=assessment.assessment_id
+            ).all()
+        if len(type_1s) <= 0 and len(type_2s) <=0: 
+            return False 
+        else: 
+            return True 
     
     def current_attempts(self, assessment): 
         t1_responses = self.t1_responses.filter_by(assessment_id=assessment.assessment_id).all()
