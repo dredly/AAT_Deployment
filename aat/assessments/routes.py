@@ -107,6 +107,20 @@ def view_module(module_id):
 @assessments.route("/<int:id>")
 def show_assessment(id):
     assessment = Assessment.query.get_or_404(id)
+    assessment_id=id
+    t1_difficulty = 0
+    t2_difficulty = 0
+    count_t1 = 0
+    count_t2 = 0
+    questions_t1 = QuestionT1.query.filter_by(assessment_id=assessment_id).all()
+    questions_t2 = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+    for question in questions_t1:
+        count_t1 += 1
+        t1_difficulty = (t1_difficulty + question.difficulty) / count_t1
+    for question in questions_t2:
+        count_t2 += 1
+        t2_difficulty = (t2_difficulty + question.difficulty) / count_t2
+    assessment_difficulty = math.ceil((t1_difficulty + t2_difficulty) / 2)
     try:
         time_limit_minutes = math.floor(int(assessment.time_limit) / 60)
     except:
@@ -122,7 +136,7 @@ def show_assessment(id):
     # TODO make a combined list of T1 and T2 questions and order by their question index
     questions = QuestionT1.query.filter_by(assessment_id=id).all() + QuestionT2.query.filter_by(assessment_id=id).all()
     return render_template(
-        "show_assessment.html", assessment=assessment, questions=questions, current_date=current_date, time_limit_minutes=time_limit_minutes, assessment_type=assessment_type
+        "show_assessment.html", assessment=assessment, questions=questions, current_date=current_date, time_limit_minutes=time_limit_minutes, assessment_type=assessment_type, assessment_difficulty=assessment_difficulty
     )
 
 
