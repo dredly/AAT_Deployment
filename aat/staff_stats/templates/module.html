@@ -13,24 +13,34 @@
     Assessment id: {{assessmentIds[count]}}
 </h2>
    
-
+    {%if lengthT1questions > 0 %}
     <h3>T1 Questions:</h3>
+    {%endif%}
     {%for question in t1questions%}
         
         {%if question.assessment_id == assessmentIds[count]%}
+            {%if t1Correct.get(question.q_t1_id) != None or t1Wrong.get(question.q_t1_id) != None  %}
             <p>{{question.q_t1_id}}. {{question.question_text}}</p>
             <p>Correct Answers: {{t1Correct.get(question.q_t1_id)}}
-                  Wrong Answers: {{t1Wrong.get(question.q_t1_id)}} </p>
+                Wrong Answers: {{t1Wrong.get(question.q_t1_id)}}
+                Pass rate: {{t1percentages.pop(0)}}%
+                </p>
+            {%endif%}
         {%endif%}
     {%endfor%}
 
+    {%if lengthT2questions > 0 %}
+    <h3>T2 Question{%if lengthT2questions > 1%}s{%endif%}:</h3>
+    {%endif%}
     
-    <h3>T2 Questions:</h3>
     {%for question in t2questions%}
         {%if question.assessment_id == assessmentIds[count]%}
-            <p>{{question.q_t2_id}}. {{question}}</p>
+            {%if t2Correct.get(question.q_t2_id) != None or t2Wrong.get(question.q_t2_id) != None  %}
+            <p>{{question.q_t2_id}}. {{question}}</p>  
             <p>Correct Answers: {{t2Correct.get(question.q_t2_id)}} 
-                Wrong Answers: {{t2Wrong.get(question.q_t2_id)}}</p>
+                Wrong Answers: {{t2Wrong.get(question.q_t2_id)}}
+                Pass rate: {{t2percentages.pop(0)}}%</p>           
+            {%endif%}
         {%endif%}
     {%endfor%}
 

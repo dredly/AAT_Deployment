@@ -83,6 +83,8 @@ def module(Module_title):
         if question.assessment_id in assessmentIds:
             t1questions.append(question)
     print ("t1questions",t1questions)
+    lengthT1questions = len(t1questions)
+    
 
     t1Responses = ResponseT1.query.all()
 
@@ -104,7 +106,42 @@ def module(Module_title):
     print ("t1Correct",t1Correct)
     print ("t1Wrong",t1Wrong)
 
+# T1 percentages
+    t1correctAnswers = []
+    t1wrongAnswers = []
 
+    for question in questionT1s:
+        if question in t1questions:
+            correctAnswer = t1Correct.get(question.q_t1_id)
+            wrongAnswer = t1Wrong.get(question.q_t1_id)
+            print(correctAnswer)
+            if correctAnswer != None:
+                t1correctAnswers.append(correctAnswer)
+            if wrongAnswer != None:
+                t1wrongAnswers.append(wrongAnswer)
+    print("t1correct Answers", t1correctAnswers )
+    print("t1wrong Answers", t1wrongAnswers)
+
+    t1TotalAnswers = []
+    count = 0
+    for answer in t1correctAnswers:
+        t1TotalAnswers.append(t1wrongAnswers[count] + answer) 
+        count += 1
+        
+    print ("t1 total answers =",t1TotalAnswers)
+
+    t1percentages = []
+    count = 0
+    for answer2 in t1TotalAnswers:
+        if t1correctAnswers[count] == 0:
+            percentage = 0
+        if t1wrongAnswers[count] == 0:
+            percentage = 100
+        else:
+            percentage = (t1correctAnswers[count]/answer2) * 100
+        t1percentages.append(int(percentage))
+        count += 1
+    print("t1 percentages",t1percentages)
 
     questionT2s = QuestionT2.query.all()
     t2questions = []
@@ -112,6 +149,7 @@ def module(Module_title):
         if question.assessment_id in assessmentIds:
             t2questions.append(question)
     print("t2questions", t2questions)
+    lengthT2questions = len(t2questions)
 
     t2Responses = ResponseT2.query.all()
 
@@ -135,53 +173,57 @@ def module(Module_title):
     print ("t2Correct",t2Correct)
     print ("t2Wrong",t2Wrong)
 
+# T2 percentages
     t2correctAnswers = []
     t2wrongAnswers = []
 
     for question in questionT2s:
-        if question.assessment_id == assessment.assessment_id:
-            print("yay")
+        
+        if question in t2questions:           
             correctAnswer = t2Correct.get(question.q_t2_id)
-            wrongAnswer = t2Wrong.get(question.q_t2_id)
-            t2correctAnswers.append(correctAnswer)
-            t2wrongAnswers.append(wrongAnswer)
+            wrongAnswer = t2Wrong.get(question.q_t2_id)          
+            if correctAnswer != None:
+                t2correctAnswers.append(correctAnswer)
+            if wrongAnswer != None:
+                t2wrongAnswers.append(wrongAnswer)
     print("t2correct Answers", t2correctAnswers )
     print("t2wrong Answers", t2wrongAnswers)
 
-    totalAnswers = []
+    t2TotalAnswers = []
     count = 0
     for answer in t2correctAnswers:
-        totalAnswers.append(t2wrongAnswers[count] + answer) 
+        t2TotalAnswers.append(t2wrongAnswers[count] + answer) 
         count += 1
-    print ("total answers =",totalAnswers)
+        
+    print ("T2 total answers =",t2TotalAnswers)
 
-    percentages = []
+    t2percentages = []
     count = 0
-    for answer2 in totalAnswers:
+    for answer2 in t2TotalAnswers:
         if t2correctAnswers[count] == 0:
             percentage = 0
         if t2wrongAnswers[count] == 0:
             percentage = 100
         else:
             percentage = (t2correctAnswers[count]/answer2) * 100
-        percentages.append(int(percentage))
+        t2percentages.append(int(percentage))
         count += 1
-    print("percentages",percentages)
+    print("T2 percentages",t2percentages)
 
     return render_template("module.html",
      
-      
-        questionT1s = questionT1s,
-        questionT2s = questionT2s,
-
         module_title = Module_title,
         lecturersAssessments = lecturersAssessments,
         assessmentIds = assessmentIds,
         formOrSumm = formOrSumm,
         t1questions = t1questions,
+        lengthT1questions = lengthT1questions,
         t1Correct = t1Correct,
         t1Wrong = t1Wrong,
+        t1percentages = t1percentages,
         t2questions = t2questions,
+        lengthT2questions = lengthT2questions,
         t2Correct = t2Correct,
-        t2Wrong = t2Wrong)
+        t2Wrong = t2Wrong,
+        t2percentages = t2percentages)
 
