@@ -37,6 +37,7 @@
                 </button>
             {% endif %}
         </div>
+        <small>Assessment subject tags: {% for tag in assess_tags[summative_assessment.title] %}{{ tag }}, {% endfor %}</small>
         <hr>
     {% endfor %}
 </section>
@@ -64,6 +65,7 @@
                 </button>
             {% endif %}
         </div>
+        <small>Assessment subject tags: {% for tag in assess_tags[formative_assessment.title] %}{{ tag }}, {% endfor %}</small>
         <hr>
     {% endfor %}
 </section>

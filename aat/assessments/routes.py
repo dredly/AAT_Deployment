@@ -5,7 +5,7 @@ from stringprep import in_table_d2
 from flask import Response, redirect, render_template, request, url_for, abort, session
 from . import assessments
 
-from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT2, ResponseT1, Option
+from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT2, ResponseT1, Option, Tag
 from .forms import AddQuestionToAssessmentForm, DeleteQuestionsForm, AnswerType1Form, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, FinishForm, RemoveQuestionForm
 from .. import db
 from flask_login import current_user
@@ -27,13 +27,25 @@ def view_module(module_id):
     summatives = []
     formatives = []
     marks_achieved = dict()
+    # ----> find all tags 
+    assess_tags = dict()
     for assessment in assessments:
-
-        #---> calculate marks available 
+        # ----> find all questions
         qs = QuestionT1.query.filter_by(assessment_id=assessment.assessment_id).all(
         ) + QuestionT2.query.filter_by(assessment_id=assessment.assessment_id).all()
+
+        #---> calculate marks available 
         marks_av = 0
+
         for q in qs: 
+            tag = Tag.query.filter_by(id=q.tag_id).first()
+            if tag is not None: 
+                if assessment.title in assess_tags: 
+                    if not tag.name in assess_tags[assessment.title]:
+                        assess_tags[assessment.title].append(tag.name)
+                else: 
+                    assess_tags[assessment.title] = [tag.name]
+
             marks_av += q.num_of_marks 
 
         # ---> check if user has responded to assessment 
@@ -81,12 +93,14 @@ def view_module(module_id):
             summatives.append(assessment)
         else: 
             formatives.append(assessment)
+    session["assessment_tags"] = assess_tags 
     return render_template("view_module.html", 
         module=module, 
         assessments=assessments,
         summatives=summatives,
         formatives=formatives,
-        marks_achieved=marks_achieved
+        marks_achieved=marks_achieved,
+        assess_tags=assess_tags
         )
 
 

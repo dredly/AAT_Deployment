@@ -13,6 +13,8 @@
     <p>This assessment has an average difficulty rating of: {{ difficulty }}.</p>
 
     <p>You will have unlimited attempts to complete this assessment. </p>
+
+    <p><em>Assessment subject tags: {% for tag in session["assessment_tags"][assessment.title] %}{{ tag }}, {% endfor %}</em></p>
 </section>
 
 

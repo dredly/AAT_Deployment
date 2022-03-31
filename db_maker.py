@@ -124,6 +124,7 @@ with app.app_context():
             Tag(name="computational"),
             Tag(name="decimal"),
             Tag(name="environments"),
+            Tag(name="git commands")
         ]
     )
 
@@ -211,7 +212,7 @@ with app.app_context():
             # Questions (with Assessments)
             QuestionT2(  # 1
                 assessment_id=1,
-                tag_id=1,
+                tag_id=6,
                 num_of_marks=5,
                 question_text="What flag do you use to add a commit message?",
                 correct_answer="-m",
@@ -221,6 +222,7 @@ with app.app_context():
             ),
             QuestionT2(  # 2
                 assessment_id=1,
+                tag_id=6,
                 num_of_marks=10,
                 question_text="which command is used to upload your commits to a remote repository?",
                 correct_answer="push",
