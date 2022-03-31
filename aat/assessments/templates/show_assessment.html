@@ -33,6 +33,7 @@
     {% for question in questions %}
         <h3>{{question.question_text}}</h3>
         <p>{{question.num_of_marks}} marks</p>
+        <p>Tag: {{question.tag}}</p>
         {% if assessment.is_summative == False %}
         <p> Difficulty = {{question.difficulty}}/3</p>
         {% endif %}

@@ -218,18 +218,23 @@ def edit_assessment(id):
     assessment = Assessment.query.get_or_404(id)
     form = EditAssessmentForm()
     session["assessment_edit"] = id
-    print(id)
+    error = ' '
     if request.method == "POST":
         assessment.title = form.title.data
         assessment.module_id = form.module_id.data
-        try:
-            total_date = request.form["due_date"]
-            year = int(total_date[:4])
-            month = int(total_date[5:7])
-            day = int(total_date[8:10])
-            assessment.due_date = datetime(year, month, day)
-        except:
-            assessment.due_date = None  
+        total_date = request.form["due_date"]
+        if total_date >= date.today().strftime("%Y-%m-%d"):
+                try:
+                    year = int(total_date[:4])
+                    month = int(total_date[5:7])
+                    day = int(total_date[8:10])
+                    assessment.due_date = datetime(year, month, day)
+                except:
+                    assessment.due_date = None  
+        else:
+            error = "Due date cannot be in the past"
+            return render_template("edit_assessments.html", form=form, assessment=assessment, error=error)
+        
         assessment.num_of_credits = form.num_of_credits.data
         assessment.time_limit = form.time_limit.data
         assessment.is_summative = form.is_summative.data

@@ -1,7 +1,9 @@
 {% extends("layout.html") %}
 
 {% block content %}
-
+{% if error %}
+        <p class="warning"><strong> Error: </strong></p> {{error}}
+    {% endif %}
 
 <div class="form-container">
     <h1>Edit {{assessment.title}}</h1>
