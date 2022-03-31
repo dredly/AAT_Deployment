@@ -9,6 +9,11 @@
 {% else %}
 <p>Not assigned</p>
 {% endif %}
+{% if question.tag_id %}
+<p>Tagged with <strong>{{question.tag.name}}</strong></p>
+{% else %}
+<p>No tag</p>
+{% endif %}
 <p>Difficulty: {{question.difficulty}}/3</p>
 <p>Number of marks: {{question.num_of_marks}}</p>
 <h4>Question options:</h4>
