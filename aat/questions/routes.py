@@ -116,13 +116,17 @@ def edit_question_t1(id):
             else:
                 options[i].is_correct = False
 
+        question.tag_id = form.tag.data
         question.num_of_marks = form.num_of_marks.data
         question.difficulty = form.difficulty.data
         question.feedback_if_correct = form.feedback_if_correct.data
         question.feedback_if_wrong = form.feedback_if_wrong.data
         db.session.commit()
         return redirect(url_for("questions.index", id=id))
+    form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
     form.question_text.data = question.question_text
+    if question.tag:
+        form.tag.data = str(question.tag.id)
     form.num_of_marks.data = question.num_of_marks
     form.difficulty.data = question.difficulty
     form.feedback_if_correct.data = question.feedback_if_correct
@@ -189,14 +193,18 @@ def edit_question_t2(id):
     if request.method == "POST":
         question.question_text = form.question_text.data
         question.correct_answer = form.correct_answer.data
+        question.tag_id = form.tag.data
         question.num_of_marks = form.num_of_marks.data
         question.difficulty = form.difficulty.data
         question.feedback_if_correct = form.feedback_if_correct.data
         question.feedback_if_wrong = form.feedback_if_wrong.data
         db.session.commit()
         return redirect(url_for("questions.index", id=id))
+    form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
     form.question_text.data = question.question_text
     form.correct_answer.data = question.correct_answer
+    if question.tag:
+        form.tag.data = str(question.tag.id)
     form.num_of_marks.data = question.num_of_marks
     form.difficulty.data = question.difficulty
     form.feedback_if_correct.data = question.feedback_if_correct
