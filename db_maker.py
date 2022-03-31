@@ -48,7 +48,7 @@ with app.app_context():
             ),
             Assessment(  # 2
                 module_id=1,
-                lecturer_id=2,
+                lecturer_id=2,#1, #dont mind me I am for Jake testing purposes
                 title="Advanced Git",
                 due_date=None,
                 time_limit=60 * 60 * 45,
