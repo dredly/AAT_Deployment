@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 import math
 import random 
 from stringprep import in_table_d2
@@ -86,17 +86,25 @@ def delete_questions(id):
 def new_assessment():
     session.pop("assessment_edit", None)
     form = AssessmentForm()
+    error = " "
     is_summative_1 = ""
     session["user"] = current_user.id 
     if request.method == "POST":
         lecturer_id = session["user"]
         is_summative = False
         title = request.form["title"]
-        total_date = request.form["due_date"]
-        year = int(total_date[:4])
-        month = int(total_date[5:7])
-        day = int(total_date[8:10])
-        due_date = datetime(year, month, day)
+        if form.validate_on_submit:
+            total_date = request.form["due_date"]
+            print(date.today().strftime("%Y-%m-%d"))
+            print(total_date)
+            if total_date >= date.today().strftime("%Y-%m-%d"):
+                year = int(total_date[:4])
+                month = int(total_date[5:7])
+                day = int(total_date[8:10])
+                due_date = datetime(year, month, day)
+            else:
+                error = "Due date cannot be in the past"
+                return render_template("new_assessment.html", form=form , error=error)
         time_limit = request.form["time_limit"]
         num_of_credits = request.form["num_of_credits"]
         module_id = request.form["module_id"]

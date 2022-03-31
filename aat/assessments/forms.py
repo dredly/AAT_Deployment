@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms.fields import DateField, RadioField
 from wtforms.validators import NumberRange
+from datetime import date
 from wtforms import (
     TextAreaField,
     IntegerField,
@@ -32,6 +33,7 @@ class AnswerType2Form(FlaskForm):
 
 # CRUD Assessment forms
 
+
 class AssessmentForm(FlaskForm):
     title = TextAreaField("Enter Title", default="", validators=[DataRequired()])
     module_id= IntegerField("Enter module ID",validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
@@ -40,6 +42,16 @@ class AssessmentForm(FlaskForm):
     time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     is_summative = BooleanField("Select if Assessment is summative")
     submit = SubmitField("Add Questions")
+
+
+    def validate_on_submit(self):
+            result = super(AssessmentForm, self).validate()
+            print(date.today)
+            if (self.due_date.data < date.today()):
+                return False
+            else:
+                return result
+
 
 class DeleteAssessmentForm(FlaskForm):
     submit = SubmitField("Confirm")
