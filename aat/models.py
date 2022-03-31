@@ -62,6 +62,7 @@ class Awarded_Achievement(db.Model):
 
 class ResponseT1(db.Model):
     __tablename__ = "t1_responses"
+    attempt_number = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     assessment_id = db.Column(
         db.Integer, db.ForeignKey("Assessment.assessment_id"), primary_key=True
@@ -87,6 +88,7 @@ class ResponseT2(db.Model):
     # ------ Chapter 12: Followers
     ###
     __tablename__ = "t2_responses"
+    attempt_number = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     assessment_id = db.Column(
         db.Integer, db.ForeignKey("Assessment.assessment_id"), primary_key=True
@@ -108,7 +110,7 @@ class Assessment(db.Model):
     module_id = db.Column(db.Integer, db.ForeignKey("Module.module_id"))
     lecturer_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     # --- Other Columns ---
-    title = db.Column(db.String(120), nullable=False)
+    title = db.Column(db.String(120), nullable=False, unique=True)
     due_date = db.Column(db.DateTime())
     time_limit = db.Column(db.Integer)  # Time limit in seconds
     num_of_credits = db.Column(db.Integer, nullable=True, default=0)
@@ -307,7 +309,42 @@ class User(UserMixin, db.Model):
     def is_administrator(self):
         return self.can(Permission.ADMIN)
 
-    def has_answered(self, type, question, assessment):
+    def has_taken(self, assessment):
+        if assessment.assessment_id is None: 
+            return False 
+
+        type_1s = self.t1_responses.filter_by(assessment_id=assessment.assessment_id
+            ).all()
+        type_2s= self.t2_responses.filter_by(assessment_id=assessment.assessment_id
+            ).all()
+        if len(type_1s) <= 0 and len(type_2s) <=0: 
+            return False 
+        else: 
+            return True 
+    
+    def current_attempts(self, assessment): 
+        t1_responses = self.t1_responses.filter_by(assessment_id=assessment.assessment_id).all()
+        t2_responses = self.t2_responses.filter_by(assessment_id=assessment.assessment_id).all()
+        attempts = dict()
+        for response in t1_responses: 
+            new_key = f"t1_{response.t1_question_id}"
+            if new_key in attempts: 
+                attempts[new_key] = attempts[new_key] + 1
+            else: 
+                attempts[new_key] = 1 
+                print(response)
+        for response in t2_responses: 
+            new_key = f"t2_{response.t2_question_id}"
+            if new_key in attempts: 
+                attempts[new_key] = attempts[new_key] + 1
+            else: 
+                attempts[new_key] = 1 
+            print(response)
+        highest_number_of_responses = max(attempts, key=attempts.get)
+        taken_attempts = attempts[highest_number_of_responses]
+        return taken_attempts
+
+    def has_answered(self, type, question, assessment, attempt):
         if assessment.assessment_id is None:
             return False
         if type == 1:  # q_t1_id
@@ -316,6 +353,7 @@ class User(UserMixin, db.Model):
             return (
                 self.t1_responses.filter_by(t1_question_id=question.q_t1_id)
                 .filter_by(assessment_id=assessment.assessment_id)
+                .filter_by(attempt_number=attempt)
                 .first()
                 is not None
             )
@@ -327,21 +365,24 @@ class User(UserMixin, db.Model):
             return (
                 self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
                 .filter_by(assessment_id=assessment.assessment_id)
+                .filter_by(attempt_number=attempt)
                 .first()
                 is not None
             )
 
-    def remove_answer(self, type, question, assessment):
+    def remove_answer(self, type, question, assessment, attempt):
         if type == 1:
             response = (
                 self.t1_responses.filter_by(t1_question_id=question.q_t1_id)
                 .filter_by(assessment_id=assessment.assessment_id)
+                .filter_by(attempt_number=attempt)
                 .first()
             )
         elif type == 2:
             response = (
                 self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
                 .filter_by(assessment_id=assessment.assessment_id)
+                .filter_by(attempt_number=attempt)
                 .first()
             )
         if response:

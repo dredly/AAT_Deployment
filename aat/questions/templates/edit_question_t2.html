@@ -16,6 +16,9 @@
             </div>
             {{form.correct_answer(rows='3', cols='60')}}
         </div>
+        <div class="small-bottom-margin">
+            {{form.tag.label(class='inline-label')}}{{form.tag}}
+        </div>
         <div>
             {{form.num_of_marks.label(class='inline-label')}}{{form.num_of_marks}}
         </div>

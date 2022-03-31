@@ -22,6 +22,7 @@ class QuestionT1Form(FlaskForm):
         choices=[(0, "option a"), (1, "option b"), (2, "option c")],
         validators=[DataRequired()],
     )
+    tag = SelectField("Select a tag for the question.", choices=[])
     num_of_marks = IntegerField(
         "How many marks?", validators=[DataRequired(), NumberRange(min=0)]
     )
@@ -58,6 +59,7 @@ class QuestionT2Form(FlaskForm):
     correct_answer = TextAreaField(
         "Enter the correct answer", validators=[DataRequired()]
     )
+    tag = SelectField("Select a tag for the question.", choices=[])
     num_of_marks = IntegerField(
         "How many marks?", validators=[DataRequired(), NumberRange(min=0)]
     )

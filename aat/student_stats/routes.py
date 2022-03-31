@@ -355,7 +355,7 @@ def module_not_found(module_id):
 
 
 @student_stats.route("/assessment/not-found/<int:assessment_id>")
-def assessment_not_found(assessment_id):
+def empty_assessment(assessment_id):
     return "TODO"
 
 

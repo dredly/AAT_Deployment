@@ -94,8 +94,14 @@ footer {
 }
 .Assessment_Index_Parent{
 	display: flex;
-	justify-content: space-between;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
 	padding-left: 1vw;
+}
+
+.Assessment_Index_Parent button {
+	height: 100%; 
 }
 .Assessment_Index_Children{
 	display: flex;
@@ -169,6 +175,10 @@ footer {
 .delete-button {
 	background-color: red;
 	color: white;
+}
+
+.small-bottom-margin {
+	margin-bottom: 0.5em;
 }
 
 /* FOOTER */

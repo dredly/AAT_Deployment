@@ -7,5 +7,6 @@
             "database": "${workspaceFolder:assessment3}/aat/aat.db",
             "name": "aat_db"
         }
-    ]
+    ],
+    "sqltools.useNodeRuntime": true
 }
