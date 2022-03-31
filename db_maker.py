@@ -375,6 +375,7 @@ with app.app_context():
     db.session.add_all(
         [
             ResponseT1(  # 1
+                attempt_number=1,
                 user_id=1,
                 assessment_id=1,
                 t1_question_id=1,
@@ -382,6 +383,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT1(  # 2
+                attempt_number=1,
                 user_id=1,
                 assessment_id=2,
                 t1_question_id=2,
@@ -389,6 +391,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT1(  # 1
+                attempt_number=1,
                 user_id=4,
                 assessment_id=1,
                 t1_question_id=1,
@@ -396,6 +399,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT1(  # 2
+                attempt_number=1,
                 user_id=4,
                 assessment_id=2,
                 t1_question_id=2,
@@ -411,6 +415,7 @@ with app.app_context():
     db.session.add_all(
         [
             ResponseT2(  # 1
+                    attempt_number=1,
                 user_id=1,
                 assessment_id=1,
                 t2_question_id=1,
@@ -418,6 +423,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 2
+                attempt_number=1,
                 user_id=1,
                 assessment_id=1,
                 t2_question_id=2,
@@ -425,6 +431,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 3
+                attempt_number=1,
                 user_id=2,
                 assessment_id=1,
                 t2_question_id=1,
@@ -433,6 +440,7 @@ with app.app_context():
             ),
             # RESPONSES for Student "s"
             ResponseT2(  # 4
+                attempt_number=1,
                 user_id=4,
                 assessment_id=1,
                 t2_question_id=1,
@@ -440,6 +448,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 5
+                attempt_number=1,
                 user_id=4,
                 assessment_id=1,
                 t2_question_id=2,
@@ -460,6 +469,7 @@ with app.app_context():
             #     is_correct=True,
             # ),
             ResponseT2(  # 6
+                attempt_number=1,
                 user_id=4,
                 assessment_id=6,
                 t2_question_id=3,
@@ -467,6 +477,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 7
+                attempt_number=1,
                 user_id=4,
                 assessment_id=4,
                 t2_question_id=4,
@@ -474,6 +485,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 8
+                attempt_number=1,
                 user_id=4,
                 assessment_id=9,
                 t2_question_id=8,
@@ -481,6 +493,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 9
+                attempt_number=1,
                 user_id=4,
                 assessment_id=9,
                 t2_question_id=9,
@@ -488,6 +501,7 @@ with app.app_context():
                 is_correct=False,
             ),
             ResponseT2(  # 10
+                attempt_number=1,
                 user_id=4,
                 assessment_id=9,
                 t2_question_id=10,
@@ -495,6 +509,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 11
+                attempt_number=1,
                 user_id=4,
                 assessment_id=9,
                 t2_question_id=11,
@@ -502,6 +517,7 @@ with app.app_context():
                 is_correct=False,
             ),
             ResponseT2(  # 11
+                attempt_number=1,
                 user_id=4,
                 assessment_id=9,
                 t2_question_id=12,

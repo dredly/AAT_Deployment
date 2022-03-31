@@ -37,27 +37,40 @@ def view_module(module_id):
 
         # ---> check if user has responded to assessment 
         if current_user.has_taken(assessment): 
-            t1_responses = current_user.t1_responses.filter_by(
-            assessment_id=assessment.assessment_id
-            ).all()
-            t2_responses = current_user.t2_responses.filter_by(
-                assessment_id=assessment.assessment_id
-            ).all()
+            attempts_taken = current_user.current_attempts(assessment)
+            result_of_attempts = dict()
+            highest_result = 0 
 
-            # ---> find what user's result was 
-            result = 0
-            for response in t1_responses:
-                if response.is_correct:
-                    answered_question = QuestionT1.query.filter_by(
-                        q_t1_id=response.t1_question_id
-                    ).first()
-                    result += answered_question.num_of_marks
-            for response in t2_responses:
-                if response.is_correct:
-                    answered_question = QuestionT2.query.filter_by(
-                        q_t2_id=response.t2_question_id
-                    ).first()
-                    result += answered_question.num_of_marks
+            # --- > break out achieved result for each attempt 
+            for attempt in range(1, attempts_taken + 1):
+                t1_responses = current_user.t1_responses.filter_by(
+                assessment_id=assessment.assessment_id
+                ).filter_by(attempt_number=attempt
+                ).all()
+                t2_responses = current_user.t2_responses.filter_by(
+                    assessment_id=assessment.assessment_id
+                ).filter_by(attempt_number=attempt
+                ).all()
+
+                # ---> find what user's result was 
+                res = 0
+                for response in t1_responses:
+                    if response.is_correct:
+                        answered_question = QuestionT1.query.filter_by(
+                            q_t1_id=response.t1_question_id
+                        ).first()
+                        res += answered_question.num_of_marks
+                for response in t2_responses:
+                    if response.is_correct:
+                        answered_question = QuestionT2.query.filter_by(
+                            q_t2_id=response.t2_question_id
+                        ).first()
+                        res += answered_question.num_of_marks
+                result_of_attempts[attempt] = res
+            
+            # --- > find the highest result achieved across all attempts 
+            d_ref = max(result_of_attempts, key=result_of_attempts.get)
+            result = result_of_attempts[d_ref]
         else: 
             result = 0
     
@@ -305,6 +318,8 @@ def assessment_summary(assessment_id):
     questions_t2 = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
     if len(questions_t1) == 0 and len(questions_t2) == 0: 
         return redirect(url_for("assessments.empty_assessment"))
+
+    # ---- > create list of questions to cover in assessment 
     question_ids = []
     difficulties = []
     print(question_ids)
@@ -331,6 +346,14 @@ def assessment_summary(assessment_id):
     first_question = session["questions"][0][0]
     first_question_type = session["questions"][0][0]
     first_question_id = session["questions"][0][1]
+
+    # ---- > calculate which attempt this is for user 
+    if not current_user.has_taken(assessment): 
+        session["attempt_number"] = 1
+    else: 
+        current_no_attempts = current_user.current_attempts(assessment)
+        session["attempt_number"] = current_no_attempts + 1
+
     return render_template(
         "assessment_summary.html",
         assessment=assessment,
@@ -358,8 +381,9 @@ def answer_question(type, question_id):
         form = AnswerType2Form(answer=None)
 
     ## check if there's a previous answer to prepopulate 
-    if current_user.has_answered(type, question, assessment):
-        if request.method == "GET":
+    if request.method == "GET":
+        if current_user.has_answered(type, question, assessment, session["attempt_number"]):
+        
             if type == 1: 
                 previous_response = (
                 current_user.t1_responses.filter_by(
@@ -388,7 +412,7 @@ def answer_question(type, question_id):
     ## actions to take on a post method - i.e. when user submits an answer to their question
     if request.method == "POST":
         ## if changing / resubmitting answer, ensures no duplicate responses by deleting the old
-        if current_user.has_answered(type, question, assessment):
+        if current_user.has_answered(type, question, assessment, session["attempt_number"]):
             current_user.remove_answer(type, question, assessment)
             db.session.commit()
         if type == 1:
@@ -398,6 +422,7 @@ def answer_question(type, question_id):
             else: 
                 result = False 
             response = ResponseT1(
+                attempt_number=session["attempt_number"],
                 user_id=current_user.id,
                 assessment_id=assessment.assessment_id,
                 t1_question_id=question_id,
@@ -411,6 +436,7 @@ def answer_question(type, question_id):
             else:
                 result = False
             response = ResponseT2(
+                attempt_number=session["attempt_number"],
                 user_id=current_user.id,
                 assessment_id=assessment.assessment_id,
                 t2_question_id=question_id,
@@ -468,6 +494,7 @@ def mark_answer(type, question_id):
         chosen_option = (
         current_user.t1_responses.filter_by(assessment_id=session.get("assessment"))
         .filter_by(t1_question_id=question_id)
+        .filter_by(attempt_number=session["attempt_number"])
         .first()
         )
         response = Option.query.filter_by(option_id=chosen_option.selected_option).first()
@@ -478,6 +505,7 @@ def mark_answer(type, question_id):
         response = (
             current_user.t2_responses.filter_by(assessment_id=session.get("assessment"))
             .filter_by(t2_question_id=question_id)
+            .filter_by(attempt_number=session["attempt_number"])
             .first()
         )
     return render_template(
@@ -498,9 +526,11 @@ def results(assessment_id):
     # ----- Find all the responses given during assessment session 
     t1_responses = current_user.t1_responses.filter_by(
         assessment_id=assessment_id
+    ).filter_by(attempt_number=session["attempt_number"]
     ).all()
     t2_responses = current_user.t2_responses.filter_by(
         assessment_id=assessment_id
+    ).filter_by(attempt_number=session["attempt_number"]
     ).all()
 
     # ----- find all questions asked 
@@ -542,6 +572,7 @@ def results(assessment_id):
             q = QuestionT1.query.filter_by(q_t1_id=current_question[1]).first()
             related_response = current_user.t1_responses.filter_by(assessment_id=assessment.assessment_id
                 ).filter_by(t1_question_id=q.q_t1_id
+                ).filter_by(attempt_number=session["attempt_number"]
                 ).first()
             answer_content = Option.query.filter_by(option_id=related_response.selected_option).first().option_text
             correct_answer = Option.query.filter_by(q_t1_id=q.q_t1_id).filter_by(is_correct=True).first().option_text
@@ -550,6 +581,7 @@ def results(assessment_id):
             q = QuestionT2.query.filter_by(q_t2_id=current_question[1]).first()
             related_response = current_user.t2_responses.filter_by(assessment_id=assessment.assessment_id
             ).filter_by(t2_question_id=q.q_t2_id
+            ).filter_by(attempt_number=session["attempt_number"]
             ).first()
             answer_content = related_response.response_content
             correct_answer = q.correct_answer 

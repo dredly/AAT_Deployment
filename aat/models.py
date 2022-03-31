@@ -62,6 +62,7 @@ class Awarded_Achievement(db.Model):
 
 class ResponseT1(db.Model):
     __tablename__ = "t1_responses"
+    attempt_number = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     assessment_id = db.Column(
         db.Integer, db.ForeignKey("Assessment.assessment_id"), primary_key=True
@@ -87,6 +88,7 @@ class ResponseT2(db.Model):
     # ------ Chapter 12: Followers
     ###
     __tablename__ = "t2_responses"
+    attempt_number = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     assessment_id = db.Column(
         db.Integer, db.ForeignKey("Assessment.assessment_id"), primary_key=True
@@ -340,7 +342,7 @@ class User(UserMixin, db.Model):
         taken_attempts = attempts[highest_number_of_responses]
         return taken_attempts
 
-    def has_answered(self, type, question, assessment):
+    def has_answered(self, type, question, assessment, attempt):
         if assessment.assessment_id is None:
             return False
         if type == 1:  # q_t1_id
@@ -349,6 +351,7 @@ class User(UserMixin, db.Model):
             return (
                 self.t1_responses.filter_by(t1_question_id=question.q_t1_id)
                 .filter_by(assessment_id=assessment.assessment_id)
+                .filter_by(attempt_number=attempt)
                 .first()
                 is not None
             )
@@ -360,6 +363,7 @@ class User(UserMixin, db.Model):
             return (
                 self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
                 .filter_by(assessment_id=assessment.assessment_id)
+                .filter_by(attempt_number=attempt)
                 .first()
                 is not None
             )

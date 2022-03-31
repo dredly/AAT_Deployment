@@ -10,7 +10,7 @@
             <h3>{{ summative_assessment.title }}</h3>
             <p>Must be completed by: <b class="date">{{ summative_assessment.due_date }}</b></p>
             {% if current_user.has_taken(summative_assessment) %}
-                <p>Most recent result: {{ marks_achieved[summative_assessment.title] }}</p>
+                <p>Highest Result Achieved: {{ marks_achieved[summative_assessment.title] }}</p>
             {% endif %}
             <button type="button" class = "Assessment_Index_Child">
                 <a href="{{ url_for('assessments.assessment_summary', assessment_id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">Take Assessment</a>
@@ -26,7 +26,7 @@
         <div class="assessment-instance">
             <h3>{{ formative_assessment.title }}</h3>
             {% if current_user.has_taken(formative_assessment) %}
-                <p>Most recent result: {{ marks_achieved[formative_assessment.title] }}</p>
+                <p>Highest Result Achieved: {{ marks_achieved[formative_assessment.title] }}</p>
             {% endif %}
             <button type="button" class = "Assessment_Index_Child">
                 <a href="{{ url_for('assessments.assessment_summary', assessment_id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">Take Assessment</a>
