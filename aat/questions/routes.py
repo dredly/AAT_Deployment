@@ -1,6 +1,6 @@
 from flask import request, redirect, url_for, render_template
 from .forms import QuestionT1Form, QuestionT2Form, FilterForm, DeleteForm
-from ..models import QuestionT1, QuestionT2, Option
+from ..models import QuestionT1, QuestionT2, Option, Tag
 from ..decorators import permission_required
 from .. import Permission
 from . import questions
@@ -52,6 +52,7 @@ def new_question_t1():
         option_b_text = request.form["option_b"]
         option_c_text = request.form["option_c"]
         correct_option = request.form["correct_option"]
+        tag_id = request.form["tag"]
         print(correct_option)
         num_of_marks = request.form["num_of_marks"]
         difficulty = request.form["difficulty"]
@@ -59,6 +60,7 @@ def new_question_t1():
         feedback_if_wrong = request.form["feedback_if_wrong"]
         new_question = QuestionT1(
             question_text=question_text,
+            tag_id=tag_id,
             num_of_marks=num_of_marks,
             difficulty=difficulty,
             feedback_if_correct=feedback_if_correct,
@@ -82,6 +84,7 @@ def new_question_t1():
         db.session.add(option_c)
         db.session.commit()
         return redirect(url_for("questions.index"))
+    form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
     return render_template("new_question_t1.html", form=form)
 
 
@@ -152,6 +155,7 @@ def new_question_t2():
     if request.method == "POST":
         question_text = request.form["question_text"]
         correct_answer = request.form["correct_answer"]
+        tag_id = request.form["tag"]
         num_of_marks = request.form["num_of_marks"]
         difficulty = request.form["difficulty"]
         feedback_if_correct = request.form["feedback_if_correct"]
@@ -159,6 +163,7 @@ def new_question_t2():
         new_question = QuestionT2(
             question_text=question_text,
             correct_answer=correct_answer,
+            tag_id=tag_id,
             num_of_marks=num_of_marks,
             difficulty=difficulty,
             feedback_if_correct=feedback_if_correct,
@@ -167,6 +172,7 @@ def new_question_t2():
         db.session.add(new_question)
         db.session.commit()
         return redirect(url_for("questions.index"))
+    form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
     return render_template("new_question_t2.html", form=form)
 
 

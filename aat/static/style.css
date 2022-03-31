@@ -199,6 +199,10 @@ footer {
 	color: white;
 }
 
+.small-bottom-margin {
+	margin-bottom: 0.5em;
+}
+
 /* FOOTER */
 footer {
 	position:static;
