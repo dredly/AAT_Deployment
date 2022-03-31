@@ -332,12 +332,14 @@ class User(UserMixin, db.Model):
                 attempts[new_key] = attempts[new_key] + 1
             else: 
                 attempts[new_key] = 1 
+                print(response)
         for response in t2_responses: 
             new_key = f"t2_{response.t2_question_id}"
             if new_key in attempts: 
                 attempts[new_key] = attempts[new_key] + 1
             else: 
                 attempts[new_key] = 1 
+            print(response)
         highest_number_of_responses = max(attempts, key=attempts.get)
         taken_attempts = attempts[highest_number_of_responses]
         return taken_attempts
@@ -368,17 +370,19 @@ class User(UserMixin, db.Model):
                 is not None
             )
 
-    def remove_answer(self, type, question, assessment):
+    def remove_answer(self, type, question, assessment, attempt):
         if type == 1:
             response = (
                 self.t1_responses.filter_by(t1_question_id=question.q_t1_id)
                 .filter_by(assessment_id=assessment.assessment_id)
+                .filter_by(attempt_number=attempt)
                 .first()
             )
         elif type == 2:
             response = (
                 self.t2_responses.filter_by(t2_question_id=question.q_t2_id)
                 .filter_by(assessment_id=assessment.assessment_id)
+                .filter_by(attempt_number=attempt)
                 .first()
             )
         if response:

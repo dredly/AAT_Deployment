@@ -21,6 +21,7 @@ def index():
 
 @assessments.route("/view_module/<int:module_id>")
 def view_module(module_id): 
+    session["module_id"] = module_id 
     module = Module.query.filter_by(module_id=module_id).first()
     assessments = Assessment.query.filter_by(module_id=module.module_id).all()
     summatives = []
@@ -352,7 +353,9 @@ def assessment_summary(assessment_id):
         session["attempt_number"] = 1
     else: 
         current_no_attempts = current_user.current_attempts(assessment)
+        print(f"current number of attempts is: {current_no_attempts}")
         session["attempt_number"] = current_no_attempts + 1
+        print(session["attempt_number"])
 
     return render_template(
         "assessment_summary.html",
@@ -382,6 +385,8 @@ def answer_question(type, question_id):
 
     ## check if there's a previous answer to prepopulate 
     if request.method == "GET":
+        print("The current user has answered this question in this attempt: ")
+        print(current_user.has_answered(type, question, assessment, session["attempt_number"]))
         if current_user.has_answered(type, question, assessment, session["attempt_number"]):
         
             if type == 1: 
@@ -390,6 +395,7 @@ def answer_question(type, question_id):
                     assessment_id=session.get("assessment")
                 )
                 .filter_by(t1_question_id=question_id)
+                .filter_by(attempt_number=session["attempt_number"])
                 .first()
                 )
                 # find id of option chosen 
@@ -404,6 +410,7 @@ def answer_question(type, question_id):
                         assessment_id=session.get("assessment")
                     )
                     .filter_by(t2_question_id=question_id)
+                    .filter_by(attempt_number=session["attempt_number"])
                     .first()
                 )
                 previous_given_answer = previous_response.response_content
@@ -413,7 +420,7 @@ def answer_question(type, question_id):
     if request.method == "POST":
         ## if changing / resubmitting answer, ensures no duplicate responses by deleting the old
         if current_user.has_answered(type, question, assessment, session["attempt_number"]):
-            current_user.remove_answer(type, question, assessment)
+            current_user.remove_answer(type, question, assessment, session["attempt_number"])
             db.session.commit()
         if type == 1:
             given_answer = Option.query.filter_by(option_id=form.chosen_option.data).first()
@@ -614,11 +621,12 @@ def exit_assessment():
     session.pop("no_questions", None)
     session.pop("assessment", None)
     session.pop("takes_assessment_id", None)
-    return redirect(url_for("assessments.index"))
+    module = session.pop("module_id", None)
+    return redirect(url_for("assessments.view_module", module_id=module))
 
 
 # ----------------------------------------------------------------------------------------------------
-# ---------------------------------  Start of TAKE ASSESSMENT  ---------------------------------------
+# ---------------------------------  END of TAKE ASSESSMENT  ---------------------------------------
 # ----------------------------------------------------------------------------------------------------
 
 @assessments.route("/empty_assessment")
