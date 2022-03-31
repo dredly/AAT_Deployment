@@ -365,3 +365,8 @@ nav {
 .outgoing-challenges {
     text-align: center;
 }
+
+.active-challenges {
+    text-align: center;
+    padding-bottom: 10px;
+}

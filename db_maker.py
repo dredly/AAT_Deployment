@@ -1,3 +1,4 @@
+from black import diff
 from aat import db
 from aat import Role
 from aat import app
@@ -627,9 +628,9 @@ with app.app_context():
 
     db.session.add_all(
         [
-            Challenge(challenge_id=1, from_user=1, to_user=3),
+            Challenge(challenge_id=1, from_user=1, to_user=3, difficulty=3),
             Challenge(challenge_id=2, from_user=1, to_user=2),
-            Challenge(challenge_id=3, from_user=2, to_user=1),
+            Challenge(challenge_id=3, from_user=2, to_user=1, difficulty=2),
             Challenge(challenge_id=4, from_user=2, to_user=3),
         ]
     )

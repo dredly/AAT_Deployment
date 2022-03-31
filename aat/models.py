@@ -20,12 +20,14 @@ class Challenge(db.Model):
     to_user = db.Column(db.Integer, nullable=False)
     active = db.Column(db.Integer, default=0)
     difficulty = db.Column(db.Integer, default=0)
+    challenge_questions_id = db.relationship("ChallengeQuestions", backref="challenges", lazy=True)
 
 
-# class ActiveChallenge(db.Model):
-#     __tablename__ = "active_challenges"
-#     challenge_id = db.Column(db.Integer, primary_key=True)
-#     questiont1_id = db.Column(db.Integer, )
+class ChallengeQuestions(db.Model):
+    __tablename__ = "challenge_questions"
+    id = db.Column(db.Integer, primary_key=True)
+    challenge_id = db.Column(db.Integer, db.ForeignKey('challenges.challenge_id'), nullable=False)
+    question_id = db.Column(db.Integer, nullable=False)
 
 class Tier(db.Model):
     __tablename__ = "tiers"
