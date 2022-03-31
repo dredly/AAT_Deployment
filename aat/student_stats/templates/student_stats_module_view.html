@@ -1,4 +1,7 @@
 {% extends 'layout.html' %}
+{% block title %}
+    Student | Module View
+{% endblock title %}
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
 <link
@@ -7,7 +10,7 @@
 />
 {% endblock extra_head %}
 {% block content %}
-    <h1>Welcome "{{current_user.name}}". Let's see how you have done.</h1>
+    <h1>Student Stats for {{current_user.name}} | Module View for {{module_details["module_name"]}}</h1>
     <p>
     <a href="{{url_for('student_stats.course_view')}}">
         Course View
@@ -35,16 +38,17 @@
     <ul>
     {% for module, assessments in module_dict.items() %}
         {% for assessment, marks in assessments.items() %}
-            <li>
-                <p>
-                    <a href="{{url_for('student_stats.assessment_view', assessment_id=assessment.assessment_id )}}">
-                        {{assessment}}:
-                    </a> 
-                    {{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
-                        format((marks.marks_awarded/marks.marks_possible)*100)}}%)
-                </p>
-         
-            </li>
+            <div class="student_stats_container {% if marks.marks_awarded/marks.marks_possible >= 0.5 %} correct_answer {% else %} incorrect_answer {% endif %}">
+                <li>
+                    <p>
+                        <a href="{{url_for('student_stats.assessment_view', assessment_id=assessment.assessment_id )}}">
+                            {{assessment}}:
+                        </a>
+                        {{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
+                            format((marks.marks_awarded/marks.marks_possible)*100)}}%)
+                    </p>
+                </li>
+            </div>
         {% endfor %}
     {% endfor %}
 </ul>
