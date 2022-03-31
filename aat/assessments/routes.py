@@ -268,19 +268,23 @@ def assessment_summary(assessment_id):
     if len(questions_t1) == 0 and len(questions_t2) == 0: 
         return redirect(url_for("assessments.empty_assessment"))
     question_ids = []
+    difficulties = []
     print(question_ids)
     for question in questions_t1:
         print("now adding type 1...")
+        difficulties.append(question.difficulty)
         question_info = (1, question.q_t1_id)
         question_ids.append(question_info)
         print(question_info)
     for question in questions_t2:
         print("now adding type 2...")
+        difficulties.append(question.difficulty)
         question_info = (2, question.q_t2_id)
         question_ids.append(question_info)
         print(question_info)
     random.shuffle(question_ids)
     print(question_ids)
+    final_difficulty = round(sum(difficulties) / len(difficulties))
     session["user"] = current_user.id
     session["questions"] = question_ids
     session["past_questions"] = []
@@ -297,7 +301,8 @@ def assessment_summary(assessment_id):
         question_ids=question_ids,
         first_question=first_question,
         type=first_question_type,
-        first_question_id=first_question_id
+        first_question_id=first_question_id, 
+        difficulty=final_difficulty
     )
 
 

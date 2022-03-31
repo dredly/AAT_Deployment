@@ -307,6 +307,33 @@ class User(UserMixin, db.Model):
     def is_administrator(self):
         return self.can(Permission.ADMIN)
 
+    def has_taken(self, assessment):
+        if assessment.assessment_id is None: 
+            return False 
+        return self.t1_responses.filter_by(assessment_id=assessment.assessment_id
+            ) is not None or self.t2_responses.filter_by(assessment_id=assessment.assessment_id
+            ) is not None 
+    
+    def current_attempts(self, assessment): 
+        t1_responses = self.t1_responses.filter_by(assessment_id=assessment.assessment_id).all()
+        t2_responses = self.t2_responses.filter_by(assessment_id=assessment.assessment_id).all()
+        attempts = dict()
+        for response in t1_responses: 
+            new_key = f"t1_{response.t1_question_id}"
+            if new_key in attempts: 
+                attempts[new_key] = attempts[new_key] + 1
+            else: 
+                attempts[new_key] = 1 
+        for response in t2_responses: 
+            new_key = f"t2_{response.t2_question_id}"
+            if new_key in attempts: 
+                attempts[new_key] = attempts[new_key] + 1
+            else: 
+                attempts[new_key] = 1 
+        highest_number_of_responses = max(attempts, key=attempts.get)
+        taken_attempts = attempts[highest_number_of_responses]
+        return taken_attempts
+
     def has_answered(self, type, question, assessment):
         if assessment.assessment_id is None:
             return False
