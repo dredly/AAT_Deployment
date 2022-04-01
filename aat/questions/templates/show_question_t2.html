@@ -3,11 +3,16 @@
 <h1>{{ question.question_text }}</h1>
 <a href="{{url_for('questions.edit_question_t2', id=question.q_t2_id)}}"><button>Edit details</button></a>
 <a href="{{url_for('questions.delete_question_t2', id=question.q_t2_id)}}"><button class="delete-button">Delete
-        question</button></a>
+                question</button></a>
 {% if question.assessment_id %}
 <p>Assigned to assessment <strong>{{question.assessment.title}}</strong></p>
 {% else %}
 <p>Not assigned</p>
+{% endif %}
+{% if question.tag_id %}
+<p>Tagged with <strong>{{question.tag.name}}</strong></p>
+{% else %}
+<p>No tag</p>
 {% endif %}
 <p>Difficulty: {{question.difficulty}}/3</p>
 <p>Number of marks: {{question.num_of_marks}}</p>

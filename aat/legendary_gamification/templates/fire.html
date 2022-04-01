@@ -16,12 +16,11 @@
     <div class="question-megacontainer">
         <div class="question-container">
             <form action="" method="POST">
-                <h4>{{ question }}</h4>
+                <h4>{{ question[1] }}</h4>
                 <div class="question-options">
-                    <input type="radio" name="options" id="option1" value="0"> {{ options[0] }} </input><br>
-                    <input type="radio" name="options" id="option2" value="1"> {{ options[1] }} </input><br>
-                    <input type="radio" name="options" id="option3" value="2"> {{ options[2] }} </input><br>
-                    <input type="radio" name="options" id="option4" value="3"> {{ options[3] }} </input><br>
+                    {% for option in options %}
+                        <div><input type="radio" name="options" value="{{ option[2] }}">{{ option[1] }}</option></div>
+                    {% endfor %}
                     <input type="submit" name="button" value="send" class='send-button'>
                 </div>
             </form>

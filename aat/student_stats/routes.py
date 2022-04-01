@@ -106,6 +106,8 @@ def course_view():
         "sum_of_marks_possible": sum_of_marks_possible,
     }
 
+    print(overall_results)
+
     module_totals = {}
 
     for module, module_details in module_dict.items():
