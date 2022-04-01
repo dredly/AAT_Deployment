@@ -98,7 +98,7 @@ def achievements():
             "sum_of_marks_possible": sum_of_marks_possible,
         }
 
-        print(user.name, overall_results)
+        # print(user.name, overall_results)
 
         lines_ranks.append((overall_results['sum_of_marks_awarded'], user.name))
 
@@ -114,8 +114,8 @@ def achievements():
                     "marks_possible"
                 ]
 
-    print(f"{module_totals=}")
-    print(lines_ranks)
+    # print(f"{module_totals=}")
+    # print(lines_ranks)
 
     award_badges = Awarded_Badge.query.filter_by(user_id=current_user.id).all()
     # for awards in award_badges:
@@ -159,9 +159,9 @@ def achievements():
             active_users.append((challenge.challenge_id, user.name, difficulty))
 
 
-    print(in_users)
-    print(out_users)
-    print(active_users)
+    # print(in_users)
+    # print(out_users)
+    # print(active_users)
     challenge = ChallengeForm()
 
     # with open("aat/legendary_gamification/ranks.txt", 'r') as f:
@@ -176,7 +176,6 @@ def achievements():
 
         try:
             choice = request.form["accept_challenge_button"]
-            print(choice)
         except:
             pass
 
@@ -185,7 +184,22 @@ def achievements():
         except:
             pass
         if choice == "Practice Rapid Fire Tests" or choice == "Take Rank Up Test":
-            return redirect("rapid-fire")
+                questions_t1 = QuestionT1.query.all()
+                max_questions = len(questions_t1)
+                question_ids = []
+                while len(question_ids) < 3:
+                    q_id = random.randrange(1, max_questions+1)
+                    if q_id not in question_ids:
+                        question_ids.append(q_id)
+                for i in question_ids:
+                    question = QuestionT1.query.with_entities(QuestionT1.q_t1_id, QuestionT1.question_text).filter_by(q_t1_id=i).first()
+                    challenge_questions.append(question)
+                for i in question_ids:
+                    option = Option.query.with_entities(Option.option_id, Option.option_text, Option.is_correct).filter_by(q_t1_id=i).all()
+                    challenge_options.append(option)
+
+                return redirect(url_for(".rapid_fire"))
+
         elif choice == "Challenge User":
             challenge_details = Challenge(from_user=current_user.id, to_user=int(request.form.get("Users")), difficulty=int(challenge.difficulty.data))
             db.session.add(challenge_details)
@@ -222,11 +236,11 @@ def achievements():
                 for question in challenge_question_all:
                     question = QuestionT1.query.with_entities(QuestionT1.q_t1_id, QuestionT1.question_text).filter_by(q_t1_id=question.question_id).first()
                     challenge_questions.append(question)
-                print(challenge_questions)
+                # print(challenge_questions)
                 for question in challenge_question_all:
                     option = Option.query.with_entities(Option.option_id, Option.option_text, Option.is_correct).filter_by(q_t1_id=question.question_id).all()
                     challenge_options.append(option)
-                print(challenge_options)
+                # print(challenge_options)
                 return redirect(url_for(".rapid_fire", challenge_questions=challenge_questions, challenge_options=challenge_options))
             except BadRequestKeyError:
                 pass           
