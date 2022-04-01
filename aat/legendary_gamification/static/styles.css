@@ -20,22 +20,40 @@ ul {
     list-style: none;
 }
 
-nav a {
-    float: left;
-    color: #ffffff;
-    text-align: center;
-    padding: 14px 16px;
-    padding-top: 0px;
-    text-decoration: none;
-    font-size: 17px;
-    padding-left: 0;
+nav,
+footer {
+	background: black;
+	color: white;
 }
 
-nav {
-    background-color: rgb(26, 26, 26);
-    overflow: hidden;
+nav ul {
+	display: flex;
+	flex-direction: row;
+	margin: 0;
 }
 
+nav li {
+	list-style: none;
+	margin: 1rem 1rem;
+}
+
+nav li a,
+nav li a:visited {
+	color: white;
+	transition: color 0.2s ease-in-out;
+}
+
+nav li a:hover {
+	color: red;
+}
+
+nav li.admin {
+	margin-left: auto;
+}
+
+nav li a {
+	text-decoration: none;
+}
 .divider {
     height: 18px;
     border-top-style:ridge;
@@ -373,4 +391,11 @@ nav {
 .active-challenges {
     text-align: center;
     padding-bottom: 10px;
+}
+
+footer {
+	position:static;
+	bottom:0px;
+	text-align: center;
+	width: 100%;
 }
