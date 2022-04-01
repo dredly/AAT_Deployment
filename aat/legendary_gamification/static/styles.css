@@ -83,6 +83,10 @@ nav {
     font-size: 30px;
 }
 
+#user-leaderboard {
+    font-size: large;
+}
+
 .content-container {
     display: flex;
     background-color: #ffffff;

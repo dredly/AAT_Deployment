@@ -7,7 +7,7 @@ from aat import db
 from aat.legendary_gamification.forms import ChallengeForm
 from . import legendary_gamification
 from werkzeug.exceptions import BadRequestKeyError
-from ..models import Achievement, Awarded_Achievement, Awarded_Badge, Badge, Challenge, ChallengeQuestions, QuestionT1, User, Option
+from ..models import Achievement, Awarded_Achievement, Awarded_Badge, Badge, Challenge, ChallengeQuestions, QuestionT1, User, Option, Module
 
 questions = ["How do you print things in python",
              "How do you declare a function in python",
@@ -31,7 +31,92 @@ def achievements():
     global challenge_options
     badges = []
     achievements = []
+    lines_ranks = []
     all_users = User.query.all()
+
+
+    for user in all_users:
+        assessment_marks = {}
+        for response in user.t1_responses:
+            if response.assessment not in assessment_marks:
+                assessment_marks[response.assessment] = {
+                    "marks_awarded": response.question.num_of_marks
+                    if response.is_correct
+                    else 0,
+                    "marks_possible": response.question.num_of_marks,
+                }
+            else:
+                assessment_marks[response.assessment]["marks_awarded"] += (
+                    response.question.num_of_marks if response.is_correct else 0
+                )
+                assessment_marks[response.assessment][
+                    "marks_possible"
+                ] += response.question.num_of_marks
+
+        ## T2_responses
+        for response in user.t2_responses:
+            if response.assessment not in assessment_marks:
+                assessment_marks[response.assessment] = {
+                    "marks_awarded": response.question.num_of_marks
+                    if response.is_correct
+                    else 0,
+                    "marks_possible": response.question.num_of_marks,
+                }
+            else:
+                assessment_marks[response.assessment]["marks_awarded"] += (
+                    response.question.num_of_marks if response.is_correct else 0
+                )
+                assessment_marks[response.assessment][
+                    "marks_possible"
+                ] += response.question.num_of_marks
+
+        module_dict = {}
+
+        for module in Module.query.all():
+            for assessment, data in assessment_marks.items():
+                if assessment.module_id == module.module_id:
+                    if module not in module_dict:
+                        module_dict[module] = {assessment: data}
+                    else:
+                        module_dict[module][assessment] = data
+
+        sum_of_marks_awarded = 0
+        sum_of_marks_possible = 0
+
+        for module in module_dict:
+            for assessment, data in assessment_marks.items():
+                sum_of_marks_awarded += data["marks_awarded"]
+                sum_of_marks_possible += data["marks_possible"]
+                # module_dict[module]["marks_awarded"] += data["marks_awarded"]
+                # module_dict[module]["marks_possible"] += data["marks_possible"]
+
+        # if sum_of_marks_possible == 0:
+        #     return render_template("no_questions_answered.html")
+
+        overall_results = {
+            "sum_of_marks_awarded": sum_of_marks_awarded,
+            "sum_of_marks_possible": sum_of_marks_possible,
+        }
+
+        print(user.name, overall_results)
+
+        lines_ranks.append((overall_results['sum_of_marks_awarded'], user.name))
+
+        module_totals = {}
+
+        for module, module_details in module_dict.items():
+            module_totals[module.title] = {"marks_awarded": 0, "marks_possible": 0}
+            for assessment, assessment_details in module_details.items():
+                module_totals[module.title]["marks_awarded"] += assessment_details[
+                    "marks_awarded"
+                ]
+                module_totals[module.title]["marks_possible"] += assessment_details[
+                    "marks_possible"
+                ]
+
+    print(f"{module_totals=}")
+    print(lines_ranks)
+
     award_badges = Awarded_Badge.query.filter_by(user_id=current_user.id).all()
     # for awards in award_badges:
     #     print(awards.badge_id)
@@ -79,10 +164,10 @@ def achievements():
     print(active_users)
     challenge = ChallengeForm()
 
-    with open("aat/legendary_gamification/ranks.txt", 'r') as f:
-        lines_ranks = f.readlines()
-    with open("aat/legendary_gamification/awards.txt", 'r') as f:
-        lines_achievements = f.readlines()
+    # with open("aat/legendary_gamification/ranks.txt", 'r') as f:
+    #     lines_ranks = f.readlines()
+    # with open("aat/legendary_gamification/awards.txt", 'r') as f:
+    #     lines_achievements = f.readlines()
     if request.method == "POST":
         try:
             choice = request.form['button']
@@ -146,7 +231,7 @@ def achievements():
             except BadRequestKeyError:
                 pass           
     return render_template(
-        "achievements.html", ranks=sorted(lines_ranks), awards=lines_achievements, badges=badges,
+        "achievements.html", ranks=sorted(lines_ranks, key=lambda x: x[0], reverse=True), badges=badges,
         achievements=achievements, incoming_challenges=in_users, outgoing_challenges=out_users, challenge=challenge,
         all_users=all_users, challenge_ids=challenge_ids, in_difficulty=incoming_challenge_difficulty,
         out_difficulty=outgoing_challenge_difficulty, active_users=active_users
