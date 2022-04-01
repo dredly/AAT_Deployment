@@ -287,7 +287,7 @@ class User(UserMixin, db.Model):
     challenge_from = db.relationship("Challenge", foreign_keys='Challenge.from_user', backref="users", lazy='dynamic')
     t1_responses = db.relationship(
         "ResponseT1",
-        foreign_keys=[ResponseT1.user_id],
+        foreign_keys="ResponseT1.user_id",
         backref=db.backref("responding_student", lazy="joined"),
         lazy="dynamic",
         # delete orphan - so if a user is deleted,
@@ -296,7 +296,7 @@ class User(UserMixin, db.Model):
     )
     t2_responses = db.relationship(
         "ResponseT2",
-        foreign_keys=[ResponseT2.user_id],
+        foreign_keys="ResponseT2.user_id",
         backref=db.backref("responding_student", lazy="joined"),
         lazy="dynamic",
         # delete orphan - so if a user is deleted,
