@@ -1,4 +1,3 @@
-from black import diff
 from aat import db
 from aat import Role
 from aat import app
@@ -47,7 +46,7 @@ with app.app_context():
             ),
             Assessment(  # 2
                 module_id=1,
-                lecturer_id=2,#1, #dont mind me I am for Jake testing purposes
+                lecturer_id=2,  # 1, #dont mind me I am for Jake testing purposes
                 title="Advanced Git",
                 due_date=None,
                 time_limit=60 * 60 * 45,
@@ -123,7 +122,7 @@ with app.app_context():
             Tag(name="computational"),
             Tag(name="decimal"),
             Tag(name="environments"),
-            Tag(name="git commands")
+            Tag(name="git commands"),
         ]
     )
 
@@ -327,19 +326,9 @@ with app.app_context():
     db.session.add_all(
         [
             User(  # 1
-                name="Jim",
-                password="j",
-                is_admin=True,
-                role_id=1,
-                tier="Silver"
+                name="Jim", password="j", is_admin=True, role_id=1, tier="Silver"
             ),
-            User(  # 2
-                name="Kate",
-                password="k",
-                is_admin=True,
-                role_id=1,
-                tier="Gold"
-            ),
+            User(name="Kate", password="k", is_admin=True, role_id=1, tier="Gold"),  # 2
             User(  # 3
                 name="Al",
                 password="a",
@@ -416,7 +405,7 @@ with app.app_context():
     db.session.add_all(
         [
             ResponseT2(  # 1
-                    attempt_number=1,
+                attempt_number=1,
                 user_id=1,
                 assessment_id=1,
                 t2_question_id=1,
@@ -458,10 +447,10 @@ with app.app_context():
             ),
             # PLEASE NOTE CAREFUL NOT TO CREATE RESPONSES
             # FOR QUESTIONS THAT ARE NOT LINKED TO THE GIVEN
-            # ASSESSMENT 
-            # THE POINTS WILL ADD TO THEIR RESULT 
-            # BUT THE QUESTION STILL WON'T SHOW IN THE 
-            # ASSESSMENT ITSELF 
+            # ASSESSMENT
+            # THE POINTS WILL ADD TO THEIR RESULT
+            # BUT THE QUESTION STILL WON'T SHOW IN THE
+            # ASSESSMENT ITSELF
             # ResponseT2(  # 6
             #     user_id=4,
             #     assessment_id=1,
@@ -645,7 +634,6 @@ with app.app_context():
         ]
     )
 
-
     db.session.add_all(
         [
             Tier(tier_id=1, name="Bronze", level=1),
@@ -653,7 +641,7 @@ with app.app_context():
             Tier(tier_id=3, name="Gold", level=3),
             Tier(tier_id=4, name="Emerald", level=4),
             Tier(tier_id=5, name="Ruby", level=5),
-            Tier(tier_id=6, name="Diamond", level=6)
+            Tier(tier_id=6, name="Diamond", level=6),
         ]
     )
 
