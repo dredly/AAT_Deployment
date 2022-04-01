@@ -47,7 +47,7 @@ with app.app_context():
             ),
             Assessment(  # 2
                 module_id=1,
-                lecturer_id=2,
+                lecturer_id=2,#1, #dont mind me I am for Jake testing purposes
                 title="Advanced Git",
                 due_date=None,
                 time_limit=60 * 60 * 45,
@@ -123,6 +123,7 @@ with app.app_context():
             Tag(name="computational"),
             Tag(name="decimal"),
             Tag(name="environments"),
+            Tag(name="git commands")
         ]
     )
 
@@ -210,7 +211,7 @@ with app.app_context():
             # Questions (with Assessments)
             QuestionT2(  # 1
                 assessment_id=1,
-                tag_id=1,
+                tag_id=6,
                 num_of_marks=5,
                 question_text="What flag do you use to add a commit message?",
                 correct_answer="-m",
@@ -220,6 +221,7 @@ with app.app_context():
             ),
             QuestionT2(  # 2
                 assessment_id=1,
+                tag_id=6,
                 num_of_marks=10,
                 question_text="which command is used to upload your commits to a remote repository?",
                 correct_answer="push",
@@ -374,6 +376,7 @@ with app.app_context():
     db.session.add_all(
         [
             ResponseT1(  # 1
+                attempt_number=1,
                 user_id=1,
                 assessment_id=1,
                 t1_question_id=1,
@@ -381,6 +384,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT1(  # 2
+                attempt_number=1,
                 user_id=1,
                 assessment_id=2,
                 t1_question_id=2,
@@ -388,6 +392,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT1(  # 1
+                attempt_number=1,
                 user_id=4,
                 assessment_id=1,
                 t1_question_id=1,
@@ -395,6 +400,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT1(  # 2
+                attempt_number=1,
                 user_id=4,
                 assessment_id=2,
                 t1_question_id=2,
@@ -410,6 +416,7 @@ with app.app_context():
     db.session.add_all(
         [
             ResponseT2(  # 1
+                    attempt_number=1,
                 user_id=1,
                 assessment_id=1,
                 t2_question_id=1,
@@ -417,6 +424,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 2
+                attempt_number=1,
                 user_id=1,
                 assessment_id=1,
                 t2_question_id=2,
@@ -424,6 +432,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 3
+                attempt_number=1,
                 user_id=2,
                 assessment_id=1,
                 t2_question_id=1,
@@ -432,6 +441,7 @@ with app.app_context():
             ),
             # RESPONSES for Student "s"
             ResponseT2(  # 4
+                attempt_number=1,
                 user_id=4,
                 assessment_id=1,
                 t2_question_id=1,
@@ -439,20 +449,36 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 5
+                attempt_number=1,
                 user_id=4,
                 assessment_id=1,
                 t2_question_id=2,
                 response_content="adad",
                 is_correct=False,
             ),
+            # PLEASE NOTE CAREFUL NOT TO CREATE RESPONSES
+            # FOR QUESTIONS THAT ARE NOT LINKED TO THE GIVEN
+            # ASSESSMENT 
+            # THE POINTS WILL ADD TO THEIR RESULT 
+            # BUT THE QUESTION STILL WON'T SHOW IN THE 
+            # ASSESSMENT ITSELF 
+            # ResponseT2(  # 6
+            #     user_id=4,
+            #     assessment_id=1,
+            #     t2_question_id=3,
+            #     response_content=".",
+            #     is_correct=True,
+            # ),
             ResponseT2(  # 6
+                attempt_number=1,
                 user_id=4,
-                assessment_id=1,
+                assessment_id=6,
                 t2_question_id=3,
                 response_content=".",
                 is_correct=True,
             ),
             ResponseT2(  # 7
+                attempt_number=1,
                 user_id=4,
                 assessment_id=4,
                 t2_question_id=4,
@@ -460,6 +486,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 8
+                attempt_number=1,
                 user_id=4,
                 assessment_id=9,
                 t2_question_id=8,
@@ -467,6 +494,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 9
+                attempt_number=1,
                 user_id=4,
                 assessment_id=9,
                 t2_question_id=9,
@@ -474,6 +502,7 @@ with app.app_context():
                 is_correct=False,
             ),
             ResponseT2(  # 10
+                attempt_number=1,
                 user_id=4,
                 assessment_id=9,
                 t2_question_id=10,
@@ -481,6 +510,7 @@ with app.app_context():
                 is_correct=True,
             ),
             ResponseT2(  # 11
+                attempt_number=1,
                 user_id=4,
                 assessment_id=9,
                 t2_question_id=11,
@@ -488,6 +518,7 @@ with app.app_context():
                 is_correct=False,
             ),
             ResponseT2(  # 11
+                attempt_number=1,
                 user_id=4,
                 assessment_id=9,
                 t2_question_id=12,

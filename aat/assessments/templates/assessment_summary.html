@@ -1,6 +1,21 @@
 {% extends("layout.html") %}
 {% block content %}
 <h1>{{assessment.title}}</h1>
+<section>
+    <p>This assessment will include {{ session["no_questions"] }} questions. Questions will be a mix of multiple choice and written answers.</p>
+
+    <p>You will have {{ (assessment.time_limit / 60)|round|int }} minutes to complete this assessment.</p>
+
+    {% if assessment.due_date %}
+    <p>The assessment must be completed by {{ assessment.due_date }} at 11:59pm.</p>
+    {% endif %}
+
+    <p>This assessment has an average difficulty rating of: {{ difficulty }}.</p>
+
+    <p>You will have unlimited attempts to complete this assessment. </p>
+
+    <p><em>Assessment subject tags: {% for tag in session["assessment_tags"][assessment.title] %}{{ tag }}, {% endfor %}</em></p>
+</section>
 
 
 <button type="button"><a href="{{ url_for('assessments.answer_question', type=type, question_id=first_question_id) }}">Start Assessment</a></button>
