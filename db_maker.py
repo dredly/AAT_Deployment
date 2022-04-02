@@ -451,13 +451,6 @@ with app.app_context():
             # THE POINTS WILL ADD TO THEIR RESULT
             # BUT THE QUESTION STILL WON'T SHOW IN THE
             # ASSESSMENT ITSELF
-            # ResponseT2(  # 6
-            #     user_id=4,
-            #     assessment_id=1,
-            #     t2_question_id=3,
-            #     response_content=".",
-            #     is_correct=True,
-            # ),
             ResponseT2(  # 6
                 attempt_number=1,
                 user_id=4,
@@ -513,6 +506,46 @@ with app.app_context():
                 t2_question_id=12,
                 response_content="Didn't I answer this already?",
                 is_correct=False,
+            ),
+            ResponseT2(  # 12
+                attempt_number=2,
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=8,
+                response_content="ad's a jar",
+                is_correct=False,
+            ),
+            ResponseT2(  # 13
+                attempt_number=2,
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=9,
+                response_content="ad it's a jar",
+                is_correct=False,
+            ),
+            ResponseT2(  # 14
+                attempt_number=2,
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=10,
+                response_content="ad it's a jar",
+                is_correct=False,
+            ),
+            ResponseT2(  # 15
+                attempt_number=2,
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=11,
+                response_content="Huh?",
+                is_correct=False,
+            ),
+            ResponseT2(  # 16
+                attempt_number=2,
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=12,
+                response_content="When it's a jar",
+                is_correct=True,
             ),
         ]
     )

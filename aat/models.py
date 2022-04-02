@@ -20,20 +20,26 @@ class Challenge(db.Model):
     to_user = db.Column(db.Integer, nullable=False)
     active = db.Column(db.Integer, default=0)
     difficulty = db.Column(db.Integer, default=0)
-    challenge_questions_id = db.relationship("ChallengeQuestions", backref="challenges", lazy=True)
+    challenge_questions_id = db.relationship(
+        "ChallengeQuestions", backref="challenges", lazy=True
+    )
 
 
 class ChallengeQuestions(db.Model):
     __tablename__ = "challenge_questions"
     id = db.Column(db.Integer, primary_key=True)
-    challenge_id = db.Column(db.Integer, db.ForeignKey('challenges.challenge_id'), nullable=False)
+    challenge_id = db.Column(
+        db.Integer, db.ForeignKey("challenges.challenge_id"), nullable=False
+    )
     question_id = db.Column(db.Integer, nullable=False)
+
 
 class Tier(db.Model):
     __tablename__ = "tiers"
     tier_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(10), nullable=False)
     level = db.Column(db.Integer, nullable=False)
+
 
 class Badge(db.Model):
     __tablename__ = "badges"
@@ -61,6 +67,7 @@ class Achievement(db.Model):
 
     def __repr__(self):
         return self.name
+
 
 class Awarded_Badge(db.Model):
     __tablename__ = "awarded_badges"
@@ -284,7 +291,9 @@ class User(UserMixin, db.Model):
     awarded_achievement = db.relationship(
         "Awarded_Achievement", backref="user", lazy=True
     )
-    challenge_from = db.relationship("Challenge", foreign_keys='Challenge.from_user', backref="users", lazy='dynamic')
+    challenge_from = db.relationship(
+        "Challenge", foreign_keys="Challenge.from_user", backref="users", lazy="dynamic"
+    )
     t1_responses = db.relationship(
         "ResponseT1",
         foreign_keys="ResponseT1.user_id",
@@ -332,36 +341,42 @@ class User(UserMixin, db.Model):
         return self.can(Permission.ADMIN)
 
     def has_taken(self, assessment):
-        if assessment.assessment_id is None: 
-            return False 
+        if assessment.assessment_id is None:
+            return False
 
-        type_1s = self.t1_responses.filter_by(assessment_id=assessment.assessment_id
-            ).all()
-        type_2s= self.t2_responses.filter_by(assessment_id=assessment.assessment_id
-            ).all()
-        if len(type_1s) <= 0 and len(type_2s) <=0: 
-            return False 
-        else: 
-            return True 
-    
-    def current_attempts(self, assessment): 
-        t1_responses = self.t1_responses.filter_by(assessment_id=assessment.assessment_id).all()
-        t2_responses = self.t2_responses.filter_by(assessment_id=assessment.assessment_id).all()
+        type_1s = self.t1_responses.filter_by(
+            assessment_id=assessment.assessment_id
+        ).all()
+        type_2s = self.t2_responses.filter_by(
+            assessment_id=assessment.assessment_id
+        ).all()
+        if len(type_1s) <= 0 and len(type_2s) <= 0:
+            return False
+        else:
+            return True
+
+    def current_attempts(self, assessment):
+        t1_responses = self.t1_responses.filter_by(
+            assessment_id=assessment.assessment_id
+        ).all()
+        t2_responses = self.t2_responses.filter_by(
+            assessment_id=assessment.assessment_id
+        ).all()
         attempts = dict()
-        for response in t1_responses: 
+        for response in t1_responses:
             new_key = f"t1_{response.t1_question_id}"
-            if new_key in attempts: 
+            if new_key in attempts:
                 attempts[new_key] = attempts[new_key] + 1
-            else: 
-                attempts[new_key] = 1 
-                print(response)
-        for response in t2_responses: 
+            else:
+                attempts[new_key] = 1
+                # print(response)
+        for response in t2_responses:
             new_key = f"t2_{response.t2_question_id}"
-            if new_key in attempts: 
+            if new_key in attempts:
                 attempts[new_key] = attempts[new_key] + 1
-            else: 
-                attempts[new_key] = 1 
-            print(response)
+            else:
+                attempts[new_key] = 1
+            # print(response)
         highest_number_of_responses = max(attempts, key=attempts.get)
         taken_attempts = attempts[highest_number_of_responses]
         return taken_attempts
