@@ -3,7 +3,7 @@
 <h1>{{ question.question_text }}</h1>
 <a href="{{url_for('questions.edit_question_t2', id=question.q_t2_id)}}"><button>Edit details</button></a>
 <a href="{{url_for('questions.delete_question_t2', id=question.q_t2_id)}}"><button class="delete-button">Delete
-                question</button></a>
+        question</button></a>
 {% if question.assessment_id %}
 <p>Assigned to assessment <strong>{{question.assessment.title}}</strong></p>
 {% else %}
@@ -22,4 +22,8 @@
 <p>{{question.feedback_if_correct}}</p>
 <h4>Feedback if wrong</h4>
 <p>{{question.feedback_if_wrong}}</p>
+<h4>Feedforward if correct</h4>
+<p>{{question.feedforward_if_correct}}</p>
+<h4>Feedforward if wrong</h4>
+<p>{{question.feedforward_if_wrong}}</p>
 {% endblock %}
