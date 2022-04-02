@@ -20,22 +20,40 @@ ul {
     list-style: none;
 }
 
-nav a {
-    float: left;
-    color: #ffffff;
-    text-align: center;
-    padding: 14px 16px;
-    padding-top: 0px;
-    text-decoration: none;
-    font-size: 17px;
-    padding-left: 0;
+nav,
+footer {
+	background: black;
+	color: white;
 }
 
-nav {
-    background-color: rgb(26, 26, 26);
-    overflow: hidden;
+nav ul {
+	display: flex;
+	flex-direction: row;
+	margin: 0;
 }
 
+nav li {
+	list-style: none;
+	margin: 1rem 1rem;
+}
+
+nav li a,
+nav li a:visited {
+	color: white;
+	transition: color 0.2s ease-in-out;
+}
+
+nav li a:hover {
+	color: red;
+}
+
+nav li.admin {
+	margin-left: auto;
+}
+
+nav li a {
+	text-decoration: none;
+}
 .divider {
     height: 18px;
     border-top-style:ridge;
@@ -81,6 +99,10 @@ nav {
     text-align: center;
     border-bottom: 3px solid rgb(0, 0, 0);
     font-size: 30px;
+}
+
+#user-leaderboard {
+    font-size: large;
 }
 
 .content-container {
@@ -155,7 +177,7 @@ nav {
 }
 
 .question-megacontainer {
-    color: aliceblue;
+    color: rgb(0, 0, 0);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -307,4 +329,73 @@ nav {
     display: flex;
     flex-direction: row;
     /* margin: 0 auto; */;
+}
+
+.challenges-container {
+    display: flex;
+    background-color: #ffffff;
+    margin-left: 50px;
+    margin-right: 50px;
+    padding: 10px;
+    height: auto;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.challenges-content {
+    background-color: rgb(255, 255, 255);
+    width: 95%;
+    height: 88%;
+    display: flex;
+    flex-direction: row;
+    /* margin: 0 auto; */;
+}
+
+.challenge-creator {
+    margin: 20px;
+    background-color: rgb(255, 255, 255);
+    flex: 1;
+    border: 3px solid black;
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+    height: 150px;
+}
+
+.challenge-notification {
+    margin: 20px;
+    background-color: rgb(255, 255, 255);
+    flex: 1;
+    border: 3px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.challenge-creator form * {
+    margin-bottom: 5px;
+}
+
+.incoming-challenges {
+    text-align: center;
+}
+
+.outgoing-challenges {
+    text-align: center;
+}
+
+.active-challenges {
+    text-align: center;
+    padding-bottom: 10px;
+}
+
+footer {
+	position:static;
+	bottom:0px;
+	text-align: center;
+	width: 100%;
 }

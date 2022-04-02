@@ -1,11 +1,6 @@
-from pydoc import describe
-from unicodedata import name
-from aat import db
-from aat import Role
-from aat import app
+from aat import app, db, Role
 
 from aat.models import *
-
 
 with app.app_context():
     db.drop_all()
@@ -48,7 +43,7 @@ with app.app_context():
             ),
             Assessment(  # 2
                 module_id=1,
-                lecturer_id=2,#1, #dont mind me I am for Jake testing purposes
+                lecturer_id=2,  # 1, #dont mind me I am for Jake testing purposes
                 title="Advanced Git",
                 due_date=None,
                 time_limit=60 * 60 * 45,
@@ -124,7 +119,7 @@ with app.app_context():
             Tag(name="computational"),
             Tag(name="decimal"),
             Tag(name="environments"),
-            Tag(name="git commands")
+            Tag(name="git commands"),
         ]
     )
 
@@ -142,6 +137,8 @@ with app.app_context():
                 difficulty=1,
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT1(  # 2
                 assessment_id=2,
@@ -150,6 +147,8 @@ with app.app_context():
                 difficulty=3,
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT1(  # 3
                 assessment_id=2,
@@ -158,6 +157,8 @@ with app.app_context():
                 difficulty=2,
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             # Floating Questions
             QuestionT1(  # 4
@@ -166,6 +167,8 @@ with app.app_context():
                 difficulty=1,
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT1(  # 5
                 num_of_marks=5,
@@ -173,6 +176,8 @@ with app.app_context():
                 difficulty=1,
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
         ]
     )
@@ -219,6 +224,8 @@ with app.app_context():
                 difficulty=1,
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT2(  # 2
                 assessment_id=1,
@@ -229,6 +236,8 @@ with app.app_context():
                 difficulty=1,
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT2(  # 3
                 assessment_id=3,
@@ -238,6 +247,8 @@ with app.app_context():
                 difficulty=2,
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Better luck next time :)",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT2(  # 4
                 assessment_id=4,
@@ -247,6 +258,8 @@ with app.app_context():
                 difficulty=3,
                 feedback_if_correct="WOOF!",
                 feedback_if_wrong="GRRRRRRRRRR",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             # Floating Questions
             QuestionT2(  # 5
@@ -256,6 +269,8 @@ with app.app_context():
                 difficulty=3,
                 feedback_if_correct="Thats's right!",
                 feedback_if_wrong="WRONG",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT2(  # 6
                 num_of_marks=4,
@@ -264,6 +279,8 @@ with app.app_context():
                 difficulty=1,
                 feedback_if_correct="Indeed it was!",
                 feedback_if_wrong="WRONG!!!",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT2(  # 7
                 num_of_marks=5,
@@ -272,6 +289,8 @@ with app.app_context():
                 difficulty=2,
                 feedback_if_correct="Yup!",
                 feedback_if_wrong="nope that's wrong",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             # More Questions (with Assessments)
             QuestionT2(  # 8
@@ -282,6 +301,8 @@ with app.app_context():
                 difficulty=3,
                 feedback_if_correct="Truth incarnate",
                 feedback_if_wrong="YOU SUCK",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT2(  # 9
                 assessment_id=9,
@@ -291,6 +312,8 @@ with app.app_context():
                 difficulty=3,
                 feedback_if_correct="Truth incarnate",
                 feedback_if_wrong="YOU SUCK",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT2(  # 10
                 assessment_id=9,
@@ -300,6 +323,8 @@ with app.app_context():
                 difficulty=3,
                 feedback_if_correct="Truth incarnate",
                 feedback_if_wrong="YOU SUCK",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT2(  # 11
                 assessment_id=9,
@@ -309,6 +334,8 @@ with app.app_context():
                 difficulty=3,
                 feedback_if_correct="Truth incarnate",
                 feedback_if_wrong="YOU SUCK",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT2(  # 12
                 assessment_id=9,
@@ -318,6 +345,8 @@ with app.app_context():
                 difficulty=3,
                 feedback_if_correct="Truth incarnate",
                 feedback_if_wrong="YOU SUCK",
+                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
         ]
     )
@@ -328,19 +357,9 @@ with app.app_context():
     db.session.add_all(
         [
             User(  # 1
-                name="Jim",
-                password="j",
-                is_admin=True,
-                role_id=1,
-                tier="Silver"
+                name="Jim", password="j", is_admin=True, role_id=1, tier="Silver"
             ),
-            User(  # 2
-                name="Kate",
-                password="k",
-                is_admin=True,
-                role_id=1,
-                tier="Gold"
-            ),
+            User(name="Kate", password="k", is_admin=True, role_id=1, tier="Gold"),  # 2
             User(  # 3
                 name="Al",
                 password="a",
@@ -417,7 +436,7 @@ with app.app_context():
     db.session.add_all(
         [
             ResponseT2(  # 1
-                    attempt_number=1,
+                attempt_number=1,
                 user_id=1,
                 assessment_id=1,
                 t2_question_id=1,
@@ -459,32 +478,25 @@ with app.app_context():
             ),
             # PLEASE NOTE CAREFUL NOT TO CREATE RESPONSES
             # FOR QUESTIONS THAT ARE NOT LINKED TO THE GIVEN
-            # ASSESSMENT 
-            # THE POINTS WILL ADD TO THEIR RESULT 
-            # BUT THE QUESTION STILL WON'T SHOW IN THE 
-            # ASSESSMENT ITSELF 
-            # ResponseT2(  # 6
-            #     user_id=4,
-            #     assessment_id=1,
-            #     t2_question_id=3,
-            #     response_content=".",
-            #     is_correct=True,
-            # ),
+            # ASSESSMENT
+            # THE POINTS WILL ADD TO THEIR RESULT
+            # BUT THE QUESTION STILL WON'T SHOW IN THE
+            # ASSESSMENT ITSELF
             ResponseT2(  # 6
                 attempt_number=1,
                 user_id=4,
                 assessment_id=6,
                 t2_question_id=3,
-                response_content=".",
-                is_correct=True,
+                response_content="zzz",
+                is_correct=False,
             ),
             ResponseT2(  # 7
                 attempt_number=1,
                 user_id=4,
                 assessment_id=4,
                 t2_question_id=4,
-                response_content="Bark!",
-                is_correct=True,
+                response_content="zzz",
+                is_correct=False,
             ),
             ResponseT2(  # 8
                 attempt_number=1,
@@ -500,7 +512,7 @@ with app.app_context():
                 assessment_id=9,
                 t2_question_id=9,
                 response_content="When it's a jar",
-                is_correct=False,
+                is_correct=True,
             ),
             ResponseT2(  # 10
                 attempt_number=1,
@@ -525,6 +537,46 @@ with app.app_context():
                 t2_question_id=12,
                 response_content="Didn't I answer this already?",
                 is_correct=False,
+            ),
+            ResponseT2(  # 12
+                attempt_number=2,
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=8,
+                response_content="ad's a jar",
+                is_correct=False,
+            ),
+            ResponseT2(  # 13
+                attempt_number=2,
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=9,
+                response_content="ad it's a jar",
+                is_correct=False,
+            ),
+            ResponseT2(  # 14
+                attempt_number=2,
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=10,
+                response_content="ad it's a jar",
+                is_correct=False,
+            ),
+            ResponseT2(  # 15
+                attempt_number=2,
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=11,
+                response_content="Huh?",
+                is_correct=False,
+            ),
+            ResponseT2(  # 16
+                attempt_number=2,
+                user_id=4,
+                assessment_id=9,
+                t2_question_id=12,
+                response_content="When it's a jar",
+                is_correct=True,
             ),
         ]
     )
@@ -643,6 +695,26 @@ with app.app_context():
             Awarded_Achievement(id=2, user_id=1, achievement_id=4),
             Awarded_Achievement(id=3, user_id=2, achievement_id=9),
             Awarded_Achievement(id=4, user_id=3, achievement_id=9),
+        ]
+    )
+
+    db.session.add_all(
+        [
+            Tier(tier_id=1, name="Bronze", level=1),
+            Tier(tier_id=2, name="Silver", level=2),
+            Tier(tier_id=3, name="Gold", level=3),
+            Tier(tier_id=4, name="Emerald", level=4),
+            Tier(tier_id=5, name="Ruby", level=5),
+            Tier(tier_id=6, name="Diamond", level=6),
+        ]
+    )
+
+    db.session.add_all(
+        [
+            Challenge(challenge_id=1, from_user=1, to_user=3, difficulty=3),
+            Challenge(challenge_id=2, from_user=1, to_user=2),
+            Challenge(challenge_id=3, from_user=2, to_user=1, difficulty=2),
+            Challenge(challenge_id=4, from_user=2, to_user=3),
         ]
     )
 

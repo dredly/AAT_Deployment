@@ -1,3 +1,4 @@
+<script src = "https://d3js.org/d3.v7.min.js" ></script>
 {% extends("layout.html") %}
 {% block content %}
 <a href="{{ url_for('staff_stats.index') }}">BACK</a>
@@ -25,6 +26,40 @@
                 Wrong Answers: {{t1Wrong.get(question.q_t1_id)}}
                 Pass rate: {{t1percentages.pop(0)}}%
                 </p>
+                <div id="t1vis{{question.assessment_id}}{{question.q_t1_id}}"></div>
+                <script>
+                    var data = ["{{t1Wrong.get(question.q_t1_id)}}","{{t1Correct.get(question.q_t1_id)}}"];
+                    var svg = d3.select("#t1vis{{question.assessment_id}}{{question.q_t1_id}}").append('svg').attr("width",300).attr("height",200),
+                    width = svg.attr("width"),
+                    height = svg.attr("height"),
+                    radius = Math.min(width, height) / 2,
+                    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+                    var color = d3.scaleOrdinal(['red','green']);
+
+                    // Generate the pie
+                    var pie = d3.pie();
+
+                    // Generate the arcs
+                    var arc = d3.arc()
+                    .innerRadius(0)
+                    .outerRadius(radius);
+
+                    //Generate groups
+                    var arcs = g.selectAll("arc")
+                                .data(pie(data))
+                                .enter()
+                                .append("g")
+                                .attr("class", "arc")
+
+                    //Draw arc paths
+                    arcs.append("path")
+                        .attr("fill", function(d, i) {
+                            return color(i);
+                        })
+                        .attr("d", arc);
+
+                </script>
             {%endif%}
         {%endif%}
     {%endfor%}
@@ -39,7 +74,41 @@
             <p>{{question.q_t2_id}}. {{question}}</p>  
             <p>Correct Answers: {{t2Correct.get(question.q_t2_id)}} 
                 Wrong Answers: {{t2Wrong.get(question.q_t2_id)}}
-                Pass rate: {{t2percentages.pop(0)}}%</p>           
+                Pass rate: {{t2percentages.pop(0)}}%</p>
+                <div id="t2vis{{question.assessment_id}}{{question.q_t2_id}}"></div>
+                <script>
+                    var data = ["{{t2Wrong.get(question.q_t2_id)}}","{{t2Correct.get(question.q_t2_id)}}"];
+                    var svg = d3.select("#t2vis{{question.assessment_id}}{{question.q_t2_id}}").append('svg').attr("width",300).attr("height",200),
+                    width = svg.attr("width"),
+                    height = svg.attr("height"),
+                    radius = Math.min(width, height) / 2,
+                    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+                    var color = d3.scaleOrdinal(['red','green']);
+
+                    // Generate the pie
+                    var pie = d3.pie();
+
+                    // Generate the arcs
+                    var arc = d3.arc()
+                    .innerRadius(0)
+                    .outerRadius(radius);
+
+                    //Generate groups
+                    var arcs = g.selectAll("arc")
+                                .data(pie(data))
+                                .enter()
+                                .append("g")
+                                .attr("class", "arc")
+
+                    //Draw arc paths
+                    arcs.append("path")
+                        .attr("fill", function(d, i) {
+                            return color(i);
+                        })
+                        .attr("d", arc);
+
+                </script>           
             {%endif%}
         {%endif%}
     {%endfor%}
