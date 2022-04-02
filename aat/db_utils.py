@@ -18,7 +18,7 @@ dictionary_of_results = results_list_totals()
 """
 
 
-def results_list_totals():
+def get_all_assessment_marks():
     """
     Returns list of dictionaries, each dictionary has the following keys:
     - 'user_id' (int)
