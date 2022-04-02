@@ -58,6 +58,8 @@ def new_question_t1():
         difficulty = request.form["difficulty"]
         feedback_if_correct = request.form["feedback_if_correct"]
         feedback_if_wrong = request.form["feedback_if_wrong"]
+        feedforward_if_correct = request.form["feedforward_if_correct"]
+        feedforward_if_wrong = request.form["feedforward_if_wrong"]
         new_question = QuestionT1(
             question_text=question_text,
             tag_id=tag_id,
@@ -65,6 +67,8 @@ def new_question_t1():
             difficulty=difficulty,
             feedback_if_correct=feedback_if_correct,
             feedback_if_wrong=feedback_if_wrong,
+            feedforward_if_correct=feedforward_if_correct,
+            feedforward_if_wrong=feedforward_if_wrong,
         )
         db.session.add(new_question)
         found_question = QuestionT1.query.filter(
@@ -164,6 +168,8 @@ def new_question_t2():
         difficulty = request.form["difficulty"]
         feedback_if_correct = request.form["feedback_if_correct"]
         feedback_if_wrong = request.form["feedback_if_wrong"]
+        feedforward_if_correct = request.form["feedforward_if_correct"]
+        feedforward_if_wrong = request.form["feedforward_if_wrong"]
         new_question = QuestionT2(
             question_text=question_text,
             correct_answer=correct_answer,
@@ -172,6 +178,8 @@ def new_question_t2():
             difficulty=difficulty,
             feedback_if_correct=feedback_if_correct,
             feedback_if_wrong=feedback_if_wrong,
+            feedforward_if_correct=feedforward_if_correct,
+            feedforward_if_wrong=feedforward_if_wrong,
         )
         db.session.add(new_question)
         db.session.commit()
