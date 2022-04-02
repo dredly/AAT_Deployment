@@ -149,38 +149,38 @@ with app.app_context():
                 question_text="What does git rebase do?",
                 difficulty=3,
                 feedback_if_correct="Well done!",
-                feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                feedback_if_wrong="Make sure you understand the differencs between rebase and merge",
+                feedforward_if_correct="Well done. To learn more about the use cases for rebase see link PLACEHOLDER",
+                feedforward_if_wrong="Make sure you can complete all the question from the git basics assessment",
             ),
             QuestionT1(  # 3
                 assessment_id=2,
                 num_of_marks=5,
                 question_text="What does git stash do?",
                 difficulty=2,
-                feedback_if_correct="Well done!",
-                feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                feedback_if_correct="Well done! This is most often used when you want to go back to a clean working directory. ",
+                feedback_if_wrong="Not quite.",
+                feedforward_if_correct="Well done. To learn even more, look up the different ways of calling git stash, such as git stash list and git stash apply. ",
+                feedforward_if_wrong="Make sure to read through all lecture notes on advanced git commands",
             ),
             # Floating Questions
             QuestionT1(  # 4
                 num_of_marks=5,
                 question_text="What is the initial capacity of an array list?",
                 difficulty=1,
-                feedback_if_correct="Well done!",
+                feedback_if_correct="Well done! The capacity can also be manually changed on creation.",
                 feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                feedforward_if_correct="Well done. For further reading, you could look up other similar data structures in Java, such as Lists and Linked Lists.",
+                feedforward_if_wrong="The official Java API documentation is a great place to find this information and much more.",
             ),
             QuestionT1(  # 5
                 num_of_marks=5,
                 question_text="What does SQL stand for?",
                 difficulty=1,
-                feedback_if_correct="Well done!",
-                feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                feedback_if_correct="That's right! Structured query language is used to manage relational databases.",
+                feedback_if_wrong="I hope you didn't choose super quick lunch at least",
+                feedforward_if_correct="Well done. Look into Sqlite if you want to try using an SQL database.",
+                feedforward_if_wrong="Make sure to go over basic definitions",
             ),
         ]
     )
@@ -193,22 +193,30 @@ with app.app_context():
             Option(q_t1_id=1, option_text="checkout", is_correct=True),  # 1
             Option(q_t1_id=1, option_text="reset"),  # 2
             Option(q_t1_id=1, option_text="commit"),  # 3
-            Option(q_t1_id=2, option_text="wrong answer"),  # 4
-            Option(q_t1_id=2, option_text="right answer", is_correct=True),  # 5
-            Option(q_t1_id=2, option_text="also the wrong answer"),  # 6
-            Option(q_t1_id=3, option_text="wrong answer"),  # 7
-            Option(q_t1_id=3, option_text="right answer", is_correct=True),  # 8
-            Option(q_t1_id=3, option_text="another wrong answer"),  # 9
+            Option(q_t1_id=2, option_text="deletes the entire repository"),  # 4
+            Option(
+                q_t1_id=2,
+                option_text="moves or combines a sequence of commits to a new base commit",
+                is_correct=True,
+            ),  # 5
+            Option(
+                q_t1_id=2, option_text="reverses changes made by a certain user"
+            ),  # 6
+            Option(q_t1_id=3, option_text="deletes the current branch"),  # 7
+            Option(
+                q_t1_id=3,
+                option_text="records the current state of the working directory and the index",
+                is_correct=True,
+            ),  # 8
+            Option(q_t1_id=3, option_text="unstages all staged changes"),  # 9
             Option(q_t1_id=4, option_text="12"),  # 10
             Option(q_t1_id=4, option_text="10", is_correct=True),  # 11
             Option(q_t1_id=4, option_text="100"),  # 12
             Option(q_t1_id=5, option_text="Super Quick Lunch"),  # 13
             Option(
-                q_t1_id=5, option_text="Standard Query Language", is_correct=True
+                q_t1_id=5, option_text="Structured Query Language", is_correct=True
             ),  # 14
-            Option(
-                q_t1_id=5, option_text="Why did I choose the databases module?????"
-            ),  # 15
+            Option(q_t1_id=5, option_text="Standard Query Language"),  # 15
         ]
     )
 
