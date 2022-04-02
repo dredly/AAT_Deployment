@@ -17,15 +17,15 @@ with app.app_context():
     db.session.add_all(
         [
             Module(  # 1
-                title="Databases and Modelling",
+                title="Version Control and Large Projects",
                 total_credits=120,
             ),
             Module(  # 2
-                title="Advanced BennieScript",
+                title="Front End Web Development",
                 total_credits=30,
             ),
             Module(  # 3
-                title="Jinjavitus",
+                title="Algorithms",
                 total_credits=80,
             ),
         ]
@@ -38,7 +38,7 @@ with app.app_context():
         [
             Assessment(  # 1
                 module_id=1,
-                lecturer_id=1,
+                lecturer_id=7,
                 title="Git Basics",
                 due_date=None,
                 time_limit=60 * 60 * 30,
@@ -47,7 +47,7 @@ with app.app_context():
             ),
             Assessment(  # 2
                 module_id=1,
-                lecturer_id=2,  # 1, #dont mind me I am for Jake testing purposes
+                lecturer_id=7,  # 1, #dont mind me I am for Jake testing purposes
                 title="Advanced Git",
                 due_date=None,
                 time_limit=60 * 60 * 45,
@@ -55,8 +55,8 @@ with app.app_context():
                 is_summative=True,
             ),
             Assessment(  # 3
-                module_id=1,
-                lecturer_id=3,
+                module_id=2,
+                lecturer_id=9,
                 title="DOM Manipulation in JS",
                 due_date=None,
                 time_limit=60 * 60 * 20,
@@ -64,49 +64,52 @@ with app.app_context():
                 is_summative=False,
             ),
             Assessment(  # 4
-                module_id=2,
-                lecturer_id=1,
-                title="Woof",
+                module_id=3,
+                lecturer_id=8,
+                title="Sorting Algorithms",
                 due_date=None,
                 num_of_credits=10,
                 is_summative=True,
             ),
             Assessment(  # 5
-                module_id=2,
-                lecturer_id=1,
-                title="Formative Assessment",
+                module_id=3,
+                lecturer_id=8,
+                title="B Trees",
                 due_date=None,
                 time_limit=60 * 60 * 30,
                 num_of_credits=12,
                 is_summative=False,
             ),
             Assessment(  # 6
-                lecturer_id=2,
-                title="No Module Summative",
+                module_id=3,
+                lecturer_id=8,
+                title="Pathfinding algorithms",
                 due_date=None,
                 time_limit=60 * 60 * 45,
                 num_of_credits=10,
                 is_summative=True,
             ),
             Assessment(  # 7
-                lecturer_id=3,
-                title="No module Formative",
+                module_id=2,
+                lecturer_id=9,
+                title="ReactJS Basics",
                 due_date=None,
                 time_limit=60 * 60 * 20,
                 num_of_credits=40,
                 is_summative=False,
             ),
             Assessment(  # 8
-                lecturer_id=1,
-                title=" A title",
+                module_id=2,
+                lecturer_id=9,
+                title="Flexbox and Grid",
                 due_date=None,
                 num_of_credits=10,
                 is_summative=True,
             ),
             Assessment(  # 9
-                module_id=3,
-                lecturer_id=1,
-                title="Tuesday Trauma",
+                module_id=2,
+                lecturer_id=9,
+                title="Semantic HTML",
                 due_date=None,
                 num_of_credits=20,
                 is_summative=True,
@@ -118,12 +121,12 @@ with app.app_context():
     #######
     db.session.add_all(
         [
-            Tag(name="abstract"),
-            Tag(name="boolean"),
-            Tag(name="computational"),
-            Tag(name="decimal"),
-            Tag(name="environments"),
-            Tag(name="git commands"),
+            Tag(name="abstract"),  # 1
+            Tag(name="boolean"),  # 2
+            Tag(name="computational"),  # 3
+            Tag(name="decimal"),  # 4
+            Tag(name="environments"),  # 5
+            Tag(name="git commands"),  # 6
         ]
     )
 
@@ -135,13 +138,13 @@ with app.app_context():
             # Questions on assignments
             QuestionT1(  # 1
                 assessment_id=1,
-                tag_id=1,
+                tag_id=6,
                 num_of_marks=2,
                 question_text="Which command do use use to view a particular commit?",
                 difficulty=1,
-                feedback_if_correct="Well done!",
-                feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedback_if_correct="Well done! git checkout can also be used to view a particular branch",
+                feedback_if_wrong="Be sure to go over the lecture notes on git commands",
+                feedforward_if_correct="Well done. To learn more about git commits see link PLACEHOLDER",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT1(  # 2
@@ -226,7 +229,7 @@ with app.app_context():
                 question_text="What flag do you use to add a commit message?",
                 correct_answer="-m",
                 difficulty=1,
-                feedback_if_correct="Well done!",
+                feedback_if_correct="Well done! <a href='https://blog.thoughtram.io/git/2014/11/18/the-anatomy-of-a-git-commit.html'>link</a>",
                 feedback_if_wrong="Better luck next time :)",
                 feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
@@ -389,6 +392,25 @@ with app.app_context():
                 password="a",
                 is_admin=False,
                 role_id=3,
+            ),
+            # Making some more realistic sounding lecturers
+            User(  # 7
+                name="John Branchman",
+                password="j",
+                is_admin=True,
+                role_id=2,
+            ),
+            User(  # 8
+                name="Alice Bubblesort",
+                password="a",
+                is_admin=True,
+                role_id=2,
+            ),
+            User(  # 9
+                name="Jean Consolog",
+                password="j",
+                is_admin=True,
+                role_id=2,
             ),
         ]
     )
