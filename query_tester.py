@@ -18,25 +18,82 @@ with app.app_context():
         - Total marks
         - Possible marks
     """
+
+    attempt_totals_t1 = (
+        db.session.query(User, QuestionT1, ResponseT1, Module, Assessment)
+        .with_entities(
+            User.id,
+            Module.module_id,
+            Assessment.assessment_id,
+            ResponseT1.attempt_number,
+            func.sum(QuestionT1.num_of_marks)
+            .filter(ResponseT1.is_correct == True)
+            .label("correct_marks"),
+            func.sum(QuestionT1.num_of_marks).label("possible_marks"),
+        )
+        .select_from(User)
+        .join(ResponseT1)
+        .join(QuestionT1)
+        .join(Assessment)
+        .join(Module)
+        .group_by(User)
+        .group_by(ResponseT1.attempt_number)
+    )
+
     attempt_totals_t2 = (
         db.session.query(User, QuestionT2, ResponseT2, Module, Assessment)
         .with_entities(
-            User,
-            Module.title,
+            User.id,
+            Module.module_id,
+            Assessment.assessment_id,
             ResponseT2.attempt_number,
-            func.sum(QuestionT2.num_of_marks).filter(ResponseT2.is_correct == True),
-            func.sum(QuestionT2.num_of_marks),
+            func.sum(QuestionT2.num_of_marks)
+            .filter(ResponseT2.is_correct == True)
+            .label("correct_marks"),
+            func.sum(QuestionT2.num_of_marks).label("possible_marks"),
         )
         .select_from(User)
         .join(ResponseT2)
         .join(QuestionT2)
         .join(Assessment)
+        .join(Module)
         .group_by(User)
         .group_by(ResponseT2.attempt_number)
-        .all()
     )
 
-    pprint(attempt_totals_t2)
+    # UNION: https://docs.sqlalchemy.org/en/14/orm/query.html
+    all_values = attempt_totals_t1.union_all(attempt_totals_t2)
+
+    results_list = []
+
+    for row in all_values:
+        marks_dict = {}
+        user_id = row[0]
+        module_id = row[1]
+        assessment_id = row[2]
+        attempt_number = row[3]
+        correct_marks = row[4]
+        possible_marks = row[5]
+        for entry in results_list:
+            if (
+                entry["user_id"] == user_id
+                and entry["module_id"] == module_id
+                and entry["assessment_id"] == assessment_id
+                and entry["attempt_number"] == attempt_number
+            ):
+                entry["correct_marks"] += correct_marks
+                entry["possible_marks"] += possible_marks
+        else:
+            marks_dict["user_id"] = user_id
+            marks_dict["module_id"] = user_id
+            marks_dict["assessment_id"] = assessment_id
+            marks_dict["attempt_number"] = attempt_number
+            marks_dict["correct_marks"] = correct_marks
+            marks_dict["possible_marks"] = possible_marks
+
+        results_list.append(marks_dict)
+
+    pprint(results_list)
 
     """
     # ALL MODULES AND ASSESSMENTS
