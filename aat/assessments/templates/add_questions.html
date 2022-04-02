@@ -8,7 +8,7 @@
 <h3>Add a new question</h3>
 
 <a href="{{url_for('assessments.create_questions_t1', id=assessment.assessment_id)}}"><button>Type 1</button></a>
-<a href="{{url_for('questions.new_question_t2')}}"><button>Type 2</button></a>
+<a href="{{url_for('assessments.create_question_t2', id=assessment.assessment_id)}}"><button>Type 2</button></a>
 
 {% for question in questions %}
     <h2>{{ question.question_text }}</h2>

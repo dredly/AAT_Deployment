@@ -108,5 +108,34 @@ class CreateQuestionT1Form(FlaskForm):
     )
     submit = SubmitField("Add question")
 
+class CreateQuestionT2Form(FlaskForm):
+    question_text = TextAreaField(
+        "Enter question text", default="", validators=[DataRequired()]
+    )
+    correct_answer = TextAreaField(
+        "Enter the correct answer", validators=[DataRequired()]
+    )
+    tag = SelectField("Select a tag for the question.", choices=[])
+    num_of_marks = IntegerField(
+        "How many marks?", validators=[DataRequired(), NumberRange(min=0)]
+    )
+    difficulty = IntegerRangeField("Select a difficulty from 1 to 3 (1 being easiest)")
+    feedback_if_correct = TextAreaField(
+        "Enter feedback to be shown if answered correctly", validators=[DataRequired()]
+    )
+    feedback_if_wrong = TextAreaField(
+        "Enter feedback to be shown if answered incorrectly",
+        validators=[DataRequired()],
+    )
+    feedforward_if_correct = TextAreaField(
+        "Enter feedforward to be shown if answered correctly",
+        validators=[DataRequired()],
+    )
+    feedforward_if_wrong = TextAreaField(
+        "Enter feedforward to be shown if answered incorrectly",
+        validators=[DataRequired()],
+    )
+    submit = SubmitField("Add question")
+
 class FinishForm(FlaskForm):
     finish = SubmitField(label="Finish")
