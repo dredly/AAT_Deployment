@@ -19,6 +19,16 @@ from ..models import (
     ResponseT2,
 )
 
+# Database Util Functions
+from ..db_utils import get_all_assessment_marks
+
+
+@student_stats.route("/rich")
+def rich():
+    print(get_all_assessment_marks())
+    return "hi"
+
+
 #### QUERY ####
 # db.session.query(func.avg(QuestionT2.num_of_marks)).filter_by(assessment_id=1))
 # db.session.query(func.avg(QuestionT2.num_of_marks)).filter_by(assessment_id=1).all()
