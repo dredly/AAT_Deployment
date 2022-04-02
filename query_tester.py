@@ -7,8 +7,22 @@ from sqlalchemy import (
 )  # https://docs.sqlalchemy.org/en/14/core/functions.html?highlight=func#module-sqlalchemy.sql.functions
 
 with app.app_context():
+    # ALL MODULES AND ASSESSMENTS
+    all_modules_and_assessments = (
+        db.session.query(User, Assessment, Module)
+        .with_entities(Module.title, Assessment.title)
+        .select_from(User)
+        .join(Assessment)
+        .join(Module)
+        .group_by(Module.title)
+        .group_by(Assessment.title)
+    ).all()
+
+    pprint(f"{all_modules_and_assessments=}")
+
+    # USER-FILTERED QUERIES
     user_id = 4
-    q = (
+    base_query = (
         db.session.query(User, ResponseT2, QuestionT2, Assessment, Module)
         .select_from(User)
         .join(ResponseT2)
@@ -18,28 +32,26 @@ with app.app_context():
         .filter(User.id == user_id)
     )
 
-    possible_marks_query = (
-        q.with_entities(
+    marks_query = (
+        base_query.with_entities(
             Module.title,
             Assessment.title,
             ResponseT2.attempt_number,
+            func.sum(QuestionT2.num_of_marks).filter(ResponseT2.is_correct == True),
             func.sum(QuestionT2.num_of_marks),
         )
         .group_by(Module.title)
         .group_by(Assessment.title)
         .group_by(ResponseT2.attempt_number)
-    )
+    ).all()
 
-    correct_marks_query = possible_marks_query.filter(ResponseT2.is_correct == True)
+    pprint(f"{marks_query=}")
 
-    pprint(possible_marks_query.all())
-    pprint(correct_marks_query.all())
+    # module_query = q.with_entities(Module.title).group_by(Module.title).all()
 
-    module_query = q.with_entities(Module.title).group_by(Module.title).all()
-
-    assessment_query = (
-        q.with_entities(Assessment.title).group_by(Assessment.title).all()
-    )
+    # assessment_query = (
+    #     q.with_entities(Assessment.title).group_by(Assessment.title).all()
+    # )
     # marks_query = db.engine.execute(User.select())
 
     # marks_query = db.engine.execute(select(func.count()).select_from(q))

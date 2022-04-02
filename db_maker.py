@@ -1,9 +1,6 @@
-from aat import db
-from aat import Role
-from aat import app
+from aat import app, db, Role
 
 from aat.models import *
-
 
 with app.app_context():
     db.drop_all()
@@ -456,16 +453,16 @@ with app.app_context():
                 user_id=4,
                 assessment_id=6,
                 t2_question_id=3,
-                response_content=".",
-                is_correct=True,
+                response_content="zzz",
+                is_correct=False,
             ),
             ResponseT2(  # 7
                 attempt_number=1,
                 user_id=4,
                 assessment_id=4,
                 t2_question_id=4,
-                response_content="Bark!",
-                is_correct=True,
+                response_content="zzz",
+                is_correct=False,
             ),
             ResponseT2(  # 8
                 attempt_number=1,
@@ -481,7 +478,7 @@ with app.app_context():
                 assessment_id=9,
                 t2_question_id=9,
                 response_content="When it's a jar",
-                is_correct=False,
+                is_correct=True,
             ),
             ResponseT2(  # 10
                 attempt_number=1,
@@ -544,8 +541,8 @@ with app.app_context():
                 user_id=4,
                 assessment_id=9,
                 t2_question_id=12,
-                response_content="When it's a jar",
-                is_correct=True,
+                response_content="zzz",
+                is_correct=False,
             ),
         ]
     )
