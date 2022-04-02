@@ -5,6 +5,7 @@ from datetime import date
 from wtforms import (
     TextAreaField,
     IntegerField,
+    IntegerRangeField,
     SubmitField,
     SelectMultipleField,
     BooleanField,
@@ -64,7 +65,7 @@ class EditAssessmentForm(FlaskForm):
     num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     is_summative = BooleanField("Select if Assessment is summative")
-    submit = SubmitField("Done")
+    submit = SubmitField("Add Questions")
 
 class RemoveQuestionForm(FlaskForm):
     submit = SubmitField("Remove")
@@ -72,6 +73,40 @@ class RemoveQuestionForm(FlaskForm):
 
 class AddQuestionToAssessmentForm(FlaskForm):
     add = SubmitField(label="Add to Assessment")
+
+class CreateQuestionT1Form(FlaskForm):
+    question_text = TextAreaField(
+        "Enter question text", default="", validators=[DataRequired()]
+    )
+    option_a = TextAreaField("Please enter option a", validators=[DataRequired()])
+    option_b = TextAreaField("Please enter option b", validators=[DataRequired()])
+    option_c = TextAreaField("Please enter option c", validators=[DataRequired()])
+    correct_option = RadioField(
+        "Correct Option",
+        choices=[(0, "option a"), (1, "option b"), (2, "option c")],
+        validators=[DataRequired()],
+    )
+    tag = SelectField("Select a tag for the question.", choices=[])
+    num_of_marks = IntegerField(
+        "How many marks?", validators=[DataRequired(), NumberRange(min=0)]
+    )
+    difficulty = IntegerRangeField("Select a difficulty from 1 to 3 (1 being easiest)")
+    feedback_if_correct = TextAreaField(
+        "Enter feedback to be shown if answered correctly", validators=[DataRequired()]
+    )
+    feedback_if_wrong = TextAreaField(
+        "Enter feedback to be shown if answered incorrectly",
+        validators=[DataRequired()],
+    )
+    feedforward_if_correct = TextAreaField(
+        "Enter feedforward to be shown if answered correctly",
+        validators=[DataRequired()],
+    )
+    feedforward_if_wrong = TextAreaField(
+        "Enter feedforward to be shown if answered incorrectly",
+        validators=[DataRequired()],
+    )
+    submit = SubmitField("Add question")
 
 class FinishForm(FlaskForm):
     finish = SubmitField(label="Finish")
