@@ -1,37 +1,34 @@
-from aat import db, app
-from aat.models import *
+# from . import db, app
+from .models import *
 from pprint import pprint
 from sqlalchemy import (
     select,
     func,
 )  # https://docs.sqlalchemy.org/en/14/core/functions.html?highlight=func#module-sqlalchemy.sql.functions
 
-with app.app_context():
+
+"""
+To use db_utils from inside a blueprint:
+
+- Import statement:
+from ..db_utils import results_list_totals
+
+- Call functions:
+dictionary_of_results = results_list_totals()
+"""
+
+
+def results_list_totals():
     """
     Returns list of dictionaries, each dictionary has the following keys:
-        - 'user_id' (int)
-        - 'module_id' (int)
-        - 'assessment_id' (int)
-        - 'attempt_number' (int)
-        - 'correct_marks' (int)
-        - 'possible_marks' (int)
-        - 'highest_value' (bool)
-
-    STEP ONE:
-    - Get sum of marks (T1 & T2) for all attempts, then mark which attempt scored highest.
-    - If multiple versions score highest then first one is kept.
-
-    SPLIT by T1 T2
-    Calculate attempt totals:
-    - Grouped by
-        - User ID
-        - Assessment ID
-        - Module ID
-    - Values
-        - Total marks
-        - Possible marks
+    - 'user_id' (int)
+    - 'module_id' (int)
+    - 'assessment_id' (int)
+    - 'attempt_number' (int)
+    - 'correct_marks' (int)
+    - 'possible_marks' (int)
+    - 'highest_value' (bool)
     """
-
     attempt_totals_t1 = (
         db.session.query(User, QuestionT1, ResponseT1, Module, Assessment)
         .with_entities(
@@ -121,7 +118,8 @@ with app.app_context():
             ):
                 if comparison["correct_marks"] > row["correct_marks"]:
                     row["highest_value"] = False
-    pprint(results_list)
+    # pprint(results_list)
+    return results_list
 
     """
     # ALL MODULES AND ASSESSMENTS
