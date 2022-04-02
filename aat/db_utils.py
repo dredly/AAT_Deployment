@@ -24,6 +24,7 @@ def get_all_assessment_marks():
     - 'user_id' (int)
     - 'module_id' (int)
     - 'assessment_id' (int)
+    - 'lecturer_id' (int)
     - 'attempt_number' (int)
     - 'correct_marks' (int)
     - 'possible_marks' (int)
@@ -35,6 +36,7 @@ def get_all_assessment_marks():
             User.id,
             Module.module_id,
             Assessment.assessment_id,
+            Assessment.lecturer_id,
             ResponseT1.attempt_number,
             func.sum(QuestionT1.num_of_marks)
             .filter(ResponseT1.is_correct == True)
@@ -49,6 +51,7 @@ def get_all_assessment_marks():
         .group_by(User.id)
         .group_by(Module.module_id)
         .group_by(Assessment.assessment_id)
+        .group_by(Assessment.lecturer_id)
         .group_by(ResponseT1.attempt_number)
     )
 
@@ -58,6 +61,7 @@ def get_all_assessment_marks():
             User.id,
             Module.module_id,
             Assessment.assessment_id,
+            Assessment.lecturer_id,
             ResponseT2.attempt_number,
             func.sum(QuestionT2.num_of_marks)
             .filter(ResponseT2.is_correct == True)
@@ -72,6 +76,7 @@ def get_all_assessment_marks():
         .group_by(User.id)
         .group_by(Module.module_id)
         .group_by(Assessment.assessment_id)
+        .group_by(Assessment.lecturer_id)
         .group_by(ResponseT2.attempt_number)
     )
 
@@ -86,9 +91,10 @@ def get_all_assessment_marks():
         user_id = row[0]
         module_id = row[1]
         assessment_id = row[2]
-        attempt_number = row[3]
-        correct_marks = row[4] if row[4] is not None else 0
-        possible_marks = row[5]
+        lecturer_id = row[3]
+        attempt_number = row[4]
+        correct_marks = row[5] if row[5] is not None else 0
+        possible_marks = row[6]
         for entry in results_list:
             if (
                 entry["user_id"] == user_id
@@ -101,6 +107,7 @@ def get_all_assessment_marks():
             marks_dict["user_id"] = user_id
             marks_dict["module_id"] = user_id
             marks_dict["assessment_id"] = assessment_id
+            marks_dict["lecturer_id"] = lecturer_id
             marks_dict["attempt_number"] = attempt_number
             marks_dict["correct_marks"] = correct_marks
             marks_dict["possible_marks"] = possible_marks

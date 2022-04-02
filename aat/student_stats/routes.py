@@ -20,12 +20,12 @@ from ..models import (
 )
 
 # Database Util Functions
-from ..db_utils import results_list_totals
+from ..db_utils import get_all_assessment_marks
 
 
 @student_stats.route("/rich")
 def rich():
-    print(results_list_totals())
+    print(get_all_assessment_marks())
     return "hi"
 
 
