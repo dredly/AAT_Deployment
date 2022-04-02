@@ -46,6 +46,18 @@
             </div>
             {{form.feedback_if_wrong(rows='3', cols='60')}}
         </div>
+        <div>
+            <div>
+                {{form.feedforward_if_correct.label}}
+            </div>
+            {{form.feedforward_if_correct(rows='3', cols='60')}}
+        </div>
+        <div>
+            <div>
+                {{form.feedforward_if_wrong.label}}
+            </div>
+            {{form.feedforward_if_wrong(rows='3', cols='60')}}
+        </div>
         <button type="submit">Save changes</button>
     </form>
 </div>

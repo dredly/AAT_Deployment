@@ -34,6 +34,14 @@ class QuestionT1Form(FlaskForm):
         "Enter feedback to be shown if answered incorrectly",
         validators=[DataRequired()],
     )
+    feedforward_if_correct = TextAreaField(
+        "Enter feedforward to be shown if answered correctly",
+        validators=[DataRequired()],
+    )
+    feedforward_if_wrong = TextAreaField(
+        "Enter feedforward to be shown if answered incorrectly",
+        validators=[DataRequired()],
+    )
     submit = SubmitField("Add question")
 
 
@@ -69,6 +77,14 @@ class QuestionT2Form(FlaskForm):
     )
     feedback_if_wrong = TextAreaField(
         "Enter feedback to be shown if answered incorrectly",
+        validators=[DataRequired()],
+    )
+    feedforward_if_correct = TextAreaField(
+        "Enter feedforward to be shown if answered correctly",
+        validators=[DataRequired()],
+    )
+    feedforward_if_wrong = TextAreaField(
+        "Enter feedforward to be shown if answered incorrectly",
         validators=[DataRequired()],
     )
     submit = SubmitField("Add question")
