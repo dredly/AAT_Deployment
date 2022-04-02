@@ -127,3 +127,27 @@ def get_all_assessment_marks():
                     row["highest_value"] = False
     # pprint(results_list)
     return results_list
+
+
+def get_all_assessment_questions():
+    ...
+    """
+    Combines Q1 and Q2 question types into one table of FUN
+    - user_id
+    - attempt_id
+    - question_id
+    - t1_or_t2
+    - response
+    - correct_answer
+    - marks_awarded
+    - assessment_id
+    - module_id
+    - lecturer_id
+    """
+    # attempt_totals_t1 = (
+    #     db.session.query(User, QuestionT1, ResponseT1, Module, Assessment)
+    #     .with_entities(
+    #         User.id,
+    #     )
+    #     .select_from(User)
+    # )
