@@ -12,6 +12,7 @@
 
     <!--number of credits: {{assessment.num_of_credits}}. -->
     Assessment id: {{assessmentIds[count]}}
+    <a href="{{url_for('staff_stats.view_students',assessment = assessment)}}">View Students</a>
 </h2>
    
     {%if lengthT1questions > 0 %}
@@ -24,8 +25,8 @@
             <p>{{question.q_t1_id}}. {{question.question_text}}</p>
             <p>Correct Answers: {{t1Correct.get(question.q_t1_id)}}
                 Wrong Answers: {{t1Wrong.get(question.q_t1_id)}}
-                Pass rate: {{t1percentages.pop(0)}}%
-                </p>
+                Pass rate: {{t1percentages.pop(0)}}% </p>
+                
                 <div id="t1vis{{question.assessment_id}}{{question.q_t1_id}}"></div>
                 <script>
                     var data = ["{{t1Wrong.get(question.q_t1_id)}}","{{t1Correct.get(question.q_t1_id)}}"];
@@ -107,7 +108,6 @@
                             return color(i);
                         })
                         .attr("d", arc);
-
                 </script>           
             {%endif%}
         {%endif%}

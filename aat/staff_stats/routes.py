@@ -1,6 +1,6 @@
 from . import staff_stats
 from flask_login import current_user
-from flask import render_template, url_for
+from flask import render_template, url_for, session
 
 from ..models import (
     Module,
@@ -21,7 +21,7 @@ def index():
     user = User.query.filter_by(name = current_user.name).first()
     user_id = user.id
     name = user.name
-
+    session["name"] = name
     # establish assessments linked to user within Assessment db
     Assessments = Assessment.query.all()
     Modules = Module.query.all() 
@@ -40,9 +40,7 @@ def index():
 
     return render_template("Staff-stats.html", name = name, lecturersModules = lecturersModules)
 
-@staff_stats.route("/test")
-def test():
-    return render_template("test.html")
+
 
 
 
@@ -59,9 +57,12 @@ def module(Module_title):
     Assessments = Assessment.query.all()
 
     lecturersAssessments = []
+    modulesOtherAssessments = []
     for assessment in Assessments:
         if assessment.lecturer_id == user_id and assessment.module_id == moduleId:
             lecturersAssessments.append(assessment)
+        if assessment.module_id == moduleId and assessment not in lecturersAssessments:
+            modulesOtherAssessments.append(assessment) 
     
     assessmentIds = []
     formOrSumm = []
@@ -74,6 +75,7 @@ def module(Module_title):
         else:
             formOrSumm.append("Formative")
     print("lecturers Assessments", lecturersAssessments)
+    print("Modules other assessments", modulesOtherAssessments)
     print("assessmentIds", assessmentIds)
     print("form or Sum", formOrSumm)
     
@@ -227,3 +229,30 @@ def module(Module_title):
         t2Wrong = t2Wrong,
         t2percentages = t2percentages)
 
+@staff_stats.route("/view-students/<string:assessment>")
+def view_students(assessment):
+    if "name" in session:
+        print(session["name"])
+    assessments= Assessment.query.all()
+    assessmentID = 0
+    for assessment2 in assessments:
+        if assessment2.title == assessment:
+            
+            assessmentID = assessment2.assessment_id
+    print(assessmentID)
+
+    users = User.query.all()
+    t1Questions= QuestionT1.query.all()
+    t1Responses= ResponseT1.query.all()
+    
+    t1Responses2 = []
+    for response in t1Responses:
+        if response.assessment_id == assessmentID:
+            t1Responses2.append(response) 
+
+    return render_template("view-students.html", name = session["name"],
+    assessment = assessment,
+    assessmentID = assessmentID,
+    users = users,
+    t1Questions = t1Questions,
+    t1Responses2 = t1Responses2)

@@ -1,0 +1,11 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1>Student views for {{assessment}}!</h1>
+AssID: {{assessmentID}}
+{{name}}
+{%for user in users%}
+    
+    <p>{{user.name}}</p>
+{{t1Responses2}}
+{%endfor%}
+{% endblock %}
