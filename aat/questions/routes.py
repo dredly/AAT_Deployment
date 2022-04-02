@@ -125,6 +125,8 @@ def edit_question_t1(id):
         question.difficulty = form.difficulty.data
         question.feedback_if_correct = form.feedback_if_correct.data
         question.feedback_if_wrong = form.feedback_if_wrong.data
+        question.feedforward_if_correct = form.feedforward_if_correct.data
+        question.feedforward_if_wrong = form.feedforward_if_wrong.data
         db.session.commit()
         return redirect(url_for("questions.index", id=id))
     form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
@@ -135,6 +137,8 @@ def edit_question_t1(id):
     form.difficulty.data = question.difficulty
     form.feedback_if_correct.data = question.feedback_if_correct
     form.feedback_if_wrong.data = question.feedback_if_wrong
+    form.feedforward_if_correct.data = question.feedforward_if_correct
+    form.feedforward_if_wrong.data = question.feedforward_if_wrong
     form.correct_option.data = str(options.index(correct_option))
 
     form.option_a.data = options[0]
@@ -206,6 +210,8 @@ def edit_question_t2(id):
         question.difficulty = form.difficulty.data
         question.feedback_if_correct = form.feedback_if_correct.data
         question.feedback_if_wrong = form.feedback_if_wrong.data
+        question.feedforward_if_correct = form.feedforward_if_correct.data
+        question.feedforward_if_wrong = form.feedforward_if_wrong.data
         db.session.commit()
         return redirect(url_for("questions.index", id=id))
     form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
@@ -217,6 +223,8 @@ def edit_question_t2(id):
     form.difficulty.data = question.difficulty
     form.feedback_if_correct.data = question.feedback_if_correct
     form.feedback_if_wrong.data = question.feedback_if_wrong
+    form.feedforward_if_correct.data = question.feedforward_if_correct
+    form.feedforward_if_wrong.data = question.feedforward_if_wrong
     return render_template("edit_question_t2.html", form=form)
 
 
