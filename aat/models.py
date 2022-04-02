@@ -108,13 +108,14 @@ class ResponseT1(db.Model):
 
 
 class ResponseT2(db.Model):
-    ###
-    # Response models adapted from code used to represent 'Followers'
-    # Flask Web Development, 2nd Edition by Miguel Grinberg
-    # https://learning.oreilly.com/library/view/flask-web-development/9781491991725/ch13.html
-    # Particular sections used include:
-    # ------ Chapter 12: Followers
-    ###
+    """
+    Response models adapted from code used to represent 'Followers'
+    Flask Web Development, 2nd Edition by Miguel Grinberg
+    https://learning.oreilly.com/library/view/flask-web-development/9781491991725/ch13.html
+    Particular sections used include:
+    ------ Chapter 12: Followers
+    """
+
     __tablename__ = "t2_responses"
     attempt_number = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
@@ -267,14 +268,15 @@ class Module(db.Model):
 
 
 class User(UserMixin, db.Model):
-    ###
-    # User and Role Models, and their included methods, adapted from
-    # Flask Web Development, 2nd Edition by Miguel Grinberg
-    # https://learning.oreilly.com/library/view/flask-web-development/9781491991725/ch13.html
-    # Particular sections used include:
-    # ------ Chapter 8: User Authentication
-    # ------ Chapter 9: User Roles
-    ###
+    """
+    User and Role Models, and their included methods, adapted from
+    Flask Web Development, 2nd Edition by Miguel Grinberg
+    https://learning.oreilly.com/library/view/flask-web-development/9781491991725/ch13.html
+    Particular sections used include:
+    ------ Chapter 8: User Authentication
+    ------ Chapter 9: User Roles
+    """
+
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), unique=True, nullable=False)
@@ -438,14 +440,15 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 class Role(db.Model):
-    ###
-    # User and Role Models, and their included methods, adapted from
-    # Flask Web Development, 2nd Edition by Miguel Grinberg
-    # https://learning.oreilly.com/library/view/flask-web-development/9781491991725/ch13.html
-    # Particular sections used include:
-    # ------ Chapter 8: User Authentication
-    # ------ Chapter 9: User Roles
-    ###
+    """
+    User and Role Models, and their included methods, adapted from
+    Flask Web Development, 2nd Edition by Miguel Grinberg
+    https://learning.oreilly.com/library/view/flask-web-development/9781491991725/ch13.html
+    Particular sections used include:
+    ------ Chapter 8: User Authentication
+    ------ Chapter 9: User Roles
+    """
+
     __tablename__ = "roles"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)

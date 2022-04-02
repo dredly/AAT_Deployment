@@ -541,8 +541,8 @@ with app.app_context():
                 user_id=4,
                 assessment_id=9,
                 t2_question_id=12,
-                response_content="zzz",
-                is_correct=False,
+                response_content="When it's a jar",
+                is_correct=True,
             ),
         ]
     )
