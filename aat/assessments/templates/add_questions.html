@@ -3,7 +3,7 @@
 {% block content %}
 
 <!-- Adapted Add question page from Type 1 and Type 2 Questions -->
-<h1>Add Questions to your assessment</h1>
+<h1>Add Questions to {{assessment}}</h1>
 
 <h3>Add a new question</h3>
 
@@ -12,6 +12,8 @@
 
 {% for question in questions %}
     <h2>{{ question.question_text }}</h2>
+    <p>{{question.num_of_marks}} marks</p>
+    <p>Tag: {{question.tag}}</p>
     <form method="POST" action="">
         {{ addQuestionForm.csrf_token}}
         {{ addQuestionForm.add}}

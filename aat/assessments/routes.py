@@ -231,10 +231,24 @@ def edit_assessment(id):
         assessment.module_id = form.module_id.data
         assessment.num_of_credits = form.num_of_credits.data
         time_limit = request.form["time_limit"]
-        print(time_limit)
         assessment.time_limit = int(time_limit) * 60
         assessment.is_summative = form.is_summative.data
-        assessment.due_date = form.due_date.data
+        total_date = form.due_date.data
+        if total_date == None:
+            db.session.commit()
+            return redirect(url_for("assessments.add_questions", id=id))
+        else:
+            total_date = total_date.strftime("%Y-%m-%d")
+            year = int(total_date[:4])
+            month = int(total_date[5:7])
+            day = int(total_date[8:10])
+            assessment.due_date = datetime(year, month, day)
+            if assessment.due_date.strftime("%Y-%m-%d") >= date.today().strftime("%Y-%m-%d"):
+                db.session.commit()
+                return redirect(url_for("assessments.add_questions", id=id))
+            else:
+                error = "Due date cannot be in the past"
+                return render_template("edit_assessments.html", form=form, assessment=assessment, error=error)
         # doesnt work neeeds fixing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         # try:
         #     year = int(total_date[:4])
@@ -326,6 +340,7 @@ def add_questions(id):
 @assessments.route("/<int:id>/type1/new", methods=["GET", "POST"])
 def create_questions_t1(id):
     form = CreateQuestionT1Form()
+    assessment = Assessment.query.get_or_404(id)
     if session.get("assessment_add") != None:
         id = session.get("assessment_add")
         print(id)
@@ -379,12 +394,13 @@ def create_questions_t1(id):
         elif session.get("assessment_add") != None:
             return redirect(url_for("assessments.add_questions", id=id))
     form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
-    return render_template("create_questions_t1.html", form=form, id=id)
+    return render_template("create_questions_t1.html", form=form, id=id, assessment=assessment)
 
 
 @assessments.route("/<int:id>/type2/new", methods=["GET", "POST"])
 def create_question_t2(id):
     form = CreateQuestionT2Form()
+    assessment = Assessment.query.get_or_404(id)
     if session.get("assessment_add") != None:
         id = session.get("assessment_add")
         print(id)
@@ -422,7 +438,7 @@ def create_question_t2(id):
             session.pop("assessment_add", None)
             return redirect(url_for("assessments.add_questions", id=id))
     form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
-    return render_template("create_questions_t2.html", form=form, id=id)
+    return render_template("create_questions_t2.html", form=form, id=id, assessment=assessment)
 
 # ---------------------------------  End Of CRUD For Assessments ---------------------------------------
 

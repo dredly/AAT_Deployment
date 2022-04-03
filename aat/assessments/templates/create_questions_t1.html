@@ -1,7 +1,7 @@
 {% extends("layout.html") %}
 {% block content %}
 <div class="form-container">
-    <h1>Add a new Type 1 question to {{id.title}}</h1>
+    <h1>Add a new Type 1 question to {{assessment}}</h1>
     <form method="POST" action="">
         {{ form.csrf_token }}
         <div>
