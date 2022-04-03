@@ -179,6 +179,12 @@ footer {
 	padding-top: 2vh;
 }
 
+.view_module_create{
+	display: flex;
+	justify-content: flex-start;
+	padding-bottom: 1vh;
+}
+
 /* ----------------------------------------------------- END OF CRUD ASSESSMENTS ------------------------------------------------ */
 
 

@@ -1,12 +1,14 @@
 {% extends("layout.html") %}
 {% block content %}
+<div class="block_contents">
 <h1>{{module.title}}</h1>
 
 {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
-
+<div class = "view_module_create">
 <button type="button" class="Create_Assessment_Button" role="button">
     <a href="{{ url_for('assessments.new_assessment') }}" class="Create_Assessment_Link">Create Assessment</a>
 </button>
+</div>
 
 {% endif %}
 
@@ -76,5 +78,5 @@
     {% endfor %}
 </section>
 
-
+</div>
 {% endblock %}
