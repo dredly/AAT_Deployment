@@ -10,12 +10,18 @@
 <p>{{ i + 1 }}. {{ ordered_questions[i].question_text }}</p>
 <p>Your answer: {{ given_answers[i] }}</p>
 <p>Correct answer: {{ correct_answers[i] }}</p>
-<p>Total points: {% if is_correct[i] == True%}{{ ordered_questions[i].num_of_marks }}{% else %}0{% endif %}/{{ ordered_questions[i].num_of_marks }}</p>
+<p>Total points: {% if is_correct[i] == True%}{{ ordered_questions[i].num_of_marks }}{% else %}0{% endif %}/{{
+    ordered_questions[i].num_of_marks }}</p>
 <h3>Feedback</h3>
 {% if is_correct[i] == True%}
+<p class="feedback-or-feedforward">
     {{ ordered_questions[i].feedback_if_correct }}
+</p>
 {% else %}
+<p class="feedback-or-feedforward">
     {{ ordered_questions[i].feedback_if_wrong }}
+</p>
+
 {% endif %}
 
 <hr>
