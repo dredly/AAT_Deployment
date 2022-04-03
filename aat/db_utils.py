@@ -18,6 +18,23 @@ dictionary_of_results = results_list_totals()
 """
 
 
+def get_assessment_id_and_total_marks_possible():
+    """
+    Returns dictionary: {assessment_id: total_possible_marks}
+    (useful for combining question type 1 and type 2)
+    """
+    a = Assessment.query.all()
+    assessment_id_and_total_marks_possible = {}
+    for q in a:
+        total_marks_possible = 0
+        for q1 in q.question_t1:
+            total_marks_possible += q1.num_of_marks
+        for q2 in q.question_t2:
+            total_marks_possible += q2.num_of_marks
+        assessment_id_and_total_marks_possible[q.assessment_id] = total_marks_possible
+    return assessment_id_and_total_marks_possible
+
+
 def get_all_assessment_marks(
     input_user_id=None,
     input_lecturer_id=None,
@@ -48,7 +65,6 @@ def get_all_assessment_marks(
             func.sum(QuestionT1.num_of_marks)
             .filter(ResponseT1.is_correct == True)
             .label("correct_marks"),
-            func.sum(QuestionT1.num_of_marks).label("possible_marks"),
         )
         .select_from(User)
         .join(ResponseT1)
@@ -62,6 +78,11 @@ def get_all_assessment_marks(
         .group_by(ResponseT1.attempt_number)
     )
 
+    print("***")
+    print("Attempts Total T1")
+    for items in attempt_totals_t1:
+        pprint(f"{items}")
+
     attempt_totals_t2 = (
         db.session.query(User, QuestionT2, ResponseT2, Module, Assessment)
         .with_entities(
@@ -73,7 +94,6 @@ def get_all_assessment_marks(
             func.sum(QuestionT2.num_of_marks)
             .filter(ResponseT2.is_correct == True)
             .label("correct_marks"),
-            func.sum(QuestionT2.num_of_marks).label("possible_marks"),
         )
         .select_from(User)
         .join(ResponseT2)
@@ -87,13 +107,30 @@ def get_all_assessment_marks(
         .group_by(ResponseT2.attempt_number)
     )
 
+    print("***")
+    print("Attempts Total T2")
+    for items in attempt_totals_t2:
+        pprint(f"{items}")
+
     # UNION: https://docs.sqlalchemy.org/en/14/orm/query.html
     all_values = attempt_totals_t1.union_all(attempt_totals_t2)
+
+    print("***")
+    print("All values")
+    for items in all_values:
+        pprint(f"{items}")
+
+    assessment_id_and_total_marks_possible = (
+        get_assessment_id_and_total_marks_possible()
+    )
+
+    pprint(f"{assessment_id_and_total_marks_possible=}")
 
     final_output = []
 
     # Make list of dictionaries holding relevant IDs and summations of correct marks
     for row in all_values:
+        add_to_dict = True
         marks_dict = {}
         user_id = row[0]
         module_id = row[1]
@@ -101,7 +138,9 @@ def get_all_assessment_marks(
         lecturer_id = row[3]
         attempt_number = row[4]
         correct_marks = row[5] if row[5] is not None else 0
-        possible_marks = row[6]
+        possible_marks = assessment_id_and_total_marks_possible[assessment_id]
+
+        # Is it already in the final_output? If so, adjust that
         for entry in final_output:
             if (
                 entry["user_id"] == user_id
@@ -110,7 +149,10 @@ def get_all_assessment_marks(
                 and entry["attempt_number"] == attempt_number
             ):
                 entry["correct_marks"] += correct_marks
-        else:
+                add_to_dict = False
+
+        # If no adjustment happened then append to final_output
+        if add_to_dict:
             marks_dict["user_id"] = user_id
             marks_dict["module_id"] = user_id
             marks_dict["assessment_id"] = assessment_id
@@ -118,7 +160,14 @@ def get_all_assessment_marks(
             marks_dict["attempt_number"] = attempt_number
             marks_dict["correct_marks"] = correct_marks
             marks_dict["possible_marks"] = possible_marks
+
             final_output.append(marks_dict)
+
+    # POSSIBLE MARKS NOT CORRECT - work out separately then add on?
+
+    print("***")
+    pprint(f"final_output_before_highest_flag=")
+    pprint(final_output)
 
     # Add a "highest_value" attribute for if this attempt is the HIGHEST scoring attempt the user has made
     for row in final_output:
@@ -151,6 +200,8 @@ def get_all_assessment_marks(
             for item in final_output
             if item["assessment_id"] == input_assessment_id
         ]
+    print("***")
+    pprint(f"{final_output=}")
 
     return final_output
 

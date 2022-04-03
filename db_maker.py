@@ -263,7 +263,7 @@ with app.app_context():
             ),
             QuestionT2(  # 4
                 assessment_id=9,
-                num_of_marks=5,
+                num_of_marks=100,
                 question_text="What is the name of an element which denotes a section?",
                 correct_answer="section",
                 difficulty=1,
@@ -528,6 +528,7 @@ with app.app_context():
                 response_content="zzz",
                 is_correct=False,
             ),
+            # ASSESSMENT 9
             ResponseT2(  # 8
                 attempt_number=1,
                 user_id=4,
@@ -568,6 +569,7 @@ with app.app_context():
                 response_content="Didn't I answer this already?",
                 is_correct=False,
             ),
+            # ATTEMPT 2: u_id=4, ass=9
             ResponseT2(  # 12
                 attempt_number=2,
                 user_id=4,
@@ -606,7 +608,7 @@ with app.app_context():
                 assessment_id=9,
                 t2_question_id=12,
                 response_content="When it's a jar",
-                is_correct=True,
+                is_correct=False,
             ),
         ]
     )
@@ -709,7 +711,9 @@ with app.app_context():
             ),
         ]
     )
-
+    ##################
+    # AWARDED BADGES #
+    ##################
     db.session.add_all(
         [
             Awarded_Badge(id=1, user_id=1, badge_id=1),
@@ -718,7 +722,9 @@ with app.app_context():
             Awarded_Badge(id=4, user_id=2, badge_id=2),
         ]
     )
-
+    #######################
+    # AWARDED ACHIEVEMENT #
+    #######################
     db.session.add_all(
         [
             Awarded_Achievement(id=1, user_id=2, achievement_id=6),
@@ -727,7 +733,9 @@ with app.app_context():
             Awarded_Achievement(id=4, user_id=3, achievement_id=9),
         ]
     )
-
+    ########
+    # TIER #
+    ########
     db.session.add_all(
         [
             Tier(tier_id=1, name="Bronze", level=1),
@@ -738,7 +746,9 @@ with app.app_context():
             Tier(tier_id=6, name="Diamond", level=6),
         ]
     )
-
+    #############
+    # CHALLENGE #
+    #############
     db.session.add_all(
         [
             Challenge(challenge_id=1, from_user=1, to_user=3, difficulty=3),
