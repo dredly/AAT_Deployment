@@ -96,7 +96,9 @@ def new_question_t1():
 def show_question_t1(id):
     question = QuestionT1.query.get_or_404(id)
     options = Option.query.filter_by(q_t1_id=id).all()
-    return render_template("show_question_t1.html", question=question, options=options)
+    return render_template(
+        "show_question.html", question=question, question_type="t1", options=options
+    )
 
 
 @questions.route("/type1/<int:id>/edit", methods=["GET", "POST"])
@@ -195,7 +197,7 @@ def new_question_t2():
 @questions.route("/type2/<int:id>", methods=["GET", "POST"])
 def show_question_t2(id):
     question = QuestionT2.query.get_or_404(id)
-    return render_template("show_question_t2.html", question=question)
+    return render_template("show_question.html", question=question, question_type="t2")
 
 
 @questions.route("/type2/<int:id>/edit", methods=["GET", "POST"])
