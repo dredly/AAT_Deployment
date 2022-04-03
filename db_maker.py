@@ -233,7 +233,7 @@ with app.app_context():
                 question_text="What letter do you use after the hyphen to add a commit message?",
                 correct_answer="m",
                 difficulty=1,
-                feedback_if_correct="Well done! m for message",
+                feedback_if_correct="Well done! m for message test link: https://github.com/",
                 feedback_if_wrong="Clue: what letter does message start with?",
                 feedforward_if_correct="If this is too easy, it might be time to move onto the Advanced Git assessment",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
