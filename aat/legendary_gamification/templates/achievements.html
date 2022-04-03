@@ -5,8 +5,12 @@
 {% endblock styles %}
 
 {% block content %}
+{% if leaderboard_user.id == current_user.id %}
     <h1>Your Progress</h1>
-    <h2>Tier - {{ current_user.tier }}</h2>
+{% else %}
+    <h1>{{ leaderboard_user.name }}'s Progress</h1>
+{% endif %}
+    <h2>Tier - {{ leaderboard_user.tier }}</h2>
     <div class="content-container">
         <div class="content">
             <div class="leaderboard-section">
@@ -16,11 +20,13 @@
                 <div class="divider"></div>
                 <div id="leaderboard">
                     {% for i in range(ranks | length) %}
-                    <div class="user-rank">
-                        <h4 id="user-leaderboard">
-                            {{ i + 1 }}. {{ ranks[i][1] }} - {{ ranks[i][0] }}
-                        </h4>
-                    </div>
+                    <a href="{{ url_for('.achievements', user_id=ranks[i][2]) }}" class="leaderboard-links">
+                        <div class="user-rank">
+                            <h4 id="user-leaderboard">
+                                {{ i + 1 }}. {{ ranks[i][1] }} - {{ ranks[i][0] }}
+                            </h4>
+                        </div>
+                    </a>
                     {% endfor %}
                 </div>
             </div>
@@ -46,7 +52,7 @@
                 {% endfor %}
                 <div class="pie-container">
                     <div class="pie-information">
-                        {% if current_user.tier == "Gold" %}
+                        {% if leaderboard_user.tier == "Gold" %}
                             <div class="pie" style="--p:{{ ((badges|length + achievements|length)/16 * 100) }};--b:20px;--c:rgb(43, 255, 0);">{{ ((badges|length + achievements|length)/16 * 100) }}%</div>
                             <p>{{ badges|length + achievements|length }} out of 16 rewards unlocked!</p>
                         {% else %}
@@ -98,7 +104,11 @@
                 </form>
             </div>
             <div class="challenge-notification">
-                <h2>Your Challenges</h2>
+                {% if leaderboard_user.id == current_user.id %}
+                    <h2>Your Challenges</h2>
+                {% else %}
+                    <h2>{{ leaderboard_user.name }}'s Challenges</h2>
+                {% endif %}
                 <div class="incoming-challenges">
                     <h3>Incoming Challenges</h3>
                     {% if incoming_challenges|length > 0 %}
@@ -106,10 +116,14 @@
                             {% for i in range(incoming_challenges|length) %}
                                 <div class="challenge-options">
                                     <p style="display: inline;">{{ incoming_challenges[i][1] }} {{ in_difficulty[i] }}</p>
+                                    {% if leaderboard_user.id == current_user.id %}
                                     <input type="radio" name="accept_options" id="option{{i}}" value="{{ challenge_ids[i] }}"></input>
+                                    {% endif %}
                                 </div>
                             {% endfor %}
+                            {% if leaderboard_user.id == current_user.id %}
                             <input type="submit" name="accept_challenge_button" value="Accept Challenge">
+                            {% endif %}
                         </form>
                     {% else %}
                         <p>You have no incoming challenges</p>
@@ -133,7 +147,9 @@
                                 {% if challenge[0] not in taken_challenges %}
                                     <div class="active-challenge-options">
                                         <p style="display: inline;">{{ challenge[1] }} {{ challenge[2] }}</p>
+                                        {% if leaderboard_user.id == current_user.id %}
                                         <input type="radio" name="active_options" value="{{ challenge[0] }}"></input>
+                                        {% endif %}
                                     </div>
                                 {% else %}
                                     <div class="active-challenge-options">
@@ -141,7 +157,9 @@
                                     </div>
                                 {% endif %}
                             {% endfor %}
+                            {% if leaderboard_user.id == current_user.id %}
                             <input type="submit" name="take_challenge_button" value="Take Challenge">
+                            {% endif %}
                         </form>
                     {% else %}
                         <p>You have no active challenges</p>

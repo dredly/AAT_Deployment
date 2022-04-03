@@ -54,8 +54,13 @@ nav li.admin {
 nav li a {
 	text-decoration: none;
 }
+
+a {
+    text-decoration: none;
+}
+
 .divider {
-    height: 18px;
+    height: 1px;
     border-top-style:ridge;
     border-top-color: #003108;
     border-top-width: 3px;
@@ -70,6 +75,15 @@ nav li a {
     margin-right: 20px;
     display: flex;
     flex-direction: column;
+}
+
+.leaderboard-links:hover {
+    background-color: rgb(226, 226, 226);
+    transition: 0.4s;
+}
+
+.leaderboard-links {
+    color: #000;
 }
 
 .leader-title {
