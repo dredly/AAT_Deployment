@@ -709,7 +709,9 @@ with app.app_context():
             ),
         ]
     )
-
+    ##################
+    # AWARDED BADGES #
+    ##################
     db.session.add_all(
         [
             Awarded_Badge(id=1, user_id=1, badge_id=1),
@@ -718,7 +720,9 @@ with app.app_context():
             Awarded_Badge(id=4, user_id=2, badge_id=2),
         ]
     )
-
+    #######################
+    # AWARDED ACHIEVEMENT #
+    #######################
     db.session.add_all(
         [
             Awarded_Achievement(id=1, user_id=2, achievement_id=6),
@@ -727,7 +731,9 @@ with app.app_context():
             Awarded_Achievement(id=4, user_id=3, achievement_id=9),
         ]
     )
-
+    ########
+    # TIER #
+    ########
     db.session.add_all(
         [
             Tier(tier_id=1, name="Bronze", level=1),
@@ -738,7 +744,9 @@ with app.app_context():
             Tier(tier_id=6, name="Diamond", level=6),
         ]
     )
-
+    #############
+    # CHALLENGE #
+    #############
     db.session.add_all(
         [
             Challenge(challenge_id=1, from_user=1, to_user=3, difficulty=3),
