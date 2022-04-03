@@ -263,7 +263,7 @@ with app.app_context():
             ),
             QuestionT2(  # 4
                 assessment_id=9,
-                num_of_marks=5,
+                num_of_marks=100,
                 question_text="What is the name of an element which denotes a section?",
                 correct_answer="section",
                 difficulty=1,
@@ -528,6 +528,7 @@ with app.app_context():
                 response_content="zzz",
                 is_correct=False,
             ),
+            # ASSESSMENT 9
             ResponseT2(  # 8
                 attempt_number=1,
                 user_id=4,
@@ -568,6 +569,7 @@ with app.app_context():
                 response_content="Didn't I answer this already?",
                 is_correct=False,
             ),
+            # ATTEMPT 2: u_id=4, ass=9
             ResponseT2(  # 12
                 attempt_number=2,
                 user_id=4,
@@ -606,7 +608,7 @@ with app.app_context():
                 assessment_id=9,
                 t2_question_id=12,
                 response_content="When it's a jar",
-                is_correct=True,
+                is_correct=False,
             ),
         ]
     )
