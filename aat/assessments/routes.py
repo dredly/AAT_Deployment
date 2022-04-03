@@ -269,7 +269,10 @@ def edit_assessment(id):
     form.module_id.data = assessment.module_id
     form.due_date.data = assessment.due_date
     form.num_of_credits.data = assessment.num_of_credits
-    form.time_limit.data = math.floor(int(assessment.time_limit) / 60)
+    if assessment.time_limit != None:
+        form.time_limit.data = math.floor(int(assessment.time_limit) / 60)
+    else:
+        form.time_limit.data = assessment.time_limit
     form.is_summative.data = assessment.is_summative
     return render_template("edit_assessments.html", form=form, assessment=assessment, id=id)
     
