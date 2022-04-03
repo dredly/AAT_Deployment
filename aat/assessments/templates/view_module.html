@@ -29,6 +29,9 @@
                 </button>
 
             {% elif current_user.can(Permission.WRITE_ASSESSMENT) %}
+            <button type="button" class = "Assessment_Index_Child">
+                <a href="{{ url_for('assessments.show_assessment', id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">View Assessment</a>
+            </button>   
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.edit_assessment', id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
                 </button>
@@ -57,6 +60,9 @@
                 </button>
 
             {% elif current_user.can(Permission.WRITE_ASSESSMENT) %}
+                <button type="button" class = "Assessment_Index_Child">
+                    <a href="{{ url_for('assessments.show_assessment', id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">View Assessment</a>
+                </button>   
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.edit_assessment', id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
                 </button>

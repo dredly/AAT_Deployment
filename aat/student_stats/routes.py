@@ -29,11 +29,6 @@ def rich():
     return "hi"
 
 
-#### QUERY ####
-# db.session.query(func.avg(QuestionT2.num_of_marks)).filter_by(assessment_id=1))
-# db.session.query(func.avg(QuestionT2.num_of_marks)).filter_by(assessment_id=1).all()
-
-
 ###############
 # COURSE VIEW #
 ###############
