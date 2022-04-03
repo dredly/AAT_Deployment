@@ -150,7 +150,7 @@ with app.app_context():
                 difficulty=3,
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="Make sure you understand the differencs between rebase and merge",
-                feedforward_if_correct="Well done. To learn more about the use cases for rebase see link PLACEHOLDER",
+                feedforward_if_correct="Well done. To learn more about the use cases for rebase see link https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
                 feedforward_if_wrong="Make sure you can complete all the question from the git basics assessment",
             ),
             QuestionT1(  # 3
@@ -233,7 +233,7 @@ with app.app_context():
                 question_text="What letter do you use after the hyphen to add a commit message?",
                 correct_answer="m",
                 difficulty=1,
-                feedback_if_correct="Well done! m for message test link: https://github.com/",
+                feedback_if_correct="Well done! m for message",
                 feedback_if_wrong="Clue: what letter does message start with?",
                 feedforward_if_correct="If this is too easy, it might be time to move onto the Advanced Git assessment",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
@@ -258,7 +258,7 @@ with app.app_context():
                 difficulty=2,
                 feedback_if_correct="Well done! document.querySelector() is very convenient, as it uses the same syntax for selection as CSS.",
                 feedback_if_wrong="It's the same in CSS",
-                feedforward_if_correct="Well done. To see another way of selecting elements, check out this page on MDN",
+                feedforward_if_correct="Well done. To see another way of selecting elements, check out this page on MDN: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById",
                 feedforward_if_wrong="It might be useful to revise CSS selectors first.",
             ),
             QuestionT2(  # 4
@@ -269,7 +269,7 @@ with app.app_context():
                 difficulty=1,
                 feedback_if_correct="That's right!",
                 feedback_if_wrong="It's not a trick question",
-                feedforward_if_correct="Well done. For other semantic div element names, see here",
+                feedforward_if_correct="Well done. For other semantic div element names, see here: https://developer.mozilla.org/en-US/docs/Glossary/Semantics#semantics_in_html",
                 feedforward_if_wrong="Make sure you are comfortable with basic HTML first",
             ),
             # Floating Questions
@@ -290,7 +290,7 @@ with app.app_context():
                 difficulty=1,
                 feedback_if_correct="That's right. William the Conqueror landed on the English coast that year",
                 feedback_if_wrong="Wrong year",
-                feedforward_if_correct="Well done. To learn more about events in this sime period, check out this article about the Bayeux Tapestry.",
+                feedforward_if_correct="Well done. To learn more about events in this sime period, check out this article about the Bayeux Tapestry: https://www.britannica.com/topic/Bayeux-Tapestry",
                 feedforward_if_wrong="Make sure to go over the lecture notes for Medieval History of Western Europe.",
             ),
             QuestionT2(  # 7
