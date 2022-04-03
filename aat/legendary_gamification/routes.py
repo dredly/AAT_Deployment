@@ -7,7 +7,7 @@ from aat import db
 from aat.legendary_gamification.forms import ChallengeForm
 from . import legendary_gamification
 from werkzeug.exceptions import BadRequestKeyError
-from ..models import Achievement, Awarded_Achievement, Awarded_Badge, Badge, Challenge, ChallengeQuestions, QuestionT1, User, Option, Module
+from ..models import *
 
 questions = ["How do you print things in python",
              "How do you declare a function in python",
@@ -33,7 +33,9 @@ def achievements():
     achievements = []
     lines_ranks = []
     all_users = User.query.all()
-
+    all_takenChallenges = ChallengesTaken.query.all()
+    takenChallengesIDs = ChallengesTaken.query.with_entities(ChallengesTaken.challenge_id).filter_by(user_id=current_user.id).all()
+    takenChallengesList = [item[0] for item in takenChallengesIDs]
 
     for user in all_users:
         assessment_marks = {}
@@ -128,9 +130,9 @@ def achievements():
         achievement = Achievement.query.filter_by(achievement_id=awards.achievement_id).first()
         achievements.append(achievement)
     
-    in_challenges = Challenge.query.with_entities(Challenge.from_user, Challenge.to_user, Challenge.challenge_id, Challenge.difficulty).filter_by(to_user=current_user.id, active=0).all()
-    out_challenges = Challenge.query.with_entities(Challenge.from_user, Challenge.to_user, Challenge.difficulty).filter_by(from_user=current_user.id, active=0).all()
-    active_challenges = Challenge.query.filter_by(active=1).all()
+    in_challenges = Challenge.query.with_entities(Challenge.from_user, Challenge.to_user, Challenge.challenge_id, Challenge.difficulty).filter_by(to_user=current_user.id, status="Pending").all()
+    out_challenges = Challenge.query.with_entities(Challenge.from_user, Challenge.to_user, Challenge.difficulty).filter_by(from_user=current_user.id, status="Pending").all()
+    active_challenges = Challenge.query.filter_by(status="Active").all()
     in_users = []
     out_users = []
     active_users = []
@@ -149,21 +151,29 @@ def achievements():
         out_users.append((user_to.id, user_to.name))
         outgoing_challenge_difficulty.append(challenge[2])
     for challenge in active_challenges:
-        if challenge.from_user == current_user.id:
-            user = User.query.filter_by(id=challenge.to_user).first()
-            difficulty = challenge.difficulty
-            active_users.append((challenge.challenge_id, user.name, difficulty))
-        elif challenge.to_user == current_user.id:
-            user = User.query.filter_by(id=challenge.from_user).first()
-            difficulty = challenge.difficulty
-            active_users.append((challenge.challenge_id, user.name, difficulty))
+        all_taken = ChallengesTaken.query.filter_by(challenge_id=challenge.challenge_id).all()
+        all_taken_users = [item.user_id for item in all_taken]
+        if not (challenge.from_user in all_taken_users and challenge.to_user in all_taken_users):
+            if challenge.from_user == current_user.id:
+                user = User.query.filter_by(id=challenge.to_user).first()
+                difficulty = challenge.difficulty
+                active_users.append((challenge.challenge_id, user.name, difficulty))
+            elif challenge.to_user == current_user.id:
+                user = User.query.filter_by(id=challenge.from_user).first()
+                difficulty = challenge.difficulty
+                active_users.append((challenge.challenge_id, user.name, difficulty))
+        else:
+            challenge.status = "Completed"
+            db.session.add(challenge)
+            db.session.commit()
+    print(active_users)
 
 
     # print(in_users)
     # print(out_users)
     # print(active_users)
     challenge = ChallengeForm()
-
+    ids_finished_challenge = []
     # with open("aat/legendary_gamification/ranks.txt", 'r') as f:
     #     lines_ranks = f.readlines()
     # with open("aat/legendary_gamification/awards.txt", 'r') as f:
@@ -209,7 +219,7 @@ def achievements():
             try:
                 chosen_challenge = request.form['accept_options']
                 challenge_active = Challenge.query.filter_by(challenge_id=chosen_challenge).first()
-                challenge_active.active = 1
+                challenge_active.status = "Active"
                 db.session.add(challenge_active)
                 db.session.commit()
                 questions_t1 = QuestionT1.query.all()
@@ -230,8 +240,11 @@ def achievements():
         elif choice == "Take Challenge":
             try:
                 chosen_challenge = request.form['active_options']
-                challenge_taken_id = Challenge.query.filter_by(challenge_id=chosen_challenge).first()
                 challenge_question_all = ChallengeQuestions.query.filter_by(challenge_id=chosen_challenge).all()
+                
+                takenChallenge = ChallengesTaken(user_id=current_user.id, challenge_id=chosen_challenge)
+                db.session.add(takenChallenge)
+                db.session.commit()
 
                 for question in challenge_question_all:
                     question = QuestionT1.query.with_entities(QuestionT1.q_t1_id, QuestionT1.question_text).filter_by(q_t1_id=question.question_id).first()
@@ -243,12 +256,12 @@ def achievements():
                 # print(challenge_options)
                 return redirect(url_for(".rapid_fire", challenge_questions=challenge_questions, challenge_options=challenge_options))
             except BadRequestKeyError:
-                pass           
+                pass
     return render_template(
         "achievements.html", ranks=sorted(lines_ranks, key=lambda x: x[0], reverse=True), badges=badges,
         achievements=achievements, incoming_challenges=in_users, outgoing_challenges=out_users, challenge=challenge,
         all_users=all_users, challenge_ids=challenge_ids, in_difficulty=incoming_challenge_difficulty,
-        out_difficulty=outgoing_challenge_difficulty, active_users=active_users
+        out_difficulty=outgoing_challenge_difficulty, active_users=active_users, taken_challenges=takenChallengesList
         )
 
 

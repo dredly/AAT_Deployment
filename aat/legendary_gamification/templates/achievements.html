@@ -130,10 +130,16 @@
                     {% if active_users|length > 0 %}
                         <form action="" method="POST">
                             {% for challenge in active_users %}
-                                <div class="active-challenge-options">
-                                    <p style="display: inline;">{{ challenge[1] }} {{ challenge[2] }}</p>
-                                    <input type="radio" name="active_options" value="{{ challenge[0] }}"></input>
-                                </div>
+                                {% if challenge[0] not in taken_challenges %}
+                                    <div class="active-challenge-options">
+                                        <p style="display: inline;">{{ challenge[1] }} {{ challenge[2] }}</p>
+                                        <input type="radio" name="active_options" value="{{ challenge[0] }}"></input>
+                                    </div>
+                                {% else %}
+                                    <div class="active-challenge-options">
+                                        <p style="display: inline;">{{ challenge[1] }} {{ challenge[2] }} - Completed</p>
+                                    </div>
+                                {% endif %}
                             {% endfor %}
                             <input type="submit" name="take_challenge_button" value="Take Challenge">
                         </form>
