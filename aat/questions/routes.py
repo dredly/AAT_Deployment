@@ -157,7 +157,7 @@ def delete_question_t1(id):
         db.session.delete(question)
         db.session.commit()
         return redirect(url_for("questions.index"))
-    return render_template("delete_question_t1.html", question=question, form=form)
+    return render_template("delete_question.html", question=question, form=form)
 
 
 # --- Type 2 routes ---
@@ -238,4 +238,4 @@ def delete_question_t2(id):
         db.session.delete(question)
         db.session.commit()
         return redirect(url_for("questions.index"))
-    return render_template("delete_question_t2.html", question=question, form=form)
+    return render_template("delete_question.html", question=question, form=form)
