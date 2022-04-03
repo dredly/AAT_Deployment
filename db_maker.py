@@ -140,7 +140,7 @@ with app.app_context():
                 difficulty=1,
                 feedback_if_correct="Well done! git checkout can also be used to view a particular branch",
                 feedback_if_wrong="Be sure to go over the lecture notes on git commands",
-                feedforward_if_correct="Well done. To learn more about git commits see link PLACEHOLDER",
+                feedforward_if_correct="Well done. To learn more about git commits see link https://www.git-scm.com/docs/git-commit",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT1(  # 2
@@ -247,7 +247,7 @@ with app.app_context():
                 difficulty=1,
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="What is the opposite of pull?",
-                feedforward_if_correct="Well done. For more information, look at this link PLACEHOLDER to see how remote repositories work.",
+                feedforward_if_correct="Well done. For more information, look at https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes to see how remote repositories work.",
                 feedforward_if_wrong="Make sure to learn the basic git commands before you move on",
             ),
             QuestionT2(  # 3
