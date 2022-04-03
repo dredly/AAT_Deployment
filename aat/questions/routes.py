@@ -1,5 +1,5 @@
 from flask import request, redirect, url_for, render_template
-from .forms import QuestionT1Form, QuestionT2Form, FilterForm, DeleteForm
+from .forms import QuestionForm, FilterForm, DeleteForm
 from ..models import QuestionT1, QuestionT2, Option, Tag
 from ..decorators import permission_required
 from .. import Permission
@@ -45,7 +45,7 @@ def index():
 
 @questions.route("/type1/new", methods=["GET", "POST"])
 def new_question_t1():
-    form = QuestionT1Form()
+    form = QuestionForm()
     if request.method == "POST":
         question_text = request.form["question_text"]
         option_a_text = request.form["option_a"]
@@ -53,7 +53,6 @@ def new_question_t1():
         option_c_text = request.form["option_c"]
         correct_option = request.form["correct_option"]
         tag_id = request.form["tag"]
-        print(correct_option)
         num_of_marks = request.form["num_of_marks"]
         difficulty = request.form["difficulty"]
         feedback_if_correct = request.form["feedback_if_correct"]
@@ -83,20 +82,22 @@ def new_question_t1():
             option_b.is_correct = True
         elif correct_option == "2":
             option_c.is_correct = True
-        db.session.add(option_a)
-        db.session.add(option_b)
-        db.session.add(option_c)
+        db.session.add_all([option_a, option_b, option_c])
         db.session.commit()
         return redirect(url_for("questions.index"))
     form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
-    return render_template("new_question_t1.html", form=form)
+    return render_template(
+        "question.html", form=form, question_type="t1", editing=False
+    )
 
 
 @questions.route("/type1/<int:id>", methods=["GET", "POST"])
 def show_question_t1(id):
     question = QuestionT1.query.get_or_404(id)
     options = Option.query.filter_by(q_t1_id=id).all()
-    return render_template("show_question_t1.html", question=question, options=options)
+    return render_template(
+        "show_question.html", question=question, question_type="t1", options=options
+    )
 
 
 @questions.route("/type1/<int:id>/edit", methods=["GET", "POST"])
@@ -107,7 +108,7 @@ def edit_question_t1(id):
         Option.query.filter_by(q_t1_id=id).filter(Option.is_correct.is_(True)).first()
     )
 
-    form = QuestionT1Form()
+    form = QuestionForm()
     if request.method == "POST":
         question.question_text = form.question_text.data
         options[0].option_text = form.option_a.data
@@ -144,7 +145,7 @@ def edit_question_t1(id):
     form.option_a.data = options[0]
     form.option_b.data = options[1]
     form.option_c.data = options[2]
-    return render_template("edit_question_t1.html", form=form)
+    return render_template("question.html", form=form, question_type="t1", editing=True)
 
 
 @questions.route("/type1/<int:id>/delete", methods=["GET", "POST"])
@@ -155,7 +156,7 @@ def delete_question_t1(id):
         db.session.delete(question)
         db.session.commit()
         return redirect(url_for("questions.index"))
-    return render_template("delete_question_t1.html", question=question, form=form)
+    return render_template("delete_question.html", question=question, form=form)
 
 
 # --- Type 2 routes ---
@@ -163,7 +164,7 @@ def delete_question_t1(id):
 
 @questions.route("/type2/new", methods=["GET", "POST"])
 def new_question_t2():
-    form = QuestionT2Form()
+    form = QuestionForm()
     if request.method == "POST":
         question_text = request.form["question_text"]
         correct_answer = request.form["correct_answer"]
@@ -189,19 +190,21 @@ def new_question_t2():
         db.session.commit()
         return redirect(url_for("questions.index"))
     form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
-    return render_template("new_question_t2.html", form=form)
+    return render_template(
+        "question.html", form=form, question_type="t2", editing=False
+    )
 
 
 @questions.route("/type2/<int:id>", methods=["GET", "POST"])
 def show_question_t2(id):
     question = QuestionT2.query.get_or_404(id)
-    return render_template("show_question_t2.html", question=question)
+    return render_template("show_question.html", question=question, question_type="t2")
 
 
 @questions.route("/type2/<int:id>/edit", methods=["GET", "POST"])
 def edit_question_t2(id):
     question = QuestionT2.query.get_or_404(id)
-    form = QuestionT2Form()
+    form = QuestionForm()
     if request.method == "POST":
         question.question_text = form.question_text.data
         question.correct_answer = form.correct_answer.data
@@ -225,7 +228,7 @@ def edit_question_t2(id):
     form.feedback_if_wrong.data = question.feedback_if_wrong
     form.feedforward_if_correct.data = question.feedforward_if_correct
     form.feedforward_if_wrong.data = question.feedforward_if_wrong
-    return render_template("edit_question_t2.html", form=form)
+    return render_template("question.html", form=form, question_type="t2", editing=True)
 
 
 @questions.route("/type2/<int:id>/delete", methods=["GET", "POST"])
@@ -236,4 +239,4 @@ def delete_question_t2(id):
         db.session.delete(question)
         db.session.commit()
         return redirect(url_for("questions.index"))
-    return render_template("delete_question_t2.html", question=question, form=form)
+    return render_template("delete_question.html", question=question, form=form)
