@@ -16,16 +16,18 @@
             <div>{{form.module_id.label}}</div>{{form.module_id}}
         </div>
         <div>
+            <div>{{form.time_limit.label}}</div>{{form.time_limit}}
+        </div>
+        <hr />
+        <div>
+            <div>{{form.is_summative.label}}</div>{{form.is_summative}}
+        </div>
+        <hr />
+        <div>
             <div>{{form.due_date.label}}</div>{{form.due_date}}
         </div>
         <div>
-            <div>{{form.time_limit.label}}</div>{{form.time_limit}}
-        </div>
-        <div>
             <div>{{form.num_of_credits.label}}</div>{{form.num_of_credits}}
-        </div>
-        <div>
-            <div>{{form.is_summative.label}}</div>{{form.is_summative}}
         </div>
         {{form.submit}}
     </form>
@@ -38,10 +40,16 @@
     {% for question in assessment.question_t1 %}
         <div class = "Assessment_Edit_Children">
             <h3>{{question}}</h3>
+
                 {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
                 <a href="{{url_for('assessments.remove_question_t1', id3=question.q_t1_id, id=assessment.assessment_id)}}"><button class="delete-button" class="Assessment_Edit_Child">Remove Question</a>
                 {% endif %}
         </div>
+        <p>{{question.num_of_marks}} marks</p>
+        <p>Tag: {{question.tag}}</p>
+        {% if assessment.is_summative == False %}
+        <p> Difficulty = {{question.difficulty}}/3</p>
+        {% endif %}
     {% endfor %}
 
     {% for question in assessment.question_t2 %}   
@@ -51,9 +59,11 @@
                     <a href="{{url_for('assessments.remove_question_t2', id2=question.q_t2_id, id=assessment.assessment_id)}}"><button class="delete-button" class="Assessment_Edit_Child">Remove Question</a>
                     {% endif %}
         </div>
+        <p>{{question.num_of_marks}} marks</p>
+        <p>Tag: {{question.tag}}</p>
+        {% if assessment.is_summative == False %}
+        <p> Difficulty = {{question.difficulty}}/3</p>
+        {% endif %}
     {% endfor %} 
 </div>
-
-<!--[Matt] To Do, add routes to assesment  -->
-<a href="{{url_for('assessments.index')}}"><button>Finish Editing</button></a>
 {% endblock %}

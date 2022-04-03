@@ -37,7 +37,7 @@ class AnswerType2Form(FlaskForm):
 
 class AssessmentForm(FlaskForm):
     title = TextAreaField("Enter Title", default="", validators=[DataRequired()])
-    module_id= IntegerField("Enter module ID",validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
+    module_id= IntegerField("Enter module ID",validators=[NumberRange(min=0, message='Must enter a number greater than 0'), DataRequired()])
     due_date = DateField("Enter the due date", format='%Y-%m-%d')
     num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
@@ -60,12 +60,12 @@ class DeleteAssessmentForm(FlaskForm):
 
 class EditAssessmentForm(FlaskForm):
     title = TextAreaField("Enter Title", default="", validators=[DataRequired()])
-    module_id= IntegerField("Enter module ID",validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
+    module_id= IntegerField("Enter module ID",validators=[NumberRange(min=0, message='Must enter a number greater than 0'), DataRequired()])
     due_date = DateField("Enter the due date", format='%Y-%m-%d')
     num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
     is_summative = BooleanField("Select if Assessment is summative")
-    submit = SubmitField("Add Questions")
+    submit = SubmitField("Next")
 
 class RemoveQuestionForm(FlaskForm):
     submit = SubmitField("Remove")
