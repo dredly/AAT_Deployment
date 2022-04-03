@@ -1,5 +1,5 @@
 from flask import request, redirect, url_for, render_template
-from .forms import QuestionT1Form, QuestionT2Form, FilterForm, DeleteForm
+from .forms import QuestionForm, FilterForm, DeleteForm
 from ..models import QuestionT1, QuestionT2, Option, Tag
 from ..decorators import permission_required
 from .. import Permission
@@ -45,7 +45,7 @@ def index():
 
 @questions.route("/type1/new", methods=["GET", "POST"])
 def new_question_t1():
-    form = QuestionT1Form()
+    form = QuestionForm()
     if request.method == "POST":
         question_text = request.form["question_text"]
         option_a_text = request.form["option_a"]
@@ -107,7 +107,7 @@ def edit_question_t1(id):
         Option.query.filter_by(q_t1_id=id).filter(Option.is_correct.is_(True)).first()
     )
 
-    form = QuestionT1Form()
+    form = QuestionForm()
     if request.method == "POST":
         question.question_text = form.question_text.data
         options[0].option_text = form.option_a.data
@@ -163,7 +163,7 @@ def delete_question_t1(id):
 
 @questions.route("/type2/new", methods=["GET", "POST"])
 def new_question_t2():
-    form = QuestionT2Form()
+    form = QuestionForm()
     if request.method == "POST":
         question_text = request.form["question_text"]
         correct_answer = request.form["correct_answer"]
@@ -201,7 +201,7 @@ def show_question_t2(id):
 @questions.route("/type2/<int:id>/edit", methods=["GET", "POST"])
 def edit_question_t2(id):
     question = QuestionT2.query.get_or_404(id)
-    form = QuestionT2Form()
+    form = QuestionForm()
     if request.method == "POST":
         question.question_text = form.question_text.data
         question.correct_answer = form.correct_answer.data
