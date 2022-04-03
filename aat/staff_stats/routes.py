@@ -49,7 +49,8 @@ def module(Module_title):
     user_id = user.id
     module = Module.query.filter_by(title = Module_title).first()
     moduleId = module.module_id
-
+    session["Module_title"] = Module_title
+    
     
 
     Assessments = Assessment.query.all()
@@ -350,7 +351,7 @@ def module(Module_title):
 
     return render_template("module.html",
      
-        module_title = Module_title,
+        Module_title = Module_title,
         lecturersAssessments = lecturersAssessments,
         modulesOtherAssessments = modulesOtherAssessments,
         assessmentIds = assessmentIds,
@@ -382,6 +383,8 @@ def module(Module_title):
 
 @staff_stats.route("/view-students/<string:assessment>")
 def view_students(assessment):
+    print(session["Module_title"])
+    Module_title = session["Module_title"]
     if "name" in session:
         print(session["name"])
     assessments= Assessment.query.all()
@@ -414,7 +417,7 @@ def view_students(assessment):
     print("users2",users2)            
     
 
-    return render_template("view-students.html", 
+    return render_template("view-students.html", Module_title = Module_title,
     assessment = assessment,
     assessmentID = assessmentID,
     users2 = users2,)
