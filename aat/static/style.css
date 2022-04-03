@@ -87,10 +87,26 @@ footer {
 	text-decoration: none;
 	color: black;
 }
+.modules_title{
+	padding-top:2vh;
+	display: flex;
+	justify-content: center;
+}
 
 /* EDIT DELETE TAKE ASSESSMENT BUTTONS ON INDEX */
 .module_title{
 	padding-left: 1vw;
+}
+.index_modules{
+	display: flex;
+	max-width: max-content;
+	align-items: center;
+	justify-content: space-between;
+	padding-left: 1vw;
+}
+.modules_child{
+	display: flex;
+	padding-left: 5vw;
 }
 .Assessment_Index_Parent{
 	display: flex;
