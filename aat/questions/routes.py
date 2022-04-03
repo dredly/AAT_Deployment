@@ -53,7 +53,6 @@ def new_question_t1():
         option_c_text = request.form["option_c"]
         correct_option = request.form["correct_option"]
         tag_id = request.form["tag"]
-        print(correct_option)
         num_of_marks = request.form["num_of_marks"]
         difficulty = request.form["difficulty"]
         feedback_if_correct = request.form["feedback_if_correct"]
@@ -83,13 +82,13 @@ def new_question_t1():
             option_b.is_correct = True
         elif correct_option == "2":
             option_c.is_correct = True
-        db.session.add(option_a)
-        db.session.add(option_b)
-        db.session.add(option_c)
+        db.session.add_all([option_a, option_b, option_c])
         db.session.commit()
         return redirect(url_for("questions.index"))
     form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
-    return render_template("new_question_t1.html", form=form)
+    return render_template(
+        "question.html", form=form, question_type="t1", editing=False
+    )
 
 
 @questions.route("/type1/<int:id>", methods=["GET", "POST"])
@@ -146,7 +145,7 @@ def edit_question_t1(id):
     form.option_a.data = options[0]
     form.option_b.data = options[1]
     form.option_c.data = options[2]
-    return render_template("edit_question_t1.html", form=form)
+    return render_template("question.html", form=form, question_type="t1", editing=True)
 
 
 @questions.route("/type1/<int:id>/delete", methods=["GET", "POST"])
@@ -191,7 +190,9 @@ def new_question_t2():
         db.session.commit()
         return redirect(url_for("questions.index"))
     form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
-    return render_template("new_question_t2.html", form=form)
+    return render_template(
+        "question.html", form=form, question_type="t2", editing=False
+    )
 
 
 @questions.route("/type2/<int:id>", methods=["GET", "POST"])
@@ -227,7 +228,7 @@ def edit_question_t2(id):
     form.feedback_if_wrong.data = question.feedback_if_wrong
     form.feedforward_if_correct.data = question.feedforward_if_correct
     form.feedforward_if_wrong.data = question.feedforward_if_wrong
-    return render_template("edit_question_t2.html", form=form)
+    return render_template("question.html", form=form, question_type="t2", editing=True)
 
 
 @questions.route("/type2/<int:id>/delete", methods=["GET", "POST"])
