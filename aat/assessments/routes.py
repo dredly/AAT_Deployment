@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 import math
 import random 
 from stringprep import in_table_d2
@@ -6,7 +6,7 @@ from flask import Response, redirect, render_template, request, url_for, abort, 
 from . import assessments
 
 from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT2, ResponseT1, Option, Tag
-from .forms import AddQuestionToAssessmentForm, DeleteQuestionsForm, AnswerType1Form, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, FinishForm, RemoveQuestionForm
+from .forms import AddQuestionToAssessmentForm, CreateQuestionT1Form, CreateQuestionT2Form, DeleteQuestionsForm, AnswerType1Form, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, FinishForm, RemoveQuestionForm
 from .. import db
 from flask_login import current_user
 
@@ -107,6 +107,20 @@ def view_module(module_id):
 @assessments.route("/<int:id>")
 def show_assessment(id):
     assessment = Assessment.query.get_or_404(id)
+    assessment_id=id
+    t1_difficulty = 0
+    t2_difficulty = 0
+    count_t1 = 0
+    count_t2 = 0
+    questions_t1 = QuestionT1.query.filter_by(assessment_id=assessment_id).all()
+    questions_t2 = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+    for question in questions_t1:
+        count_t1 += 1
+        t1_difficulty = (t1_difficulty + question.difficulty) / count_t1
+    for question in questions_t2:
+        count_t2 += 1
+        t2_difficulty = (t2_difficulty + question.difficulty) / count_t2
+    assessment_difficulty = math.ceil((t1_difficulty + t2_difficulty) / 2)
     try:
         time_limit_minutes = math.floor(int(assessment.time_limit) / 60)
     except:
@@ -122,7 +136,7 @@ def show_assessment(id):
     # TODO make a combined list of T1 and T2 questions and order by their question index
     questions = QuestionT1.query.filter_by(assessment_id=id).all() + QuestionT2.query.filter_by(assessment_id=id).all()
     return render_template(
-        "show_assessment.html", assessment=assessment, questions=questions, current_date=current_date, time_limit_minutes=time_limit_minutes, assessment_type=assessment_type
+        "show_assessment.html", assessment=assessment, questions=questions, current_date=current_date, time_limit_minutes=time_limit_minutes, assessment_type=assessment_type, assessment_difficulty=assessment_difficulty
     )
 
 
@@ -153,18 +167,27 @@ def delete_questions(id):
 @assessments.route("/assessment/new", methods=["GET", "POST"])
 def new_assessment():
     session.pop("assessment_edit", None)
+    session.pop("assessment_add", None)
     form = AssessmentForm()
+    error = " "
     is_summative_1 = ""
     session["user"] = current_user.id 
     if request.method == "POST":
         lecturer_id = session["user"]
         is_summative = False
         title = request.form["title"]
-        total_date = request.form["due_date"]
-        year = int(total_date[:4])
-        month = int(total_date[5:7])
-        day = int(total_date[8:10])
-        due_date = datetime(year, month, day)
+        if form.validate_on_submit:
+            total_date = request.form["due_date"]
+            print(date.today().strftime("%Y-%m-%d"))
+            print(total_date)
+            if total_date >= date.today().strftime("%Y-%m-%d"):
+                year = int(total_date[:4])
+                month = int(total_date[5:7])
+                day = int(total_date[8:10])
+                due_date = datetime(year, month, day)
+            else:
+                error = "Due date cannot be in the past"
+                return render_template("new_assessment.html", form=form , error=error)
         time_limit = request.form["time_limit"]
         num_of_credits = request.form["num_of_credits"]
         module_id = request.form["module_id"]
@@ -193,26 +216,36 @@ def new_assessment():
 @assessments.route("/<int:id>/edit_assessment", methods=["GET", "POST"])
 def edit_assessment(id):
     session.pop("assessment_add", None)
+    session.pop("assessment_edit", None)
     assessment = Assessment.query.get_or_404(id)
     form = EditAssessmentForm()
     session["assessment_edit"] = id
-    print(id)
+    error = ' '
     if request.method == "POST":
         assessment.title = form.title.data
         assessment.module_id = form.module_id.data
+        total_date = request.form["due_date"]
         try:
-            total_date = request.form["due_date"]
-            year = int(total_date[:4])
-            month = int(total_date[5:7])
-            day = int(total_date[8:10])
-            assessment.due_date = datetime(year, month, day)
+                year = int(total_date[:4])
+                month = int(total_date[5:7])
+                day = int(total_date[8:10])
+                assessment.due_date = datetime(year, month, day)
+                if assessment.due_date >= date.today().strftime("%Y-%m-%d"):
+                    assessment.num_of_credits = form.num_of_credits.data
+                    assessment.time_limit = form.time_limit.data
+                    assessment.is_summative = form.is_summative.data
+                    db.session.commit()
+                    return redirect(url_for("assessments.add_questions", id=id))
+                else:
+                    error = "Due date cannot be in the past"
+                    return render_template("edit_assessments.html", form=form, assessment=assessment, error=error)
         except:
-            assessment.due_date = None  
-        assessment.num_of_credits = form.num_of_credits.data
-        assessment.time_limit = form.time_limit.data
-        assessment.is_summative = form.is_summative.data
-        db.session.commit()
-        return redirect(url_for("assessments.index"))
+                assessment.due_date = None 
+                assessment.num_of_credits = form.num_of_credits.data
+                assessment.time_limit = form.time_limit.data
+                assessment.is_summative = form.is_summative.data
+                db.session.commit()
+                return redirect(url_for("assessments.add_questions", id=id))
     form.title.data = assessment.title
     form.module_id.data = assessment.module_id
     form.due_date.data = assessment.due_date
@@ -269,11 +302,10 @@ def remove_question_t1(id, id3):
 def add_questions(id):
     if session.get("assessment_add") != None:
         id = session.get("assessment_add")
-        print(session.get("assessment_add"))
     elif session.get("assessment_edit") != None:
         id = session.get("assessment_edit")
-        print(session.get("assessment_edit"))
     form=FinishForm()
+    assessment = Assessment.query.get_or_404(id)
     addQuestionForm = AddQuestionToAssessmentForm()
     questions = (
             QuestionT1.query.filter(QuestionT1.assessment_id.is_(None)).all()
@@ -283,17 +315,116 @@ def add_questions(id):
         if addQuestionForm.validate_on_submit() and addQuestionForm.add.data:
             question.assessment_id = id
             db.session.commit()
-            return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form)   
-
+            return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form))
     if form.validate_on_submit() and form.finish.data:
         if session.get("assessment_edit") != None:
-            session.pop("assessment_edit", None)
             return redirect(url_for("assessments.edit_assessment", id=id))
         elif session.get("assessment_add") != None:
-            session.pop("assessment_add", None)
             return redirect(url_for("assessments.index"))
-            
-    return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form)
+        else:
+            return redirect(url_for("assessments.index"))
+    return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, assessment=assessment)
+
+@assessments.route("/<int:id>/type1/new", methods=["GET", "POST"])
+def create_questions_t1(id):
+    form = CreateQuestionT1Form()
+    if session.get("assessment_add") != None:
+        id = session.get("assessment_add")
+        print(id)
+    elif session.get("assessment_edit") != None:
+        id = session.get("assessment_edit")
+        print(id)
+    if request.method == "POST":
+        question_text = request.form["question_text"]
+        option_a_text = request.form["option_a"]
+        option_b_text = request.form["option_b"]
+        option_c_text = request.form["option_c"]
+        correct_option = request.form["correct_option"]
+        tag_id = request.form["tag"]
+        # print(correct_option)
+        num_of_marks = request.form["num_of_marks"]
+        difficulty = request.form["difficulty"]
+        feedback_if_correct = request.form["feedback_if_correct"]
+        feedback_if_wrong = request.form["feedback_if_wrong"]
+        feedforward_if_correct = request.form["feedforward_if_correct"]
+        feedforward_if_wrong = request.form["feedforward_if_wrong"]
+        new_question = QuestionT1(
+            question_text=question_text,
+            tag_id=tag_id,
+            num_of_marks=num_of_marks,
+            difficulty=difficulty,
+            feedback_if_correct=feedback_if_correct,
+            feedback_if_wrong=feedback_if_wrong,
+            feedforward_if_correct=feedforward_if_correct,
+            feedforward_if_wrong=feedforward_if_wrong,
+            assessment_id=id
+        )
+        db.session.add(new_question)
+        found_question = QuestionT1.query.filter(
+            QuestionT1.question_text == new_question.question_text
+        ).first()
+        option_a = Option(q_t1_id=found_question.q_t1_id, option_text=option_a_text)
+        option_b = Option(q_t1_id=found_question.q_t1_id, option_text=option_b_text)
+        option_c = Option(q_t1_id=found_question.q_t1_id, option_text=option_c_text)
+        if correct_option == "0":
+            option_a.is_correct = True
+        elif correct_option == "1":
+            option_b.is_correct = True
+        elif correct_option == "2":
+            option_c.is_correct = True
+        db.session.add(option_a)
+        db.session.add(option_b)
+        db.session.add(option_c)
+        db.session.commit()
+        if session.get("assessment_edit") != None:
+            return redirect(url_for("assessments.add_questions", id=id))
+        elif session.get("assessment_add") != None:
+            return redirect(url_for("assessments.add_questions", id=id))
+    form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
+    return render_template("new_question_t1.html", form=form, id=id)
+
+
+@assessments.route("/<int:id>/type2/new", methods=["GET", "POST"])
+def create_question_t2(id):
+    form = CreateQuestionT2Form()
+    if session.get("assessment_add") != None:
+        id = session.get("assessment_add")
+        print(id)
+    elif session.get("assessment_edit") != None:
+        id = session.get("assessment_edit")
+        print(id)
+    if request.method == "POST":
+        question_text = request.form["question_text"]
+        correct_answer = request.form["correct_answer"]
+        tag_id = request.form["tag"]
+        num_of_marks = request.form["num_of_marks"]
+        difficulty = request.form["difficulty"]
+        feedback_if_correct = request.form["feedback_if_correct"]
+        feedback_if_wrong = request.form["feedback_if_wrong"]
+        feedforward_if_correct = request.form["feedforward_if_correct"]
+        feedforward_if_wrong = request.form["feedforward_if_wrong"]
+        new_question = QuestionT2(
+            question_text=question_text,
+            correct_answer=correct_answer,
+            tag_id=tag_id,
+            num_of_marks=num_of_marks,
+            difficulty=difficulty,
+            feedback_if_correct=feedback_if_correct,
+            feedback_if_wrong=feedback_if_wrong,
+            feedforward_if_correct=feedforward_if_correct,
+            feedforward_if_wrong=feedforward_if_wrong,
+            assessment_id=id
+        )
+        db.session.add(new_question)
+        db.session.commit()
+        if session.get("assessment_edit") != None:
+            session.pop("assessment_edit", None)
+            return redirect(url_for("assessments.add_questions", id=id))
+        elif session.get("assessment_add") != None:
+            session.pop("assessment_add", None)
+            return redirect(url_for("assessments.add_questions", id=id))
+    form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
+    return render_template("new_question_t2.html", form=form, id=id)
 
 # ---------------------------------  End Of CRUD For Assessments ---------------------------------------
 
