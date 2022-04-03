@@ -249,7 +249,6 @@ def edit_assessment(id):
             else:
                 error = "Due date cannot be in the past"
                 return render_template("edit_assessments.html", form=form, assessment=assessment, error=error)
-        # doesnt work neeeds fixing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         # try:
         #     year = int(total_date[:4])
         #     month = int(total_date[5:7])
@@ -279,17 +278,18 @@ def edit_assessment(id):
 @assessments.route("/<int:id>/delete_assessment", methods=["GET", "POST"])
 def delete_assessment(id):
     assessment = Assessment.query.get_or_404(id)
+    module_id=session.get("module_id")
     form = DeleteAssessmentForm()
     if request.method == "POST":
         try: 
             request.form['submit']
             db.session.delete(assessment)
             db.session.commit()
-            return redirect(url_for("assessments.index"))
+            return redirect(url_for("assessments.view_module", module_id=module_id))
         except:
             request.form['cancel']
-            return redirect(url_for("assessments.index"))
-    return render_template("delete_assessment.html", assessment=assessment, form=form, id=id)
+            return redirect(url_for("assessments.view_module", module_id=module_id))
+    return render_template("delete_assessment.html", assessment=assessment, form=form, id=id, module_id=module_id)
 
 @assessments.route("/<int:id>/edit_assessment/remove/t2/<int:id2>", methods=["GET", "POST"])
 def remove_question_t2(id, id2):
@@ -334,7 +334,7 @@ def add_questions(id):
             db.session.commit()
             return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form))
     if form.validate_on_submit() and form.finish.data:
-        return redirect(url_for("assessments.index"))
+        return redirect(url_for("assessments.show_assessment", id=id))
     return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, assessment=assessment)
 
 @assessments.route("/<int:id>/type1/new", methods=["GET", "POST"])

@@ -1,6 +1,7 @@
 {% extends("layout.html") %}
 
 {% block content %}
+<div class="block_contents">
     {% if error %}
         <p class="warning"><strong> Error: </strong></p> {{error}}
     {% endif %}
@@ -18,7 +19,7 @@
         <div>
             <div>{{form.time_limit.label}}</div>{{form.time_limit}}
         </div>
-        <hr />
+        
         <div>
             <div>{{form.is_summative.label}}</div>{{form.is_summative}}
         </div>
@@ -34,7 +35,6 @@
 </div>
 
 <h2>{{assessment.title}} Questions</h2>
-
 <div class = "Assessment_Edit_Parent">
 
     {% for question in assessment.question_t1 %}
@@ -52,7 +52,7 @@
         {% endif %}
     {% endfor %}
 
-    {% for question in assessment.question_t2 %}   
+    {% for question in assessment.question_t2 %}  
         <div class = "Assessment_Edit_Children">
             <h3>{{question}}</h3>
                     {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
@@ -65,5 +65,6 @@
         <p> Difficulty = {{question.difficulty}}/3</p>
         {% endif %}
     {% endfor %} 
+</div>
 </div>
 {% endblock %}

@@ -67,7 +67,7 @@
                     <a href="{{ url_for('assessments.edit_assessment', id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
                 </button>
                 <button type="button" class = "Assessment_Index_Child">
-                    <a href="{{ url_for('assessments.delete_assessment', id=formative_assessment.assessment_id) }}"class="Assessment_Index_Text">Delete Assessment</a>
+                    <a href="{{ url_for('assessments.delete_assessment', id=formative_assessment.assessment_id) }}"class="Assessment_Index_Text" class="delete-button">Delete Assessment</a>
                 </button>
             {% endif %}
         </div>

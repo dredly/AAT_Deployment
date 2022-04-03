@@ -119,6 +119,12 @@ footer {
 	text-decoration: none;
 	color: black;
 }
+.Assessment_show_button{
+	text-decoration: none;
+	color: black;
+	display: flex;
+	justify-content: flex-end;
+}
 
 /* EDIT_ASSESSMENT.html */
 .Assessment_Edit_Parent{
@@ -146,6 +152,10 @@ footer {
 	display: flex;
 	justify-content: center;
 }
+.show_assessment_edit{
+	display:flex;
+	justify-content: flex-end;
+}
 .show_assessment_parent{
 	display: flex;
 	justify-content: space-between;
@@ -162,6 +172,11 @@ footer {
 	display: flex;
 	flex-wrap: nowrap;
 	margin-left: 2vw;
+}
+
+.add_questions_finish{
+	display: flex;
+	padding-top: 2vh;
 }
 
 /* ----------------------------------------------------- END OF CRUD ASSESSMENTS ------------------------------------------------ */

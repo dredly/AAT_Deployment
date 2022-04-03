@@ -1,7 +1,7 @@
 {% extends("layout.html") %}
 
 {% block content %}
-
+<div class="block_contents">
 <!-- Adapted Add question page from Type 1 and Type 2 Questions -->
 <h1>Add Questions to {{assessment}}</h1>
 
@@ -21,9 +21,9 @@
    
 {% endfor %}
 
-<form method="POST" action="">
+<form method="POST" action="" class="add_questions_finish">
     {{ form.csrf_token}}
     {{ form.finish}}
 </form>
-
+</div>
 {% endblock %}
