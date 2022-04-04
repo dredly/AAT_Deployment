@@ -46,6 +46,12 @@ def achievements(user_id):
     achievements = []
     lines_ranks = []
     all_users = User.query.all()
+    all_friends = Friends.query.filter_by(user_id=current_user.id).all()
+    all_challenge_friends = []
+    for friend in all_friends:
+        all_challenge_friends.append((User.query.filter_by(id=friend.friend_id).first().id, User.query.filter_by(id=friend.friend_id).first().name))
+    print(all_challenge_friends)
+    all_challenge_friends_names = [item[1] for item in all_challenge_friends]
     all_takenChallenges = ChallengesTaken.query.all()
     takenChallengesIDs = ChallengesTaken.query.with_entities(ChallengesTaken.challenge_id).filter_by(user_id=user_id).all()
     takenChallengesList = [item[0] for item in takenChallengesIDs]
@@ -116,7 +122,7 @@ def achievements(user_id):
         # print(user.name, overall_results)
 
         lines_ranks.append((overall_results['sum_of_marks_awarded'], user.name, user.id))
-        print(lines_ranks)
+        # print(lines_ranks)
 
         module_totals = {}
 
@@ -181,7 +187,7 @@ def achievements(user_id):
             challenge.status = "Completed"
             db.session.add(challenge)
             db.session.commit()
-    print(active_users)
+    # print(active_users)
 
     # print(in_users)
     # print(out_users)
@@ -303,13 +309,23 @@ def achievements(user_id):
                     )
                 )
             except BadRequestKeyError:
-                pass
+                pass       
+        elif choice == "Add Friend":
+            friend = Friends(user_id=current_user.id, friend_id=user_id)
+            db.session.add(friend)
+            db.session.commit()
+            return redirect(url_for(".get_id"))
+        elif choice == "Remove Friend":
+            friend = Friends.query.filter_by(user_id=current_user.id, friend_id=user_id).first()
+            db.session.delete(friend)
+            db.session.commit()
+            return redirect(url_for(".get_id"))
     return render_template(
         "achievements.html", ranks=sorted(lines_ranks, key=lambda x: x[0], reverse=True), badges=badges,
         achievements=achievements, incoming_challenges=in_users, outgoing_challenges=out_users, challenge=challenge,
         all_users=all_users, challenge_ids=challenge_ids, in_difficulty=incoming_challenge_difficulty,
         out_difficulty=outgoing_challenge_difficulty, active_users=active_users, taken_challenges=takenChallengesList,
-        leaderboard_user=leaderboard_user
+        leaderboard_user=leaderboard_user, all_friends=all_challenge_friends, all_friends_names=all_challenge_friends_names
         )
 
 

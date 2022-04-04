@@ -59,6 +59,15 @@ a {
     text-decoration: none;
 }
 
+.friendship-container {
+    position: absolute;
+    text-align: right;
+    width: 100%;
+}
+.add-friend-button {
+    margin: 10px;
+}
+
 .divider {
     height: 1px;
     border-top-style:ridge;
