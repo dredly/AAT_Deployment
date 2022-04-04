@@ -413,7 +413,7 @@ def view_students(assessment):
                 questions.append(question.get("question_type"))
                 attemptLists[question.get("attempt_number")-1].append(questions)          
             users2.append(attemptLists)
-            
+    print(users2)
     return render_template("view-students.html", Module_title = Module_title,
     assessment = assessment,
     assessmentID = assessmentID,

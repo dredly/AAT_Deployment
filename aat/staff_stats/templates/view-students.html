@@ -10,27 +10,23 @@
     <h1>Student Name: {{user.pop(-1)}}</h1>
     
     {%for allQuestions in user%}
-    {%set attempt = loop.index%}
-    <h2>This is attempt: {{attempt}}</h2>
-        {%for question in allQuestions%}      
-        <h3> Question: {{question[0]}} &nbsp;&nbsp;&nbsp; Question difficulty: {{question[1]}} &nbsp;&nbsp;&nbsp; Question Type: {{question[5]}} </h3>
-        <p> Answer given: {{question[2]}} &nbsp;&nbsp;&nbsp; {%if question[3] == True%} Answered Correct! {%else%} Answered False! {%endif%} </p>
-        {%endfor%}
+        {%set allQuestionsLength = allQuestions|length%}
+        {%if allQuestionsLength > 0%}
+            {%set attempt = loop.index%}
+            <h2>This is attempt: {{attempt}}</h2>
+        
+            {%for question in allQuestions%}      
+                <h3> Question: {{question[0]}} &nbsp;&nbsp;&nbsp; Question difficulty: {{question[1]}} &nbsp;&nbsp;&nbsp; Question Type: {{question[5]}} </h3>
+                <p> Answer given: {{question[2]}} &nbsp;&nbsp;&nbsp; {%if question[3] == True%} Answered Correct! {%else%} Answered False! {%endif%} </p>
+            {%endfor%}
+        {%else%}
+            <p>No questions have been answered</p>
+        {%endif%}
     {%endfor%}
 
 
 
 
-    <!--
-    <h1>Student Name: {{user.pop(0)}}</h1>
-    {%if users2Length > 1 %}    
-        {%for question in users2[count]%}
-            <h2> Question: {{question[0]}} &nbsp;&nbsp;&nbsp; Question difficulty: {{question[1]}} &nbsp;&nbsp;&nbsp; Question Type: {{question[5]}} </h2>  
-            <p> Answer given: {{question[2]}} &nbsp;&nbsp;&nbsp; {%if question[3] == True%} Answered Correct! {%else%} Answered False! {%endif%} &nbsp;&nbsp;&nbsp; Attmempt Number: {{question[4]}} </p>
-    
-        {%endfor%}
-    {%else%}
-        <p>No questions have been answered</p>
-    {%endif%}-->
+   
 {%endfor%}
 {% endblock %}
