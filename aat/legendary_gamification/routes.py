@@ -240,7 +240,8 @@ def achievements(user_id):
             challenge_details = Challenge(from_user=user_id, to_user=int(request.form.get("Users")), difficulty=int(challenge.difficulty.data))
             db.session.add(challenge_details)
             db.session.commit()
-            return redirect("redirect-page-achievement")
+            return redirect(url_for(".get_id"))
+
         elif choice == "Accept Challenge":
             try:
                 chosen_challenge = request.form['accept_options']
@@ -262,7 +263,7 @@ def achievements(user_id):
                     db.session.add(question)
                     db.session.commit()
 
-                return redirect("redirect-page-achievement")
+                return redirect(url_for(".get_id"))
             except BadRequestKeyError:
                 pass
         elif choice == "Take Challenge":
@@ -344,9 +345,9 @@ def assessment_success():
         challenge_questions = []
         challenge_options = []
         if choice == "reset":
-            return redirect("rapid-fire")
+            return redirect(url_for(".get_id"))
         elif choice == "return":
-            return redirect("achievements")
+            return redirect(url_for(".get_id"))
     return render_template("assess_success.html")
 
 
