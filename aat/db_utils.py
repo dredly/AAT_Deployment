@@ -405,6 +405,7 @@ def get_all_response_details(
             Assessment.num_of_credits,  # 17
             Module.title,  # 18
             Assessment.title,  # 19
+            QuestionT1.tag_id,  # 20
         )
         .select_from(User)
         .join(ResponseT1)
@@ -442,6 +443,7 @@ def get_all_response_details(
         output_dict["num_of_credits"] = question[17]
         output_dict["module_title"] = question[18]
         output_dict["assessment_title"] = question[19]
+        output_dict["tag_id"] = question[20]
 
         for answer in table_of_correct_t1_answers:
             if answer.q_t1_id == output_dict["q_id"]:
@@ -481,6 +483,7 @@ def get_all_response_details(
             Assessment.num_of_credits,  # 17
             Module.title,  # 18
             Assessment.title,  # 19
+            QuestionT2.tag_id,
         )
         .select_from(User)
         .join(ResponseT2)
@@ -517,6 +520,7 @@ def get_all_response_details(
         output_dict["num_of_credits"] = question[17]
         output_dict["module_title"] = question[18]
         output_dict["assessment_title"] = question[19]
+        output_dict["tag_id"] = question[20]
 
         ## ADD FEEDBACK/FEEDFORWARD IF CORRECT/INCORRECT
         output_dict["feedback"] = (
@@ -528,6 +532,10 @@ def get_all_response_details(
         t2_output.append(output_dict)
 
     final_output = t1_output + t2_output
+
+    # Add tag names
+    for item in final_output:
+        item["tag_name"] = Tag.query.filter_by(id=item["tag_id"]).first()
 
     all_assessment_marks = get_all_assessment_marks()
 

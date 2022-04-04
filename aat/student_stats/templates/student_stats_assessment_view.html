@@ -8,15 +8,15 @@
 {% endblock extra_head %}
 {% block title %}
     Student | Assessment View
-{% endblock title %}
+{% endblock title %}`
 {% block content %}
-<h1>Student Stats for {{current_user.name}} | Assessment View for {{assessment_details["assessment_name"]}}</h1>
+<h1>Student Stats for {{current_user.name}} | Assessment View for "{{assessment_details["assessment_name"]}}"</h1>
     <p>
         <a href="{{url_for('student_stats.course_view')}}">
             Course View
         </a> 
         > 
-        <a href="{{url_for('student_stats.module_view', module_id=module_id)}}">
+        <a href="{{url_for('student_stats.module_view', module_id=assessment_details['module_id'])}}">
             Module View
         </a>
          > Assessment View
@@ -25,55 +25,68 @@
     <h2>
         Overall Marks
     </h2>
-    <p>{{overall_results["sum_of_marks_awarded"]}}/{{overall_results["sum_of_marks_possible"]}}
+    <p>{{assessment_details["sum_of_marks_awarded"]}}/{{assessment_details["sum_of_marks_possible"]}}
     ({{ "%.2d" |
-    format((overall_results["sum_of_marks_awarded"]/overall_results["sum_of_marks_possible"])*100)}}%)</p>
+    format((assessment_details["sum_of_marks_awarded"]/assessment_details["sum_of_marks_possible"])*100)}}%)</p>
 
     <div class="content-block">
         <div
             class="chart-container"
-            style="position: relative; height: 20vh; margin-bottom: 12rem"
         >
             <canvas id="myChart"></canvas>
         </div>
     </div>
 
-    <h2>Questions</h2>
+    <h2>Attempts</h2>
     <ul>
-    {% for question, marks in assessment_marks.items() %}
-        <div class="student_stats_container {% if marks.is_correct %}correct_answer{% else %}incorrect_answer{% endif %}">
+    <h3>Highest scoring attempt (attempt: {{assessment_details["highest_scoring_attempt_number"]}}) </h3>
+
+    {% for r in highest_scoring_response_details %}
+        <div class="student_stats_container results_box {% if r.is_correct %} correct_answer {% else %} incorrect_answer {% endif %}">
             <li>
-                <p><b>Question: {{question}}</b></p>
+                <b>Question: {{r.question_text}}</b>
             </li>
-            <ul>
-                <li>
-                    <p>Answer Given: {{marks.answer_given}}</p>
-                </li>
-                <li>
-                    <p>Corrent Answer: {{marks.correct_answer}}</p>
-                </li>
-                <li>
-                    <p>Feedback Given: {{marks.feedback_given}}</p>
-                </li>
-                <li>
-                    <p>Difficulty: {{marks.difficulty}}</p>
-                </li>
-                <li>
-                    <p>Mark: {{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.1d" |
-                        format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
-                </li>
-            </ul>
+            <li>Difficulty: {{r.question_difficulty}}</li>
+            <li>Answer given: {{r.answer_given}}</li>
+            <li>Correct? {{r.is_correct}}</li>
+            <li>Question Tag: {{r.tag_name}}</li>
+            <li>Marks: {% if r.is_correct %}{{r.num_of_marks}}{% else %}0{% endif %}/{{r.num_of_marks}}</li>
         </div>
     {% endfor %}
-</ul>
+
+    <h3>Other attempts</h3>
+
+    <ul>
+        {% if all_response_details %}
+            {% for r in all_response_details %}
+                {% if loop.first %}
+                    <li>
+                        <h3>{{r.attempt_number}}</h3>
+                    </li>        
+                {% endif %}
+                <div class="student_stats_container results_box {% if r.is_correct %} correct_answer {% else %} incorrect_answer {% endif %}">
+                    <li>
+                        <b>Question: {{r.question_text}}</b>
+                    </li>
+                    <li>Difficulty: {{r.question_difficulty}}</li>
+                    <li>Answer given: {{r.answer_given}}</li>
+                    <li>Correct? {{r.is_correct}}</li>
+                    <li>Question Tag: {{r.tag_name}}</li>
+                    <li>Marks: {% if r.is_correct %}{{r.num_of_marks}}{% else %}0{% endif %}/{{r.num_of_marks}}</li>
+                </div>
+            {% endfor %} 
+        {% else %}
+            <h2>No other attempts</h2>
+        {% endif %}
+    </ul>
+
     <h2>Download</h2>
     <p><a href="{{ url_for('student_stats.download')}}">Download CSV</a></p>
     
 
-
     <script>
-        const correct = '{{overall_results["sum_of_marks_awarded"]}}';
-        const incorrect = '{{overall_results["sum_of_marks_possible"]-overall_results["sum_of_marks_awarded"]}}';
+        const correct = '{{assessment_details["sum_of_marks_awarded"]}}';
+        const incorrect = '{{assessment_details["sum_of_marks_possible"]-assessment_details["sum_of_marks_awarded"]}}';
     
         const ctx = document.getElementById('myChart').getContext('2d');
         const myChart = new Chart(ctx, {
@@ -91,4 +104,6 @@
             },
         });
     </script>
-{% endblock content %}
+  
+    
+    {% endblock content %}
