@@ -13,68 +13,148 @@
 <h1>Student Stats for {{current_user.name}} | Course View for MSc. Computing</h1>
     <p>Course View</p>
     <h2>Course: Computer Science</h2>
+    <h2>TODOs</h2>
+    <ul>
+        <li>Assessment & Module credits: <ul>
+                <li>Need to calculate the credits the student has achieved based on Assessment results</li>
+                <li>Can then have percentages calculated etc.</li>
+            </ul>
+        </li>
+        <li>
+            Add reference to achivements
+        </li>
+        <li>
+            Cohort marks should only be calculated from modules STUDENT HAS ALREADY TAKEN
+            <ul>
+                <li>Should probably also be summative only?</li>
+                <li>Add buttons for:
+                    <ul>
+                        <li>Summative</li>
+                        <li>Formative</li>
+                        <li>All</li>
+                    </ul>
+                    
+            </ul>
+        </li>
+        <li>Modules finished? If a student has entirely finished all Assessments attached to Module?</li>
+    </ul>
     <h2>
-        Overall Marks
+        Overall Marks - STUDENT
     </h2>
-    <p>{{overall_results["sum_of_marks_awarded"]}}/{{overall_results["sum_of_marks_possible"]}}
+    <p>{{overall_results_student["sum_of_marks_awarded"]}}/{{overall_results_student["sum_of_marks_possible"]}}
     ({{ "%.2d" |
-    format((overall_results["sum_of_marks_awarded"]/overall_results["sum_of_marks_possible"])*100)}}%)</p>
-
+    format((overall_results_student["sum_of_marks_awarded"]/overall_results_student["sum_of_marks_possible"])*100)}}%)</p>
     <div class="content-block">
         <div
             class="chart-container"
-            style="position: relative; height: 20vh; margin-bottom: 12rem"
+            style="position: relative; height: 20vh"
         >
-            <canvas id="myChart"></canvas>
+            <canvas id="overallResultsStudentPi"></canvas>
+        </div>
+    </div>
+    <h2>
+        Overall Marks - COHORT
+    </h2>
+    <p>{{overall_results_cohort["sum_of_marks_awarded"]}}/{{overall_results_cohort["sum_of_marks_possible"]}}
+    ({{ "%.2d" |
+    format((overall_results_cohort["sum_of_marks_awarded"]/overall_results_cohort["sum_of_marks_possible"])*100)}}%)</p>
+    <div class="content-block">
+        <div
+            class="chart-container"
+            style="position: relative; height: 20vh"
+        >
+            <canvas id="overallResultsCohortPi"></canvas>
         </div>
     </div>
 
     <h2>Modules</h2>
+    <h3>Modules started:</h3>
     <ul>
-        {% for module, assessments in module_dict.items() %}
-            <div class="student_stats_container {% if module_totals[module.title]['marks_awarded']/module_totals[module.title]['marks_possible'] >= 0.5 %} correct_answer {% else %} incorrect_answer {% endif %}">
-                <li>
-                    <p><a href="{{url_for('student_stats.module_view', module_id=module.module_id)}}"><b>{{module}}:</b></a>
-                        {{module_totals[module.title]["marks_awarded"]}}/{{module_totals[module.title]["marks_possible"]}} 
-                        ({{ "%.2d" |
-                        format((module_totals[module.title]["marks_awarded"]/module_totals[module.title]["marks_possible"])*100)}}%)
-                
-                    </p>
-                    <ul>
-                    {% for assessment, marks in assessments.items() %}
+        {% for module_key, module in module_stats_student.items() %}
+            {% if module.taken_by_student %}
+            <a href="{{url_for('student_stats.module_view', module_id=module_key)}}">
+                <div class="student_stats_container results_box {% if module['marks_awarded']/module['marks_possible'] >= 0.5 %} correct_answer {% else %} incorrect_answer {% endif %}">
                         <li>
-                        <p><a href="{{url_for('student_stats.assessment_view', assessment_id=assessment.assessment_id )}}">
-                            {{assessment}}:
-                        </a> : {{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
-                            format((marks.marks_awarded/marks.marks_possible)*100)}}%)</p>
+                            <p><b>{{module.module_title}}</b></p>
+                            <p>Your score: 
+                                    {{module['marks_awarded']}}/{{module['marks_possible']}}
+                                    ({{ "%.2d" |
+                                    format((module['marks_awarded']/module['marks_possible'])*100)}}%)
+                            </p>
+                            <p>
+                                Total assessment credits: {{module.total_assessment_credits}} 
+                            </p>
+                            <p>
+                                Total module credits: {{module.total_module_credits}}
+                            </p>
                         </li>
-                    {% endfor %}
-                    </ul>
-                </li>
-            </div>
+                    </div> 
+                </a>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <h3>Modules not yet started:</h3>
+    <ul>
+        {% for module_key, module in module_stats_student.items() %}
+            {% if not module.taken_by_student %}
+                <div class="student_stats_container results_box not_answered">
+                    <li>
+                        <p><a href="{{url_for('student_stats.module_view', module_id=module_key)}}"><b>{{module.module_title}}</b></a>                    
+                        </p>
+                        <p>
+                            Total assessment credits: {{module.total_assessment_credits}} 
+                        </p>
+                        <p>
+                            Total module credits: {{module.total_module_credits}}
+                        </p>
+                    </li>
+                   
+                </div> 
+            {% endif %}
         {% endfor %}
     </ul>
     <h2>Download</h2>
-    <p><a href="{{ url_for('student_stats.download')}}">Download CSV</a></p>
+    <button><p><a href="{{ url_for('student_stats.download')}}">Download CSV</a></p></button>
 
+    <h2>Achievements</h2>
+    <p><a href="{{ url_for('legendary_gamification.achievements')}}">View Achievements</a></p>
     <script>
-        const correct = '{{overall_results["sum_of_marks_awarded"]}}';
-        const incorrect = '{{overall_results["sum_of_marks_possible"]-overall_results["sum_of_marks_awarded"]}}';
-    
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const myChart = new Chart(ctx, {
+        // OVERALL: STUDENT
+        const overallResultsStudentcorrect = '{{overall_results_student["sum_of_marks_awarded"]}}';
+        const overallResultsStudentincorrect = '{{overall_results_student["sum_of_marks_possible"]-overall_results_student["sum_of_marks_awarded"]}}';
+        const overallResultsStudentPiElement = document.getElementById('overallResultsStudentPi').getContext('2d');
+        const overallResultsStudentPi = new Chart(overallResultsStudentPiElement, {
             type: 'pie',
             data: {
                 labels: ['Correct', 'Incorrect'],
                 datasets: [
                     {
                         label: 'Course View',
-                        data: [correct, incorrect],
+                        data: [overallResultsStudentcorrect, overallResultsStudentincorrect],
                         backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)'],
                         hoverOffset: 4,
                     },
                 ],
             },
         });
+         // OVERALL: COHORT
+         const overallResultsCohortcorrect = '{{overall_results_cohort["sum_of_marks_awarded"]}}';
+         const overallResultsCohortincorrect = '{{overall_results_cohort["sum_of_marks_possible"]-overall_results_cohort["sum_of_marks_awarded"]}}';
+         const overallResultsCohortPiElement = document.getElementById('overallResultsCohortPi').getContext('2d');
+         const overallResultsCohortPi = new Chart(overallResultsCohortPiElement, {
+             type: 'pie',
+             data: {
+                 labels: ['Correct', 'Incorrect'],
+                 datasets: [
+                     {
+                         label: 'Course View',
+                         data: [overallResultsCohortcorrect, overallResultsCohortincorrect],
+                         backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)'],
+                         hoverOffset: 4,
+                     },
+                 ],
+             },
+         });
     </script>
 {% endblock content %}

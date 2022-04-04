@@ -35,25 +35,30 @@ def get_assessment_id_and_total_marks_possible():
     return assessment_id_and_total_marks_possible
 
 
-def get_module_ids_with_total_credits_and_total_marks_possible():
+def get_module_ids_with_details():
     """
     Returns dictionary:
         [module_id (int): {
-            total_num_of_credits (int),
-            total_marks_possible (int)
+            module_title (string),
+            total_module_credits (int),
+            total_assessment_credits (int),
+            total_marks_possible (int),
+            module (Module)
             }]
     """
     q = Module.query.all()
     output_dict = {}
     for module in q:
         output_dict[module.module_id] = {
-            "total_num_of_credits": 0,
+            "module_title": module.title,
+            "total_module_credits": module.total_credits,
+            "total_assessment_credits": 0,
             "total_marks_possible": 0,
         }
         # Find all assessments connected
         for assessment in module.assessments:
             output_dict[module.module_id][
-                "total_num_of_credits"
+                "total_assessment_credits"
             ] += assessment.num_of_credits
 
             # Q1

@@ -1,11 +1,17 @@
+a{
+	text-decoration: none;
+	color: black;
+}
 
-
+li{
+	list-style: none;
+}	
 .content-block {
 	display: flex;
 	align-items: left;
 	vertical-align: bottom;
-	margin-bottom: auto;
-	margin-top: auto;
+	margin-bottom: 4rem;
+
 }
 
 .content-block > p {
@@ -13,19 +19,35 @@
 	margin-top: auto;
 }
 
-.correct_answer{
-	background: rgba(54, 162, 235,0.8);
+.results_box{ 
+	border-width: 8px;
+	border-style: solid;
+	border-radius: 1rem;
+	transition: 0.4s background;
 }
 
-.incorrect_answer{
-	background: rgba(255, 99, 132,0.8);
+.correct_answer{
+	border-color: rgba(54, 162, 235,0.8);
 }
+.correct_answer:hover{
+	background: rgba(54, 162, 235,0.4);
+}
+.incorrect_answer{
+	border-color: rgba(255, 99, 132,0.8);
+}
+.incorrect_answer:hover{
+	background: rgba(255, 99, 132,0.4);
+}
+.not_answered{
+	border-color: rgba(41, 230, 41, 0.8);
+}
+.not_answered:hover{
+	background: rgba(41, 230, 41, 0.4);
+}
+
 
 .student_stats_container{
 	padding: 0.8rem;
 	margin: 0.8rem 0;
 }
 
-.student_stats_container>li{
-	list-style: none;
-}	
