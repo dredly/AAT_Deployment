@@ -35,14 +35,36 @@ def get_assessment_id_and_total_marks_possible():
     return assessment_id_and_total_marks_possible
 
 
-def get_list_of_all_modules_and_total_marks_possible():
-
-    assessment_id_and_total_marks_possible = (
-        get_assessment_id_and_total_marks_possible()
-    )
+def get_module_ids_with_total_credits_and_total_marks_possible():
+    """
+    Returns dictionary:
+        {module_id (int): {
+            total_num_of_credits (int),
+            total_marks_possible (int)
+            }}
+    """
     q = Module.query.all()
+    output_dict = {}
+    for module in q:
+        output_dict[module.module_id] = {
+            "total_num_of_credits": 0,
+            "total_marks_possible": 0,
+        }
+        # Find all assessments connected
+        for assessment in module.assessments:
+            output_dict[module.module_id][
+                "total_num_of_credits"
+            ] += assessment.num_of_credits
 
-    return q
+            # Q1
+            for q1 in assessment.question_t1:
+                output_dict[module.module_id]["total_marks_possible"] += q1.num_of_marks
+            # Q2
+            for q2 in assessment.question_t2:
+                output_dict[module.module_id]["total_marks_possible"] += q2.num_of_marks
+
+            # Will then need to go through the question types
+    return output_dict
 
 
 def get_all_assessment_marks(
@@ -51,6 +73,7 @@ def get_all_assessment_marks(
     input_module_id=None,
     input_assessment_id=None,
     highest_scoring_attempt_only=False,
+    summative_only=False,
     debug=False,
 ):
     """
@@ -64,8 +87,10 @@ def get_all_assessment_marks(
     - 'possible_marks' (int)
     - 'highest_scoring_attempt' (bool)
     - 'num_of_credits' (int)
+    - 'is_summative' (bool)
 
     Optional filters added for student, lecturer, module and assessment id
+    print statements are enabled/disabled through debug=True/False
     """
     attempt_totals_t1 = (
         db.session.query(User, QuestionT1, ResponseT1, Module, Assessment)
@@ -79,6 +104,7 @@ def get_all_assessment_marks(
             .filter(ResponseT1.is_correct == True)
             .label("correct_marks"),
             Assessment.num_of_credits,
+            Assessment.is_summative,
         )
         .select_from(User)
         .join(ResponseT1)
@@ -110,6 +136,7 @@ def get_all_assessment_marks(
             .filter(ResponseT2.is_correct == True)
             .label("correct_marks"),
             Assessment.num_of_credits,
+            Assessment.is_summative,
         )
         .select_from(User)
         .join(ResponseT2)
@@ -159,6 +186,7 @@ def get_all_assessment_marks(
         correct_marks = row[5] if row[5] is not None else 0
         possible_marks = assessment_id_and_total_marks_possible[assessment_id]
         num_of_credits = row[6]
+        is_summative = row[7]
         # Is it already in the final_output? If so, adjust that
         for entry in final_output:
             if (
@@ -180,6 +208,7 @@ def get_all_assessment_marks(
             marks_dict["correct_marks"] = correct_marks
             marks_dict["possible_marks"] = possible_marks
             marks_dict["num_of_credits"] = num_of_credits
+            marks_dict["is_summative"] = is_summative
 
             final_output.append(marks_dict)
 
@@ -234,6 +263,9 @@ def get_all_assessment_marks(
         final_output = [
             item for item in final_output if item["highest_scoring_attempt"]
         ]
+    # Summative Only
+    if summative_only:
+        final_output = [item for item in final_output if item["is_summative"]]
 
     if debug:
         print("***")
