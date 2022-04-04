@@ -38,10 +38,10 @@ def get_assessment_id_and_total_marks_possible():
 def get_module_ids_with_total_credits_and_total_marks_possible():
     """
     Returns dictionary:
-        {module_id (int): {
+        [module_id (int): {
             total_num_of_credits (int),
             total_marks_possible (int)
-            }}
+            }]
     """
     q = Module.query.all()
     output_dict = {}

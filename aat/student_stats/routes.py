@@ -13,7 +13,10 @@ from .. import db
 from ..models import *
 
 # Database Util Functions
-from ..db_utils import get_all_assessment_marks
+from ..db_utils import (
+    get_all_assessment_marks,
+    get_module_ids_with_total_credits_and_total_marks_possible,
+)
 
 
 @student_stats.route("/rich")
@@ -40,9 +43,15 @@ def course_view():
     print("NEW")
     print("***")
 
+    ##################
+    # db_utils calls #
+    ##################
     all_assessment_marks = get_all_assessment_marks(highest_scoring_attempt_only=True)
     all_assessment_marks_student = get_all_assessment_marks(
         input_user_id=current_user.id, highest_scoring_attempt_only=True
+    )
+    module_ids_with_total_credits_and_total_marks_possible = (
+        get_module_ids_with_total_credits_and_total_marks_possible()
     )
 
     marks_dictionary = {"sum_of_marks_awarded": 0, "sum_of_marks_possible": 0}
@@ -78,8 +87,34 @@ def course_view():
         module_totals_student[assessment_mark["module_id"]] = {
             "marks_awarded": assessment_mark["correct_marks"],
             "marks_possible": assessment_mark["possible_marks"],
+            "taken_by_student": True,
         }
+
+    # TODO: THIS (7:56am)
+
+    for (
+        module_key,
+        module_vals,
+    ) in module_ids_with_total_credits_and_total_marks_possible.items():
+        print("!!!!!!")
+        print(f"{module_key=}")
+        print("Type of module:", type(module_key))
+        if module_key not in module_totals_student:
+            ...
+            ## If  in module_totals_student then add it, with "taken_by_student":False
+            ## module_totals_student[module]
+        else:
+            module_totals_student[assessment_mark["module_id"]][
+                "total_num_of_credits"
+            ] = module_ids_with_total_credits_and_total_marks_possible[module_key][
+                "total_num_of_credits"
+            ]
+        ## Else add in "total_num_of_credits"
+
+    # got through "get_module_ids_with_total_credits_and_total_marks_possible"
+
     print(f"{module_totals_student=}")
+    print("?????????")
 
     ############################################
     # OLD VERSION
