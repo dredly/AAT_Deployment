@@ -4,3 +4,4 @@ aat/models.py
 .env
 __pycache__
 *.db
+data_dumps/
