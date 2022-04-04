@@ -144,7 +144,7 @@ def get_all_assessment_marks(
         lecturer_id = row[3]
         attempt_number = row[4]
         correct_marks = row[5] if row[5] is not None else 0
-        possible_marks = 1  # assessment_id_and_total_marks_possible[assessment_id]
+        possible_marks = assessment_id_and_total_marks_possible[assessment_id]
 
         # Is it already in the final_output? If so, adjust that
         for entry in final_output:

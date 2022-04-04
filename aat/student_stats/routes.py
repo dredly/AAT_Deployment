@@ -42,7 +42,7 @@ def course_view():
 
     all_assessment_marks = get_all_assessment_marks(highest_scoring_attempt_only=True)
     all_assessment_marks_student = get_all_assessment_marks(
-        input_user_id=current_user.id, highest_scoring_attempt_only=True, debug=True
+        input_user_id=current_user.id, highest_scoring_attempt_only=True
     )
 
     marks_dictionary = {"sum_of_marks_awarded": 0, "sum_of_marks_possible": 0}
