@@ -36,18 +36,56 @@ def course_view():
     # NEW VERSION
     ############################################
     # OVERALL RESULTS
-    all_assessment_marks = get_all_assessment_marks()
+    print("***")
+    print("NEW")
+    print("***")
+
+    all_assessment_marks = get_all_assessment_marks(highest_scoring_attempt_only=True)
     all_assessment_marks_student = get_all_assessment_marks(
-        input_user_id=current_user.id
+        input_user_id=current_user.id, highest_scoring_attempt_only=True, debug=True
     )
 
-    overall_results = {"sum_of_marks_awarded": 0, "sum_of_marks_possible": 0}
-    # for line in all_assessment_marks_student:
-    #     if line.highest_scoring_attempt:
+    marks_dictionary = {"sum_of_marks_awarded": 0, "sum_of_marks_possible": 0}
+    # - COHORT RESULTS
+    overall_results_cohort = marks_dictionary.copy()
+    for assessment_mark in all_assessment_marks:
+        overall_results_cohort["sum_of_marks_awarded"] += assessment_mark[
+            "correct_marks"
+        ]
+        overall_results_cohort["sum_of_marks_possible"] += assessment_mark[
+            "possible_marks"
+        ]
 
+    # - STUDENT RESULTS
+    overall_results_student = marks_dictionary.copy()
+    for assessment_mark in all_assessment_marks_student:
+        overall_results_student["sum_of_marks_awarded"] += assessment_mark[
+            "correct_marks"
+        ]
+        overall_results_student["sum_of_marks_possible"] += assessment_mark[
+            "possible_marks"
+        ]
+
+    print(f"{overall_results_cohort=}")
+    print(f"{overall_results_student=}")
+
+    # MODULE TOTALS
+    # dict {"module_name":{"marks_awarded":0, "marks_possible:0"}}
+    # - STUDENT RESULTS
+    module_totals_student = {}
+    print(f"{all_assessment_marks_student=}")
+    for assessment_mark in all_assessment_marks_student:
+        module_totals_student[assessment_mark["module_id"]] = {
+            "marks_awarded": assessment_mark["correct_marks"],
+            "marks_possible": assessment_mark["possible_marks"],
+        }
+    print(f"{module_totals_student=}")
     ############################################
     # OLD VERSION
     ############################################
+    print("***")
+    print("OLD")
+    print("***")
 
     ## T1_responses
     for response in current_user.t1_responses:

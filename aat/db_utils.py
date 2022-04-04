@@ -121,7 +121,7 @@ def get_all_assessment_marks(
 
     if debug:
         print("***")
-        print("All values")
+        print("All values:")
         for items in all_values:
             pprint(f"{items}")
 
@@ -129,8 +129,9 @@ def get_all_assessment_marks(
         get_assessment_id_and_total_marks_possible()
     )
 
-    pprint(f"{assessment_id_and_total_marks_possible=}") if debug else ...
-
+    print("****")
+    print(f"{assessment_id_and_total_marks_possible=}") if debug else ...
+    print("****")
     final_output = []
 
     # Make list of dictionaries holding relevant IDs and summations of correct marks
@@ -143,7 +144,7 @@ def get_all_assessment_marks(
         lecturer_id = row[3]
         attempt_number = row[4]
         correct_marks = row[5] if row[5] is not None else 0
-        possible_marks = assessment_id_and_total_marks_possible[assessment_id]
+        possible_marks = 1  # assessment_id_and_total_marks_possible[assessment_id]
 
         # Is it already in the final_output? If so, adjust that
         for entry in final_output:
@@ -159,7 +160,7 @@ def get_all_assessment_marks(
         # If no adjustment happened then append to final_output
         if add_to_dict:
             marks_dict["user_id"] = user_id
-            marks_dict["module_id"] = user_id
+            marks_dict["module_id"] = module_id
             marks_dict["assessment_id"] = assessment_id
             marks_dict["lecturer_id"] = lecturer_id
             marks_dict["attempt_number"] = attempt_number
@@ -225,6 +226,9 @@ def get_all_assessment_marks(
         pprint(f"{final_output=}")
 
     return final_output
+
+
+########################################################################
 
 
 def get_all_response_details(
