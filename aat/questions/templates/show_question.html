@@ -1,9 +1,16 @@
 {% extends("layout.html") %}
 {% block content %}
 <h1>{{ question.question_text }}</h1>
+{% if question_type == 't1' %}
 <a href="{{url_for('questions.edit_question_t1', id=question.q_t1_id)}}"><button>Edit details</button></a>
 <a href="{{url_for('questions.delete_question_t1', id=question.q_t1_id)}}"><button class="delete-button">Delete
         question</button></a>
+{% endif %}
+{% if question_type == 't2' %}
+<a href="{{url_for('questions.edit_question_t2', id=question.q_t2_id)}}"><button>Edit details</button></a>
+<a href="{{url_for('questions.delete_question_t2', id=question.q_t2_id)}}"><button class="delete-button">Delete
+        question</button></a>
+{% endif %}
 {% if question.assessment_id %}
 <p>Assigned to assessment <strong>{{question.assessment.title}}</strong></p>
 {% else %}
@@ -16,6 +23,7 @@
 {% endif %}
 <p>Difficulty: {{question.difficulty}}/3</p>
 <p>Number of marks: {{question.num_of_marks}}</p>
+{% if question_type == 't1' %}
 <h4>Question options:</h4>
 {%for option in options%}
 <p>{{option.option_text}}
@@ -23,9 +31,18 @@
 
     {% endif%}</p>
 {%endfor%}
+{% endif%}
+{% if question_type == 't2' %}
+<h4>Correct answer</h4>
+<p>{{question.correct_answer}}</p>
+{% endif%}
 
 <h4>Feedback if correct</h4>
-<p>{{question.feedback_if_correct}}</p>
+<p class="feedback-or-feedforward">{{question.feedback_if_correct}}</p>
 <h4>Feedback if wrong</h4>
-<p>{{question.feedback_if_wrong}}</p>
+<p class="feedback-or-feedforward">{{question.feedback_if_wrong}}</p>
+<h4>Feedforward if correct</h4>
+<p class="feedback-or-feedforward">{{question.feedforward_if_correct}}</p>
+<h4>Feedforward if wrong</h4>
+<p class="feedback-or-feedforward">{{question.feedforward_if_wrong}}</p>
 {% endblock %}

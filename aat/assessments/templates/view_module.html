@@ -1,12 +1,14 @@
 {% extends("layout.html") %}
 {% block content %}
+<div class="block_contents">
 <h1>{{module.title}}</h1>
 
 {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
-
+<div class = "view_module_create">
 <button type="button" class="Create_Assessment_Button" role="button">
     <a href="{{ url_for('assessments.new_assessment') }}" class="Create_Assessment_Link">Create Assessment</a>
 </button>
+</div>
 
 {% endif %}
 
@@ -29,13 +31,16 @@
                 </button>
 
             {% elif current_user.can(Permission.WRITE_ASSESSMENT) %}
+            <button type="button" class = "Assessment_Index_Child">
+                <a href="{{ url_for('assessments.show_assessment', id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">View Assessment</a>
+            </button>   
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.show_assessment', id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">View Assessment</a>
                 </button>
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.edit_assessment', id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
                 </button>
-                <button type="button" class = "Assessment_Index_Child">
+                <button type="button" class = "Assessment_Index_Child delete-button">
                     <a href="{{ url_for('assessments.delete_assessment', id=summative_assessment.assessment_id) }}"class="Assessment_Index_Text">Delete Assessment</a>
                 </button>
             {% endif %}
@@ -63,10 +68,11 @@
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.show_assessment', id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">View Assessment</a>
                 </button>
+
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.edit_assessment', id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
                 </button>
-                <button type="button" class = "Assessment_Index_Child">
+                <button type="button" class = "Assessment_Index_Child delete-button">
                     <a href="{{ url_for('assessments.delete_assessment', id=formative_assessment.assessment_id) }}"class="Assessment_Index_Text">Delete Assessment</a>
                 </button>
             {% endif %}
@@ -76,5 +82,5 @@
     {% endfor %}
 </section>
 
-
+</div>
 {% endblock %}
