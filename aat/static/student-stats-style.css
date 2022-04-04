@@ -6,12 +6,12 @@ a{
 li{
 	list-style: none;
 }	
+
 .content-block {
 	display: flex;
 	align-items: left;
 	vertical-align: bottom;
 	margin-bottom: 4rem;
-
 }
 
 .content-block > p {

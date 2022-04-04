@@ -39,9 +39,9 @@ def course_view():
     # NEW VERSION
     ############################################
     # OVERALL RESULTS
-    print("***")
-    print("NEW")
-    print("***")
+    # print("***")
+    # print("NEW")
+    # print("***")
 
     ##################
     # db_utils calls #
@@ -122,22 +122,25 @@ def course_view():
     # Write dictionary to CSV
     import json
 
-    with open(
-        "aat/student_stats/data_dumps/overall_results_cohort.txt", "w"
-    ) as convert_file:
-        convert_file.write(json.dumps(overall_results_cohort))
-    with open(
-        "aat/student_stats/data_dumps/overall_results_student.txt", "w"
-    ) as convert_file:
-        convert_file.write(json.dumps(overall_results_student))
-    with open(
-        "aat/student_stats/data_dumps/module_stats_student.txt", "w"
-    ) as convert_file:
-        convert_file.write(json.dumps(module_stats_student))
-    with open(
-        "aat/student_stats/data_dumps/module_stats_cohort.txt", "w"
-    ) as convert_file:
-        convert_file.write(json.dumps(module_stats_cohort))
+    try:
+        with open(
+            "aat/student_stats/data_dumps/overall_results_cohort.txt", "w"
+        ) as convert_file:
+            convert_file.write(json.dumps(overall_results_cohort))
+        with open(
+            "aat/student_stats/data_dumps/overall_results_student.txt", "w"
+        ) as convert_file:
+            convert_file.write(json.dumps(overall_results_student))
+        with open(
+            "aat/student_stats/data_dumps/module_stats_student.txt", "w"
+        ) as convert_file:
+            convert_file.write(json.dumps(module_stats_student))
+        with open(
+            "aat/student_stats/data_dumps/module_stats_cohort.txt", "w"
+        ) as convert_file:
+            convert_file.write(json.dumps(module_stats_cohort))
+    except:
+        ...
 
     # RETURN
 

@@ -11,6 +11,7 @@
 {% endblock extra_head %}
 {% block content %}
 <h1>Student Stats for {{current_user.name}} | Course View for MSc. Computing</h1>
+<p><a href="{{ url_for('legendary_gamification.get_id')}}"><button>Tier: {{current_user.tier}}</button></a></p>
     <p>Course View</p>
     <h2>Course: Computer Science</h2>
     <h2>TODOs</h2>
@@ -19,9 +20,6 @@
                 <li>Need to calculate the credits the student has achieved based on Assessment results</li>
                 <li>Can then have percentages calculated etc.</li>
             </ul>
-        </li>
-        <li>
-            Add reference to achivements
         </li>
         <li>
             Cohort marks should only be calculated from modules STUDENT HAS ALREADY TAKEN
@@ -47,7 +45,6 @@
     <div class="content-block">
         <div
             class="chart-container"
-            style="position: relative; height: 20vh"
         >
             <canvas id="overallResultsStudentPi"></canvas>
         </div>
@@ -61,7 +58,6 @@
     <div class="content-block">
         <div
             class="chart-container"
-            style="position: relative; height: 20vh"
         >
             <canvas id="overallResultsCohortPi"></canvas>
         </div>
@@ -116,9 +112,10 @@
     </ul>
     <h2>Download</h2>
     <button><p><a href="{{ url_for('student_stats.download')}}">Download CSV</a></p></button>
-
     <h2>Achievements</h2>
-    <p><a href="{{ url_for('legendary_gamification.achievements')}}">View Achievements</a></p>
+    <button>
+        <p><a href="{{ url_for('legendary_gamification.get_id')}}">View Achievements</a></p>
+    </button>
     <script>
         // OVERALL: STUDENT
         const overallResultsStudentcorrect = '{{overall_results_student["sum_of_marks_awarded"]}}';
