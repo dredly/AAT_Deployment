@@ -5,31 +5,8 @@ from stringprep import in_table_d2
 from flask import Response, redirect, render_template, request, url_for, abort, session
 from . import assessments
 
-from ..models import (
-    Assessment,
-    QuestionT1,
-    QuestionT2,
-    Module,
-    User,
-    ResponseT2,
-    ResponseT2,
-    ResponseT1,
-    Option,
-    Tag,
-)
-from .forms import (
-    AddQuestionToAssessmentForm,
-    CreateQuestionT1Form,
-    CreateQuestionT2Form,
-    DeleteQuestionsForm,
-    AnswerType1Form,
-    AnswerType2Form,
-    AssessmentForm,
-    DeleteAssessmentForm,
-    EditAssessmentForm,
-    FinishForm,
-    RemoveQuestionForm,
-)
+from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT2, ResponseT1, Option, Tag
+from .forms import AddQuestionToAssessmentForm, CreateQuestionT1Form, CreateQuestionT2Form, DeleteQuestionsForm, AnswerType1Form, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, FinishForm, RandomQuestionsForm, RemoveQuestionForm
 from .. import db
 from flask_login import current_user
 
@@ -328,7 +305,10 @@ def edit_assessment(id):
     form.module_id.data = str(assessment.module_id)
     form.due_date.data = assessment.due_date
     form.num_of_credits.data = assessment.num_of_credits
-    form.time_limit.data = math.floor(int(assessment.time_limit) / 60)
+    if assessment.time_limit != None:
+        form.time_limit.data = math.floor(int(assessment.time_limit) / 60)
+    else:
+        form.time_limit.data = assessment.time_limit
     form.is_summative.data = assessment.is_summative
     return render_template(
         "edit_assessments.html", form=form, assessment=assessment, id=id
@@ -400,37 +380,31 @@ def add_questions(id):
         id = session.get("assessment_add")
     elif session.get("assessment_edit") != None:
         id = session.get("assessment_edit")
-    form = FinishForm()
+    form=FinishForm()
+    randomiser = RandomQuestionsForm()
     assessment = Assessment.query.get_or_404(id)
     addQuestionForm = AddQuestionToAssessmentForm()
     questions = (
-        QuestionT1.query.filter(QuestionT1.assessment_id.is_(None)).all()
-        + QuestionT2.query.filter(QuestionT2.assessment_id.is_(None)).all()
-    )
+            QuestionT1.query.filter(QuestionT1.assessment_id.is_(None)).all()
+            + QuestionT2.query.filter(QuestionT2.assessment_id.is_(None)).all()
+        )
+    if randomiser.validate_on_submit() and randomiser.random.data:
+        difficulty_level = randomiser.question_difficulty.data
+        difficulty_level = int(difficulty_level)
+        for question in questions:
+            if difficulty_level == question.difficulty:
+                question.assessment_id = assessment.assessment_id
+                db.session.commit()
+        return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, randomiser=randomiser))
+
     for question in questions:
         if addQuestionForm.validate_on_submit() and addQuestionForm.add.data:
             question.assessment_id = id
             db.session.commit()
-            return redirect(
-                url_for(
-                    "assessments.add_questions",
-                    questions=questions,
-                    id=id,
-                    addQuestionForm=addQuestionForm,
-                    form=form,
-                )
-            )
+            return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, randomiser=randomiser))
     if form.validate_on_submit() and form.finish.data:
         return redirect(url_for("assessments.show_assessment", id=id))
-    return render_template(
-        "add_questions.html",
-        questions=questions,
-        id=id,
-        addQuestionForm=addQuestionForm,
-        form=form,
-        assessment=assessment,
-    )
-
+    return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, assessment=assessment, randomiser=randomiser)
 
 @assessments.route("/<int:id>/type1/new", methods=["GET", "POST"])
 def create_questions_t1(id):

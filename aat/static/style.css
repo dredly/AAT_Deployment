@@ -163,10 +163,15 @@ footer {
 	background-color:red ;
 
 }
+.edit_submit_button{
+	padding-top: 1vh;
+}
 
 .show_assessment_title{
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
+	align-content: center;
+	align-items: center;
 }
 .show_assessment_edit{
 	display:flex;

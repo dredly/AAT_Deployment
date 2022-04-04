@@ -10,6 +10,17 @@
 <a href="{{url_for('assessments.create_questions_t1', id=assessment.assessment_id)}}"><button>Type 1</button></a>
 <a href="{{url_for('assessments.create_question_t2', id=assessment.assessment_id)}}"><button>Type 2</button></a>
 
+{% if assessment.is_summative == False %}
+
+<h3>Generate Random Assessment by Difficulty</h3>
+<form method="POST" action="">
+    {{ randomiser.csrf_token}}
+    {{ randomiser.question_difficulty}}
+    {{ randomiser.random}}
+</form>
+
+{% endif %}
+
 {% for question in questions %}
     <h2>{{ question.question_text }}</h2>
     <p>{{question.num_of_marks}} marks</p>
