@@ -384,24 +384,19 @@ def module(Module_title):
 @staff_stats.route("/view-students/<string:assessment>")
 def view_students(assessment):
     Module_title = session["Module_title"]
-    if "name" in session:
-        print(session["name"])
     assessments= Assessment.query.all()
     assessmentID = 0
     for assessment2 in assessments:
         if assessment2.title == assessment:         
             assessmentID = assessment2.assessment_id
-    print(assessmentID)
     
     users = User.query.all()
     users2 = []
-    usersAttempts = []
+
     for user in users:
         if user.role_id == 1:
             userInfo = get_all_response_details(user.id, None, None, assessmentID )
           
-           
-            
             attempts = 1
             for question in userInfo:
                 if question.get("attempt_number") > attempts:
@@ -416,16 +411,10 @@ def view_students(assessment):
                 questions.append(question.get("is_correct"))
                 questions.append(question.get("attempt_number"))
                 questions.append(question.get("question_type"))
-                attemptLists[question.get("attempt_number")-1].append(questions)
-            print("length",len(attemptLists))
-            
+                attemptLists[question.get("attempt_number")-1].append(questions)          
             users2.append(attemptLists)
-            usersAttempts.append(attempts)
-    print("users2",users2)            
-    
-
+            
     return render_template("view-students.html", Module_title = Module_title,
     assessment = assessment,
     assessmentID = assessmentID,
-    users2 = users2,
-    usersAttempts = usersAttempts)
+    users2 = users2,)

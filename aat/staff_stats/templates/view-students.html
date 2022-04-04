@@ -11,7 +11,7 @@
     
     {%for allQuestions in user%}
     {%set attempt = loop.index%}
-    <h2>This is from attempt: {{attempt}}</h2>
+    <h2>This is attempt: {{attempt}}</h2>
         {%for question in allQuestions%}      
         <h3> Question: {{question[0]}} &nbsp;&nbsp;&nbsp; Question difficulty: {{question[1]}} &nbsp;&nbsp;&nbsp; Question Type: {{question[5]}} </h3>
         <p> Answer given: {{question[2]}} &nbsp;&nbsp;&nbsp; {%if question[3] == True%} Answered Correct! {%else%} Answered False! {%endif%} </p>
