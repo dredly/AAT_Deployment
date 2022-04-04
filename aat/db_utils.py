@@ -35,11 +35,51 @@ def get_assessment_id_and_total_marks_possible():
     return assessment_id_and_total_marks_possible
 
 
+def get_module_ids_with_details():
+    """
+    Returns dictionary:
+        [module_id (int): {
+            module_title (string),
+            total_module_credits (int),
+            total_assessment_credits (int),
+            total_marks_possible (int),
+            module (Module)
+            }]
+    """
+    q = Module.query.all()
+    output_dict = {}
+    for module in q:
+        output_dict[module.module_id] = {
+            "module_title": module.title,
+            "total_module_credits": module.total_credits,
+            "total_assessment_credits": 0,
+            "total_marks_possible": 0,
+        }
+        # Find all assessments connected
+        for assessment in module.assessments:
+            output_dict[module.module_id][
+                "total_assessment_credits"
+            ] += assessment.num_of_credits
+
+            # Q1
+            for q1 in assessment.question_t1:
+                output_dict[module.module_id]["total_marks_possible"] += q1.num_of_marks
+            # Q2
+            for q2 in assessment.question_t2:
+                output_dict[module.module_id]["total_marks_possible"] += q2.num_of_marks
+
+            # Will then need to go through the question types
+    return output_dict
+
+
 def get_all_assessment_marks(
     input_user_id=None,
     input_lecturer_id=None,
     input_module_id=None,
     input_assessment_id=None,
+    highest_scoring_attempt_only=False,
+    summative_only=False,
+    debug=False,
 ):
     """
     Returns list of dictionaries, each dictionary has the following keys:
@@ -50,9 +90,12 @@ def get_all_assessment_marks(
     - 'attempt_number' (int)
     - 'correct_marks' (int)
     - 'possible_marks' (int)
-    - 'highest_value' (bool)
+    - 'highest_scoring_attempt' (bool)
+    - 'num_of_credits' (int)
+    - 'is_summative' (bool)
 
     Optional filters added for student, lecturer, module and assessment id
+    print statements are enabled/disabled through debug=True/False
     """
     attempt_totals_t1 = (
         db.session.query(User, QuestionT1, ResponseT1, Module, Assessment)
@@ -65,6 +108,8 @@ def get_all_assessment_marks(
             func.sum(QuestionT1.num_of_marks)
             .filter(ResponseT1.is_correct == True)
             .label("correct_marks"),
+            Assessment.num_of_credits,
+            Assessment.is_summative,
         )
         .select_from(User)
         .join(ResponseT1)
@@ -78,10 +123,11 @@ def get_all_assessment_marks(
         .group_by(ResponseT1.attempt_number)
     )
 
-    print("***")
-    print("Attempts Total T1")
-    for items in attempt_totals_t1:
-        pprint(f"{items}")
+    if debug:
+        print("***")
+        print("Attempts Total T1")
+        for items in attempt_totals_t1:
+            pprint(f"{items}")
 
     attempt_totals_t2 = (
         db.session.query(User, QuestionT2, ResponseT2, Module, Assessment)
@@ -94,6 +140,8 @@ def get_all_assessment_marks(
             func.sum(QuestionT2.num_of_marks)
             .filter(ResponseT2.is_correct == True)
             .label("correct_marks"),
+            Assessment.num_of_credits,
+            Assessment.is_summative,
         )
         .select_from(User)
         .join(ResponseT2)
@@ -107,25 +155,28 @@ def get_all_assessment_marks(
         .group_by(ResponseT2.attempt_number)
     )
 
-    print("***")
-    print("Attempts Total T2")
-    for items in attempt_totals_t2:
-        pprint(f"{items}")
+    if debug:
+        print("***")
+        print("Attempts Total T2")
+        for items in attempt_totals_t2:
+            pprint(f"{items}")
 
     # UNION: https://docs.sqlalchemy.org/en/14/orm/query.html
     all_values = attempt_totals_t1.union_all(attempt_totals_t2)
 
-    print("***")
-    print("All values")
-    for items in all_values:
-        pprint(f"{items}")
+    if debug:
+        print("***")
+        print("All values:")
+        for items in all_values:
+            pprint(f"{items}")
 
     assessment_id_and_total_marks_possible = (
         get_assessment_id_and_total_marks_possible()
     )
 
-    pprint(f"{assessment_id_and_total_marks_possible=}")
-
+    print("****")
+    print(f"{assessment_id_and_total_marks_possible=}") if debug else ...
+    print("****")
     final_output = []
 
     # Make list of dictionaries holding relevant IDs and summations of correct marks
@@ -139,7 +190,8 @@ def get_all_assessment_marks(
         attempt_number = row[4]
         correct_marks = row[5] if row[5] is not None else 0
         possible_marks = assessment_id_and_total_marks_possible[assessment_id]
-
+        num_of_credits = row[6]
+        is_summative = row[7]
         # Is it already in the final_output? If so, adjust that
         for entry in final_output:
             if (
@@ -154,24 +206,27 @@ def get_all_assessment_marks(
         # If no adjustment happened then append to final_output
         if add_to_dict:
             marks_dict["user_id"] = user_id
-            marks_dict["module_id"] = user_id
+            marks_dict["module_id"] = module_id
             marks_dict["assessment_id"] = assessment_id
             marks_dict["lecturer_id"] = lecturer_id
             marks_dict["attempt_number"] = attempt_number
             marks_dict["correct_marks"] = correct_marks
             marks_dict["possible_marks"] = possible_marks
+            marks_dict["num_of_credits"] = num_of_credits
+            marks_dict["is_summative"] = is_summative
 
             final_output.append(marks_dict)
 
     # POSSIBLE MARKS NOT CORRECT - work out separately then add on?
 
-    print("***")
-    pprint(f"final_output_before_highest_flag=")
-    pprint(final_output)
+    if debug:
+        print("***")
+        pprint(f"final_output_before_highest_flag=")
+        pprint(final_output)
 
-    # Add a "highest_value" attribute for if this attempt is the HIGHEST scoring attempt the user has made
+    # Add a "highest_scoring_attempt" attribute for if this attempt is the HIGHEST scoring attempt the user has made
     for row in final_output:
-        row["highest_value"] = True
+        row["highest_scoring_attempt"] = True
         for comparison in final_output:
             if (
                 row is not comparison
@@ -180,30 +235,51 @@ def get_all_assessment_marks(
                 and row["assessment_id"] == comparison["assessment_id"]
             ):
                 if comparison["correct_marks"] > row["correct_marks"]:
-                    row["highest_value"] = False
+                    row["highest_scoring_attempt"] = False
 
+    ###########
+    # FILTERS #
+    ###########
+
+    # User_ID
     if input_user_id:
         final_output = [
             item for item in final_output if item["user_id"] == input_user_id
         ]
+    # Lecturer_ID
     if input_lecturer_id:
         final_output = [
             item for item in final_output if item["lecturer_id"] == input_lecturer_id
         ]
+    # Module_ID
     if input_module_id:
         final_output = [
             item for item in final_output if item["module_id"] == input_module_id
         ]
+    # Assessment_ID
     if input_assessment_id:
         final_output = [
             item
             for item in final_output
             if item["assessment_id"] == input_assessment_id
         ]
-    print("***")
-    pprint(f"{final_output=}")
+    # Highest Scoring Attempt Only
+    if highest_scoring_attempt_only:
+        final_output = [
+            item for item in final_output if item["highest_scoring_attempt"]
+        ]
+    # Summative Only
+    if summative_only:
+        final_output = [item for item in final_output if item["is_summative"]]
+
+    if debug:
+        print("***")
+        pprint(f"{final_output=}")
 
     return final_output
+
+
+########################################################################
 
 
 def get_all_response_details(

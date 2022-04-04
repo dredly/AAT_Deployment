@@ -37,7 +37,7 @@
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.edit_assessment', id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
                 </button>
-                <button type="button" class = "Assessment_Index_Child">
+                <button type="button" class = "Assessment_Index_Child delete-button">
                     <a href="{{ url_for('assessments.delete_assessment', id=summative_assessment.assessment_id) }}"class="Assessment_Index_Text">Delete Assessment</a>
                 </button>
             {% endif %}
@@ -68,8 +68,8 @@
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.edit_assessment', id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
                 </button>
-                <button type="button" class = "Assessment_Index_Child">
-                    <a href="{{ url_for('assessments.delete_assessment', id=formative_assessment.assessment_id) }}"class="Assessment_Index_Text" class="delete-button">Delete Assessment</a>
+                <button type="button" class = "Assessment_Index_Child delete-button">
+                    <a href="{{ url_for('assessments.delete_assessment', id=formative_assessment.assessment_id) }}"class="Assessment_Index_Text">Delete Assessment</a>
                 </button>
             {% endif %}
         </div>

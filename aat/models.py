@@ -18,7 +18,7 @@ class Challenge(db.Model):
     challenge_id = db.Column(db.Integer, primary_key=True)
     from_user = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     to_user = db.Column(db.Integer, nullable=False)
-    active = db.Column(db.Integer, default=0)
+    status = db.Column(db.Text, default="Pending")
     difficulty = db.Column(db.Integer, default=0)
     challenge_questions_id = db.relationship(
         "ChallengeQuestions", backref="challenges", lazy=True
@@ -33,6 +33,12 @@ class ChallengeQuestions(db.Model):
     )
     question_id = db.Column(db.Integer, nullable=False)
 
+
+class ChallengesTaken(db.Model):
+    __tablename__ = "challenges_taken"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    challenge_id = db.Column(db.Integer, db.ForeignKey('challenges.challenge_id'), nullable=False)
 
 class Tier(db.Model):
     __tablename__ = "tiers"
