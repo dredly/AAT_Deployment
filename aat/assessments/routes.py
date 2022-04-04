@@ -17,7 +17,14 @@ def index():
         return redirect(url_for("auth.login"))
     assessments = Assessment.query.all()
     modules = Module.query.all()
-    return render_template("index.html", assessments=assessments, modules=modules)
+    module_credits = dict()
+    for module in modules:
+        assessment_credits = 0
+        assessment_modules = Assessment.query.filter_by(module_id=module.module_id).all()
+        for assessment in assessment_modules:
+            assessment_credits += int(assessment.num_of_credits)
+            module_credits[module.title] = assessment_credits
+    return render_template("index.html", assessments=assessments, modules=modules, module_credits=module_credits)
 
 
 @assessments.route("/view_module/<int:module_id>")
@@ -97,7 +104,6 @@ def view_module(module_id):
             result = 0
 
         marks_achieved[assessment.title] = f"{result}/{marks_av}"
-
         if assessment.is_summative:
             summatives.append(assessment)
         else:
@@ -203,27 +209,30 @@ def new_assessment():
         lecturer_id = session["user"]
         is_summative = False
         title = request.form["title"]
-        if form.validate_on_submit:
-            total_date = request.form["due_date"]
-            print(date.today().strftime("%Y-%m-%d"))
-            print(total_date)
-            if total_date >= date.today().strftime("%Y-%m-%d"):
-                year = int(total_date[:4])
-                month = int(total_date[5:7])
-                day = int(total_date[8:10])
-                due_date = datetime(year, month, day)
-            else:
-                error = "Due date cannot be in the past"
-                return render_template("new_assessment.html", form=form, error=error)
         time_limit = request.form["time_limit"]
+        module_id = form.module_id.data
         num_of_credits = request.form["num_of_credits"]
-        module_id = request.form["module_id"]
+        if form.validate_on_submit:
+            total_date = form.due_date.data
+            if total_date != None:
+                total_date = total_date.strftime("%Y-%m-%d")
+                if total_date >= date.today().strftime("%Y-%m-%d"):
+                    year = int(total_date[:4])
+                    month = int(total_date[5:7])
+                    day = int(total_date[8:10])
+                    due_date = datetime(year, month, day)
+                else:
+                    error = "Due date cannot be in the past"
+                    return render_template("new_assessment.html", form=form, error=error)
+            else:
+                due_date=None
         try:
             is_summative_1 = request.form["is_summative"]
         except:
             pass
         if is_summative_1 == "y":
             is_summative = True
+        
         new_assessment = Assessment(
             title=title,
             due_date=due_date,
@@ -257,7 +266,10 @@ def edit_assessment(id):
         assessment.module_id = form.module_id.data
         assessment.num_of_credits = form.num_of_credits.data
         time_limit = request.form["time_limit"]
-        assessment.time_limit = int(time_limit) * 60
+        try:
+            assessment.time_limit = int(time_limit) * 60
+        except:
+            pass
         assessment.is_summative = form.is_summative.data
         total_date = form.due_date.data
         if total_date == None:
@@ -282,22 +294,6 @@ def edit_assessment(id):
                     assessment=assessment,
                     error=error,
                 )
-        # try:
-        #     year = int(total_date[:4])
-        #     month = int(total_date[5:7])
-        #     day = int(total_date[8:10])
-        #     assessment.due_date = datetime(year, month, day)
-        #     if assessment.due_date >= date.today().strftime("%Y-%m-%d"):
-        #         db.session.commit()
-        #         return redirect(url_for("assessments.add_questions", id=id))
-        #     else:
-        #         error = "Due date cannot be in the past"
-        #         return render_template("edit_assessments.html", form=form, assessment=assessment, error=error)
-        # except:
-        #     assessment.due_date = None
-        #     return redirect(url_for("assessments.add_questions", id=id))
-        db.session.commit()
-        return redirect(url_for("assessments.add_questions", id=id))
     form.module_id.choices = [
         (module.module_id, module.title) for module in Module.query.all()
     ]

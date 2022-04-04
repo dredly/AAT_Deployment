@@ -11,7 +11,10 @@ from wtforms import (
     BooleanField,
     SelectField,
 )
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
+
+
+from aat.models import Assessment, Module
 
 
 class DeleteQuestionsForm(FlaskForm):
@@ -51,6 +54,10 @@ class AssessmentForm(FlaskForm):
     )
     is_summative = BooleanField("Select if Assessment is summative")
     submit = SubmitField("Add Questions")
+
+    def validate_num_of_credits(form, num_of_credits):
+        if int(num_of_credits.data) > 50:
+            raise ValidationError('Name must be less than 50 characters')
 
     def validate_on_submit(self):
         result = super(AssessmentForm, self).validate()
