@@ -17,7 +17,14 @@ def index():
         return redirect(url_for("auth.login"))
     assessments = Assessment.query.all()
     modules = Module.query.all()
-    return render_template("index.html", assessments=assessments, modules=modules)
+    module_credits = dict()
+    for module in modules:
+        assessment_credits = 0
+        assessment_modules = Assessment.query.filter_by(module_id=module.module_id).all()
+        for assessment in assessment_modules:
+            assessment_credits += int(assessment.num_of_credits)
+            module_credits[module.title] = assessment_credits
+    return render_template("index.html", assessments=assessments, modules=modules, module_credits=module_credits)
 
 
 @assessments.route("/view_module/<int:module_id>")
@@ -97,7 +104,6 @@ def view_module(module_id):
             result = 0
 
         marks_achieved[assessment.title] = f"{result}/{marks_av}"
-
         if assessment.is_summative:
             summatives.append(assessment)
         else:
@@ -204,8 +210,8 @@ def new_assessment():
         is_summative = False
         title = request.form["title"]
         time_limit = request.form["time_limit"]
-        num_of_credits = request.form["num_of_credits"]
         module_id = form.module_id.data
+        num_of_credits = request.form["num_of_credits"]
         if form.validate_on_submit:
             total_date = form.due_date.data
             if total_date != None:
@@ -226,6 +232,7 @@ def new_assessment():
             pass
         if is_summative_1 == "y":
             is_summative = True
+        
         new_assessment = Assessment(
             title=title,
             due_date=due_date,
@@ -259,7 +266,10 @@ def edit_assessment(id):
         assessment.module_id = form.module_id.data
         assessment.num_of_credits = form.num_of_credits.data
         time_limit = request.form["time_limit"]
-        assessment.time_limit = int(time_limit) * 60
+        try:
+            assessment.time_limit = int(time_limit) * 60
+        except:
+            pass
         assessment.is_summative = form.is_summative.data
         total_date = form.due_date.data
         if total_date == None:

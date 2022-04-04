@@ -18,9 +18,7 @@
     {% for summative_assessment in summatives %}
         <div class="assessment-instance">
             <h3>{{ summative_assessment.title }}</h3>
-            
-            <p>Must be completed by: <b class="date">{{ summative_assessment.due_date }}</b></p>
-            
+            <p>Must be completed by: <b class="date">{% if summative_assessment.due_date != None %}{{ summative_assessment.due_date.strftime("%d/%m/%Y") }}{% endif %}{% if summative_assessment.due_date == None %}{{ summative_assessment.due_date }}{% endif %}</b></p>
             {% if current_user.can(Permission.ANSWER_ASSESSMENT) %}
             
                 {% if current_user.has_taken(summative_assessment) %}

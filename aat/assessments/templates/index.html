@@ -14,7 +14,7 @@
 		<div class = "Assessment_Index_Parent">
 			<div class=" summary-page formative">
 				<h2>{{ module.title }}<h2> 
-				<h3>Module Credits: {{module.total_credits}}</h3>
+				<h3>Module Credits: {{module_credits[module.title]}}</h3>
 					<button type="button">
 						<a href="{{ url_for('assessments.view_module', module_id=module.module_id) }}" class="Assessment_Index_Text">View Module Breakdown</a>
 					</button>
