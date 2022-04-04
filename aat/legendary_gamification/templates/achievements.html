@@ -96,7 +96,7 @@
                         {{ challenge.challengee.label }}
                         <select name="Users" id="">
                             {% for user in all_users %}
-                                <option value="{{ user.id }}" selected>{{ user.name }}</option>
+                                <option value="{{ user.id }}">{{ user.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
