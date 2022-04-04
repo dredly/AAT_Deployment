@@ -40,6 +40,8 @@ def get_all_assessment_marks(
     input_lecturer_id=None,
     input_module_id=None,
     input_assessment_id=None,
+    highest_scoring_attempt_only=False,
+    debug=False,
 ):
     """
     Returns list of dictionaries, each dictionary has the following keys:
@@ -50,7 +52,7 @@ def get_all_assessment_marks(
     - 'attempt_number' (int)
     - 'correct_marks' (int)
     - 'possible_marks' (int)
-    - 'highest_value' (bool)
+    - 'highest_scoring_attempt' (bool)
 
     Optional filters added for student, lecturer, module and assessment id
     """
@@ -78,10 +80,11 @@ def get_all_assessment_marks(
         .group_by(ResponseT1.attempt_number)
     )
 
-    print("***")
-    print("Attempts Total T1")
-    for items in attempt_totals_t1:
-        pprint(f"{items}")
+    if debug:
+        print("***")
+        print("Attempts Total T1")
+        for items in attempt_totals_t1:
+            pprint(f"{items}")
 
     attempt_totals_t2 = (
         db.session.query(User, QuestionT2, ResponseT2, Module, Assessment)
@@ -107,24 +110,26 @@ def get_all_assessment_marks(
         .group_by(ResponseT2.attempt_number)
     )
 
-    print("***")
-    print("Attempts Total T2")
-    for items in attempt_totals_t2:
-        pprint(f"{items}")
+    if debug:
+        print("***")
+        print("Attempts Total T2")
+        for items in attempt_totals_t2:
+            pprint(f"{items}")
 
     # UNION: https://docs.sqlalchemy.org/en/14/orm/query.html
     all_values = attempt_totals_t1.union_all(attempt_totals_t2)
 
-    print("***")
-    print("All values")
-    for items in all_values:
-        pprint(f"{items}")
+    if debug:
+        print("***")
+        print("All values")
+        for items in all_values:
+            pprint(f"{items}")
 
     assessment_id_and_total_marks_possible = (
         get_assessment_id_and_total_marks_possible()
     )
 
-    pprint(f"{assessment_id_and_total_marks_possible=}")
+    pprint(f"{assessment_id_and_total_marks_possible=}") if debug else ...
 
     final_output = []
 
@@ -165,13 +170,14 @@ def get_all_assessment_marks(
 
     # POSSIBLE MARKS NOT CORRECT - work out separately then add on?
 
-    print("***")
-    pprint(f"final_output_before_highest_flag=")
-    pprint(final_output)
+    if debug:
+        print("***")
+        pprint(f"final_output_before_highest_flag=")
+        pprint(final_output)
 
-    # Add a "highest_value" attribute for if this attempt is the HIGHEST scoring attempt the user has made
+    # Add a "highest_scoring_attempt" attribute for if this attempt is the HIGHEST scoring attempt the user has made
     for row in final_output:
-        row["highest_value"] = True
+        row["highest_scoring_attempt"] = True
         for comparison in final_output:
             if (
                 row is not comparison
@@ -180,28 +186,43 @@ def get_all_assessment_marks(
                 and row["assessment_id"] == comparison["assessment_id"]
             ):
                 if comparison["correct_marks"] > row["correct_marks"]:
-                    row["highest_value"] = False
+                    row["highest_scoring_attempt"] = False
 
+    ###########
+    # FILTERS #
+    ###########
+
+    # User_ID
     if input_user_id:
         final_output = [
             item for item in final_output if item["user_id"] == input_user_id
         ]
+    # Lecturer_ID
     if input_lecturer_id:
         final_output = [
             item for item in final_output if item["lecturer_id"] == input_lecturer_id
         ]
+    # Module_ID
     if input_module_id:
         final_output = [
             item for item in final_output if item["module_id"] == input_module_id
         ]
+    # Assessment_ID
     if input_assessment_id:
         final_output = [
             item
             for item in final_output
             if item["assessment_id"] == input_assessment_id
         ]
-    print("***")
-    pprint(f"{final_output=}")
+    # Highest Scoring Attempt Only
+    if highest_scoring_attempt_only:
+        final_output = [
+            item for item in final_output if item["highest_scoring_attempt"]
+        ]
+
+    if debug:
+        print("***")
+        pprint(f"{final_output=}")
 
     return final_output
 

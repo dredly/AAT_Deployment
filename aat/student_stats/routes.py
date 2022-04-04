@@ -4,23 +4,16 @@ from flask import render_template, redirect, url_for
 from sqlalchemy import func
 from io import StringIO
 import csv
+import pprint
 from flask import make_response
 from werkzeug.exceptions import NotFound
 from .. import db
 
 # MODELS
-from ..models import (
-    Module,
-    Assessment,
-    QuestionT1,
-    QuestionT2,
-    Option,
-    User,
-    ResponseT2,
-)
+from ..models import *
 
 # Database Util Functions
-from ..db_utils import get_all_assessment_marks, get_all_response_details
+from ..db_utils import get_all_assessment_marks
 
 
 @student_stats.route("/rich")
@@ -39,13 +32,22 @@ def course_view():
         return redirect(url_for("auth.login"))
     # GET SUM OF QUESTIONS FOR EACH ASSESSMENT
     assessment_marks = {}
+    ############################################
+    # NEW VERSION
+    ############################################
+    # OVERALL RESULTS
+    all_assessment_marks = get_all_assessment_marks()
+    all_assessment_marks_student = get_all_assessment_marks(
+        input_user_id=current_user.id
+    )
 
-    # Let's try to to get the average of all marks
-    # SUM OF CORRECT RESPONSE
-    # sum_of_correct_responses
+    overall_results = {"sum_of_marks_awarded": 0, "sum_of_marks_possible": 0}
+    # for line in all_assessment_marks_student:
+    #     if line.highest_scoring_attempt:
 
-    # val = ()
-    # print(f"{db.session.query(func.sum(ResponseT2.question.num_of_marks)).all()}")
+    ############################################
+    # OLD VERSION
+    ############################################
 
     ## T1_responses
     for response in current_user.t1_responses:
@@ -110,8 +112,6 @@ def course_view():
         "sum_of_marks_possible": sum_of_marks_possible,
     }
 
-    print(overall_results)
-
     module_totals = {}
 
     for module, module_details in module_dict.items():
@@ -123,6 +123,11 @@ def course_view():
             module_totals[module.title]["marks_possible"] += assessment_details[
                 "marks_possible"
             ]
+
+    print("Required fields:")
+    print(f"{overall_results=}")
+    print(f"{module_dict=}")
+    print(f"{module_totals=}")
 
     return render_template(
         "student_stats_course_view.html",
