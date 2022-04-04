@@ -163,6 +163,9 @@ footer {
 	background-color:red ;
 
 }
+.edit_submit_button{
+	padding-top: 1vh;
+}
 
 .show_assessment_title{
 	display: flex;
