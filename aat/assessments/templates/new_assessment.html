@@ -8,13 +8,13 @@
         <h1>Create New Assessment</h1>
         <form method="POST" action="">
             {{ form.csrf_token }}
-            <div>
+            <div class="edit_submit_button">
                 <div>{{form.title.label}}</div>{{form.title}}
             </div>
-            <div>
+            <div class="edit_submit_button">
                 <div>{{form.module_id.label}}</div>{{form.module_id}}
             </div>
-            <div>
+            <div class="edit_submit_button">
                 <div>{{form.time_limit.label}}</div>{{form.time_limit}}
             </div>
             <hr />
@@ -26,7 +26,7 @@
                 <div>{{form.due_date.label}}</div>{{form.due_date}}
             </div>
             <div>
-                <div>{{form.num_of_credits.label}}</div>{{form.num_of_credits}}
+                <div class="edit_submit_button">{{form.num_of_credits.label}}</div>{{form.num_of_credits}}
             </div>
             <div class="edit_submit_button">
                 <div>{{form.submit}}</div>

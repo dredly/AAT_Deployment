@@ -203,21 +203,23 @@ def new_assessment():
         lecturer_id = session["user"]
         is_summative = False
         title = request.form["title"]
-        if form.validate_on_submit:
-            total_date = request.form["due_date"]
-            print(date.today().strftime("%Y-%m-%d"))
-            print(total_date)
-            if total_date >= date.today().strftime("%Y-%m-%d"):
-                year = int(total_date[:4])
-                month = int(total_date[5:7])
-                day = int(total_date[8:10])
-                due_date = datetime(year, month, day)
-            else:
-                error = "Due date cannot be in the past"
-                return render_template("new_assessment.html", form=form, error=error)
         time_limit = request.form["time_limit"]
         num_of_credits = request.form["num_of_credits"]
-        module_id = request.form["module_id"]
+        module_id = form.module_id.data
+        if form.validate_on_submit:
+            total_date = form.due_date.data
+            if total_date != None:
+                total_date = total_date.strftime("%Y-%m-%d")
+                if total_date >= date.today().strftime("%Y-%m-%d"):
+                    year = int(total_date[:4])
+                    month = int(total_date[5:7])
+                    day = int(total_date[8:10])
+                    due_date = datetime(year, month, day)
+                else:
+                    error = "Due date cannot be in the past"
+                    return render_template("new_assessment.html", form=form, error=error)
+            else:
+                due_date=None
         try:
             is_summative_1 = request.form["is_summative"]
         except:
