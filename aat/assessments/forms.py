@@ -9,7 +9,7 @@ from wtforms import (
     SubmitField,
     SelectMultipleField,
     BooleanField,
-    SelectField
+    SelectField,
 )
 from wtforms.validators import DataRequired
 
@@ -23,9 +23,11 @@ class DeleteQuestionsForm(FlaskForm):
     )
     submit = SubmitField("Delete selected questions")
 
+
 class AnswerType1Form(FlaskForm):
-    chosen_option = RadioField('Answer Options')
+    chosen_option = RadioField("Answer Options")
     submit = SubmitField("Submit Answer")
+
 
 class AnswerType2Form(FlaskForm):
     answer = TextAreaField(validators=[DataRequired()])
@@ -37,42 +39,57 @@ class AnswerType2Form(FlaskForm):
 
 class AssessmentForm(FlaskForm):
     title = TextAreaField("Enter Title", default="", validators=[DataRequired()])
-    module_id= IntegerField("Enter module ID",validators=[NumberRange(min=0, message='Must enter a number greater than 0'), DataRequired()])
-    due_date = DateField("Enter the due date", format='%Y-%m-%d')
-    num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
-    time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
+    module_id = SelectField("Choose a module", choices=[])
+    due_date = DateField("Enter the due date", format="%Y-%m-%d")
+    num_of_credits = IntegerField(
+        "Enter Assessment Credits",
+        validators=[NumberRange(min=0, message="Must enter a number greater than 0")],
+    )
+    time_limit = IntegerField(
+        "Enter time limit in minutes",
+        validators=[NumberRange(min=0, message="Must enter a number greater than 0")],
+    )
     is_summative = BooleanField("Select if Assessment is summative")
     submit = SubmitField("Add Questions")
 
-
     def validate_on_submit(self):
-            result = super(AssessmentForm, self).validate()
-            print(date.today)
-            if (self.due_date.data < date.today()):
-                return False
-            else:
-                return result
+        result = super(AssessmentForm, self).validate()
+        print(date.today)
+        if self.due_date.data < date.today():
+            return False
+        else:
+            return result
 
 
 class DeleteAssessmentForm(FlaskForm):
     submit = SubmitField("Confirm")
     cancel = SubmitField("Cancel")
 
+
 class EditAssessmentForm(FlaskForm):
     title = TextAreaField("Enter Title", default="", validators=[DataRequired()])
-    module_id= IntegerField("Enter module ID",validators=[NumberRange(min=0, message='Must enter a number greater than 0'), DataRequired()])
-    due_date = DateField("Enter the due date", format='%Y-%m-%d')
-    num_of_credits = IntegerField("Enter Assessment Credits", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
-    time_limit = IntegerField("Enter time limit in minutes", validators=[NumberRange(min=0, message='Must enter a number greater than 0')])
+    module_id = SelectField("Choose a module", choices=[])
+    due_date = DateField("Enter the due date", format="%Y-%m-%d")
+    num_of_credits = IntegerField(
+        "Enter Assessment Credits",
+        validators=[NumberRange(min=0, message="Must enter a number greater than 0")],
+    )
+    time_limit = IntegerField(
+        "Enter time limit in minutes",
+        validators=[NumberRange(min=0, message="Must enter a number greater than 0")],
+    )
     is_summative = BooleanField("Select if Assessment is summative")
     submit = SubmitField("Next")
+
 
 class RemoveQuestionForm(FlaskForm):
     submit = SubmitField("Remove")
     cancel = SubmitField("Cancel")
 
+
 class AddQuestionToAssessmentForm(FlaskForm):
     add = SubmitField(label="Add to Assessment")
+
 
 class CreateQuestionT1Form(FlaskForm):
     question_text = TextAreaField(
@@ -108,6 +125,7 @@ class CreateQuestionT1Form(FlaskForm):
     )
     submit = SubmitField("Add question")
 
+
 class CreateQuestionT2Form(FlaskForm):
     question_text = TextAreaField(
         "Enter question text", default="", validators=[DataRequired()]
@@ -136,6 +154,7 @@ class CreateQuestionT2Form(FlaskForm):
         validators=[DataRequired()],
     )
     submit = SubmitField("Add question")
+
 
 class FinishForm(FlaskForm):
     finish = SubmitField(label="Finish")
