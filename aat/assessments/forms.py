@@ -137,5 +137,13 @@ class CreateQuestionT2Form(FlaskForm):
     )
     submit = SubmitField("Add question")
 
+class RandomQuestionsForm(FlaskForm):
+    question_difficulty = RadioField(
+        "Difficulty",
+        choices=[(1, "Easy"), (2, "Moderate"), (3, "Hard")],
+        validators=[DataRequired()],
+    )
+    random = SubmitField("Generate Questions")
+
 class FinishForm(FlaskForm):
     finish = SubmitField(label="Finish")
