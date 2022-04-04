@@ -20,13 +20,13 @@ from ..models import (
 )
 
 # Database Util Functions
-from ..db_utils import get_all_assessment_marks
+from ..db_utils import get_all_assessment_marks, get_all_response_details
 
 
 @student_stats.route("/rich")
 def rich():
-    print(get_all_assessment_marks())
-    return "hi"
+    results = get_all_assessment_marks()
+    return render_template("rich.html", results=results)
 
 
 ###############
@@ -37,7 +37,6 @@ def course_view():
     # Checks if logged in
     if not current_user.is_authenticated:
         return redirect(url_for("auth.login"))
-
     # GET SUM OF QUESTIONS FOR EACH ASSESSMENT
     assessment_marks = {}
 
@@ -142,7 +141,6 @@ def module_view(module_id=0):
     # Checks if logged in
     if not current_user.is_authenticated:
         return redirect(url_for("auth.login"))
-
     # Module Error Handling
     if Module.query.filter_by(module_id=module_id).first() is None:
         return redirect(url_for("student_stats.module_not_found", module_id=module_id))

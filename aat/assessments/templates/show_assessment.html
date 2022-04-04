@@ -3,6 +3,11 @@
 {% block content %}
 <div class="block_contents">
     <h1 class="show_assessment_title">{{assessment.title}}</h1>
+    <div class="show_assessment_edit">
+        <button type="button" >
+            <a href="{{ url_for('assessments.edit_assessment', id=assessment.assessment_id) }}" class="Assessment_show_button">Edit Assessment</a>
+        </button>
+    </div>  
     <div class="show_assessment_parent">
 
         <div class="show_assessment_children">
@@ -12,12 +17,13 @@
         </div>      
 
         <div class="show_assessment_children">
-            <h2 class="show_assessment_child"> Total Credits: {{assessment.num_of_credits}}</h2>
+            <h2 class="show_assessment_child"> Total Marks: {{assessment_num_of_marks}}</h2>
             <h2 class="show_assessment_child"> Time Limit (mins): {{time_limit_minutes}} </h2>
             <h2 class="show_assessment_child"> Type: {{assessment_type}}</h2>
         </div>  
-        {% if assessment.is_summative == False %}
+        
         <div class="show_assessment_children">
+        {% if assessment.is_summative == False %}
             {% if assessment_difficulty == 1 %}
             <h2 class="show_assessment_child"> Difficulty: Easy</h2>
             {% endif %}
@@ -27,8 +33,12 @@
             {% if assessment_difficulty == 3 %}
             <h2 class="show_assessment_child"> Difficulty: Hard</h2>
             {% endif %}
-        </div>  
         {% endif %}
+        {% if assessment.is_summative == True %}
+        <h2 class="show_assessment_child"> Credits: {{assessment.num_of_credits}}</h2>
+        {% endif %}
+        </div>  
+        
     </div>
     {% for question in questions %}
         <h3>{{question.question_text}}</h3>

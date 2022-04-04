@@ -15,16 +15,18 @@
                 <div>{{form.module_id.label}}</div>{{form.module_id}}
             </div>
             <div>
+                <div>{{form.time_limit.label}}</div>{{form.time_limit}}
+            </div>
+            <hr />
+            <div>
+                <div>{{form.is_summative.label}}</div>{{form.is_summative}}
+            </div>
+            <hr />
+            <div>
                 <div>{{form.due_date.label}}</div>{{form.due_date}}
             </div>
             <div>
-                <div>{{form.time_limit.label}}</div>{{form.time_limit}}
-            </div>
-            <div>
                 <div>{{form.num_of_credits.label}}</div>{{form.num_of_credits}}
-            </div>
-            <div>
-                <div>{{form.is_summative.label}}</div>{{form.is_summative}}
             </div>
             {{form.submit}}
         </form>

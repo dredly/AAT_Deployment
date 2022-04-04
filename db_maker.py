@@ -13,15 +13,15 @@ with app.app_context():
     db.session.add_all(
         [
             Module(  # 1
-                title="Databases and Modelling",
+                title="Version Control and Large Projects",
                 total_credits=120,
             ),
             Module(  # 2
-                title="Advanced BennieScript",
+                title="Front End Web Development",
                 total_credits=30,
             ),
             Module(  # 3
-                title="Jinjavitus",
+                title="Algorithms",
                 total_credits=80,
             ),
         ]
@@ -34,7 +34,7 @@ with app.app_context():
         [
             Assessment(  # 1
                 module_id=1,
-                lecturer_id=1,
+                lecturer_id=7,
                 title="Git Basics",
                 due_date=None,
                 time_limit=60 * 60 * 30,
@@ -43,7 +43,7 @@ with app.app_context():
             ),
             Assessment(  # 2
                 module_id=1,
-                lecturer_id=2,  # 1, #dont mind me I am for Jake testing purposes
+                lecturer_id=7,  # 1, #dont mind me I am for Jake testing purposes
                 title="Advanced Git",
                 due_date=None,
                 time_limit=60 * 60 * 45,
@@ -51,8 +51,8 @@ with app.app_context():
                 is_summative=True,
             ),
             Assessment(  # 3
-                module_id=1,
-                lecturer_id=3,
+                module_id=2,
+                lecturer_id=9,
                 title="DOM Manipulation in JS",
                 due_date=None,
                 time_limit=60 * 60 * 20,
@@ -60,49 +60,52 @@ with app.app_context():
                 is_summative=False,
             ),
             Assessment(  # 4
-                module_id=2,
-                lecturer_id=1,
-                title="Woof",
+                module_id=3,
+                lecturer_id=8,
+                title="Sorting Algorithms",
                 due_date=None,
                 num_of_credits=10,
                 is_summative=True,
             ),
             Assessment(  # 5
-                module_id=2,
-                lecturer_id=1,
-                title="Formative Assessment",
+                module_id=3,
+                lecturer_id=8,
+                title="B Trees",
                 due_date=None,
                 time_limit=60 * 60 * 30,
                 num_of_credits=12,
                 is_summative=False,
             ),
             Assessment(  # 6
-                lecturer_id=2,
-                title="No Module Summative",
+                module_id=3,
+                lecturer_id=8,
+                title="Pathfinding algorithms",
                 due_date=None,
                 time_limit=60 * 60 * 45,
                 num_of_credits=10,
                 is_summative=True,
             ),
             Assessment(  # 7
-                lecturer_id=3,
-                title="No module Formative",
+                module_id=2,
+                lecturer_id=9,
+                title="ReactJS Basics",
                 due_date=None,
                 time_limit=60 * 60 * 20,
                 num_of_credits=40,
                 is_summative=False,
             ),
             Assessment(  # 8
-                lecturer_id=1,
-                title=" A title",
+                module_id=2,
+                lecturer_id=9,
+                title="Flexbox and Grid",
                 due_date=None,
                 num_of_credits=10,
                 is_summative=True,
             ),
             Assessment(  # 9
-                module_id=3,
-                lecturer_id=1,
-                title="Tuesday Trauma",
+                module_id=2,
+                lecturer_id=9,
+                title="Semantic HTML",
                 due_date=None,
                 num_of_credits=20,
                 is_summative=True,
@@ -114,12 +117,12 @@ with app.app_context():
     #######
     db.session.add_all(
         [
-            Tag(name="abstract"),
-            Tag(name="boolean"),
-            Tag(name="computational"),
-            Tag(name="decimal"),
-            Tag(name="environments"),
-            Tag(name="git commands"),
+            Tag(name="abstract"),  # 1
+            Tag(name="boolean"),  # 2
+            Tag(name="computational"),  # 3
+            Tag(name="decimal"),  # 4
+            Tag(name="environments"),  # 5
+            Tag(name="git commands"),  # 6
         ]
     )
 
@@ -131,13 +134,13 @@ with app.app_context():
             # Questions on assignments
             QuestionT1(  # 1
                 assessment_id=1,
-                tag_id=1,
+                tag_id=6,
                 num_of_marks=2,
                 question_text="Which command do use use to view a particular commit?",
                 difficulty=1,
-                feedback_if_correct="Well done!",
-                feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedback_if_correct="Well done! git checkout can also be used to view a particular branch",
+                feedback_if_wrong="Be sure to go over the lecture notes on git commands",
+                feedforward_if_correct="Well done. To learn more about git commits see link https://www.git-scm.com/docs/git-commit",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT1(  # 2
@@ -146,38 +149,38 @@ with app.app_context():
                 question_text="What does git rebase do?",
                 difficulty=3,
                 feedback_if_correct="Well done!",
-                feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                feedback_if_wrong="Make sure you understand the differencs between rebase and merge",
+                feedforward_if_correct="Well done. To learn more about the use cases for rebase see link https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
+                feedforward_if_wrong="Make sure you can complete all the question from the git basics assessment",
             ),
             QuestionT1(  # 3
                 assessment_id=2,
                 num_of_marks=5,
                 question_text="What does git stash do?",
                 difficulty=2,
-                feedback_if_correct="Well done!",
-                feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                feedback_if_correct="Well done! This is most often used when you want to go back to a clean working directory. ",
+                feedback_if_wrong="Not quite.",
+                feedforward_if_correct="Well done. To learn even more, look up the different ways of calling git stash, such as git stash list and git stash apply. ",
+                feedforward_if_wrong="Make sure to read through all lecture notes on advanced git commands",
             ),
             # Floating Questions
             QuestionT1(  # 4
                 num_of_marks=5,
                 question_text="What is the initial capacity of an array list?",
                 difficulty=1,
-                feedback_if_correct="Well done!",
+                feedback_if_correct="Well done! The capacity can also be manually changed on creation.",
                 feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                feedforward_if_correct="Well done. For further reading, you could look up other similar data structures in Java, such as Lists and Linked Lists.",
+                feedforward_if_wrong="The official Java API documentation is a great place to find this information and much more.",
             ),
             QuestionT1(  # 5
                 num_of_marks=5,
                 question_text="What does SQL stand for?",
                 difficulty=1,
-                feedback_if_correct="Well done!",
-                feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                feedback_if_correct="That's right! Structured query language is used to manage relational databases.",
+                feedback_if_wrong="I hope you didn't choose super quick lunch at least",
+                feedforward_if_correct="Well done. Look into Sqlite if you want to try using an SQL database.",
+                feedforward_if_wrong="Make sure to go over basic definitions",
             ),
         ]
     )
@@ -190,22 +193,30 @@ with app.app_context():
             Option(q_t1_id=1, option_text="checkout", is_correct=True),  # 1
             Option(q_t1_id=1, option_text="reset"),  # 2
             Option(q_t1_id=1, option_text="commit"),  # 3
-            Option(q_t1_id=2, option_text="wrong answer"),  # 4
-            Option(q_t1_id=2, option_text="right answer", is_correct=True),  # 5
-            Option(q_t1_id=2, option_text="also the wrong answer"),  # 6
-            Option(q_t1_id=3, option_text="wrong answer"),  # 7
-            Option(q_t1_id=3, option_text="right answer", is_correct=True),  # 8
-            Option(q_t1_id=3, option_text="another wrong answer"),  # 9
+            Option(q_t1_id=2, option_text="deletes the entire repository"),  # 4
+            Option(
+                q_t1_id=2,
+                option_text="moves or combines a sequence of commits to a new base commit",
+                is_correct=True,
+            ),  # 5
+            Option(
+                q_t1_id=2, option_text="reverses changes made by a certain user"
+            ),  # 6
+            Option(q_t1_id=3, option_text="deletes the current branch"),  # 7
+            Option(
+                q_t1_id=3,
+                option_text="records the current state of the working directory and the index",
+                is_correct=True,
+            ),  # 8
+            Option(q_t1_id=3, option_text="unstages all staged changes"),  # 9
             Option(q_t1_id=4, option_text="12"),  # 10
             Option(q_t1_id=4, option_text="10", is_correct=True),  # 11
             Option(q_t1_id=4, option_text="100"),  # 12
             Option(q_t1_id=5, option_text="Super Quick Lunch"),  # 13
             Option(
-                q_t1_id=5, option_text="Standard Query Language", is_correct=True
+                q_t1_id=5, option_text="Structured Query Language", is_correct=True
             ),  # 14
-            Option(
-                q_t1_id=5, option_text="Why did I choose the databases module?????"
-            ),  # 15
+            Option(q_t1_id=5, option_text="Standard Query Language"),  # 15
         ]
     )
 
@@ -219,12 +230,12 @@ with app.app_context():
                 assessment_id=1,
                 tag_id=6,
                 num_of_marks=5,
-                question_text="What flag do you use to add a commit message?",
-                correct_answer="-m",
+                question_text="What letter do you use after the hyphen to add a commit message?",
+                correct_answer="m",
                 difficulty=1,
-                feedback_if_correct="Well done!",
-                feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
+                feedback_if_correct="Well done! m for message",
+                feedback_if_wrong="Clue: what letter does message start with?",
+                feedforward_if_correct="If this is too easy, it might be time to move onto the Advanced Git assessment",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
             ),
             QuestionT2(  # 2
@@ -235,9 +246,9 @@ with app.app_context():
                 correct_answer="push",
                 difficulty=1,
                 feedback_if_correct="Well done!",
-                feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                feedback_if_wrong="What is the opposite of pull?",
+                feedforward_if_correct="Well done. For more information, look at https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes to see how remote repositories work.",
+                feedforward_if_wrong="Make sure to learn the basic git commands before you move on",
             ),
             QuestionT2(  # 3
                 assessment_id=3,
@@ -245,52 +256,52 @@ with app.app_context():
                 question_text="Which symbol is used to select by class using document.querySelector()?",
                 correct_answer=".",
                 difficulty=2,
-                feedback_if_correct="Well done!",
-                feedback_if_wrong="Better luck next time :)",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                feedback_if_correct="Well done! document.querySelector() is very convenient, as it uses the same syntax for selection as CSS.",
+                feedback_if_wrong="It's the same in CSS",
+                feedforward_if_correct="Well done. To see another way of selecting elements, check out this page on MDN: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById",
+                feedforward_if_wrong="It might be useful to revise CSS selectors first.",
             ),
             QuestionT2(  # 4
-                assessment_id=4,
-                num_of_marks=5,
-                question_text="Bark?",
-                correct_answer="Bark!",
-                difficulty=3,
-                feedback_if_correct="WOOF!",
-                feedback_if_wrong="GRRRRRRRRRR",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                assessment_id=9,
+                num_of_marks=100,
+                question_text="What is the name of an element which denotes a section?",
+                correct_answer="section",
+                difficulty=1,
+                feedback_if_correct="That's right!",
+                feedback_if_wrong="It's not a trick question",
+                feedforward_if_correct="Well done. For other semantic div element names, see here: https://developer.mozilla.org/en-US/docs/Glossary/Semantics#semantics_in_html",
+                feedforward_if_wrong="Make sure you are comfortable with basic HTML first",
             ),
             # Floating Questions
             QuestionT2(  # 5
                 num_of_marks=10,
-                question_text="Why didn't the eagles take the ring to Mordor?",
-                correct_answer="Dunno",
-                difficulty=3,
-                feedback_if_correct="Thats's right!",
-                feedback_if_wrong="WRONG",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                question_text="What type of NoSQL database is MongoDB",
+                correct_answer="document",
+                difficulty=2,
+                feedback_if_correct="That's right. Instead of relational tables, data is stored in documents",
+                feedback_if_wrong="Not quite.",
+                feedforward_if_correct="Well done. For further reading, you could look up other types of NoSQL databases such as key value store and wide column.",
+                feedforward_if_wrong="Make sure to go over the introduction to NoSQL lecture",
             ),
             QuestionT2(  # 6
                 num_of_marks=4,
                 question_text="What year was the Norman invasion?",
                 correct_answer="1066",
                 difficulty=1,
-                feedback_if_correct="Indeed it was!",
-                feedback_if_wrong="WRONG!!!",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                feedback_if_correct="That's right. William the Conqueror landed on the English coast that year",
+                feedback_if_wrong="Wrong year",
+                feedforward_if_correct="Well done. To learn more about events in this sime period, check out this article about the Bayeux Tapestry: https://www.britannica.com/topic/Bayeux-Tapestry",
+                feedforward_if_wrong="Make sure to go over the lecture notes for Medieval History of Western Europe.",
             ),
             QuestionT2(  # 7
                 num_of_marks=5,
                 question_text="What does JSON stand for?",
                 correct_answer="JavaScript Object Notation",
                 difficulty=2,
-                feedback_if_correct="Yup!",
-                feedback_if_wrong="nope that's wrong",
-                feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
-                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                feedback_if_correct="That's right. Since it is so similar to the syntax of objects in JavaScript, it is very useful for transferring data on the web.",
+                feedback_if_wrong="Think about which language it looks syntactically similar to.",
+                feedforward_if_correct="Well done. If you understand what JSON is, you may want to look into AJAX requests.",
+                feedforward_if_wrong="Make sure to go over the section on data transfer over the web",
             ),
             # More Questions (with Assessments)
             QuestionT2(  # 8
@@ -386,6 +397,25 @@ with app.app_context():
                 is_admin=False,
                 role_id=3,
             ),
+            # Making some more realistic sounding lecturers
+            User(  # 7
+                name="John Branchman",
+                password="j",
+                is_admin=True,
+                role_id=2,
+            ),
+            User(  # 8
+                name="Alice Bubblesort",
+                password="a",
+                is_admin=True,
+                role_id=2,
+            ),
+            User(  # 9
+                name="Jean Consolog",
+                password="j",
+                is_admin=True,
+                role_id=2,
+            ),
         ]
     )
 
@@ -456,7 +486,7 @@ with app.app_context():
                 user_id=2,
                 assessment_id=1,
                 t2_question_id=1,
-                response_content="-m",
+                response_content="m",
                 is_correct=True,
             ),
             # RESPONSES for Student "s"
@@ -465,7 +495,7 @@ with app.app_context():
                 user_id=4,
                 assessment_id=1,
                 t2_question_id=1,
-                response_content="-m",
+                response_content="m",
                 is_correct=True,
             ),
             ResponseT2(  # 5
@@ -498,6 +528,7 @@ with app.app_context():
                 response_content="zzz",
                 is_correct=False,
             ),
+            # ASSESSMENT 9
             ResponseT2(  # 8
                 attempt_number=1,
                 user_id=4,
@@ -538,6 +569,7 @@ with app.app_context():
                 response_content="Didn't I answer this already?",
                 is_correct=False,
             ),
+            # ATTEMPT 2: u_id=4, ass=9
             ResponseT2(  # 12
                 attempt_number=2,
                 user_id=4,
@@ -576,7 +608,7 @@ with app.app_context():
                 assessment_id=9,
                 t2_question_id=12,
                 response_content="When it's a jar",
-                is_correct=True,
+                is_correct=False,
             ),
         ]
     )
@@ -679,7 +711,9 @@ with app.app_context():
             ),
         ]
     )
-
+    ##################
+    # AWARDED BADGES #
+    ##################
     db.session.add_all(
         [
             Awarded_Badge(id=1, user_id=1, badge_id=1),
@@ -688,7 +722,9 @@ with app.app_context():
             Awarded_Badge(id=4, user_id=2, badge_id=2),
         ]
     )
-
+    #######################
+    # AWARDED ACHIEVEMENT #
+    #######################
     db.session.add_all(
         [
             Awarded_Achievement(id=1, user_id=2, achievement_id=6),
@@ -697,7 +733,9 @@ with app.app_context():
             Awarded_Achievement(id=4, user_id=3, achievement_id=9),
         ]
     )
-
+    ########
+    # TIER #
+    ########
     db.session.add_all(
         [
             Tier(tier_id=1, name="Bronze", level=1),
@@ -708,7 +746,9 @@ with app.app_context():
             Tier(tier_id=6, name="Diamond", level=6),
         ]
     )
-
+    #############
+    # CHALLENGE #
+    #############
     db.session.add_all(
         [
             Challenge(challenge_id=1, from_user=1, to_user=3, difficulty=3),
