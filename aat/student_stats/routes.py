@@ -56,18 +56,9 @@ def course_view():
     marks_dictionary = {"sum_of_marks_awarded": 0, "sum_of_marks_possible": 0}
 
     # OVERALL RESULTS
-    # - COHORT
-    overall_results_cohort = marks_dictionary.copy()
-    for assessment_mark in all_assessment_marks:
-        overall_results_cohort["sum_of_marks_awarded"] += assessment_mark[
-            "correct_marks"
-        ]
-        overall_results_cohort["sum_of_marks_possible"] += assessment_mark[
-            "possible_marks"
-        ]
-
     # - STUDENT
     overall_results_student = marks_dictionary.copy()
+    print(f"{all_assessment_marks_student=}")
     for assessment_mark in all_assessment_marks_student:
         overall_results_student["sum_of_marks_awarded"] += assessment_mark[
             "correct_marks"
@@ -75,6 +66,24 @@ def course_view():
         overall_results_student["sum_of_marks_possible"] += assessment_mark[
             "possible_marks"
         ]
+
+    list_of_assessments_completed_by_student = [
+        item["assessment_id"] for item in all_assessment_marks_student
+    ]
+
+    print(f"{list_of_assessments_completed_by_student}")
+    print(f"{all_assessment_marks=}")
+    # - COHORT
+    overall_results_cohort = marks_dictionary.copy()
+    for assessment_mark in all_assessment_marks:
+        if assessment_mark["assessment_id"] in list_of_assessments_completed_by_student:
+            # Filter out if the
+            overall_results_cohort["sum_of_marks_awarded"] += assessment_mark[
+                "correct_marks"
+            ]
+            overall_results_cohort["sum_of_marks_possible"] += assessment_mark[
+                "possible_marks"
+            ]
 
     # MODULE RESULTS
     # - STUDENT

@@ -72,6 +72,22 @@ def get_module_ids_with_details():
     return output_dict
 
 
+def set_highest_scoring_attempt(dictionary_of_responses):
+    # Add a "highest_scoring_attempt" attribute for if this attempt is the HIGHEST scoring attempt the user has made
+    for row in dictionary_of_responses:
+        row["highest_scoring_attempt"] = True
+        for comparison in dictionary_of_responses:
+            if (
+                row is not comparison
+                and row["user_id"] == comparison["user_id"]
+                and row["module_id"] == comparison["module_id"]
+                and row["assessment_id"] == comparison["assessment_id"]
+            ):
+                if comparison["correct_marks"] > row["correct_marks"]:
+                    row["highest_scoring_attempt"] = False
+    return dictionary_of_responses
+
+
 def get_all_assessment_marks(
     input_user_id=None,
     input_lecturer_id=None,
@@ -224,6 +240,8 @@ def get_all_assessment_marks(
         pprint(f"final_output_before_highest_flag=")
         pprint(final_output)
 
+    final_output = set_highest_scoring_attempt(final_output)
+
     # Add a "highest_scoring_attempt" attribute for if this attempt is the HIGHEST scoring attempt the user has made
     for row in final_output:
         row["highest_scoring_attempt"] = True
@@ -305,6 +323,7 @@ def get_all_response_details(
     - correct_answer (str)
     - feedback (str)
     - feedforward (str)
+    - highest_scoring_attempt (bool)
 
     Optional filters added for student, lecturer, module and assessment id
     """
@@ -328,7 +347,9 @@ def get_all_response_details(
             QuestionT1.feedback_if_wrong,  # 12
             QuestionT1.feedforward_if_correct,  # 13
             QuestionT1.feedback_if_wrong,  # 14
-            ResponseT1,
+            ResponseT1,  # 15
+            Assessment.is_summative,  # 16
+            Assessment.num_of_credits,  # 17
         )
         .select_from(User)
         .join(ResponseT1)
@@ -362,6 +383,8 @@ def get_all_response_details(
         output_dict["module_id"] = question[9]
         output_dict["assessment_id"] = question[10]
         output_dict["question_type"] = 1
+        output_dict["is_summative"] = question[16]
+        output_dict["num_of_credits"] = question[17]
 
         for answer in table_of_correct_t1_answers:
             if answer.q_t1_id == output_dict["q_id"]:
@@ -397,6 +420,8 @@ def get_all_response_details(
             QuestionT2.feedback_if_wrong,  # 13
             QuestionT2.feedforward_if_correct,  # 14
             QuestionT2.feedforward_if_wrong,  # 15
+            Assessment.is_summative,  # 16
+            Assessment.num_of_credits,  # 17
         )
         .select_from(User)
         .join(ResponseT2)
@@ -413,6 +438,7 @@ def get_all_response_details(
 
     # Should be able to do this as a join but not working
     t2_output = []
+
     for question in question_totals_t2:
         output_dict = {}
         output_dict["user_id"] = question[0]
@@ -428,6 +454,8 @@ def get_all_response_details(
         output_dict["assessment_id"] = question[10]
         output_dict["question_type"] = 2
         output_dict["correct_answer"] = question[11]
+        output_dict["is_summative"] = question[16]
+        output_dict["num_of_credits"] = question[17]
 
         ## ADD FEEDBACK/FEEDFORWARD IF CORRECT/INCORRECT
         output_dict["feedback"] = (
@@ -439,6 +467,21 @@ def get_all_response_details(
         t2_output.append(output_dict)
 
     final_output = t1_output + t2_output
+
+    all_assessment_marks = get_all_assessment_marks()
+
+    # Add a field saying if that response is part of the highest scoring attempt
+    for item in final_output:
+        for assessment_details in all_assessment_marks:
+            if (
+                item["user_id"] == assessment_details["user_id"]
+                and item["module_id"] == assessment_details["module_id"]
+                and item["assessment_id"] == assessment_details["assessment_id"]
+                and item["attempt_number"] == assessment_details["attempt_number"]
+            ):
+                item["highest_scoring_attempt"] = assessment_details[
+                    "highest_scoring_attempt"
+                ]
 
     if input_user_id:
         final_output = [
