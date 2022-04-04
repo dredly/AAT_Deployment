@@ -80,6 +80,7 @@ def course_view():
             "marks_possible": assessment_mark["possible_marks"],
         }
     print(f"{module_totals_student=}")
+
     ############################################
     # OLD VERSION
     ############################################

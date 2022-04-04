@@ -35,6 +35,16 @@ def get_assessment_id_and_total_marks_possible():
     return assessment_id_and_total_marks_possible
 
 
+def get_list_of_all_modules_and_total_marks_possible():
+
+    assessment_id_and_total_marks_possible = (
+        get_assessment_id_and_total_marks_possible()
+    )
+    q = Module.query.all()
+
+    return q
+
+
 def get_all_assessment_marks(
     input_user_id=None,
     input_lecturer_id=None,
@@ -53,6 +63,7 @@ def get_all_assessment_marks(
     - 'correct_marks' (int)
     - 'possible_marks' (int)
     - 'highest_scoring_attempt' (bool)
+    - 'num_of_credits' (int)
 
     Optional filters added for student, lecturer, module and assessment id
     """
@@ -67,6 +78,7 @@ def get_all_assessment_marks(
             func.sum(QuestionT1.num_of_marks)
             .filter(ResponseT1.is_correct == True)
             .label("correct_marks"),
+            Assessment.num_of_credits,
         )
         .select_from(User)
         .join(ResponseT1)
@@ -97,6 +109,7 @@ def get_all_assessment_marks(
             func.sum(QuestionT2.num_of_marks)
             .filter(ResponseT2.is_correct == True)
             .label("correct_marks"),
+            Assessment.num_of_credits,
         )
         .select_from(User)
         .join(ResponseT2)
@@ -145,7 +158,7 @@ def get_all_assessment_marks(
         attempt_number = row[4]
         correct_marks = row[5] if row[5] is not None else 0
         possible_marks = assessment_id_and_total_marks_possible[assessment_id]
-
+        num_of_credits = row[6]
         # Is it already in the final_output? If so, adjust that
         for entry in final_output:
             if (
@@ -166,6 +179,7 @@ def get_all_assessment_marks(
             marks_dict["attempt_number"] = attempt_number
             marks_dict["correct_marks"] = correct_marks
             marks_dict["possible_marks"] = possible_marks
+            marks_dict["num_of_credits"] = num_of_credits
 
             final_output.append(marks_dict)
 
