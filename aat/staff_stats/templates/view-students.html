@@ -17,7 +17,7 @@
         
             {%for question in allQuestions%}      
                 <h3> Question: {{question[0]}} &nbsp;&nbsp;&nbsp; Question difficulty: {{question[1]}} &nbsp;&nbsp;&nbsp; Question Type: {{question[5]}} </h3>
-                <p> Answer given: {{question[2]}} &nbsp;&nbsp;&nbsp; {%if question[3] == True%} Answered Correct! {%else%} Answered False! {%endif%} </p>
+                <p> Answer given: {{question[2]}} &nbsp;&nbsp;&nbsp; {%if question[3] == True%} Answered Correctly {%else%} Answered Wrong {%endif%} </p>
             {%endfor%}
         {%else%}
             <p>No questions have been answered</p>
