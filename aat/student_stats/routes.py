@@ -3,8 +3,7 @@ from flask_login import current_user
 from flask import render_template, redirect, url_for
 from sqlalchemy import func
 from io import StringIO
-import csv
-import pprint
+import csv, pprint, json
 from flask import make_response
 from werkzeug.exceptions import NotFound
 from .. import db
@@ -16,7 +15,11 @@ from ..models import *
 from ..db_utils import (
     get_all_assessment_marks,
     get_module_ids_with_details,
+    get_all_response_details,
 )
+
+# Generic marks_dictionary
+marks_dictionary = {"sum_of_marks_awarded": 0, "sum_of_marks_possible": 0}
 
 
 @student_stats.route("/rich")
@@ -38,11 +41,6 @@ def course_view():
     ############################################
     # NEW VERSION
     ############################################
-    # OVERALL RESULTS
-    # print("***")
-    # print("NEW")
-    # print("***")
-
     ##################
     # db_utils calls #
     ##################
@@ -52,13 +50,10 @@ def course_view():
     )
     module_ids_with_details = get_module_ids_with_details()
 
-    # Generic marks_dictionary
-    marks_dictionary = {"sum_of_marks_awarded": 0, "sum_of_marks_possible": 0}
-
     # OVERALL RESULTS
     # - STUDENT
     overall_results_student = marks_dictionary.copy()
-    print(f"{all_assessment_marks_student=}")
+
     for assessment_mark in all_assessment_marks_student:
         overall_results_student["sum_of_marks_awarded"] += assessment_mark[
             "correct_marks"
@@ -71,8 +66,6 @@ def course_view():
         item["assessment_id"] for item in all_assessment_marks_student
     ]
 
-    print(f"{list_of_assessments_completed_by_student}")
-    print(f"{all_assessment_marks=}")
     # - COHORT
     overall_results_cohort = marks_dictionary.copy()
     for assessment_mark in all_assessment_marks:
@@ -129,7 +122,6 @@ def course_view():
     # STORING OUTPUT AS .TXT FILES FOR EASE OF MY OWN USE
     # (if I was better I would only have this running in dev, not prod, but I'm not)
     # Write dictionary to CSV
-    import json
 
     try:
         with open(
@@ -161,101 +153,191 @@ def course_view():
         module_stats_cohort=module_stats_cohort,
     )
 
-    # print(module_totals_student)
-    # ############################################
-    # # OLD VERSION
-    # ############################################
-    # print("***")
-    # print("OLD")
-    # print("***")
 
-    # ## T1_responses
-    # for response in current_user.t1_responses:
-    #     if response.assessment not in assessment_marks:
-    #         assessment_marks[response.assessment] = {
-    #             "marks_awarded": response.question.num_of_marks
-    #             if response.is_correct
-    #             else 0,
-    #             "marks_possible": response.question.num_of_marks,
-    #         }
-    #     else:
-    #         assessment_marks[response.assessment]["marks_awarded"] += (
-    #             response.question.num_of_marks if response.is_correct else 0
-    #         )
-    #         assessment_marks[response.assessment][
-    #             "marks_possible"
-    #         ] += response.question.num_of_marks
+@student_stats.route("/module/")
+@student_stats.route("/module/<int:module_id>")
+def module_view(module_id=0):
+    # Checks if logged in
+    if not current_user.is_authenticated:
+        return redirect(url_for("auth.login"))
+    # Module Error Handling
+    if Module.query.filter_by(module_id=module_id).first() is None:
+        return redirect(url_for("student_stats.module_not_found", module_id=module_id))
 
-    # ## T2_responses
-    # for response in current_user.t2_responses:
-    #     if response.assessment not in assessment_marks:
-    #         assessment_marks[response.assessment] = {
-    #             "marks_awarded": response.question.num_of_marks
-    #             if response.is_correct
-    #             else 0,
-    #             "marks_possible": response.question.num_of_marks,
-    #         }
-    #     else:
-    #         assessment_marks[response.assessment]["marks_awarded"] += (
-    #             response.question.num_of_marks if response.is_correct else 0
-    #         )
-    #         assessment_marks[response.assessment][
-    #             "marks_possible"
-    #         ] += response.question.num_of_marks
+    all_assessment_marks_student = get_all_assessment_marks(
+        input_user_id=current_user.id,
+        highest_scoring_attempt_only=True,
+        input_module_id=module_id,
+        store_output_to_file=True,
+    )
+    all_response_details = get_all_response_details(
+        input_user_id=current_user.id,
+        highest_scoring_attempt_only=True,
+        input_module_id=module_id,
+        store_output_to_file=True,
+    )
 
-    # # ADD THAT TO THE MODULE DICT
-    # module_dict = {}
+    # Takes details, unpacks based on module_id
+    module_details = get_module_ids_with_details(input_module_id=module_id)[module_id]
 
-    # for module in Module.query.all():
-    #     for assessment, data in assessment_marks.items():
-    #         if assessment.module_id == module.module_id:
-    #             if module not in module_dict:
-    #                 module_dict[module] = {assessment: data}
-    #             else:
-    #                 module_dict[module][assessment] = data
+    # MODULE DETAILS:
+    module_details["sum_of_possible_marks_summative"] = 0
+    module_details["sum_of_correct_marks_summative"] = 0
+    module_details["sum_of_num_of_credits_summative"] = 0
+    module_details["sum_of_possible_marks_formative"] = 0
+    module_details["sum_of_correct_marks_formative"] = 0
+    module_details["sum_of_num_of_credits_formative"] = 0
 
-    # sum_of_marks_awarded = 0
-    # sum_of_marks_possible = 0
+    # Adds values for Formative and Summative (combined to be calculated)
+    for entry in all_assessment_marks_student:
+        if entry["is_summative"]:
+            module_details["sum_of_possible_marks_summative"] += entry["possible_marks"]
+            module_details["sum_of_correct_marks_summative"] += entry["correct_marks"]
+            module_details["sum_of_num_of_credits_summative"] += entry["num_of_credits"]
+        else:
+            module_details["sum_of_possible_marks_formative"] += entry["possible_marks"]
+            module_details["sum_of_correct_marks_formative"] += entry["correct_marks"]
+            module_details["sum_of_num_of_credits_formative"] += entry["num_of_credits"]
 
-    # for module in module_dict:
-    #     for assessment, data in assessment_marks.items():
-    #         sum_of_marks_awarded += data["marks_awarded"]
-    #         sum_of_marks_possible += data["marks_possible"]
-    #         # module_dict[module]["marks_awarded"] += data["marks_awarded"]
-    #         # module_dict[module]["marks_possible"] += data["marks_possible"]
+    # OVERALL RESULTS
+    # Module total marks
+    # - STUDENT
+    overall_results_student = marks_dictionary.copy()
+    for assessment_mark in all_assessment_marks_student:
+        overall_results_student["sum_of_marks_awarded"] += assessment_mark[
+            "correct_marks"
+        ]
+        overall_results_student["sum_of_marks_possible"] += assessment_mark[
+            "possible_marks"
+        ]
 
-    # if sum_of_marks_possible == 0:
-    #     return render_template("no_questions_answered.html")
+    list_of_assessments_completed_by_student = [
+        item["assessment_id"] for item in all_assessment_marks_student
+    ]
 
-    # overall_results = {
-    #     "sum_of_marks_awarded": sum_of_marks_awarded,
-    #     "sum_of_marks_possible": sum_of_marks_possible,
-    # }
+    # All assessments associated with module:
+    q = Module.query.filter_by(module_id=module_id).all()
+    assessments_not_taken_yet = []
+    for m in q:
+        for a in m.assessments:
+            if a.assessment_id not in list_of_assessments_completed_by_student:
+                assessments_not_taken_yet.append(a)
 
-    # module_totals = {}
+    print(assessments_not_taken_yet)
 
-    # for module, module_details in module_dict.items():
-    #     module_totals[module.title] = {"marks_awarded": 0, "marks_possible": 0}
-    #     for assessment, assessment_details in module_details.items():
-    #         module_totals[module.title]["marks_awarded"] += assessment_details[
-    #             "marks_awarded"
-    #         ]
-    #         module_totals[module.title]["marks_possible"] += assessment_details[
-    #             "marks_possible"
-    #         ]
+    # print(f"{module_details=}")
+    # print(f"{all_response_details=}")
+    # print(f"{all_response_details=}")
+    # For each module
+    # - Breakdown of each assessment's scores
 
-    # # print("Required fields:")
-    # # print(f"{overall_results=}")
-    # # print(f"{module_dict=}")
-    # # print(f"{module_totals=}")
+    return render_template(
+        "student_stats_module_view.html",
+        module_details=module_details,
+        all_assessment_marks_student=all_assessment_marks_student,
+        assessments_not_taken_yet=assessments_not_taken_yet,
+        # overall_results_cohort=overall_results_cohort,
+        # overall_results_student=overall_results_student,
+        # module_stats_student=module_stats_student,
+        # module_stats_cohort=module_stats_cohort,
+    )
+
+
+# print(module_totals_student)
+# ############################################
+# # OLD VERSION
+# ############################################
+# print("***")
+# print("OLD")
+# print("***")
+
+# ## T1_responses
+# for response in current_user.t1_responses:
+#     if response.assessment not in assessment_marks:
+#         assessment_marks[response.assessment] = {
+#             "marks_awarded": response.question.num_of_marks
+#             if response.is_correct
+#             else 0,
+#             "marks_possible": response.question.num_of_marks,
+#         }
+#     else:
+#         assessment_marks[response.assessment]["marks_awarded"] += (
+#             response.question.num_of_marks if response.is_correct else 0
+#         )
+#         assessment_marks[response.assessment][
+#             "marks_possible"
+#         ] += response.question.num_of_marks
+
+# ## T2_responses
+# for response in current_user.t2_responses:
+#     if response.assessment not in assessment_marks:
+#         assessment_marks[response.assessment] = {
+#             "marks_awarded": response.question.num_of_marks
+#             if response.is_correct
+#             else 0,
+#             "marks_possible": response.question.num_of_marks,
+#         }
+#     else:
+#         assessment_marks[response.assessment]["marks_awarded"] += (
+#             response.question.num_of_marks if response.is_correct else 0
+#         )
+#         assessment_marks[response.assessment][
+#             "marks_possible"
+#         ] += response.question.num_of_marks
+
+# # ADD THAT TO THE MODULE DICT
+# module_dict = {}
+
+# for module in Module.query.all():
+#     for assessment, data in assessment_marks.items():
+#         if assessment.module_id == module.module_id:
+#             if module not in module_dict:
+#                 module_dict[module] = {assessment: data}
+#             else:
+#                 module_dict[module][assessment] = data
+
+# sum_of_marks_awarded = 0
+# sum_of_marks_possible = 0
+
+# for module in module_dict:
+#     for assessment, data in assessment_marks.items():
+#         sum_of_marks_awarded += data["marks_awarded"]
+#         sum_of_marks_possible += data["marks_possible"]
+#         # module_dict[module]["marks_awarded"] += data["marks_awarded"]
+#         # module_dict[module]["marks_possible"] += data["marks_possible"]
+
+# if sum_of_marks_possible == 0:
+#     return render_template("no_questions_answered.html")
+
+# overall_results = {
+#     "sum_of_marks_awarded": sum_of_marks_awarded,
+#     "sum_of_marks_possible": sum_of_marks_possible,
+# }
+
+# module_totals = {}
+
+# for module, module_details in module_dict.items():
+#     module_totals[module.title] = {"marks_awarded": 0, "marks_possible": 0}
+#     for assessment, assessment_details in module_details.items():
+#         module_totals[module.title]["marks_awarded"] += assessment_details[
+#             "marks_awarded"
+#         ]
+#         module_totals[module.title]["marks_possible"] += assessment_details[
+#             "marks_possible"
+#         ]
+
+# # print("Required fields:")
+# # print(f"{overall_results=}")
+# # print(f"{module_dict=}")
+# # print(f"{module_totals=}")
 
 
 ###############
 # MODULE VIEW #
 ###############
-@student_stats.route("/module/")
-@student_stats.route("/module/<int:module_id>")
-def module_view(module_id=0):
+@student_stats.route("/old/module/")
+@student_stats.route("/old/module/<int:module_id>")
+def old_module_view(module_id=0):
     # Checks if logged in
     if not current_user.is_authenticated:
         return redirect(url_for("auth.login"))

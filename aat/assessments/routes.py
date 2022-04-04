@@ -5,8 +5,32 @@ from stringprep import in_table_d2
 from flask import Response, redirect, render_template, request, url_for, abort, session
 from . import assessments
 
-from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT2, ResponseT1, Option, Tag
-from .forms import AddQuestionToAssessmentForm, CreateQuestionT1Form, CreateQuestionT2Form, DeleteQuestionsForm, AnswerType1Form, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, FinishForm, RandomQuestionsForm, RemoveQuestionForm
+from ..models import (
+    Assessment,
+    QuestionT1,
+    QuestionT2,
+    Module,
+    User,
+    ResponseT2,
+    ResponseT2,
+    ResponseT1,
+    Option,
+    Tag,
+)
+from .forms import (
+    AddQuestionToAssessmentForm,
+    CreateQuestionT1Form,
+    CreateQuestionT2Form,
+    DeleteQuestionsForm,
+    AnswerType1Form,
+    AnswerType2Form,
+    AssessmentForm,
+    DeleteAssessmentForm,
+    EditAssessmentForm,
+    FinishForm,
+    RandomQuestionsForm,
+    RemoveQuestionForm,
+)
 from .. import db
 from flask_login import current_user
 
@@ -20,11 +44,18 @@ def index():
     module_credits = dict()
     for module in modules:
         assessment_credits = 0
-        assessment_modules = Assessment.query.filter_by(module_id=module.module_id).all()
+        assessment_modules = Assessment.query.filter_by(
+            module_id=module.module_id
+        ).all()
         for assessment in assessment_modules:
             assessment_credits += int(assessment.num_of_credits)
             module_credits[module.title] = assessment_credits
-    return render_template("index.html", assessments=assessments, modules=modules, module_credits=module_credits)
+    return render_template(
+        "index.html",
+        assessments=assessments,
+        modules=modules,
+        module_credits=module_credits,
+    )
 
 
 @assessments.route("/view_module/<int:module_id>")
@@ -223,16 +254,18 @@ def new_assessment():
                     due_date = datetime(year, month, day)
                 else:
                     error = "Due date cannot be in the past"
-                    return render_template("new_assessment.html", form=form, error=error)
+                    return render_template(
+                        "new_assessment.html", form=form, error=error
+                    )
             else:
-                due_date=None
+                due_date = None
         try:
             is_summative_1 = request.form["is_summative"]
         except:
             pass
         if is_summative_1 == "y":
             is_summative = True
-        
+
         new_assessment = Assessment(
             title=title,
             due_date=due_date,
@@ -376,14 +409,14 @@ def add_questions(id):
         id = session.get("assessment_add")
     elif session.get("assessment_edit") != None:
         id = session.get("assessment_edit")
-    form=FinishForm()
+    form = FinishForm()
     randomiser = RandomQuestionsForm()
     assessment = Assessment.query.get_or_404(id)
     addQuestionForm = AddQuestionToAssessmentForm()
     questions = (
-            QuestionT1.query.filter(QuestionT1.assessment_id.is_(None)).all()
-            + QuestionT2.query.filter(QuestionT2.assessment_id.is_(None)).all()
-        )
+        QuestionT1.query.filter(QuestionT1.assessment_id.is_(None)).all()
+        + QuestionT2.query.filter(QuestionT2.assessment_id.is_(None)).all()
+    )
     if randomiser.validate_on_submit() and randomiser.random.data:
         difficulty_level = randomiser.question_difficulty.data
         difficulty_level = int(difficulty_level)
@@ -391,16 +424,43 @@ def add_questions(id):
             if difficulty_level == question.difficulty:
                 question.assessment_id = assessment.assessment_id
                 db.session.commit()
-        return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, randomiser=randomiser))
+        return redirect(
+            url_for(
+                "assessments.add_questions",
+                questions=questions,
+                id=id,
+                addQuestionForm=addQuestionForm,
+                form=form,
+                randomiser=randomiser,
+            )
+        )
 
     for question in questions:
         if addQuestionForm.validate_on_submit() and addQuestionForm.add.data:
             question.assessment_id = id
             db.session.commit()
-            return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, randomiser=randomiser))
+            return redirect(
+                url_for(
+                    "assessments.add_questions",
+                    questions=questions,
+                    id=id,
+                    addQuestionForm=addQuestionForm,
+                    form=form,
+                    randomiser=randomiser,
+                )
+            )
     if form.validate_on_submit() and form.finish.data:
         return redirect(url_for("assessments.show_assessment", id=id))
-    return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, assessment=assessment, randomiser=randomiser)
+    return render_template(
+        "add_questions.html",
+        questions=questions,
+        id=id,
+        addQuestionForm=addQuestionForm,
+        form=form,
+        assessment=assessment,
+        randomiser=randomiser,
+    )
+
 
 @assessments.route("/<int:id>/type1/new", methods=["GET", "POST"])
 def create_questions_t1(id):

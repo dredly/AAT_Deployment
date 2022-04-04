@@ -21,57 +21,79 @@
     <h2>
         Overall Marks
     </h2>
-    <p>{{overall_results["sum_of_marks_awarded"]}}/{{overall_results["sum_of_marks_possible"]}}
-    ({{ "%.2d" |
-    format((overall_results["sum_of_marks_awarded"]/overall_results["sum_of_marks_possible"])*100)}}%)</p>
-
+    <h3>Summative</h3>
+    {% if module_details["sum_of_possible_marks_summative"] >0 %}
+        <p>{{module_details["sum_of_correct_marks_summative"]}}/{{module_details["sum_of_possible_marks_summative"]}}
+        ({{ "%.2d" |
+        format((module_details["sum_of_correct_marks_summative"]/module_details["sum_of_possible_marks_summative"])*100)}}%)</p>
+    {% else %}
+        <p>No summative assessments answered yet</p>
+    {% endif %}
     <div class="content-block">
         <div
-            class="chart-container"
-            style="position: relative; height: 20vh; margin-bottom: 12rem"
+            class="chart-container"    
         >
             <canvas id="myChart"></canvas>
         </div>
     </div>
+    <h3>Formative</h3>
+    {% if module_details["sum_of_possible_marks_formative"] >0 %}
+        <p>{{module_details["sum_of_correct_marks_formative"]}}/{{module_details["sum_of_possible_marks_formative"]}}
+            ({{ "%.2d" |
+            format((module_details["sum_of_correct_marks_formative"]/module_details["sum_of_possible_marks_formative"])*100)}}%)</p>
+    {% else %}
+            <p>No formative assessments answered yet</p>
+    {% endif %}
+    <h3>Combined</h3>
+    {% if module_details["sum_of_possible_marks_formative"] > 0 or module_details["sum_of_possible_marks_summative"] > 0 %}
+        <p>{{module_details["sum_of_correct_marks_formative"] + module_details["sum_of_correct_marks_summative"]}}/{{module_details["sum_of_possible_marks_formative"]+module_details["sum_of_possible_marks_summative"]}}
+            ({{ "%.2d" |
+            format(((module_details["sum_of_correct_marks_formative"] + module_details["sum_of_correct_marks_summative"])/(module_details["sum_of_possible_marks_formative"]+module_details["sum_of_possible_marks_summative"]))*100)}}%)</p>
+    {% else %}
+            <p>No formative assessments or summative assessments answered yet</p>
+    {% endif %}
 
-    <h2>Assessments</h2>
-    <ul>
-    {% for module, assessments in module_dict.items() %}
-        {% for assessment, marks in assessments.items() %}
-            <div class="student_stats_container {% if marks.marks_awarded/marks.marks_possible >= 0.5 %} correct_answer {% else %} incorrect_answer {% endif %}">
-                <li>
-                    <p>
-                        <a href="{{url_for('student_stats.assessment_view', assessment_id=assessment.assessment_id )}}">
-                            {{assessment}}:
-                        </a>
-                        {{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
-                            format((marks.marks_awarded/marks.marks_possible)*100)}}%)
-                    </p>
-                </li>
+    <h1>Assessments</h1>
+    <h2>> Completed</h2>
+    {% if all_assessment_marks_student %}
+        {% for a in all_assessment_marks_student %}
+            <div class="student_stats_container results_box {% if a.passed %} correct_answer {% else %} incorrect_answer {% endif %}">
+                <h3>{{ a.assessment_title }}</h3>
+                <p>Marks: {{a.correct_marks}}/{{a.possible_marks}}</p>
+                <p>Percenage: {{ "%.2d" |
+                    format((a.correct_marks/a.possible_marks)*100)}}% </p>
+                <p>Passed: {{a.passed}}</p>
+                <p>Credits Earned: {{a.credits_earned}}/{{a.num_of_credits}}</p>
+                <p>Formative or Summative? {% if a.formative %}Formative{% else %}Summative{% endif %}</p>
             </div>
+        {% endfor %}  
+    {% else %} 
+        <p>You have not taken any of the assessments for this module.</p>
+    {% endif %}
+   
+    <h2>> Not yet taken</h2>
+    {% if assessments_not_taken_yet %}
+        {% for a in assessments_not_taken_yet %}
+        <div class="student_stats_container results_box not_answered">
+            <h3>{{a.title}}</h3>
+            <p>Possible Marks: {{a.possible_marks}}</p>
+            <p>Possible Credits: {{a.num_of_credits}}</p>
+            <p>Formative or summative? {% if a.formative %}Formative{% else %}Summative{% endif %}</p>
+            <p>Assessment ID: {{ a.assessment_id }}</p>
+            <p><a href="{{url_for('assessments.assessment_summary', assessment_id=a.assessment_id)}}"><button> Take assessment</button></a></p>
+        </div>
         {% endfor %}
-    {% endfor %}
+    {% else %}
+        <p>You have completed the module!</p>
+    {% endif %}
+
 </ul>
     <h2>Download</h2>
     <p><a href="{{ url_for('student_stats.download')}}">Download CSV</a></p>
-    {#
-    <hr>
-    <h2>Responses</h2>
- 
-    {% for response in current_user.t2_responses %}
-        {% if response.assessment.module.module_id == module_details["module_id"] %}
-            <h4>Assessment: {{response.assessment}}</h4>
-            <p>Question: {{response.question}} (Marks: {{response.question.num_of_marks}})</p>
-            <p>Response: {{response.response_content}} (Marks: {{response.is_correct}})</p>
-        {% endif %}
-    {% endfor %}
-    #}
-    <!-- Be able to move to other modules? -->
-
-
+        
     <script>
-        const correct = '{{overall_results["sum_of_marks_awarded"]}}';
-        const incorrect = '{{overall_results["sum_of_marks_possible"]-overall_results["sum_of_marks_awarded"]}}';
+        const correct = '{{module_details["sum_of_correct_marks_summative"]}}';
+        const incorrect = '{{module_details["sum_of_possible_marks_summative"]-module_details["sum_of_correct_marks_summative"]}}';
     
         const ctx = document.getElementById('myChart').getContext('2d');
         const myChart = new Chart(ctx, {
@@ -89,4 +111,5 @@
             },
         });
     </script>
+
 {% endblock content %}

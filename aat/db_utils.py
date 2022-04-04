@@ -5,6 +5,7 @@ from sqlalchemy import (
     select,
     func,
 )  # https://docs.sqlalchemy.org/en/14/core/functions.html?highlight=func#module-sqlalchemy.sql.functions
+import json
 
 
 """
@@ -17,8 +18,22 @@ from ..db_utils import results_list_totals
 dictionary_of_results = results_list_totals()
 """
 
+# STORING OUTPUT AS .TXT FILES FOR EASE OF MY OWN USE
+# (if I was better I would only have this running in dev, not prod, but I'm not)
+# Write dictionary to CSV
+# FYI rename this file as .py and the VS code formatter makes it PRETTY
+def store_dictionary_as_file(dictionary, filename):
+    try:
+        with open(
+            f"{filename}",
+            "w",
+        ) as convert_file:
+            convert_file.write(json.dumps(dictionary))
+    except:
+        ...
 
-def get_assessment_id_and_total_marks_possible():
+
+def get_assessment_id_and_total_marks_possible(store_output_to_file=False):
     """
     Returns dictionary: {assessment_id: total_possible_marks}
     (useful for combining question type 1 and type 2)
@@ -32,10 +47,16 @@ def get_assessment_id_and_total_marks_possible():
         for q2 in q.question_t2:
             total_marks_possible += q2.num_of_marks
         assessment_id_and_total_marks_possible[q.assessment_id] = total_marks_possible
+    if store_output_to_file:
+        store_dictionary_as_file(
+            assessment_id_and_total_marks_possible,
+            "aat/student_stats/data_dumps/assessment_id_and_total_marks_possible.txt",
+        )
+
     return assessment_id_and_total_marks_possible
 
 
-def get_module_ids_with_details():
+def get_module_ids_with_details(input_module_id=None, store_output_to_file=False):
     """
     Returns dictionary:
         [module_id (int): {
@@ -46,7 +67,11 @@ def get_module_ids_with_details():
             module (Module)
             }]
     """
-    q = Module.query.all()
+    q = (
+        Module.query.all()
+        if not input_module_id
+        else Module.query.filter(Module.module_id == input_module_id).all()
+    )
     output_dict = {}
     for module in q:
         output_dict[module.module_id] = {
@@ -67,8 +92,13 @@ def get_module_ids_with_details():
             # Q2
             for q2 in assessment.question_t2:
                 output_dict[module.module_id]["total_marks_possible"] += q2.num_of_marks
+    if store_output_to_file:
+        store_dictionary_as_file(
+            output_dict,
+            "aat/student_stats/data_dumps/module_ids_with_details.txt",
+        )
 
-            # Will then need to go through the question types
+    # Will then need to go through the question types
     return output_dict
 
 
@@ -96,6 +126,7 @@ def get_all_assessment_marks(
     highest_scoring_attempt_only=False,
     summative_only=False,
     debug=False,
+    store_output_to_file=False,
 ):
     """
     Returns list of dictionaries, each dictionary has the following keys:
@@ -109,6 +140,10 @@ def get_all_assessment_marks(
     - 'highest_scoring_attempt' (bool)
     - 'num_of_credits' (int)
     - 'is_summative' (bool)
+    - 'module_title' (str)
+    - 'assessment_title' (str)
+    - 'passed' (bool)
+    - 'credits_earned' (int)
 
     Optional filters added for student, lecturer, module and assessment id
     print statements are enabled/disabled through debug=True/False
@@ -116,16 +151,18 @@ def get_all_assessment_marks(
     attempt_totals_t1 = (
         db.session.query(User, QuestionT1, ResponseT1, Module, Assessment)
         .with_entities(
-            User.id,
-            Module.module_id,
-            Assessment.assessment_id,
-            Assessment.lecturer_id,
-            ResponseT1.attempt_number,
-            func.sum(QuestionT1.num_of_marks)
+            User.id,  # 0
+            Module.module_id,  # 1
+            Assessment.assessment_id,  # 2
+            Assessment.lecturer_id,  # 3
+            ResponseT1.attempt_number,  # 4
+            func.sum(QuestionT1.num_of_marks)  # 5
             .filter(ResponseT1.is_correct == True)
             .label("correct_marks"),
-            Assessment.num_of_credits,
-            Assessment.is_summative,
+            Assessment.num_of_credits,  # 6
+            Assessment.is_summative,  # 7
+            Module.title,  # 8
+            Assessment.title,  # 9
         )
         .select_from(User)
         .join(ResponseT1)
@@ -158,6 +195,8 @@ def get_all_assessment_marks(
             .label("correct_marks"),
             Assessment.num_of_credits,
             Assessment.is_summative,
+            Module.title,
+            Assessment.title,
         )
         .select_from(User)
         .join(ResponseT2)
@@ -208,6 +247,8 @@ def get_all_assessment_marks(
         possible_marks = assessment_id_and_total_marks_possible[assessment_id]
         num_of_credits = row[6]
         is_summative = row[7]
+        module_title = row[8]
+        assessment_title = row[9]
         # Is it already in the final_output? If so, adjust that
         for entry in final_output:
             if (
@@ -230,6 +271,8 @@ def get_all_assessment_marks(
             marks_dict["possible_marks"] = possible_marks
             marks_dict["num_of_credits"] = num_of_credits
             marks_dict["is_summative"] = is_summative
+            marks_dict["module_title"] = module_title
+            marks_dict["assessment_title"] = assessment_title
 
             final_output.append(marks_dict)
 
@@ -254,6 +297,12 @@ def get_all_assessment_marks(
             ):
                 if comparison["correct_marks"] > row["correct_marks"]:
                     row["highest_scoring_attempt"] = False
+
+    # PASSED
+    for row in final_output:
+        percentage_achieved = row["correct_marks"] / row["possible_marks"]
+        row["passed"] = True if percentage_achieved >= 0.5 else False
+        row["credits_earned"] = round(row["num_of_credits"] * percentage_achieved)
 
     ###########
     # FILTERS #
@@ -290,9 +339,11 @@ def get_all_assessment_marks(
     if summative_only:
         final_output = [item for item in final_output if item["is_summative"]]
 
-    if debug:
-        print("***")
-        pprint(f"{final_output=}")
+    if store_output_to_file:
+        store_dictionary_as_file(
+            final_output,
+            "aat/student_stats/data_dumps/all_assessment_marks.txt",
+        )
 
     return final_output
 
@@ -305,6 +356,8 @@ def get_all_response_details(
     input_lecturer_id=None,
     input_module_id=None,
     input_assessment_id=None,
+    highest_scoring_attempt_only=False,
+    store_output_to_file=False,
 ):
     """
     Returns a list of dictionaries gathering all relevant response details:
@@ -350,6 +403,8 @@ def get_all_response_details(
             ResponseT1,  # 15
             Assessment.is_summative,  # 16
             Assessment.num_of_credits,  # 17
+            Module.title,  # 18
+            Assessment.title,  # 19
         )
         .select_from(User)
         .join(ResponseT1)
@@ -385,6 +440,8 @@ def get_all_response_details(
         output_dict["question_type"] = 1
         output_dict["is_summative"] = question[16]
         output_dict["num_of_credits"] = question[17]
+        output_dict["module_title"] = question[18]
+        output_dict["assessment_title"] = question[19]
 
         for answer in table_of_correct_t1_answers:
             if answer.q_t1_id == output_dict["q_id"]:
@@ -422,6 +479,8 @@ def get_all_response_details(
             QuestionT2.feedforward_if_wrong,  # 15
             Assessment.is_summative,  # 16
             Assessment.num_of_credits,  # 17
+            Module.title,  # 18
+            Assessment.title,  # 19
         )
         .select_from(User)
         .join(ResponseT2)
@@ -456,6 +515,8 @@ def get_all_response_details(
         output_dict["correct_answer"] = question[11]
         output_dict["is_summative"] = question[16]
         output_dict["num_of_credits"] = question[17]
+        output_dict["module_title"] = question[18]
+        output_dict["assessment_title"] = question[19]
 
         ## ADD FEEDBACK/FEEDFORWARD IF CORRECT/INCORRECT
         output_dict["feedback"] = (
@@ -501,5 +562,15 @@ def get_all_response_details(
             for item in final_output
             if item["assessment_id"] == input_assessment_id
         ]
+    if highest_scoring_attempt_only:
+        final_output = [
+            item for item in final_output if item["highest_scoring_attempt"]
+        ]
+
+    if store_output_to_file:
+        store_dictionary_as_file(
+            final_output,
+            "aat/student_stats/data_dumps/all_response_details.txt",
+        )
 
     return final_output

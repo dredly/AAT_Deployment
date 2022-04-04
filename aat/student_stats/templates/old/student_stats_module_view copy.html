@@ -1,0 +1,92 @@
+{% extends 'layout.html' %}
+{% block title %}
+    Student | Module View
+{% endblock title %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<link
+	rel="stylesheet"
+	href="{{url_for('static',filename='student-stats-style.css')}}"
+/>
+{% endblock extra_head %}
+{% block content %}
+    <h1>Student Stats for {{current_user.name}} | Module View for {{module_details["module_name"]}}</h1>
+    <p>
+    <a href="{{url_for('student_stats.course_view')}}">
+        Course View
+    </a>
+    > Module View
+    </p>   
+    <h2>Module: {{module_details["module_name"]}}</h2>
+    <h2>
+        Overall Marks
+    </h2>
+    <p>{{overall_results["sum_of_marks_awarded"]}}/{{overall_results["sum_of_marks_possible"]}}
+    ({{ "%.2d" |
+    format((overall_results["sum_of_marks_awarded"]/overall_results["sum_of_marks_possible"])*100)}}%)</p>
+
+    <div class="content-block">
+        <div
+            class="chart-container"
+            style="position: relative; height: 20vh; margin-bottom: 12rem"
+        >
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+
+    <h2>Assessments</h2>
+    <ul>
+    {% for module, assessments in module_dict.items() %}
+        {% for assessment, marks in assessments.items() %}
+            <div class="student_stats_container {% if marks.marks_awarded/marks.marks_possible >= 0.5 %} correct_answer {% else %} incorrect_answer {% endif %}">
+                <li>
+                    <p>
+                        <a href="{{url_for('student_stats.assessment_view', assessment_id=assessment.assessment_id )}}">
+                            {{assessment}}:
+                        </a>
+                        {{marks.marks_awarded}}/{{marks.marks_possible}} ({{ "%.2d" |
+                            format((marks.marks_awarded/marks.marks_possible)*100)}}%)
+                    </p>
+                </li>
+            </div>
+        {% endfor %}
+    {% endfor %}
+</ul>
+    <h2>Download</h2>
+    <p><a href="{{ url_for('student_stats.download')}}">Download CSV</a></p>
+    {#
+    <hr>
+    <h2>Responses</h2>
+ 
+    {% for response in current_user.t2_responses %}
+        {% if response.assessment.module.module_id == module_details["module_id"] %}
+            <h4>Assessment: {{response.assessment}}</h4>
+            <p>Question: {{response.question}} (Marks: {{response.question.num_of_marks}})</p>
+            <p>Response: {{response.response_content}} (Marks: {{response.is_correct}})</p>
+        {% endif %}
+    {% endfor %}
+    #}
+    <!-- Be able to move to other modules? -->
+
+
+    <script>
+        const correct = '{{overall_results["sum_of_marks_awarded"]}}';
+        const incorrect = '{{overall_results["sum_of_marks_possible"]-overall_results["sum_of_marks_awarded"]}}';
+    
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [
+                    {
+                        label: 'Course View',
+                        data: [correct, incorrect],
+                        backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)'],
+                        hoverOffset: 4,
+                    },
+                ],
+            },
+        });
+    </script>
+{% endblock content %}

@@ -49,6 +49,7 @@
             <canvas id="overallResultsStudentPi"></canvas>
         </div>
     </div>
+    {#
     <h2>
         Overall Marks - COHORT
     </h2>
@@ -62,8 +63,11 @@
             <canvas id="overallResultsCohortPi"></canvas>
         </div>
     </div>
+    #}
 
     <h2>Modules</h2>
+    <h3>Modules completed:</h3>
+    <p>TODO</p>
     <h3>Modules started:</h3>
     <ul>
         {% for module_key, module in module_stats_student.items() %}
@@ -94,19 +98,20 @@
     <ul>
         {% for module_key, module in module_stats_student.items() %}
             {% if not module.taken_by_student %}
-                <div class="student_stats_container results_box not_answered">
-                    <li>
-                        <p><a href="{{url_for('student_stats.module_view', module_id=module_key)}}"><b>{{module.module_title}}</b></a>                    
-                        </p>
-                        <p>
-                            Total assessment credits: {{module.total_assessment_credits}} 
-                        </p>
-                        <p>
-                            Total module credits: {{module.total_module_credits}}
-                        </p>
-                    </li>
-                   
-                </div> 
+                <a href="{{url_for('student_stats.module_view', module_id=module_key)}}">
+                    <div class="student_stats_container results_box not_answered">
+                        <li>
+                            <p><b>{{module.module_title}}</b>                 
+                            </p>
+                            <p>
+                                Total assessment credits: {{module.total_assessment_credits}} 
+                            </p>
+                            <p>
+                                Total module credits: {{module.total_module_credits}}
+                            </p>
+                        </li>
+                    </div>
+                </a>
             {% endif %}
         {% endfor %}
     </ul>
@@ -135,6 +140,7 @@
                 ],
             },
         });
+        /*
          // OVERALL: COHORT
          const overallResultsCohortcorrect = '{{overall_results_cohort["sum_of_marks_awarded"]}}';
          const overallResultsCohortincorrect = '{{overall_results_cohort["sum_of_marks_possible"]-overall_results_cohort["sum_of_marks_awarded"]}}';
@@ -153,5 +159,6 @@
                  ],
              },
          });
+         */
     </script>
 {% endblock content %}
