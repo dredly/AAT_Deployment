@@ -37,8 +37,11 @@ class ChallengeQuestions(db.Model):
 class ChallengesTaken(db.Model):
     __tablename__ = "challenges_taken"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    challenge_id = db.Column(db.Integer, db.ForeignKey('challenges.challenge_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    challenge_id = db.Column(
+        db.Integer, db.ForeignKey("challenges.challenge_id"), nullable=False
+    )
+
 
 class Tier(db.Model):
     __tablename__ = "tiers"
