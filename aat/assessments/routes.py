@@ -294,22 +294,6 @@ def edit_assessment(id):
                     assessment=assessment,
                     error=error,
                 )
-        # try:
-        #     year = int(total_date[:4])
-        #     month = int(total_date[5:7])
-        #     day = int(total_date[8:10])
-        #     assessment.due_date = datetime(year, month, day)
-        #     if assessment.due_date >= date.today().strftime("%Y-%m-%d"):
-        #         db.session.commit()
-        #         return redirect(url_for("assessments.add_questions", id=id))
-        #     else:
-        #         error = "Due date cannot be in the past"
-        #         return render_template("edit_assessments.html", form=form, assessment=assessment, error=error)
-        # except:
-        #     assessment.due_date = None
-        #     return redirect(url_for("assessments.add_questions", id=id))
-        db.session.commit()
-        return redirect(url_for("assessments.add_questions", id=id))
     form.module_id.choices = [
         (module.module_id, module.title) for module in Module.query.all()
     ]
