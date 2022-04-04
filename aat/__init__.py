@@ -5,23 +5,7 @@ from flask import Flask, session, render_template
 # from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 
-from .models import (
-    db,
-    login_manager,
-    Assessment,
-    Tag,
-    QuestionT1,
-    QuestionT2,
-    Option,
-    Module,
-    ResponseT1,
-    ResponseT2,
-    User,
-    Role,
-    Permission,
-    Achievement,
-    Badge,
-)
+from .models import *
 from .assessments import assessments
 from .questions import questions
 from .auth import auth
@@ -77,6 +61,13 @@ admin.add_views(
     AdminView(ResponseT2, db.session),
     AdminView(User, db.session),
     AdminView(Role, db.session),
+    AdminView(Challenge, db.session),
+    AdminView(ChallengeQuestions, db.session),
+    AdminView(Tier, db.session),
+    AdminView(Badge, db.session),
+    AdminView(Achievement, db.session),
+    AdminView(Awarded_Badge, db.session),
+    AdminView(Awarded_Achievement, db.session),
 )
 # Now accessible through /admin/
 

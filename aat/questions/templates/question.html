@@ -1,7 +1,16 @@
 {% extends("layout.html") %}
 {% block content %}
 <div class="form-container">
+    {% if editing %}
     <h1>Edit question</h1>
+    {% else %}
+    {% if question_type == "t1" %}
+    <h1>Add a new Type 1 question to the question bank</h1>
+    {% endif %}
+    {% if question_type == "t2" %}
+    <h1>Add a new Type 2 question to the question bank</h1>
+    {% endif %}
+    {% endif %}
     <form method="POST" action="">
         {{ form.csrf_token }}
         <div>
@@ -10,12 +19,31 @@
             </div>
             {{form.question_text(rows='3', cols='60')}}
         </div>
+        {% if question_type == "t1" %}
+        <div>
+            {{form.option_a.label}}
+            {{form.option_a(rows='3', cols='60')}}
+        </div>
+        <div>
+            {{form.option_b.label}}
+            {{form.option_b(rows='3', cols='60')}}
+        </div>
+        <div>
+            {{form.option_c.label}}
+            {{form.option_c(rows='3', cols='60')}}
+        </div>
+        <div>{{form.correct_option.label}}
+            {{form.correct_option}}
+        </div>
+        {% endif %}
+        {% if question_type == "t2" %}
         <div>
             <div>
                 {{form.correct_answer.label}}
             </div>
             {{form.correct_answer(rows='3', cols='60')}}
         </div>
+        {% endif %}
         <div class="small-bottom-margin">
             {{form.tag.label(class='inline-label')}}{{form.tag}}
         </div>
@@ -37,7 +65,23 @@
             </div>
             {{form.feedback_if_wrong(rows='3', cols='60')}}
         </div>
+        <div>
+            <div>
+                {{form.feedforward_if_correct.label}}
+            </div>
+            {{form.feedforward_if_correct(rows='3', cols='60')}}
+        </div>
+        <div>
+            <div>
+                {{form.feedforward_if_wrong.label}}
+            </div>
+            {{form.feedforward_if_wrong(rows='3', cols='60')}}
+        </div>
+        {% if editing %}
         <button type="submit">Save changes</button>
+        {% else %}
+        {{form.submit}}
+        {% endif %}
     </form>
 </div>
 

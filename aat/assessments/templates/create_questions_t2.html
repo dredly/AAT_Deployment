@@ -1,7 +1,7 @@
 {% extends("layout.html") %}
 {% block content %}
 <div class="form-container">
-    <h1>Add a new Type 2 question to the question bank</h1>
+    <h1>Add a new Type 2 question to {{assessment}}</h1>
     <form method="POST" action="">
         {{ form.csrf_token }}
         <div>
@@ -34,6 +34,18 @@
                 {{form.feedback_if_wrong.label}}
             </div>
             {{form.feedback_if_wrong(rows='3', cols='60')}}
+        </div>
+        <div>
+            <div>
+                {{form.feedforward_if_correct.label}}
+            </div>
+            {{form.feedforward_if_correct(rows='3', cols='60')}}
+        </div>
+        <div>
+            <div>
+                {{form.feedforward_if_wrong.label}}
+            </div>
+            {{form.feedforward_if_wrong(rows='3', cols='60')}}
         </div>
         {{form.submit}}
     </form>

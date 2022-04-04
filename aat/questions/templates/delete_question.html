@@ -6,6 +6,11 @@
     {{ form.csrf_token }}
     {{ form.submit(class='delete-button') }}
 </form>
+{% if question.q_t1_id %}
+<a href="{{url_for('questions.show_question_t1', id=question.q_t1_id)}}"><button>Go back</button></a>
+{% endif %}
+{% if question.q_t2_id %}
 <a href="{{url_for('questions.show_question_t2', id=question.q_t2_id)}}"><button>Go back</button></a>
+{% endif %}
 
 {% endblock %}

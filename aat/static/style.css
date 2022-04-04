@@ -82,43 +82,31 @@ footer {
 /* BUTTONS */
 
 /* Create Assessment Button */
-.Create_Assessment_Button {
-  border-radius: 4px;
-  box-shadow: rgba(0, 0, 0, .1) 0 2px 4px 0;
-  box-sizing: border-box;
-  color: #fff;
-  cursor: pointer;
-  font-family: "Akzidenz Grotesk BQ Medium", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  outline: none;
-  outline: 0;
-  padding: 10px 25px;
-  text-align: center;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  margin: .5;
-}
 
-.Create_Assessment_Button:hover {
-  box-shadow: rgba(0, 0, 0, .15) 0 3px 9px 0;
-  background-color: #8ABD91;
-}
-
-@media (min-width: 768px) {
-  .Create_Assessment_Button {
-    padding: 10px 30px;
-  }
-}
 .Create_Assessment_Link{
 	text-decoration: none;
 	color: black;
+}
+.modules_title{
+	padding-top:2vh;
+	display: flex;
+	justify-content: center;
 }
 
 /* EDIT DELETE TAKE ASSESSMENT BUTTONS ON INDEX */
 .module_title{
 	padding-left: 1vw;
+}
+.index_modules{
+	display: flex;
+	max-width: max-content;
+	align-items: center;
+	justify-content: space-between;
+	padding-left: 1vw;
+}
+.modules_child{
+	display: flex;
+	padding-left: 5vw;
 }
 .Assessment_Index_Parent{
 	display: flex;
@@ -147,6 +135,12 @@ footer {
 	text-decoration: none;
 	color: black;
 }
+.Assessment_show_button{
+	text-decoration: none;
+	color: black;
+	display: flex;
+	justify-content: flex-end;
+}
 
 /* EDIT_ASSESSMENT.html */
 .Assessment_Edit_Parent{
@@ -174,6 +168,10 @@ footer {
 	display: flex;
 	justify-content: center;
 }
+.show_assessment_edit{
+	display:flex;
+	justify-content: flex-end;
+}
 .show_assessment_parent{
 	display: flex;
 	justify-content: space-between;
@@ -190,6 +188,17 @@ footer {
 	display: flex;
 	flex-wrap: nowrap;
 	margin-left: 2vw;
+}
+
+.add_questions_finish{
+	display: flex;
+	padding-top: 2vh;
+}
+
+.view_module_create{
+	display: flex;
+	justify-content: flex-start;
+	padding-bottom: 1vh;
 }
 
 /* ----------------------------------------------------- END OF CRUD ASSESSMENTS ------------------------------------------------ */

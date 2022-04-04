@@ -4,24 +4,25 @@ from flask import render_template, redirect, url_for
 from sqlalchemy import func
 from io import StringIO
 import csv
+import pprint
 from flask import make_response
 from werkzeug.exceptions import NotFound
 from .. import db
 
 # MODELS
-from ..models import (
-    Module,
-    Assessment,
-    QuestionT1,
-    QuestionT2,
-    Option,
-    User,
-    ResponseT2,
+from ..models import *
+
+# Database Util Functions
+from ..db_utils import (
+    get_all_assessment_marks,
+    get_module_ids_with_total_credits_and_total_marks_possible,
 )
 
-#### QUERY ####
-# db.session.query(func.avg(QuestionT2.num_of_marks)).filter_by(assessment_id=1))
-# db.session.query(func.avg(QuestionT2.num_of_marks)).filter_by(assessment_id=1).all()
+
+@student_stats.route("/rich")
+def rich():
+    results = get_all_assessment_marks()
+    return render_template("rich.html", results=results)
 
 
 ###############
@@ -32,16 +33,95 @@ def course_view():
     # Checks if logged in
     if not current_user.is_authenticated:
         return redirect(url_for("auth.login"))
-
     # GET SUM OF QUESTIONS FOR EACH ASSESSMENT
     assessment_marks = {}
+    ############################################
+    # NEW VERSION
+    ############################################
+    # OVERALL RESULTS
+    print("***")
+    print("NEW")
+    print("***")
 
-    # Let's try to to get the average of all marks
-    # SUM OF CORRECT RESPONSE
-    # sum_of_correct_responses
+    ##################
+    # db_utils calls #
+    ##################
+    all_assessment_marks = get_all_assessment_marks(highest_scoring_attempt_only=True)
+    all_assessment_marks_student = get_all_assessment_marks(
+        input_user_id=current_user.id, highest_scoring_attempt_only=True
+    )
+    module_ids_with_total_credits_and_total_marks_possible = (
+        get_module_ids_with_total_credits_and_total_marks_possible()
+    )
 
-    # val = ()
-    # print(f"{db.session.query(func.sum(ResponseT2.question.num_of_marks)).all()}")
+    marks_dictionary = {"sum_of_marks_awarded": 0, "sum_of_marks_possible": 0}
+    # - COHORT RESULTS
+    overall_results_cohort = marks_dictionary.copy()
+    for assessment_mark in all_assessment_marks:
+        overall_results_cohort["sum_of_marks_awarded"] += assessment_mark[
+            "correct_marks"
+        ]
+        overall_results_cohort["sum_of_marks_possible"] += assessment_mark[
+            "possible_marks"
+        ]
+
+    # - STUDENT RESULTS
+    overall_results_student = marks_dictionary.copy()
+    for assessment_mark in all_assessment_marks_student:
+        overall_results_student["sum_of_marks_awarded"] += assessment_mark[
+            "correct_marks"
+        ]
+        overall_results_student["sum_of_marks_possible"] += assessment_mark[
+            "possible_marks"
+        ]
+
+    print(f"{overall_results_cohort=}")
+    print(f"{overall_results_student=}")
+
+    # MODULE TOTALS
+    # dict {"module_name":{"marks_awarded":0, "marks_possible:0"}}
+    # - STUDENT RESULTS
+    module_totals_student = {}
+    print(f"{all_assessment_marks_student=}")
+    for assessment_mark in all_assessment_marks_student:
+        module_totals_student[assessment_mark["module_id"]] = {
+            "marks_awarded": assessment_mark["correct_marks"],
+            "marks_possible": assessment_mark["possible_marks"],
+            "taken_by_student": True,
+        }
+
+    # TODO: THIS (7:56am)
+
+    for (
+        module_key,
+        module_vals,
+    ) in module_ids_with_total_credits_and_total_marks_possible.items():
+        print("!!!!!!")
+        print(f"{module_key=}")
+        print("Type of module:", type(module_key))
+        if module_key not in module_totals_student:
+            ...
+            ## If  in module_totals_student then add it, with "taken_by_student":False
+            ## module_totals_student[module]
+        else:
+            module_totals_student[assessment_mark["module_id"]][
+                "total_num_of_credits"
+            ] = module_ids_with_total_credits_and_total_marks_possible[module_key][
+                "total_num_of_credits"
+            ]
+        ## Else add in "total_num_of_credits"
+
+    # got through "get_module_ids_with_total_credits_and_total_marks_possible"
+
+    print(f"{module_totals_student=}")
+    print("?????????")
+
+    ############################################
+    # OLD VERSION
+    ############################################
+    print("***")
+    print("OLD")
+    print("***")
 
     ## T1_responses
     for response in current_user.t1_responses:
@@ -106,8 +186,6 @@ def course_view():
         "sum_of_marks_possible": sum_of_marks_possible,
     }
 
-    print(overall_results)
-
     module_totals = {}
 
     for module, module_details in module_dict.items():
@@ -119,6 +197,11 @@ def course_view():
             module_totals[module.title]["marks_possible"] += assessment_details[
                 "marks_possible"
             ]
+
+    print("Required fields:")
+    print(f"{overall_results=}")
+    print(f"{module_dict=}")
+    print(f"{module_totals=}")
 
     return render_template(
         "student_stats_course_view.html",
@@ -137,7 +220,6 @@ def module_view(module_id=0):
     # Checks if logged in
     if not current_user.is_authenticated:
         return redirect(url_for("auth.login"))
-
     # Module Error Handling
     if Module.query.filter_by(module_id=module_id).first() is None:
         return redirect(url_for("student_stats.module_not_found", module_id=module_id))

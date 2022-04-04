@@ -1,17 +1,19 @@
 {% extends("layout.html") %}
 
 {% block content %}
-
+<div class="block_contents">
 <!-- Adapted Add question page from Type 1 and Type 2 Questions -->
-<h1>Add Questions to your assessment</h1>
+<h1>Add Questions to {{assessment}}</h1>
 
 <h3>Add a new question</h3>
 
-<a href="{{url_for('questions.new_question_t1')}}"><button>Type 1</button></a>
-<a href="{{url_for('questions.new_question_t2')}}"><button>Type 2</button></a>
+<a href="{{url_for('assessments.create_questions_t1', id=assessment.assessment_id)}}"><button>Type 1</button></a>
+<a href="{{url_for('assessments.create_question_t2', id=assessment.assessment_id)}}"><button>Type 2</button></a>
 
 {% for question in questions %}
     <h2>{{ question.question_text }}</h2>
+    <p>{{question.num_of_marks}} marks</p>
+    <p>Tag: {{question.tag}}</p>
     <form method="POST" action="">
         {{ addQuestionForm.csrf_token}}
         {{ addQuestionForm.add}}
@@ -19,9 +21,9 @@
    
 {% endfor %}
 
-<form method="POST" action="">
+<form method="POST" action="" class="add_questions_finish">
     {{ form.csrf_token}}
     {{ form.finish}}
 </form>
-
+</div>
 {% endblock %}
