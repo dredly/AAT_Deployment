@@ -10,32 +10,9 @@
 />
 {% endblock extra_head %}
 {% block content %}
-<h1>Student Stats for {{current_user.name}} | Course View for MSc. Computing</h1>
+<h1>Student Stats for {{current_user.name}} | Course View</h1>
 <p><a href="{{ url_for('legendary_gamification.get_id')}}"><button>Tier: {{current_user.tier}}</button></a></p>
-    <p>Course View</p>
-    <h2>Course: Computer Science</h2>
-    <h2>TODOs</h2>
-    <ul>
-        <li>Assessment & Module credits: <ul>
-                <li>Need to calculate the credits the student has achieved based on Assessment results</li>
-                <li>Can then have percentages calculated etc.</li>
-            </ul>
-        </li>
-        <li>
-            Cohort marks should only be calculated from modules STUDENT HAS ALREADY TAKEN
-            <ul>
-                <li>Should probably also be summative only?</li>
-                <li>Add buttons for:
-                    <ul>
-                        <li>Summative</li>
-                        <li>Formative</li>
-                        <li>All</li>
-                    </ul>
-                    
-            </ul>
-        </li>
-        <li>Modules finished? If a student has entirely finished all Assessments attached to Module?</li>
-    </ul>
+    
     <h2>
         Overall Marks - STUDENT
     </h2>
@@ -49,6 +26,7 @@
             <canvas id="overallResultsStudentPi"></canvas>
         </div>
     </div>
+    {#
     <h2>
         Overall Marks - COHORT
     </h2>
@@ -62,12 +40,44 @@
             <canvas id="overallResultsCohortPi"></canvas>
         </div>
     </div>
+    #}
 
     <h2>Modules</h2>
+    <h3>Modules completed:</h3>
+    <ul>
+        {% for module_key, module in module_stats_student.items() %}
+            {% if module.count_of_assessments == module.count_of_taken_assessments %}
+                <a href="{{url_for('student_stats.module_view', module_id=module_key)}}">
+                    <div class="student_stats_container results_box {% if module['marks_awarded']/module['marks_possible'] >= 0.5 %} correct_answer {% else %} incorrect_answer {% endif %}">
+                            <li>
+                                <p><b>{{module.module_title}}</b></p>
+                                <p>Your score:
+                                        {{module['marks_awarded']}}/{{module['marks_possible']}}
+                                        ({{ "%.2d" |
+                                        format((module['marks_awarded']/module['marks_possible'])*100)}}%)
+                                </p>
+                                <p>
+                                    Total assessment credits: {{module.total_assessment_credits}}
+                                </p>
+                                <p>
+                                    Total module credits: {{module.total_module_credits}}
+                                </p>
+                                <p>
+                                    Completed assessments: {{module.count_of_taken_assessments}}/{{ module.count_of_assessments}}
+                                </p>
+                                <p>
+                                    Passed assessments: {{module.count_of_passed_assessments}}/{{ module.count_of_assessments}}
+                                </p>
+                            </li>
+                        </div>
+                    </a>
+                {% endif %}
+            {% endfor %}
+    </ul>
     <h3>Modules started:</h3>
     <ul>
         {% for module_key, module in module_stats_student.items() %}
-            {% if module.taken_by_student %}
+            {% if module.taken_by_student and module.count_of_assessments != module.count_of_taken_assessments %}
             <a href="{{url_for('student_stats.module_view', module_id=module_key)}}">
                 <div class="student_stats_container results_box {% if module['marks_awarded']/module['marks_possible'] >= 0.5 %} correct_answer {% else %} incorrect_answer {% endif %}">
                         <li>
@@ -83,6 +93,12 @@
                             <p>
                                 Total module credits: {{module.total_module_credits}}
                             </p>
+                            <p>
+                                Completed assessments: {{module.count_of_taken_assessments}}/{{ module.count_of_assessments}}
+                            </p>
+                            <p>
+                                Passed assessments: {{module.count_of_passed_assessments}}/{{ module.count_of_assessments}}
+                            </p>
                         </li>
                     </div> 
                 </a>
@@ -94,19 +110,24 @@
     <ul>
         {% for module_key, module in module_stats_student.items() %}
             {% if not module.taken_by_student %}
-                <div class="student_stats_container results_box not_answered">
-                    <li>
-                        <p><a href="{{url_for('student_stats.module_view', module_id=module_key)}}"><b>{{module.module_title}}</b></a>                    
-                        </p>
-                        <p>
-                            Total assessment credits: {{module.total_assessment_credits}} 
-                        </p>
-                        <p>
-                            Total module credits: {{module.total_module_credits}}
-                        </p>
-                    </li>
-                   
-                </div> 
+                <a href="{{url_for('student_stats.module_view', module_id=module_key)}}">
+                    <div class="student_stats_container results_box not_answered">
+                        <li>
+                            <p><b>{{module.module_title}}</b>                 
+                            </p>
+                            <p>
+                                Total assessment credits: {{module.total_assessment_credits}} 
+                            </p>
+                            <p>
+                                Total module credits: {{module.total_module_credits}}
+                            </p>
+                            <p>
+                                Count of assessments: {{ module.count_of_assessments}}
+                            </p>
+                            
+                        </li>
+                    </div>
+                </a>
             {% endif %}
         {% endfor %}
     </ul>
@@ -135,6 +156,7 @@
                 ],
             },
         });
+        /*
          // OVERALL: COHORT
          const overallResultsCohortcorrect = '{{overall_results_cohort["sum_of_marks_awarded"]}}';
          const overallResultsCohortincorrect = '{{overall_results_cohort["sum_of_marks_possible"]-overall_results_cohort["sum_of_marks_awarded"]}}';
@@ -153,5 +175,6 @@
                  ],
              },
          });
+         */
     </script>
 {% endblock content %}

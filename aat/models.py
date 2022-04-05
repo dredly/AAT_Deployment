@@ -37,8 +37,11 @@ class ChallengeQuestions(db.Model):
 class ChallengesTaken(db.Model):
     __tablename__ = "challenges_taken"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    challenge_id = db.Column(db.Integer, db.ForeignKey('challenges.challenge_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    challenge_id = db.Column(
+        db.Integer, db.ForeignKey("challenges.challenge_id"), nullable=False
+    )
+
 
 class Tier(db.Model):
     __tablename__ = "tiers"
@@ -296,6 +299,7 @@ class User(UserMixin, db.Model):
     # (i.e. the User will be given a lecturer role)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
+    email = db.Column(db.String(64), nullable=True, default="jacksonr16@cardiff.ac.uk")
     # --- Relationships ---
 
     assessments = db.relationship("Assessment", backref="user", lazy=True)
