@@ -3,23 +3,25 @@
 {% endblock title %}
 {% block content %}
 
-<h1>WELCOME TO OUR AAT!!!</h1>
-<h2>Contents</h2>
-<ul>
-	<li>
-		<a href="{{ url_for('assessments.index') }}">Assessments</a>
-	</li>
-	<li>
-		<a href="{{ url_for('questions.index') }}">Question Bank</a>
-	</li>
-	<li>
-		<a href="{{ url_for('auth.login') }}">Auth</a>
-	</li>
-	<li>
-		<a href="{{ url_for('staff_stats.index') }}">Staff Stats</a>
-	</li>
-	<li>
-		<a href="{{ url_for('student_stats.course_view') }}">Student Stats</a>
-	</li>
-</ul>
+<main class="all-questions">
+	<h1>WELCOME TO OUR AAT!!!</h1>
+	<h2>Contents</h2>
+	<ul>
+		<li>
+			<a href="{{ url_for('assessments.index') }}">Assessments</a>
+		</li>
+		<li>
+			<a href="{{ url_for('questions.index') }}">Question Bank</a>
+		</li>
+		<li>
+			<a href="{{ url_for('auth.login') }}">Auth</a>
+		</li>
+		<li>
+			<a href="{{ url_for('staff_stats.index') }}">Staff Stats</a>
+		</li>
+		<li>
+			<a href="{{ url_for('student_stats.course_view') }}">Student Stats</a>
+		</li>
+	</ul>
+</main>
 {% endblock %}

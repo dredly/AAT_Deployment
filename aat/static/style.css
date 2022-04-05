@@ -1,7 +1,15 @@
 body {
 	margin: 0;
-	margin-bottom: 2rem;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
+
+body, body {
+	font-family: 'Work Sans', sans-serif;
+}
+
+
 
 /* NAVBAR */
 nav,
@@ -42,8 +50,7 @@ nav li a {
 /* FOOTER */
 footer {
 	padding: 0.8rem 0;
-	/* position:fixed; */
-	/* bottom:0px; */
+	margin-top: auto;
 	text-align: center;
 	width: 100%;
 }
@@ -205,6 +212,20 @@ footer {
 	justify-content: flex-start;
 	padding-bottom: 1vh;
 }
+
+/* ----------------------------------------------------- CRUD QUESTIONS --------------------------------------------- */
+
+.all-questions {
+	margin-left: 2vw;
+	margin-top: 1.5em;
+	margin-bottom: 1em;
+}
+
+.small-margin-left {
+	margin-left: 1vw;
+}
+
+/* ----------------------------------------------------- END OF CRUD QUESTIONS -------------------------------------- */
 
 /* ----------------------------------------------------- END OF CRUD ASSESSMENTS ------------------------------------------------ */
 
