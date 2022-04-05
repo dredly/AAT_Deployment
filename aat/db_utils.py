@@ -377,6 +377,8 @@ def get_all_response_details(
     - feedback (str)
     - feedforward (str)
     - highest_scoring_attempt (bool)
+    - student_email (str)
+    - lecturer_email (str)
 
     Optional filters added for student, lecturer, module and assessment id
     """
@@ -533,9 +535,27 @@ def get_all_response_details(
 
     final_output = t1_output + t2_output
 
-    # Add tag names
+    #####################
+    # ADDITIONAL FIELDS #
+    #####################
     for item in final_output:
-        item["tag_name"] = Tag.query.filter_by(id=item["tag_id"]).first()
+        # Add tag names
+        item["tag_name"] = (
+            Tag.query.with_entities(Tag.name).filter_by(id=item["tag_id"]).first()
+        )
+        # Add student email addresses
+        item["student_email"] = (
+            User.query.with_entities(User.email)
+            .filter_by(id=item["user_id"])
+            .first()[0]
+        )
+
+        # Add lecturer email addresses
+        item["lecturer_email"] = (
+            User.query.with_entities(User.email)
+            .filter_by(id=item["lecturer_id"])
+            .first()[0]
+        )
 
     all_assessment_marks = get_all_assessment_marks()
 

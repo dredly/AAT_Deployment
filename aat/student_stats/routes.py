@@ -146,7 +146,7 @@ def course_view():
     # RETURN
 
     return render_template(
-        "student_stats_course_view.html",
+        "1_student_stats_course_view.html",
         overall_results_cohort=overall_results_cohort,
         overall_results_student=overall_results_student,
         module_stats_student=module_stats_student,
@@ -227,7 +227,7 @@ def module_view(module_id=0):
     print(assessments_not_taken_yet)
 
     return render_template(
-        "student_stats_module_view.html",
+        "2_student_stats_module_view.html",
         module_details=module_details,
         all_assessment_marks_student=all_assessment_marks_student,
         assessments_not_taken_yet=assessments_not_taken_yet,
@@ -306,7 +306,7 @@ def assessment_view(assessment_id=0):
     ]
 
     return render_template(
-        "student_stats_assessment_view.html",
+        "3_student_stats_assessment_view.html",
         assessment_details=assessment_details,
         all_assessment_marks_student=all_assessment_marks_student,
         all_response_details=all_response_details,

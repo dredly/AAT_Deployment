@@ -50,7 +50,9 @@
             <li>Answer given: {{r.answer_given}}</li>
             <li>Correct? {{r.is_correct}}</li>
             <li>Question Tag: {{r.tag_name}}</li>
+            <li>Question Type: {{r.question_type}}</li>
             <li>Marks: {% if r.is_correct %}{{r.num_of_marks}}{% else %}0{% endif %}/{{r.num_of_marks}}</li>
+            <li><a href="mailto:{{r.lecturer_email}}?subject=Query from {{current_user.name}}">Email lecturer to query</a></li>
         </div>
     {% endfor %}
 
