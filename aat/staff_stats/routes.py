@@ -87,7 +87,7 @@ def module(Module_title):
     for question in userInfo:
         questionDetails = {}
         questionAssessmentId = question.get("assessment_id")        
-        questionId = question.get("q_id")
+        questionId = question.get("question_id")
         questionDetails["question_assessment_id"] = questionAssessmentId
         questionDetails["questionId"] = questionId
         #print("question ID",questionId, "assessmentId",questionAssessmentId)
