@@ -224,7 +224,7 @@ def module_view(module_id=0):
             if a.assessment_id not in list_of_assessments_completed_by_student:
                 assessments_not_taken_yet.append(a)
 
-    print(assessments_not_taken_yet)
+    # print(assessments_not_taken_yet)
 
     return render_template(
         "2_student_stats_module_view.html",

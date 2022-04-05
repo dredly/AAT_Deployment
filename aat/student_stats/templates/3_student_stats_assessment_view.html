@@ -32,19 +32,13 @@
     format((assessment_details["sum_of_marks_awarded"]/assessment_details["sum_of_marks_possible"])*100)}}%)</p>
 
     <div class="content-block">
-        <div
-            class="chart-container"
-        >
+        <div class="chart-container">
             <canvas id="myChart"></canvas>
         </div>
     </div>
 
     <h2>Progress Chart</h2>
-    <!-- Details -->
-    {{data_for_bar_chart["data"]}}
 
-    <!-- What format? -->
-    <p>{{ data_for_bar_chart["y_axis_max"] }}</p>
     <div class="content-block">
         <div class="chart-container">
             <canvas id="myBarChart"></canvas>
@@ -130,26 +124,40 @@
         // - data: list of integers
         // - backgroundColor: list of rgba (strings)
         // - options (y axis should be total possible marks)
-
                 
         const ctxBar = document.getElementById('myBarChart');
         const myChartBar = new Chart(ctxBar, {
-            type: 'bar',
             data: {
                 labels: {{data_for_bar_chart["labels"]}},
                 datasets: [{
-                    label: 'Marks',
+                    type: 'bar',
+                    label: 'Bar',
                     data: {{data_for_bar_chart["data"]}},
-                    // backgroundColor: ['rgba(54, 162, 235, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(54, 162, 235, 0.8)'],
+                    backgroundColor: [{% for color in data_for_bar_chart['backgroundColor'] %}'rgba({{color}})',{% endfor %}],  
+                    borderWidth: 1
+                }, {
+                    type: 'line',
+                    label: 'Line',
+                    data: {{data_for_bar_chart["data"]}},
                     backgroundColor: [{% for color in data_for_bar_chart['backgroundColor'] %}'rgba({{color}})',{% endfor %}],  
                     borderWidth: 1
                 }]
             },
             options: {
                 scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Attempt"
+                        }
+                    },
                     y: {
                         beginAtZero: true,
-                        max: '{{data_for_bar_chart["y_axis_max"]}}'*1
+                        max: '{{data_for_bar_chart["y_axis_max"]}}'*1,
+                        title: {
+                            display: true,
+                            text: "Marks"
+                        },
                     },
                 }
             }
