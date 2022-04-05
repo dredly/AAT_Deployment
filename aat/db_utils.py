@@ -446,7 +446,7 @@ def get_all_response_details(
         output_dict["tag_id"] = question[20]
 
         for answer in table_of_correct_t1_answers:
-            if answer.q_t1_id == output_dict["q_id"]:
+            if answer.q_t1_id == output_dict["question_id"]:
                 output_dict["correct_answer"] = answer.option_text
 
         ## ADD FEEDBACK/FEEDFORWARD IF CORRECT/INCORRECT
