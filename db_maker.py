@@ -74,7 +74,7 @@ with app.app_context():
                 due_date=None,
                 time_limit=60 * 60 * 30,
                 num_of_credits=12,
-                is_summative=False,
+                is_summative=True,
             ),
             Assessment(  # 6
                 module_id=3,
@@ -91,7 +91,7 @@ with app.app_context():
                 title="ReactJS Basics",
                 due_date=None,
                 time_limit=60 * 60 * 20,
-                num_of_credits=40,
+                num_of_credits=0,
                 is_summative=False,
             ),
             Assessment(  # 8
@@ -109,6 +109,38 @@ with app.app_context():
                 due_date=None,
                 num_of_credits=20,
                 is_summative=True,
+            ),
+            Assessment(  # 10
+                module_id=1,
+                lecturer_id=7,
+                title="Git commands",
+                due_date=None,
+                num_of_credits=0,
+                is_summative=False,
+            ),
+            Assessment(  # 11
+                module_id=1,
+                lecturer_id=9,
+                title="Git and Github",
+                due_date=None,
+                num_of_credits=0,
+                is_summative=False,
+            ),
+            Assessment(  # 12
+                module_id=3,
+                lecturer_id=8,
+                title="Big O",
+                due_date=None,
+                num_of_credits=0,
+                is_summative=False,
+            ),
+            Assessment(  # 13
+                module_id=3,
+                lecturer_id=8,
+                title="Data Structures",
+                due_date=None,
+                num_of_credits=0,
+                is_summative=False,
             ),
         ]
     )
