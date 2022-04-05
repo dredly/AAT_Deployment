@@ -252,11 +252,15 @@ def assessment_view(assessment_id=0):
             url_for("student_stats.module_not_found", assessment_id=assessment_id)
         )
 
+    # TODO: validation for if no attempts (in routes)
+
     assessment_object = Assessment.query.filter_by(assessment_id=assessment_id).first()
 
     assessment_details = {
         "module_id": assessment_object.module_id,
-        "assessment_name": assessment_object.title,
+        "module_title": assessment_object.module.title,
+        "assessment_id": assessment_id,
+        "assessment_title": assessment_object.title,
     }
 
     # db_utils calls
@@ -275,6 +279,27 @@ def assessment_view(assessment_id=0):
         input_assessment_id=assessment_id,
         store_output_to_file=True,
     )
+
+    ## Need to make dictionary of: {attempt_number : [all questions associated]}
+    all_response_details_grouped_by_attempt_number = {}
+    for r in all_response_details:
+        if not r["attempt_number"] in all_response_details_grouped_by_attempt_number:
+            all_response_details_grouped_by_attempt_number[r["attempt_number"]] = []
+        all_response_details_grouped_by_attempt_number[r["attempt_number"]].append(r)
+
+    total_score_per_attempt = (
+        {}
+    )  # dictionary of {attempt_id{correct_marks, possible_marks}}
+    for attempt_id, responses in all_response_details_grouped_by_attempt_number.items():
+        total_score_per_attempt[attempt_id] = {"correct_marks": 0, "possible_marks": 0}
+        for r in responses:
+            total_score_per_attempt[attempt_id]["correct_marks"] += (
+                r["num_of_marks"] if r["is_correct"] else 0
+            )
+            total_score_per_attempt[attempt_id]["possible_marks"] += r["num_of_marks"]
+        total_score_per_attempt[attempt_id][
+            "mark_as_percentage"
+        ] = f"{total_score_per_attempt[attempt_id]['correct_marks']/ total_score_per_attempt[attempt_id]['possible_marks']:.0%}"
 
     highest_scoring_response_details = get_all_response_details(
         input_user_id=current_user.id,
@@ -300,17 +325,14 @@ def assessment_view(assessment_id=0):
                 "attempt_number"
             ]
 
-    # REMOVE highest attempt from all_response_details
-    all_response_details = [
-        r for r in all_response_details if not r["highest_scoring_attempt"]
-    ]
-
     return render_template(
         "3_student_stats_assessment_view.html",
         assessment_details=assessment_details,
         all_assessment_marks_student=all_assessment_marks_student,
         all_response_details=all_response_details,
         highest_scoring_response_details=highest_scoring_response_details,
+        all_response_details_grouped_by_attempt_number=all_response_details_grouped_by_attempt_number,
+        total_score_per_attempt=total_score_per_attempt,
     )
 
 

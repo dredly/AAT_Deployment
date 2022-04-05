@@ -441,21 +441,37 @@ with app.app_context():
                 selected_option=5,
                 is_correct=True,
             ),
-            ResponseT1(  # 1
-                attempt_number=1,
-                user_id=4,
-                assessment_id=1,
-                t1_question_id=1,
-                selected_option=1,
-                is_correct=True,
-            ),
-            ResponseT1(  # 2
+            ResponseT1(  # 3
                 attempt_number=1,
                 user_id=4,
                 assessment_id=2,
                 t1_question_id=2,
                 selected_option=5,
                 is_correct=True,
+            ),
+            ResponseT1(  # 4
+                attempt_number=1,
+                user_id=4,
+                assessment_id=1,
+                t1_question_id=1,
+                selected_option=2,
+                is_correct=False,
+            ),
+            ResponseT1(  # 5
+                attempt_number=2,
+                user_id=4,
+                assessment_id=1,
+                t1_question_id=1,
+                selected_option=1,
+                is_correct=True,
+            ),
+            ResponseT1(  # 6
+                attempt_number=3,
+                user_id=4,
+                assessment_id=1,
+                t1_question_id=1,
+                selected_option=3,
+                is_correct=False,
             ),
         ]
     )
@@ -495,11 +511,43 @@ with app.app_context():
                 user_id=4,
                 assessment_id=1,
                 t2_question_id=1,
-                response_content="m",
-                is_correct=True,
+                response_content="madada",
+                is_correct=False,
             ),
             ResponseT2(  # 5
                 attempt_number=1,
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=2,
+                response_content="adad",
+                is_correct=False,
+            ),
+            ResponseT2(  # 6
+                attempt_number=2,
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=1,
+                response_content="m",
+                is_correct=True,
+            ),
+            ResponseT2(  # 7
+                attempt_number=2,
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=2,
+                response_content="adad",
+                is_correct=False,
+            ),
+            ResponseT2(  # 8
+                attempt_number=3,
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=1,
+                response_content="m",
+                is_correct=True,
+            ),
+            ResponseT2(  # 9
+                attempt_number=3,
                 user_id=4,
                 assessment_id=1,
                 t2_question_id=2,
@@ -512,7 +560,7 @@ with app.app_context():
             # THE POINTS WILL ADD TO THEIR RESULT
             # BUT THE QUESTION STILL WON'T SHOW IN THE
             # ASSESSMENT ITSELF
-            ResponseT2(  # 6
+            ResponseT2(  # 10
                 attempt_number=1,
                 user_id=4,
                 assessment_id=6,
@@ -520,7 +568,7 @@ with app.app_context():
                 response_content="zzz",
                 is_correct=False,
             ),
-            ResponseT2(  # 7
+            ResponseT2(  # 11
                 attempt_number=1,
                 user_id=4,
                 assessment_id=4,
@@ -529,7 +577,7 @@ with app.app_context():
                 is_correct=False,
             ),
             # ASSESSMENT 9
-            ResponseT2(  # 8
+            ResponseT2(  # 12
                 attempt_number=1,
                 user_id=4,
                 assessment_id=9,
@@ -537,7 +585,7 @@ with app.app_context():
                 response_content="When it's a jar",
                 is_correct=True,
             ),
-            ResponseT2(  # 9
+            ResponseT2(  # 13
                 attempt_number=1,
                 user_id=4,
                 assessment_id=9,
@@ -545,7 +593,7 @@ with app.app_context():
                 response_content="When it's a jar",
                 is_correct=True,
             ),
-            ResponseT2(  # 10
+            ResponseT2(  # 14
                 attempt_number=1,
                 user_id=4,
                 assessment_id=9,
@@ -553,7 +601,7 @@ with app.app_context():
                 response_content="When it's a jar",
                 is_correct=True,
             ),
-            ResponseT2(  # 11
+            ResponseT2(  # 15
                 attempt_number=1,
                 user_id=4,
                 assessment_id=9,
@@ -561,7 +609,7 @@ with app.app_context():
                 response_content="Huh?",
                 is_correct=False,
             ),
-            ResponseT2(  # 11
+            ResponseT2(  # 16
                 attempt_number=1,
                 user_id=4,
                 assessment_id=9,
@@ -570,7 +618,7 @@ with app.app_context():
                 is_correct=False,
             ),
             # ATTEMPT 2: u_id=4, ass=9
-            ResponseT2(  # 12
+            ResponseT2(  # 17
                 attempt_number=2,
                 user_id=4,
                 assessment_id=9,
@@ -578,7 +626,7 @@ with app.app_context():
                 response_content="ad's a jar",
                 is_correct=False,
             ),
-            ResponseT2(  # 13
+            ResponseT2(  # 18
                 attempt_number=2,
                 user_id=4,
                 assessment_id=9,
@@ -586,7 +634,7 @@ with app.app_context():
                 response_content="ad it's a jar",
                 is_correct=False,
             ),
-            ResponseT2(  # 14
+            ResponseT2(  # 19
                 attempt_number=2,
                 user_id=4,
                 assessment_id=9,
@@ -594,7 +642,7 @@ with app.app_context():
                 response_content="ad it's a jar",
                 is_correct=False,
             ),
-            ResponseT2(  # 15
+            ResponseT2(  # 20
                 attempt_number=2,
                 user_id=4,
                 assessment_id=9,
@@ -602,7 +650,7 @@ with app.app_context():
                 response_content="Huh?",
                 is_correct=False,
             ),
-            ResponseT2(  # 16
+            ResponseT2(  # 21
                 attempt_number=2,
                 user_id=4,
                 assessment_id=9,
