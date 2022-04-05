@@ -21,16 +21,15 @@
 
 {% endif %}
 
-{% for question in questions %}
+{% for question,f in questions_and_forms %}
     <h2>{{ question.question_text }}</h2>
     <p>{{question.num_of_marks}} marks</p>
     <p>Tag: {{question.tag}}</p>
     <form method="POST" action="">
-        {{ addQuestionForm.csrf_token}}
-        {{ addQuestionForm.add}}
+        {{ f.csrf_token}}
+        {{ f.add}}
     </form>
-   
-{% endfor %}
+    {% endfor %}
 
 <form method="POST" action="" class="add_questions_finish">
     {{ form.csrf_token}}

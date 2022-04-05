@@ -1,3 +1,4 @@
+from audioop import add
 from datetime import date, datetime
 import math
 import random
@@ -413,6 +414,7 @@ def add_questions(id):
     elif session.get("assessment_edit") != None:
         id = session.get("assessment_edit")
     form = FinishForm()
+    forms=[]
     randomiser = RandomQuestionsForm()
     assessment = Assessment.query.get_or_404(id)
     addQuestionForm = AddQuestionToAssessmentForm()
@@ -431,11 +433,18 @@ def add_questions(id):
         return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, randomiser=randomiser))
 
     for question in questions:
-        if addQuestionForm.validate_on_submit() and addQuestionForm.add.data:
-            question.assessment_id = id
-            db.session.commit()
-            flash('Question Added', 'success')
-            return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, randomiser=randomiser))
+        try:
+            addForm = AddQuestionToAssessmentForm(prefix=str(question.q_t1_id))
+        except:
+            addForm = AddQuestionToAssessmentForm(prefix=str(question.q_t2_id))
+        forms.append(addForm)
+        for f in forms:
+            if f.validate_on_submit() and f.add.data:
+                question.assessment_id = assessment.assessment_id
+                db.session.commit()
+                flash('Question Added', 'success')
+                return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, randomiser=randomiser))
+    questions_and_forms = zip(questions, forms)
     if form.validate_on_submit() and form.finish.data:
         if session.get("assessment_edit") != None:
             flash('Assessment Updated', 'success')
@@ -450,6 +459,7 @@ def add_questions(id):
         form=form,
         assessment=assessment,
         randomiser=randomiser,
+        questions_and_forms=questions_and_forms
     )
 
 
