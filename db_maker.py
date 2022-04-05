@@ -603,7 +603,7 @@ with app.app_context():
             ResponseT2(  # 11
                 attempt_number=1,
                 user_id=4,
-                assessment_id=4,
+                assessment_id=9,
                 t2_question_id=4,
                 response_content="zzz",
                 is_correct=False,
