@@ -229,9 +229,11 @@ def get_all_assessment_marks(
         get_assessment_id_and_total_marks_possible()
     )
 
-    print("****")
-    print(f"{assessment_id_and_total_marks_possible=}") if debug else ...
-    print("****")
+    if debug:
+        print("****")
+        print(f"{assessment_id_and_total_marks_possible=}")
+        print("****")
+
     final_output = []
 
     # Make list of dictionaries holding relevant IDs and summations of correct marks
@@ -543,6 +545,7 @@ def get_all_response_details(
         item["tag_name"] = (
             Tag.query.with_entities(Tag.name).filter_by(id=item["tag_id"]).first()
         )
+
         # Add student email addresses
         item["student_email"] = (
             User.query.with_entities(User.email)
