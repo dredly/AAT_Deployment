@@ -2,7 +2,7 @@ from datetime import date, datetime
 import math
 import random
 from stringprep import in_table_d2
-from flask import Response, redirect, render_template, request, url_for, abort, session
+from flask import Response, flash, redirect, render_template, request, url_for, abort, session
 from . import assessments
 
 from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT2, ResponseT1, Option, Tag
@@ -321,6 +321,7 @@ def delete_assessment(id):
             request.form["submit"]
             db.session.delete(assessment)
             db.session.commit()
+            flash('Assessment Deleted', 'info')
             return redirect(url_for("assessments.view_module", module_id=module_id))
         except:
             request.form["cancel"]
@@ -344,6 +345,7 @@ def remove_question_t2(id, id2):
     if request.method == "POST" and form.is_submitted:
         question.assessment_id = None
         db.session.commit()
+        flash('Question removed', 'info')
         return redirect(url_for("assessments.edit_assessment", id=id))
     return render_template(
         "remove_question.html",
@@ -364,6 +366,7 @@ def remove_question_t1(id, id3):
     if request.method == "POST" and form.is_submitted:
         question.assessment_id = None
         db.session.commit()
+        flash('Question removed', 'info')
         return redirect(url_for("assessments.edit_assessment", id=id))
     return render_template(
         "remove_question.html", question=question, form=form, assessment=assessment
@@ -391,14 +394,20 @@ def add_questions(id):
             if difficulty_level == question.difficulty:
                 question.assessment_id = assessment.assessment_id
                 db.session.commit()
+                flash('Questions added to assessment', 'success')
         return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, randomiser=randomiser))
 
     for question in questions:
         if addQuestionForm.validate_on_submit() and addQuestionForm.add.data:
             question.assessment_id = id
             db.session.commit()
+            flash('Question Added', 'success')
             return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, randomiser=randomiser))
     if form.validate_on_submit() and form.finish.data:
+        if session.get("assessment_edit") != None:
+            flash('Assessment Updated', 'success')
+        elif session.get("assessment_add") != None:
+            flash('Assessment Added', 'success')
         return redirect(url_for("assessments.show_assessment", id=id))
     return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, assessment=assessment, randomiser=randomiser)
 
@@ -455,8 +464,10 @@ def create_questions_t1(id):
         db.session.add(option_c)
         db.session.commit()
         if session.get("assessment_edit") != None:
+            flash('Question added to Assessment', 'success')
             return redirect(url_for("assessments.add_questions", id=id))
         elif session.get("assessment_add") != None:
+            flash('Question added to Assessment', 'success')
             return redirect(url_for("assessments.add_questions", id=id))
     form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
     return render_template(
