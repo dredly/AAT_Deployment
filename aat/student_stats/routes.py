@@ -325,6 +325,29 @@ def assessment_view(assessment_id=0):
                 "attempt_number"
             ]
 
+    # Variables required:
+    # - labels: list of strings
+    # - data: list of integers
+    # - backgroundColor: list of rgba (strings)
+    # - options (y axis should be total possible marks)
+
+    data_for_bar_chart = {
+        "labels": [],  # Attempt names
+        "data": [],  # Attempt total marks achieved
+        "backgroundColor": [],  # Red if below 50%, Blue if above
+        "y_axis_max": 0,  # Highest marks
+    }
+
+    # Sort all_response_details_grouped_by_attempt_number
+    for i in range(len(total_score_per_attempt)):
+        response = total_score_per_attempt[i + 1]
+        data_for_bar_chart["labels"].append(i + 1)
+        data_for_bar_chart["data"].append(response["correct_marks"])
+        data_for_bar_chart["backgroundColor"].append("54, 162, 235, 0.8") if (
+            response["correct_marks"] / response["possible_marks"]
+        ) > 0.5 else data_for_bar_chart["backgroundColor"].append("255, 99, 132, 0.8")
+        data_for_bar_chart["y_axis_max"] = response["possible_marks"]
+
     return render_template(
         "3_student_stats_assessment_view.html",
         assessment_details=assessment_details,
@@ -333,6 +356,7 @@ def assessment_view(assessment_id=0):
         highest_scoring_response_details=highest_scoring_response_details,
         all_response_details_grouped_by_attempt_number=all_response_details_grouped_by_attempt_number,
         total_score_per_attempt=total_score_per_attempt,
+        data_for_bar_chart=data_for_bar_chart,
     )
 
 

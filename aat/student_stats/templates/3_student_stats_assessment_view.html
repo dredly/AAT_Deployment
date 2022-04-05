@@ -39,10 +39,22 @@
         </div>
     </div>
 
+    <h2>Progress Chart</h2>
+    <!-- Details -->
+    {{data_for_bar_chart["data"]}}
+
+    <!-- What format? -->
+    <p>{{ data_for_bar_chart["y_axis_max"] }}</p>
+    <div class="content-block">
+        <div class="chart-container">
+            <canvas id="myBarChart"></canvas>
+        </div>
+    </div>
+
+
     <h2>Attempts</h2>
     <ul>
         <h3>Highest scoring attempt attempt</h3>
-
         <h3>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}}</h3>
 
         {% for r in highest_scoring_response_details %}
@@ -53,7 +65,7 @@
                 <li>Difficulty: {{r.question_difficulty}}</li>
                 <li>Answer given: {{r.answer_given}}</li>
                 <li>Correct? {{r.is_correct}}</li>
-                <li>Question Tag: {{r.tag_name}}</li>
+                <li>Question Tag: {{r.tag_name[0]}}</li>
                 <li>Question Type: {{r.question_type}}</li>
                 <li>Marks: {% if r.is_correct %}{{r.num_of_marks}}{% else %}0{% endif %}/{{r.num_of_marks}}</li>
                 <li><a href="mailto:{{r.lecturer_email}}?subject=Query from {{current_user.name}}">Email lecturer to query</a></li>
@@ -61,7 +73,7 @@
                 <li>Assessment: {{ r.assessment_id}} | {{r.assessment_title }}</li>
             </div>
         {% endfor %}
-
+    </ul>
     <h3>Other attempts</h3>
 
     <ul>
@@ -78,7 +90,7 @@
                             <li>Difficulty: {{r.question_difficulty}}</li>
                             <li>Answer given: {{r.answer_given}}</li>
                             <li>Correct? {{r.is_correct}}</li>
-                            <li>Question Tag: {{r.tag_name}}</li>
+                            <li>Question Tag: {{r.tag_name[0]}}</li>
                             <li>Marks: {% if r.is_correct %}{{r.num_of_marks}}{% else %}0{% endif %}/{{r.num_of_marks}}</li>
                         </div>
                     {% endfor %}
@@ -91,6 +103,7 @@
     
 
     <script>
+        // PIE CHART
         const correct = '{{assessment_details["sum_of_marks_awarded"]}}';
         const incorrect = '{{assessment_details["sum_of_marks_possible"]-assessment_details["sum_of_marks_awarded"]}}';
     
@@ -109,7 +122,38 @@
                 ],
             },
         });
+
+        // BAR CHART
+
+        // Variables required:
+        // - labels: list of strings
+        // - data: list of integers
+        // - backgroundColor: list of rgba (strings)
+        // - options (y axis should be total possible marks)
+
+                
+        const ctxBar = document.getElementById('myBarChart');
+        const myChartBar = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: {{data_for_bar_chart["labels"]}},
+                datasets: [{
+                    label: 'Marks',
+                    data: {{data_for_bar_chart["data"]}},
+                    // backgroundColor: ['rgba(54, 162, 235, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(54, 162, 235, 0.8)'],
+                    backgroundColor: [{% for color in data_for_bar_chart['backgroundColor'] %}'rgba({{color}})',{% endfor %}],  
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: '{{data_for_bar_chart["y_axis_max"]}}'*1
+                    },
+                }
+            }
+        });
     </script>
   
-    
     {% endblock content %}

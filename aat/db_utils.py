@@ -543,6 +543,7 @@ def get_all_response_details(
         item["tag_name"] = (
             Tag.query.with_entities(Tag.name).filter_by(id=item["tag_id"]).first()
         )
+
         # Add student email addresses
         item["student_email"] = (
             User.query.with_entities(User.email)
