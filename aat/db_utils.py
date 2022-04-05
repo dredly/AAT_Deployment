@@ -429,7 +429,7 @@ def get_all_response_details(
         output_dict = {}
         output_dict["user_id"] = question[0]
         output_dict["attempt_number"] = question[1]
-        output_dict["q_id"] = question[2]
+        output_dict["question_id"] = question[2]
         output_dict["question_text"] = question[3]
         output_dict["question_difficulty"] = question[4]
         output_dict["answer_given"] = question[5]
@@ -505,7 +505,7 @@ def get_all_response_details(
         output_dict = {}
         output_dict["user_id"] = question[0]
         output_dict["attempt_number"] = question[1]
-        output_dict["q_id"] = question[2]
+        output_dict["question_id"] = question[2]
         output_dict["question_text"] = question[3]
         output_dict["question_difficulty"] = question[4]
         output_dict["answer_given"] = question[5]
