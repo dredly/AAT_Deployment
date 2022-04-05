@@ -595,7 +595,7 @@ with app.app_context():
             ResponseT2(  # 10
                 attempt_number=1,
                 user_id=4,
-                assessment_id=6,
+                assessment_id=3,
                 t2_question_id=3,
                 response_content="zzz",
                 is_correct=False,
