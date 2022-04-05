@@ -10,10 +10,8 @@
 />
 {% endblock extra_head %}
 {% block content %}
-<h1>Student Stats for {{current_user.name}} | Course View for "MSc. Computing"</h1>
+<h1>Student Stats for {{current_user.name}} | Course View</h1>
 <p><a href="{{ url_for('legendary_gamification.get_id')}}"><button>Tier: {{current_user.tier}}</button></a></p>
-    <p>Course View</p>
-    <h2>Course: Computer Science</h2>
     
     <h2>
         Overall Marks - STUDENT
@@ -46,11 +44,40 @@
 
     <h2>Modules</h2>
     <h3>Modules completed:</h3>
-    <p>TODO</p>
+    <ul>
+        {% for module_key, module in module_stats_student.items() %}
+            {% if module.count_of_assessments == module.count_of_taken_assessments %}
+                <a href="{{url_for('student_stats.module_view', module_id=module_key)}}">
+                    <div class="student_stats_container results_box {% if module['marks_awarded']/module['marks_possible'] >= 0.5 %} correct_answer {% else %} incorrect_answer {% endif %}">
+                            <li>
+                                <p><b>{{module.module_title}}</b></p>
+                                <p>Your score:
+                                        {{module['marks_awarded']}}/{{module['marks_possible']}}
+                                        ({{ "%.2d" |
+                                        format((module['marks_awarded']/module['marks_possible'])*100)}}%)
+                                </p>
+                                <p>
+                                    Total assessment credits: {{module.total_assessment_credits}}
+                                </p>
+                                <p>
+                                    Total module credits: {{module.total_module_credits}}
+                                </p>
+                                <p>
+                                    Completed assessments: {{module.count_of_taken_assessments}}/{{ module.count_of_assessments}}
+                                </p>
+                                <p>
+                                    Passed assessments: {{module.count_of_passed_assessments}}/{{ module.count_of_assessments}}
+                                </p>
+                            </li>
+                        </div>
+                    </a>
+                {% endif %}
+            {% endfor %}
+    </ul>
     <h3>Modules started:</h3>
     <ul>
         {% for module_key, module in module_stats_student.items() %}
-            {% if module.taken_by_student %}
+            {% if module.taken_by_student and module.count_of_assessments != module.count_of_taken_assessments %}
             <a href="{{url_for('student_stats.module_view', module_id=module_key)}}">
                 <div class="student_stats_container results_box {% if module['marks_awarded']/module['marks_possible'] >= 0.5 %} correct_answer {% else %} incorrect_answer {% endif %}">
                         <li>
@@ -65,6 +92,12 @@
                             </p>
                             <p>
                                 Total module credits: {{module.total_module_credits}}
+                            </p>
+                            <p>
+                                Completed assessments: {{module.count_of_taken_assessments}}/{{ module.count_of_assessments}}
+                            </p>
+                            <p>
+                                Passed assessments: {{module.count_of_passed_assessments}}/{{ module.count_of_assessments}}
                             </p>
                         </li>
                     </div> 
@@ -88,6 +121,10 @@
                             <p>
                                 Total module credits: {{module.total_module_credits}}
                             </p>
+                            <p>
+                                Count of assessments: {{ module.count_of_assessments}}
+                            </p>
+                            
                         </li>
                     </div>
                 </a>

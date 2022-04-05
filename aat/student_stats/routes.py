@@ -78,11 +78,35 @@ def course_view():
                 "possible_marks"
             ]
 
+    # Dict of modules, how many assessments are in it, how many you've completed
+    dict_of_assessment_counts = {}
+    for module in module_ids_with_details:
+        dict_of_assessment_counts[module] = {
+            "count_of_assessments": module_ids_with_details[module][
+                "count_of_assessments"
+            ],
+            "count_of_taken_assessments": 0,
+        }
+    for assessment_id in list_of_assessments_completed_by_student:
+        a = Assessment.query.filter_by(assessment_id=assessment_id).first()
+        dict_of_assessment_counts[a.module.module_id]["count_of_taken_assessments"] += 1
+
+    # Dict of modules passed
+    dict_of_modules_and_assessments_passed = {}
+    for m in dict_of_assessment_counts:
+        for a in all_assessment_marks_student:
+            if m == a["module_id"]:
+                dict_of_assessment_counts[m]["count_of_passed_assessments"] = (
+                    dict_of_assessment_counts[m].get("count_of_passed_assessments", 0)
+                    + 1
+                )
+
     # MODULE RESULTS
     # - STUDENT
     module_stats_student = {}
     for assessment_mark in all_assessment_marks_student:
-        module_stats_student[assessment_mark["module_id"]] = {
+        k = assessment_mark["module_id"]
+        module_stats_student[k] = {
             "marks_awarded": assessment_mark["correct_marks"],
             "marks_possible": assessment_mark["possible_marks"],
             "taken_by_student": True,
@@ -90,6 +114,8 @@ def course_view():
 
     # - > ADD MODULE STATS
     for module in module_ids_with_details:
+        # Add stats for taken:
+
         if module in module_stats_student:
             module_stats_student[module]["module_title"] = module_ids_with_details[
                 module
@@ -100,6 +126,16 @@ def course_view():
             module_stats_student[module][
                 "total_module_credits"
             ] = module_ids_with_details[module]["total_module_credits"]
+            module_stats_student[module][
+                "count_of_assessments"
+            ] = dict_of_assessment_counts[module]["count_of_assessments"]
+            module_stats_student[module][
+                "count_of_taken_assessments"
+            ] = dict_of_assessment_counts[module]["count_of_taken_assessments"]
+            module_stats_student[module][
+                "count_of_passed_assessments"
+            ] = dict_of_assessment_counts[module]["count_of_passed_assessments"]
+
         else:
             module_stats_student[module] = {
                 "module_title": module_ids_with_details[module]["module_title"],
@@ -114,7 +150,11 @@ def course_view():
                 "total_module_credits": module_ids_with_details[module][
                     "total_module_credits"
                 ],
+                "count_of_assessments": dict_of_assessment_counts[module][
+                    "count_of_assessments"
+                ],
             }
+
     # - COHORT
     # TODO: module_stats_cohort
     module_stats_cohort = {}
@@ -151,6 +191,7 @@ def course_view():
         overall_results_student=overall_results_student,
         module_stats_student=module_stats_student,
         module_stats_cohort=module_stats_cohort,
+        dict_of_assessment_counts=dict_of_assessment_counts,
     )
 
 

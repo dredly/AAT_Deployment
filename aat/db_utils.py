@@ -64,7 +64,8 @@ def get_module_ids_with_details(input_module_id=None, store_output_to_file=False
             total_module_credits (int),
             total_assessment_credits (int),
             total_marks_possible (int),
-            module (Module)
+            module (Module),
+            count_of_assessments (int)
             }]
     """
     q = (
@@ -72,13 +73,16 @@ def get_module_ids_with_details(input_module_id=None, store_output_to_file=False
         if not input_module_id
         else Module.query.filter(Module.module_id == input_module_id).all()
     )
+
     output_dict = {}
+
     for module in q:
         output_dict[module.module_id] = {
             "module_title": module.title,
             "total_module_credits": module.total_credits,
             "total_assessment_credits": 0,
             "total_marks_possible": 0,
+            "count_of_assessments": len(module.assessments),
         }
         # Find all assessments connected
         for assessment in module.assessments:
@@ -277,8 +281,6 @@ def get_all_assessment_marks(
             marks_dict["assessment_title"] = assessment_title
 
             final_output.append(marks_dict)
-
-    # POSSIBLE MARKS NOT CORRECT - work out separately then add on?
 
     if debug:
         print("***")
