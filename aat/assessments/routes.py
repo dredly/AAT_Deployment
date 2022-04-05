@@ -229,10 +229,11 @@ def delete_questions(id):
 # ---------------------------------  CRUD For Assessments ---------------------------------------
 
 
-@assessments.route("/assessment/new", methods=["GET", "POST"])
-def new_assessment():
+@assessments.route("/<int:module_id>/assessment/new", methods=["GET", "POST"])
+def new_assessment(module_id):
     session.pop("assessment_edit", None)
     session.pop("assessment_add", None)
+    module = Module.query.filter_by(module_id=module_id).first()
     form = AssessmentForm()
     error = " "
     is_summative_1 = ""
@@ -284,7 +285,8 @@ def new_assessment():
     form.module_id.choices = [
         (module.module_id, module.title) for module in Module.query.all()
     ]
-    return render_template("new_assessment.html", form=form)
+    form.module_id.data = str(module.module_id)
+    return render_template("new_assessment.html", form=form, module_id=module_id)
 
 
 @assessments.route("/<int:id>/edit_assessment", methods=["GET", "POST"])
