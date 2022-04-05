@@ -291,3 +291,31 @@ footer {
 	text-align: center;
 	width: 100%;
 }
+
+
+/* ASSESSMENT STYLES */
+.summary-page {
+    width: 80%; 
+    margin: auto; 
+    margin-bottom: 20px; 
+    padding: 20px; 
+    border: 1px solid grey; 
+    border-radius: 10px;
+}
+
+.assessment-instance {
+    width: 80%;
+    margin: auto;  
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+}
+
+.assessment-instance button {
+    height: 20px; 
+}
+
+.summative { 
+    border: 5px solid black; 
+    box-shadow:  10px 10px 30px #bebebe;
+}

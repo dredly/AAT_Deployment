@@ -383,6 +383,8 @@ def get_all_response_details(
     - highest_scoring_attempt (bool)
     - student_email (str)
     - lecturer_email (str)
+    - tag_id (int)
+    - tag_name (str)
 
     Optional filters added for student, lecturer, module and assessment id
     """
