@@ -48,11 +48,13 @@ def module(Module_title):
     # restablish user lecturer_id
     session["Module_title"] = Module_title
     user = User.query.filter_by(name = current_user.name).first()
-
+    t1Response = ResponseT1.query.all()
+    t2Response = ResponseT2.query.all()
+    users = User.query.all()
     module = Module.query.filter_by(title = Module_title).first()
     moduleId = module.module_id
-    print("moduleId",moduleId)
-    print("user id", user.id)
+    #print("moduleId",moduleId)
+    #print("user id", user.id)
     userInfo = get_all_response_details(None,user.id,)
     #print(userInfo)
     
@@ -73,18 +75,51 @@ def module(Module_title):
             assessmentInfo.append(assessment.assessment_id)
             moduleAssessments.append(assessmentInfo)
 
-    print("module Assessments", moduleAssessments)
+    
+    moduleAssessmentIds = []
+    for assessment in moduleAssessments:
+        moduleAssessmentIds.append(assessment[4])
     NoOfAssessments = len(moduleAssessments)
-    print("number of assessments is", NoOfAssessments)
+    #print("number of assessments is", NoOfAssessments)
     
     questions = [[]for i in range(NoOfAssessments)]
     
     for question in userInfo:
         questionDetails = []
-        questionDetails.append(question.get("assessment_id"))
+        questionAssessmentId = question.get("assessment_id")
+        questionId = question.get("q_t2_id")
+        #print("question ID",questionId, "assessmentId",questionAssessmentId)
+
+        questionInfo = get_all_assessment_marks(None,None,None,questionAssessmentId,True)
+        for stat in questionInfo:
+            if stat.get("assessment_id") == questionAssessmentId:
+                assId = stat.get("assessment_id")
+                user = stat.get("user_id")
+                attempt = stat.get("attempt_number")
+                bestAttempt = stat.get("highest_scoring_attempt")
+                marks = stat.get("correct_marks")
+                if bestAttempt == True:
+                    bestAttempt = attempt
+                #print("user",user,"assId",assId,"best attempt",bestAttempt, marks)
+                
+                for response in t2Response:                    
+                        if response.user_id == user:
+                            if response.attempt_number == bestAttempt:
+                                if response.assessment_id == assId:
+                                    if response.is_correct == True:
+                                        #print("yay")
+                                        pass
+                                    else:
+                                        #print("nay")
+                                        pass
+
+
+                        
+        questionDetails.append(questionAssessmentId)
         questionDetails.append(question.get("question_text"))
         questionDetails.append(question.get("question_difficulty"))
         questionDetails.append(question.get("question_type"))
+        
         for bracket in questions:
             
             if len(bracket) == 0:
@@ -99,7 +134,7 @@ def module(Module_title):
     questions2 = []
     for question in questions:
         if len(question) == 0:
-            pass
+            questions2.append(["No questions set"])
         else:
             questions2.append(question)  
               
@@ -112,8 +147,8 @@ def module(Module_title):
                 dup_free.append(question2)
         questions3.append(dup_free)
              
-    
-    print("questions", questions2)
+    print(moduleAssessmentIds)
+    print("questions3", questions3)
     
 
 

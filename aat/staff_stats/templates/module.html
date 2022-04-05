@@ -4,18 +4,25 @@
 <a href="{{ url_for('staff_stats.index') }}">BACK</a>
 <h1> Module: {{Module_title}}</h1>
 {%for assessment in moduleAssessments%}
-{%set count = loop.index0%}
-<h2>{{assessment[0]}}: &nbsp;&nbsp;&nbsp; {{assessment[1]}} &nbsp;&nbsp;&nbsp; number of credits:{{assessment[2]}}&nbsp;&nbsp;&nbsp;{%if assessment[3] == True%} (Summative) {%else%} (Formative){%endif%}assessment id:{{assessment[4]}}
+    {%set count = loop.index0%}
+    <h2>{{assessment[0]}}: &nbsp;&nbsp;&nbsp; {{assessment[1]}} &nbsp;&nbsp;&nbsp; number of credits:{{assessment[2]}}&nbsp;&nbsp;&nbsp;{%if assessment[3] == True%} (Summative) {%else%} (Formative){%endif%}assessment id:{{assessment[4]}}
     <a href="{{url_for('staff_stats.view_students',assessment = assessment[0])}}">View Students</a>
-</h2>
-    {%for questionBlock in questions%}  
-    {%for question in questionBlock%} 
-    {%if question[0] == assessment[4]%}
-    <p>{{question[1]}} &nbsp;&nbsp;&nbsp; question difficulty is:{{question[2]}} &nbsp;&nbsp;&nbsp; Question type:{{question[3]}}</p>
-    
-    {%endif%}
+    </h2>
+    {%for questionBlock in questions%}
+        
+        {%for question in questionBlock%}
+        
+            {%if question[0] == assessment[4]%}
+                
+                {%if question[0] in question %}             
+                    <p>{{question[1]}} &nbsp;&nbsp;&nbsp; question difficulty is:{{question[2]}} &nbsp;&nbsp;&nbsp; Question type:{{question[3]}}</p>
+                {%else%}
+                    <p>There have been no questions set</p>
+                {%endif%}
+            {%endif%}
+        {%endfor%}
     {%endfor%}
-    {%endfor%}
+
 {%endfor%}
 
 {% endblock %}
