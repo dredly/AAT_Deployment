@@ -41,7 +41,7 @@
             <h3>{{question}}</h3>
 
                 {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
-                <a href="{{url_for('assessments.remove_question_t1', id3=question.q_t1_id, id=assessment.assessment_id)}}"><button class="delete-button" class="Assessment_Edit_Child">Remove Question</a>
+                <a href="{{url_for('assessments.remove_question_t1', id3=question.q_t1_id, id=assessment.assessment_id)}}"><button class="remove-button">Remove Question</button></a>
                 {% endif %}
         </div>
         <p>{{question.num_of_marks}} marks</p>
@@ -55,7 +55,7 @@
         <div class = "Assessment_Edit_Children">
             <h3>{{question}}</h3>
                     {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
-                    <a href="{{url_for('assessments.remove_question_t2', id2=question.q_t2_id, id=assessment.assessment_id)}}"><button class="delete-button" class="Assessment_Edit_Child">Remove Question</a>
+                    <a href="{{url_for('assessments.remove_question_t2', id2=question.q_t2_id, id=assessment.assessment_id)}}"><button class="remove-button">Remove Question</button></a>
                     {% endif %}
         </div>
         <p>{{question.num_of_marks}} marks</p>

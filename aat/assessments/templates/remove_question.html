@@ -1,11 +1,14 @@
 {% extends("layout.html") %}
 
 {% block content %}
+<div class=" block_contents">
 <form method="POST" action="">
     <p>Are you sure you want to remove this question?</p>
     {{ form.csrf_token }}
     {{ form.submit(class='delete-button') }}
 </form>
+<div class="edit_submit_button">
 <a href="{{url_for('assessments.edit_assessment', id=assessment.assessment_id)}}"><button>Cancel</button></a>
-
+</div>
+</div>
 {% endblock %}

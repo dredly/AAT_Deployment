@@ -99,6 +99,11 @@ footer {
 	display: flex;
 	justify-content: center;
 }
+.remove-button{
+	background-color: red;
+	color: white;
+	text-decoration: none;
+}
 
 /* EDIT DELETE TAKE ASSESSMENT BUTTONS ON INDEX */
 .module_title{
