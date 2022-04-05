@@ -127,7 +127,7 @@ def module(Module_title):
                         if response.user_id == user:
                             if response.attempt_number == bestAttempt:
                                 if response.assessment_id == assId:
-                                    if response.t2_question_id == questionId:
+                                    if response.t1_question_id == questionId:
                                         if response.is_correct == True:                                 
                                             print("YAY")
                                             yay += 1
