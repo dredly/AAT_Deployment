@@ -105,33 +105,39 @@ def module(Module_title):
                     bestAttempt = attempt
                 print("user",user,"assId",assId,"best attempt",bestAttempt, "questionID",questionId)
                 
-                if question.get("question_type") == 2:
-                    for response in t2Response:
+                
+                for user1 in users:
+                    if user1.id == user:
+                        userRole = user1.role_id
+                print("user role", userRole)
+                if userRole == 1:
+                    if question.get("question_type") == 2:
+                        for response in t2Response:
                                        
-                        if response.user_id == user:
-                            if response.attempt_number == bestAttempt:
-                                if response.assessment_id == assId:
-                                    if response.t2_question_id == questionId:
-                                        if response.is_correct == True:                                 
-                                            print("YAY")
-                                            yay += 1
-                                            break
+                            if response.user_id == user:
+                                if response.attempt_number == bestAttempt:
+                                    if response.assessment_id == assId:
+                                        if response.t2_question_id == questionId:
+                                            if response.is_correct == True:                                 
+                                                print("YAY")
+                                                yay += 1
+                                                break
                                         
-                                        else:
-                                            print("NAY")
-                                            nay += 1
-                                            break
-                else:
-                    for response in t1Response:
+                                            else:
+                                                print("NAY")
+                                                nay += 1
+                                                break
+                    else:
+                        for response in t1Response:
                                        
-                        if response.user_id == user:
-                            if response.attempt_number == bestAttempt:
-                                if response.assessment_id == assId:
-                                    if response.t1_question_id == questionId:
-                                        if response.is_correct == True:                                 
-                                            print("YAY")
-                                            yay += 1
-                                            break
+                            if response.user_id == user:
+                                if response.attempt_number == bestAttempt:
+                                    if response.assessment_id == assId:
+                                        if response.t1_question_id == questionId:
+                                            if response.is_correct == True:                                 
+                                                print("YAY")
+                                                yay += 1
+                                                break
                                         
                                         else:
                                             print("NAY")

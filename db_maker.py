@@ -523,7 +523,7 @@ with app.app_context():
             ),
             ResponseT2(  # 2
                 attempt_number=1,
-                user_id=1,
+                user_id=6,
                 assessment_id=1,
                 t2_question_id=2,
                 response_content="push",
@@ -531,7 +531,7 @@ with app.app_context():
             ),
             ResponseT2(  # 3
                 attempt_number=1,
-                user_id=2,
+                user_id=6,
                 assessment_id=1,
                 t2_question_id=1,
                 response_content="m",
