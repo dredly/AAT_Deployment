@@ -63,33 +63,36 @@ def module(Module_title):
     moduleAssessments = []
     assessments = Assessment.query.filter_by(module_id = moduleId).all()
     for assessment in assessments:
-        assessmentInfo = []
+        assessmentInfo = {}
         if assessment.module_id == moduleId:
-            assessmentInfo.append(assessment.title)
+            assessmentInfo["assessment_title"]=assessment.title
             if assessment.lecturer_id == user.id:
-                assessmentInfo.append("Your assessment")
+                assessmentInfo["your_assessment"] = True
             else:
-                assessmentInfo.append("NOT your assessment")
-            assessmentInfo.append(assessment.num_of_credits)
-            assessmentInfo.append(assessment.is_summative)
-            assessmentInfo.append(assessment.assessment_id)
+                assessmentInfo["your_assessment"] = False
+            assessmentInfo["number_of_credits"] = assessment.num_of_credits
+            assessmentInfo["is_summative"] = assessment.is_summative
+            assessmentInfo["assessment_id"] = assessment.assessment_id
             moduleAssessments.append(assessmentInfo)
-
+    print(moduleAssessments)
     
     moduleAssessmentIds = []
     for assessment in moduleAssessments:
-        moduleAssessmentIds.append(assessment[4])
+        moduleAssessmentIds.append(assessment.get("assessment_id"))
     NoOfAssessments = len(moduleAssessments)
     #print("number of assessments is", NoOfAssessments)
     
-    questions = [[]for i in range(NoOfAssessments)]
+    questions = []
     
     for question in userInfo:
-        questionDetails = []
-        questionAssessmentId = question.get("assessment_id")
-        questionId = question.get("q_t2_id")
+        questionDetails = {}
+        questionAssessmentId = question.get("assessment_id")        
+        questionId = question.get("q_id")
+        questionDetails["question_assessment_id"] = questionAssessmentId
+        questionDetails["questionId"] = questionId
         #print("question ID",questionId, "assessmentId",questionAssessmentId)
-
+        nay = 0
+        yay = 0
         questionInfo = get_all_assessment_marks(None,None,None,questionAssessmentId,True)
         for stat in questionInfo:
             if stat.get("assessment_id") == questionAssessmentId:
@@ -100,62 +103,82 @@ def module(Module_title):
                 marks = stat.get("correct_marks")
                 if bestAttempt == True:
                     bestAttempt = attempt
-                #print("user",user,"assId",assId,"best attempt",bestAttempt, marks)
+                print("user",user,"assId",assId,"best attempt",bestAttempt, "questionID",questionId)
                 
-                for response in t2Response:                    
+                if question.get("question_type") == 2:
+                    for response in t2Response:
+                                       
                         if response.user_id == user:
                             if response.attempt_number == bestAttempt:
                                 if response.assessment_id == assId:
-                                    if response.is_correct == True:
-                                        #print("yay")
-                                        pass
-                                    else:
-                                        #print("nay")
-                                        pass
-
-
-                        
-        questionDetails.append(questionAssessmentId)
-        questionDetails.append(question.get("question_text"))
-        questionDetails.append(question.get("question_difficulty"))
-        questionDetails.append(question.get("question_type"))
+                                    if response.t2_question_id == questionId:
+                                        if response.is_correct == True:                                 
+                                            print("YAY")
+                                            yay += 1
+                                            break
+                                        
+                                        else:
+                                            print("NAY")
+                                            nay += 1
+                                            break
+                else:
+                    for response in t1Response:
+                                       
+                        if response.user_id == user:
+                            if response.attempt_number == bestAttempt:
+                                if response.assessment_id == assId:
+                                    if response.t2_question_id == questionId:
+                                        if response.is_correct == True:                                 
+                                            print("YAY")
+                                            yay += 1
+                                            break
+                                        
+                                        else:
+                                            print("NAY")
+                                            nay += 1
+                                            break                  
+                print("yay", yay)
+                print("nay",nay)
+                    
+                                        
         
-        for bracket in questions:
+        
             
-            if len(bracket) == 0:
-                bracket.append(questionDetails)                
-                break
-            if questionDetails[0] == bracket[0][0]:
-                bracket.append(questionDetails)
-                break
-
-
-    #gets rid of empty lists ([])
-    questions2 = []
-    for question in questions:
-        if len(question) == 0:
-            questions2.append(["No questions set"])
+        if yay == 0:
+            if nay == 0:
+                pass_percentage = "No attempts have been made"
+            else:
+                pass_percentage = 0
+        if nay == 0:
+            pass_percentage = 100
         else:
-            questions2.append(question)  
-              
-    # gets rid of dupped questions
-    questions3 = []
-    for question in questions2:
-        dup_free = []
-        for question2 in question:
-            if question2 not in dup_free:
-                dup_free.append(question2)
-        questions3.append(dup_free)
-             
-    print(moduleAssessmentIds)
-    print("questions3", questions3)
+            total = yay+nay
+            pass_percentage = int((yay/total) * 100)
+        
+        questionDetails["correct_answers"] = yay
+        questionDetails["wrong_answers"] = nay
+        questionDetails["pass_percentage"] = pass_percentage
+        questionDetails["question_text"] = question.get("question_text")
+        questionDetails["question_difficulty"] = question.get("question_difficulty")
+        questionDetails["question_type"] =question.get("question_type")
+        questions.append(questionDetails)
     
 
+    # gets rid of dupped questions
+    seen = set()
+    questions2 = []
+    for question in questions:
+        t = tuple(question.items())
+        if t not in seen:
+            seen.add(t)
+            questions2.append(question)
+    
+    print("questions", questions2) 
 
     return render_template("module.html",
         Module_title = Module_title,
         moduleAssessments = moduleAssessments,
-        questions = questions3,
+        questions = questions2,
         )
 
 

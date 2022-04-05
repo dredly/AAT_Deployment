@@ -4,23 +4,56 @@
 <a href="{{ url_for('staff_stats.index') }}">BACK</a>
 <h1> Module: {{Module_title}}</h1>
 {%for assessment in moduleAssessments%}
-    {%set count = loop.index0%}
-    <h2>{{assessment[0]}}: &nbsp;&nbsp;&nbsp; {{assessment[1]}} &nbsp;&nbsp;&nbsp; number of credits:{{assessment[2]}}&nbsp;&nbsp;&nbsp;{%if assessment[3] == True%} (Summative) {%else%} (Formative){%endif%}assessment id:{{assessment[4]}}
-    <a href="{{url_for('staff_stats.view_students',assessment = assessment[0])}}">View Students</a>
+    
+    <h2>{{assessment.get("assessment_title")}}: &nbsp;&nbsp;&nbsp; {%if assessment.get("your_assessment") == True%} Your Assessment {%else%} Not Your Assessment {%endif%} &nbsp;&nbsp;&nbsp; number of credits:{{assessment.get("number_of_credits")}}&nbsp;&nbsp;&nbsp;{%if assessment.get("is_summative") == True%} (Summative) {%else%} (Formative){%endif%} &nbsp;&nbsp;&nbsp; assessment id:{{assessment.get("assessment_id")}}
+    <a href="{{url_for('staff_stats.view_students', assessment = assessment.get('assessment_title'))}}">View Students</a>
     </h2>
-    {%for questionBlock in questions%}
+    
+    {%for question in questions%}
+        {%set count = 0%}
+        {%if question.get("question_assessment_id") == assessment.get("assessment_id") %}
+        <p>{{question.get("questionId")}}.Question: {{question.get("question_text")}} &nbsp;&nbsp;&nbsp; Question Difficulty: {{question.get("question_difficulty")}} &nbsp;&nbsp;&nbsp Question Type: {{question.get("question_type")}} </p>
+        <p>Correct Answers: {{question.get("correct_answers")}}   Wrong Answers: {{question.get("wrong_answers")}}  {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate:{{question.get("pass_percentage")}}% {%endif%}</p>
+        {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %}
+        {%else%}
+        <div id='vis{{question.get("question_assessment_id")}}{{question.get("questionId")}}{{question.get("question_type")}}'></div>
+                <script>
+                    var data = ['{{question.get("wrong_answers")}}' ,'{{question.get("correct_answers")}}'];
+                    var svg = d3.select('#vis{{question.get("question_assessment_id")}}{{question.get("questionId")}}{{question.get("question_type")}}').append('svg').attr("width",300).attr("height",200),
+                    width = svg.attr("width"),
+                    height = svg.attr("height"),
+                    radius = Math.min(width, height) / 2,
+                    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+                    var color = d3.scaleOrdinal(['red','green']);
+
+                    // Generate the pie
+                    var pie = d3.pie();
+
+                    // Generate the arcs
+                    var arc = d3.arc()
+                    .innerRadius(0)
+                    .outerRadius(radius);
+
+                    //Generate groups
+                    var arcs = g.selectAll("arc")
+                                .data(pie(data))
+                                .enter()
+                                .append("g")
+                                .attr("class", "arc")
+
+                    //Draw arc paths
+                    arcs.append("path")
+                        .attr("fill", function(d, i) {
+                            return color(i);
+                        })
+                        .attr("d", arc);
+                </script>           
+        {%endif%}
         
-        {%for question in questionBlock%}
+        {%endif%}
+
         
-            {%if question[0] == assessment[4]%}
-                
-                {%if question[0] in question %}             
-                    <p>{{question[1]}} &nbsp;&nbsp;&nbsp; question difficulty is:{{question[2]}} &nbsp;&nbsp;&nbsp; Question type:{{question[3]}}</p>
-                {%else%}
-                    <p>There have been no questions set</p>
-                {%endif%}
-            {%endif%}
-        {%endfor%}
     {%endfor%}
 
 {%endfor%}
