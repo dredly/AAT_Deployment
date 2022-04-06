@@ -56,6 +56,52 @@ def get_assessment_id_and_total_marks_possible(store_output_to_file=False):
     return assessment_id_and_total_marks_possible
 
 
+def get_assessment_id_and_data(store_output_to_file=False, module_id=None):
+    """
+    Returns dictionary: {assessment_id: total_possible_marks}
+    (useful for combining question type 1 and type 2)
+    """
+    if module_id is not None:
+        a = Assessment.query.filter_by(module_id=module_id).all()
+    else:
+        a = Assessment.query.all()
+    assessment_id_and_data = {}
+    for q in a:
+        print(a)
+        assessment_id_and_data[q.assessment_id] = {
+            "total_marks_possible": 0,
+            "count_of_questions": 0,
+            "array_of_difficulty": [],
+            "array_of_tags": [],
+        }
+        for q1 in q.question_t1:
+            assessment_id_and_data[q.assessment_id][
+                "total_marks_possible"
+            ] += q1.num_of_marks
+            assessment_id_and_data[q.assessment_id]["count_of_questions"] += 1
+            assessment_id_and_data[q.assessment_id]["array_of_difficulty"].append(
+                q1.difficulty
+            )
+            assessment_id_and_data[q.assessment_id]["array_of_tags"].append(q1.tag_id)
+
+        for q2 in q.question_t2:
+            assessment_id_and_data[q.assessment_id][
+                "total_marks_possible"
+            ] += q2.num_of_marks
+            assessment_id_and_data[q.assessment_id]["count_of_questions"] += 1
+            assessment_id_and_data[q.assessment_id]["array_of_difficulty"].append(
+                q2.difficulty
+            )
+            assessment_id_and_data[q.assessment_id]["array_of_tags"].append(q2.tag_id)
+    if store_output_to_file:
+        store_dictionary_as_file(
+            assessment_id_and_data,
+            "aat/student_stats/data_dumps/assessment_id_and_data.txt",
+        )
+
+    return assessment_id_and_data
+
+
 def get_module_ids_with_details(input_module_id=None, store_output_to_file=False):
     """
     Returns dictionary:
@@ -153,6 +199,8 @@ def get_all_assessment_marks(
     - 'assessment_title' (str)
     - 'passed' (bool)
     - 'credits_earned' (int)
+    - 'difficulty_average' (int)
+    ' 'list_of_tags' ([str])
 
     Optional filters added for student, lecturer, module and assessment id
     print statements are enabled/disabled through debug=True/False
