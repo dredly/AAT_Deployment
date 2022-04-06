@@ -14,12 +14,15 @@
 
 <section class="summary-page summative">
     <h2>Summative Assessments</h2>
-    <small><em><b>Please note: summative assessments can only be completed once.</b></em></small>
+    {% if current_user.can(Permission.ANSWER_ASSESSMENT) %}
+    <small><em><b>Please note: summative assessments have a limited number of attempts. Do not start an assessment attempt if you are unable to finish in one sitting.</b></em></small>
+    {% endif %}
     {% for summative_assessment in summatives %}
         <div class="assessment-instance">
             <h3>{{ summative_assessment.title }}</h3>
-            <p>Must be completed by: <b class="date">{% if summative_assessment.due_date != None %}{{ summative_assessment.due_date.strftime("%d/%m/%Y") }}{% endif %}{% if summative_assessment.due_date == None %}{{ summative_assessment.due_date }}{% endif %}</b></p>
+            <p>Due: <b class="date">{% if summative_assessment.due_date != None %}{{ summative_assessment.due_date.strftime("%d/%m/%Y") }}{% endif %}{% if summative_assessment.due_date == None %}N/A{% endif %}</b></p>
             {% if current_user.can(Permission.ANSWER_ASSESSMENT) %}
+                <p>Attempts: 2/3</p>
                 <div>
                 {% if current_user.has_taken(summative_assessment) %}
                     <p>Highest Result Achieved: {{ marks_achieved[summative_assessment.title] }}</p>
@@ -28,7 +31,6 @@
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.assessment_summary', assessment_id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">{% if current_user.has_taken(summative_assessment) %}Retake Assessment{% else %}Take Assessment{% endif %}</a>
                 </button>
-
             {% elif current_user.can(Permission.WRITE_ASSESSMENT) %}
             <button type="button" class = "Assessment_Index_Child">
                 <a href="{{ url_for('assessments.show_assessment', id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">View Assessment</a>
@@ -57,6 +59,8 @@
         <div class="assessment-instance">
             <h3>{{ formative_assessment.title }}</h3>
             {% if current_user.can(Permission.ANSWER_ASSESSMENT) %}
+                <p>Due: <b class="date">{% if formative_assessment.due_date != None %}{{ formative_assessment.due_date.strftime("%d/%m/%Y") }}{% endif %}{% if formative_assessment.due_date == None %}N/A{% endif %}</b></p>
+                <p>Attempts: 0 / N/A</p>
                 <div>
                     {% if current_user.has_taken(formative_assessment) %}
                     <p>Highest Result Achieved: {{ marks_achieved[formative_assessment.title] }}</p>

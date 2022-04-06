@@ -7,7 +7,7 @@
 <h2>Questions</h2>
 
 {% for i in no_questions %}
-<p>{{ i + 1 }}. {{ ordered_questions[i].question_text }}</p>
+<p><b>{{ i + 1 }}. {{ ordered_questions[i].question_text }}</b></p>
 <p>Your answer: {{ given_answers[i] }}</p>
 <p>Correct answer: {{ correct_answers[i] }}</p>
 <p>Total points: {% if is_correct[i] == True%}{{ ordered_questions[i].num_of_marks }}{% else %}0{% endif %}/{{
@@ -16,10 +16,12 @@
 {% if is_correct[i] == True%}
 <p class="feedback-or-feedforward">
     {{ ordered_questions[i].feedback_if_correct }}
+    {{ ordered_questions[i].feedforward_if_correct }}
 </p>
 {% else %}
 <p class="feedback-or-feedforward">
     {{ ordered_questions[i].feedback_if_wrong }}
+    {{ ordered_questions[i].feedforward_if_wrong }}
 </p>
 
 {% endif %}

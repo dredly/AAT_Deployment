@@ -14,8 +14,9 @@
 <p class="feedback-or-feedforward">
 	{% if response.is_correct %}
 	{{ question.feedback_if_correct }}
+	{{ question.feedforward_if_correct }}
 	{% else %}
-	{{ question.feedback_if_wrong }}
+	{{ question.feedforward_if_wrong }}
 	{% endif %}
 </p>
 
