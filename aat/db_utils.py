@@ -67,31 +67,32 @@ def get_assessment_id_and_data(store_output_to_file=False, module_id=None):
         a = Assessment.query.all()
     assessment_id_and_data = {}
     for q in a:
-        assessment_id_and_data[a.assessment_id] = {
+        print(a)
+        assessment_id_and_data[q.assessment_id] = {
             "total_marks_possible": 0,
             "count_of_questions": 0,
             "array_of_difficulty": [],
             "array_of_tags": [],
         }
         for q1 in q.question_t1:
-            assessment_id_and_data[a.assessment_id][
+            assessment_id_and_data[q.assessment_id][
                 "total_marks_possible"
             ] += q1.num_of_marks
-            assessment_id_and_data[a.assessment_id]["count_of_questions"] += 1
-            assessment_id_and_data[a.assessment_id]["array_of_difficulty"].append(
+            assessment_id_and_data[q.assessment_id]["count_of_questions"] += 1
+            assessment_id_and_data[q.assessment_id]["array_of_difficulty"].append(
                 q1.difficulty
             )
-            assessment_id_and_data[a.assessment_id]["array_of_tags"].append(q1.tag_id)
+            assessment_id_and_data[q.assessment_id]["array_of_tags"].append(q1.tag_id)
 
         for q2 in q.question_t2:
-            assessment_id_and_data[a.assessment_id][
+            assessment_id_and_data[q.assessment_id][
                 "total_marks_possible"
             ] += q2.num_of_marks
-            assessment_id_and_data[a.assessment_id]["count_of_questions"] += 1
-            assessment_id_and_data[a.assessment_id]["array_of_difficulty"].append(
+            assessment_id_and_data[q.assessment_id]["count_of_questions"] += 1
+            assessment_id_and_data[q.assessment_id]["array_of_difficulty"].append(
                 q2.difficulty
             )
-            assessment_id_and_data[a.assessment_id]["array_of_tags"].append(q2.tag_id)
+            assessment_id_and_data[q.assessment_id]["array_of_tags"].append(q2.tag_id)
     if store_output_to_file:
         store_dictionary_as_file(
             assessment_id_and_data,

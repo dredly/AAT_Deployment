@@ -16,6 +16,7 @@ from ..db_utils import (
     get_all_assessment_marks,
     get_module_ids_with_details,
     get_all_response_details,
+    get_assessment_id_and_data,
 )
 
 # Generic marks_dictionary
@@ -407,8 +408,8 @@ def module_view(module_id=0):
 
     # all_assessment_marks_student = list of dictionary
     # print(all_assessment_marks_student)
-    for assessment in all_assessment_marks_student:
-        a_id = assessment["assessment_id"]
+    # for assessment in all_assessment_marks_student:
+    #     a_id = assessment["assessment_id"]
 
     # assessments_not_taken_yet: list_of_objects
     # print(assessments_not_taken_yet)
@@ -418,6 +419,7 @@ def module_view(module_id=0):
         module_details=module_details,
         all_assessment_marks_student=all_assessment_marks_student,
         assessments_not_taken_yet=assessments_not_taken_yet,
+        assessment_id_and_data=assessment_id_and_data,
     )
 
 
