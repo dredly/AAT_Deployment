@@ -14,6 +14,7 @@ from aat.legendary_gamification.forms import ChallengeForm
 from . import legendary_gamification
 from werkzeug.exceptions import BadRequestKeyError
 from ..models import *
+from ..db_utils import get_all_assessment_marks
 
 questions = [
     "How do you print things in python",
@@ -41,6 +42,7 @@ challenge_options = []
 def achievements(user_id):
     global challenge_questions
     global challenge_options
+    get_all_assessment_marks(debug=True)
     leaderboard_user = User.query.filter_by(id=user_id).first()
     badges = []
     achievements = []
@@ -311,13 +313,16 @@ def achievements(user_id):
             except BadRequestKeyError:
                 pass       
         elif choice == "Add Friend":
-            friend = Friends(user_id=current_user.id, friend_id=user_id)
-            db.session.add(friend)
+            friend1 = Friends(user_id=current_user.id, friend_id=user_id)
+            friend2 = Friends(user_id=user_id, friend_id=current_user.id)
+            db.session.add_all([friend1, friend2])
             db.session.commit()
             return redirect(url_for(".get_id"))
         elif choice == "Remove Friend":
-            friend = Friends.query.filter_by(user_id=current_user.id, friend_id=user_id).first()
-            db.session.delete(friend)
+            friend1 = Friends.query.filter_by(user_id=current_user.id, friend_id=user_id).first()
+            friend2 = Friends.query.filter_by(user_id=user_id, friend_id=current_user.id).first()
+            db.session.delete(friend1)
+            db.session.delete(friend2)
             db.session.commit()
             return redirect(url_for(".get_id"))
     return render_template(
