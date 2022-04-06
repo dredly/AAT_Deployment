@@ -235,4 +235,5 @@ def view_students(assessment):
     print(users2)
     return render_template("view-students.html", Module_title = Module_title,
     assessment = assessment,
+    users = users,
     users2 = users2,)

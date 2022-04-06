@@ -7,7 +7,7 @@
    
     {%set users2Length = users2[count]|length %}
     
-    <h1>Student Name: {{user.pop(-1)}}</h1>
+    <h1>Student Name: {{user[-1]}}&nbsp;&nbsp;&nbsp;Tier:{%for u in users%}{%if user[-1] == u.name%}{{u.tier}}{%endif%}{%endfor%}</h1>
     
     {%for allQuestions in user%}
         {%set allQuestionsLength = allQuestions|length%}
