@@ -401,6 +401,18 @@ def module_view(module_id=0):
             if a.assessment_id not in list_of_assessments_completed_by_student:
                 assessments_not_taken_yet.append(a)
 
+    # For a module, go through each assessment and get questions
+
+    assessment_id_and_data = get_assessment_id_and_data()
+
+    # all_assessment_marks_student = list of dictionary
+    # print(all_assessment_marks_student)
+    for assessment in all_assessment_marks_student:
+        a_id = assessment["assessment_id"]
+
+    # assessments_not_taken_yet: list_of_objects
+    # print(assessments_not_taken_yet)
+
     return render_template(
         "2_student_stats_module_view.html",
         module_details=module_details,
