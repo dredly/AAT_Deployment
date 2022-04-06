@@ -131,6 +131,76 @@
             {% endif %}
         {% endfor %}
     </ul>
+
+    <h1>Tag Analysis</h1>
+    <h2>This looks at ALL your responses, not just those from the  highest scoring responses.</h2>
+    <ul>
+        <li>
+            <div class="results_box student_stats_container">
+                <h2>All Questions Answered</h2>
+                <ul>
+                    <li>Correct: {{tag_totals.all_correct}}/{{tag_totals.all_questions}}</li>
+                    <li>Incorrect: {{tag_totals.all_incorrect}}/{{tag_totals.all_questions}}</li>
+                </ul>
+            </div>
+        </li>
+        
+        <li>
+            <div class="results_box correct_answer student_stats_container">
+                <h2>Strongest Tags</h2>
+                <ul>
+                    {% for t, results in dict_of_tags.items() %}
+                        <li>
+                            {% if results.status=="strongest" %}
+                                <h3>{{t}}</h3>
+                                <ul>
+                                    <li>Correct: {{results.correct}}/{{results.count_of_questions}}</li>
+                                    <li>Incorrect: {{results.incorrect}}/{{results.count_of_questions}}</li>
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </li>
+        
+        <li>
+            <div class="results_box incorrect_answer student_stats_container">
+                <h2>Weakest Tags</h2>
+                <ul>
+                    {% for t, results in dict_of_tags.items() %}
+                        <li>
+                            {% if results.status=="weakest" %}
+                                <h3>{{t}}</h3>
+                                <ul>
+                                    <li>Correct: {{results.correct}}/{{results.count_of_questions}}</li>
+                                    <li>Incorrect: {{results.incorrect}}/{{results.count_of_questions}}</li>
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </li>
+        
+        <li>
+            <div class="results_box student_stats_container">
+                <h2>All Tags</h2>
+                <ul>
+                    {% for t, results in dict_of_tags.items() %}
+                        <li>
+                            <h3>{{t}}</h3>
+                            <ul>
+                                <li>Correct: {{results.correct}}/{{results.count_of_questions}}</li>
+                                <li>Incorrect: {{results.incorrect}}/{{results.count_of_questions}}</li>
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </li>
+    </ul>
+
     <h2>Download</h2>
     <button><p><a href="{{ url_for('student_stats.download')}}">Download CSV</a></p></button>
     <h2>Achievements</h2>
