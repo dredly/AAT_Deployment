@@ -13,7 +13,7 @@
             {%if question.get("question_assessment_id") == assessment.get("assessment_id") %}
        
             <p>Question: {{question.get("question_text")}} &nbsp;&nbsp;&nbsp; Question Difficulty: {{question.get("question_difficulty")}} &nbsp;&nbsp;&nbsp Question Type: {{question.get("question_type")}} </p>
-            <p>Correct Answers: {{question.get("correct_answers")}} &nbsp;&nbsp;&nbsp;  Wrong Answers: {{question.get("wrong_answers")}} &nbsp;&nbsp;&nbsp; {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate:{{question.get("pass_percentage")}}% {%endif%}</p>
+            <p>Correct Answers: {{question.get("correct_answers")}} &nbsp;&nbsp;&nbsp;  Wrong Answers: {{question.get("wrong_answers")}} &nbsp;&nbsp;&nbsp; {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate:{{question.get("pass_percentage")}}% {%endif%} &nbsp;&nbsp;&nbsp; Students answered question: {{question.get("students_answered_question")}}</p>
                 {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %}
                 {%else%}
                     <div id='vis{{question.get("question_assessment_id")}}{{question.get("questionId")}}{{question.get("question_type")}}'></div>
@@ -56,7 +56,7 @@
         
     {%endfor%}
     {%else%}
-    <p>no questions have been created in this assessment</p>
+    <p>no questions have been created for this assessment</p>
     {%endif%}
 {%endfor%}
 

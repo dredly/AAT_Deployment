@@ -151,12 +151,15 @@ def module(Module_title):
             
         if yay == 0:
                 pass_percentage = 0
+                total = yay+nay
         if nay == 0:
             pass_percentage = 100
+            total = yay+nay
         else:
             total = yay+nay
             pass_percentage = int((yay/total) * 100)
         
+        questionDetails["students_answered_question"] = total
         questionDetails["correct_answers"] = yay
         questionDetails["wrong_answers"] = nay
         questionDetails["pass_percentage"] = pass_percentage
