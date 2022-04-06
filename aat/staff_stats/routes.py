@@ -54,7 +54,7 @@ def module(Module_title):
     moduleId = module.module_id
     #print("moduleId",moduleId)
     #print("user id", user.id)
-    userInfo = get_all_response_details(None,user.id,)
+    userInfo = get_all_response_details(None,None,moduleId)
     #print(userInfo)
     
   
@@ -79,11 +79,13 @@ def module(Module_title):
     moduleAssessmentIds = []
     for assessment in moduleAssessments:
         moduleAssessmentIds.append(assessment.get("assessment_id"))
+    print(moduleAssessmentIds)
     
     
     questions = []
     
     for question in userInfo:
+        print(question)
         questionDetails = {}
         questionAssessmentId = question.get("assessment_id")        
         questionId = question.get("question_id")
@@ -169,7 +171,7 @@ def module(Module_title):
         
         questions.append(questionDetails)
     
-
+    
     # gets rid of dupped questions
     seen = set()
     questions2 = []
@@ -184,7 +186,7 @@ def module(Module_title):
                 assessment["amount_of_questions"] = assessment.get("amount_of_questions") +1
     
     #print("questions", questions2) 
-    print(moduleAssessments)
+    #print(moduleAssessments)
 
     return render_template("module.html",
         Module_title = Module_title,
