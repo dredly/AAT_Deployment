@@ -79,7 +79,6 @@ def get_module_ids_with_details(input_module_id=None, store_output_to_file=False
     for module in q:
         output_dict[module.module_id] = {
             "module_title": module.title,
-            "total_module_credits": module.total_credits,
             "total_assessment_credits": 0,
             "total_marks_possible": 0,
             "count_of_assessments": len(module.assessments),
@@ -96,6 +95,12 @@ def get_module_ids_with_details(input_module_id=None, store_output_to_file=False
             # Q2
             for q2 in assessment.question_t2:
                 output_dict[module.module_id]["total_marks_possible"] += q2.num_of_marks
+
+    for module in q:
+        output_dict[module.module_id]["total_module_credits"] = output_dict[
+            module.module_id
+        ]["total_assessment_credits"]
+
     if store_output_to_file:
         store_dictionary_as_file(
             output_dict,
@@ -306,7 +311,11 @@ def get_all_assessment_marks(
     for row in final_output:
         percentage_achieved = row["correct_marks"] / row["possible_marks"]
         row["passed"] = True if percentage_achieved >= 0.5 else False
-        row["credits_earned"] = round(row["num_of_credits"] * percentage_achieved)
+        row["credits_earned"] = (
+            row["num_of_credits"]
+            if row["passed"] and row["highest_scoring_attempt"]
+            else 0
+        )
 
     ###########
     # FILTERS #
