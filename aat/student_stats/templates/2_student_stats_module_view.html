@@ -21,19 +21,21 @@
     <h2>
         Overall Marks
     </h2>
-    <h3>Summative</h3>
-    {% if module_details["sum_of_possible_marks_summative"] >0 %}
-        <p>{{module_details["sum_of_correct_marks_summative"]}}/{{module_details["sum_of_possible_marks_summative"]}}
-        ({{ "%.2d" |
-        format((module_details["sum_of_correct_marks_summative"]/module_details["sum_of_possible_marks_summative"])*100)}}%)</p>
-    {% else %}
-        <p>No summative assessments answered yet</p>
-    {% endif %}
-    <div class="content-block">
-        <div
-            class="chart-container"    
-        >
-            <canvas id="myChart"></canvas>
+    <div class="summative">
+        <h3>Summative</h3>
+        {% if module_details["sum_of_possible_marks_summative"] >0 %}
+            <p>{{module_details["sum_of_correct_marks_summative"]}}/{{module_details["sum_of_possible_marks_summative"]}}
+            ({{ "%.2d" |
+            format((module_details["sum_of_correct_marks_summative"]/module_details["sum_of_possible_marks_summative"])*100)}}%)</p>
+        {% else %}
+            <p>No summative assessments answered yet</p>
+        {% endif %}
+        <div class="content-block">
+            <div
+                class="chart-container"
+            >
+                <canvas id="myChart"></canvas>
+            </div>
         </div>
     </div>
     <h3>Formative</h3>
@@ -77,7 +79,7 @@
     {% if assessments_not_taken_yet %}
         {% for a in assessments_not_taken_yet %}
             <a href="{{url_for('student_stats.assessment_view', assessment_id=a.assessment_id)}}">
-                <div class="student_stats_container results_box not_answered">
+                <div class="student_stats_container results_box not_answered {% if not a.formative %}summative{% endif %}">
                     <h3>{{a.title}}</h3>
                     <p>Possible Marks: {{a.possible_marks}}</p>
                     <p>Possible Credits: {{a.num_of_credits}}</p>
