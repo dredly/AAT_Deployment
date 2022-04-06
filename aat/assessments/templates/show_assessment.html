@@ -2,13 +2,12 @@
 
 {% block content %}
 <div class="block_contents">
-    <h1 class="show_assessment_title">{{assessment.title}}</h1>
-    <div class="show_assessment_edit">
-        <button type="button">
-            <a href="{{ url_for('assessments.edit_assessment', id=assessment.assessment_id) }}"
-                class="Assessment_show_button">Edit Assessment</a>
-        </button>
-    </div>
+    <div class = "show_assessment_title">
+    <h1>{{assessment.title}}</h1>
+        <button type="button" >
+            <a href="{{ url_for('assessments.edit_assessment', id=assessment.assessment_id) }}" class="Assessment_show_button">Edit Assessment</a>
+    </button>
+    </div>  
     <div class="show_assessment_parent">
 
         <div class="show_assessment_children">

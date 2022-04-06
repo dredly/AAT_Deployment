@@ -1,7 +1,19 @@
+
+  
+
+
 body {
 	margin: 0;
-	margin-bottom: 2rem;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
+
+body, body {
+	font-family: 'Work Sans', sans-serif;
+}
+
+
 
 /* NAVBAR */
 nav,
@@ -42,8 +54,7 @@ nav li a {
 /* FOOTER */
 footer {
 	padding: 0.8rem 0;
-	/* position:fixed; */
-	/* bottom:0px; */
+	margin-top: auto;
 	text-align: center;
 	width: 100%;
 }
@@ -91,6 +102,11 @@ footer {
 	padding-top:2vh;
 	display: flex;
 	justify-content: center;
+}
+.remove-button{
+	background-color: red;
+	color: white;
+	text-decoration: none;
 }
 
 /* EDIT DELETE TAKE ASSESSMENT BUTTONS ON INDEX */
@@ -163,10 +179,15 @@ footer {
 	background-color:red ;
 
 }
+.edit_submit_button{
+	padding-top: 1vh;
+}
 
 .show_assessment_title{
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
+	align-content: center;
+	align-items: center;
 }
 .show_assessment_edit{
 	display:flex;
@@ -201,9 +222,58 @@ footer {
 	padding-bottom: 1vh;
 }
 
+/* ----------------------------------------------------- CRUD QUESTIONS --------------------------------------------- */
+
+.all-questions {
+	margin-left: 2vw;
+	margin-top: 1.5em;
+	margin-bottom: 1em;
+}
+
+.small-margin-left {
+	margin-left: 1vw;
+}
+
+/* ----------------------------------------------------- END OF CRUD QUESTIONS -------------------------------------- */
+
 /* ----------------------------------------------------- END OF CRUD ASSESSMENTS ------------------------------------------------ */
 
+/* Flash messages */
 
+.alert.success {
+	padding: 12px;
+	border-radius: 3px;
+	font-size: 1.2rem;
+	margin-bottom: 16px;
+	margin-right: 1vw;
+	border: 2px solid darkgreen;
+	background-color: green;
+	color: white;
+	list-style-type: none;
+  }
+  
+  .alert.error {
+	padding: 12px;
+	border-radius: 3px;
+	font-size: 1.2rem;
+	margin-bottom: 16px;
+	margin-right: 1vw;
+	border: 2px solid darkred;
+	background-color: red;
+	color: white;
+	list-style-type: none;
+  }
+  .alert.info {
+	padding: 12px;
+	border-radius: 3px;
+	font-size: 1.2rem;
+	margin-bottom: 16px;
+	margin-right: 1vw;
+	border: 2px solid orange;
+	background-color: yellow;
+	color: black;
+	list-style-type: none;
+  }
 
 
 
@@ -224,4 +294,10 @@ footer {
 	bottom:0px;
 	text-align: center;
 	width: 100%;
+}
+
+/* SUMMATIVE STYLING ADDED FOR CONSISTENCY */
+.summative { 
+    border: 5px solid black; 
+    box-shadow:  10px 10px 30px #bebebe;
 }

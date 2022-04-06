@@ -1,0 +1,71 @@
+{% extends 'layout.html' %}
+{% block title %}
+    Student | Course View
+{% endblock title %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<link
+	rel="stylesheet"
+	href="{{url_for('static',filename='student-stats-style.css')}}"
+/>
+{% endblock extra_head %}
+{% block content %}
+
+<p class="todo">TODO: BUILD THIS INTO 1_COURSE_VIEW</p>
+
+<h1>Tag Analysis</h1>
+<h2>This looks at ALL your responses, not just those from the  highest scoring responses.</h2>
+
+<h2>All Questions Answered</h2>
+<ul>
+    <li>All: {{totals.all_questions}}</li>
+    <li>Correct: {{totals.all_correct}} ({{ "%.2d" |
+        format((totals.all_correct/totals.all_questions)*100)}}%)</li>
+    <li>Incorrect: {{totals.all_incorrect}} ({{ "%.2d" |
+        format((totals.all_incorrect/totals.all_questions)*100)}}%)</li>
+</ul>
+
+<h2>Strongest Tags</h2>
+<ul>
+    {% for t, results in dict_of_tags.items() %}
+        <li>
+            {% if results.status=="strongest" %}
+                <h3>{{t}}</h3>
+                <ul>
+                    <li>Correct: {{results.correct}}</li>
+                    <li>Incorrect: {{results.incorrect}}</li>
+                </ul>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
+<h2>Weakest Tags</h2>
+<ul>    
+    {% for t, results in dict_of_tags.items() %}
+        <li>
+            {% if results.status=="weakest" %}
+                <h3>{{t}}</h3>
+                <ul>
+                    <li>Correct: {{results.correct}}</li>
+                    <li>Incorrect: {{results.incorrect}}</li>
+                </ul>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
+<h2>All Tags</h2>
+<ul>
+    {% for t, results in dict_of_tags.items() %}
+        <li>
+            <h3>{{t}}</h3>
+            <ul>
+                <li>Correct: {{results.correct}}</li>
+                <li>Incorrect: {{results.incorrect}}</li>
+            </ul>
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock content %}

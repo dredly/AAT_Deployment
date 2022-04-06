@@ -3,83 +3,23 @@
 {% block content %}
 <a href="{{ url_for('staff_stats.index') }}">BACK</a>
 <h1> Module: {{Module_title}}</h1>
-<h3>Your Assessments:</h3>
-{%for assessment in lecturersAssessments%}
-{%set count = loop.index0%}
-
-<h2>{{assessment}}
-    ({{formOrSumm[count]}})
-
-    <!--number of credits: {{assessment.num_of_credits}}. -->
-    Assessment id: {{assessmentIds[count]}}
-    <a href="{{url_for('staff_stats.view_students',assessment = assessment)}}">View Students</a>
-</h2>
-   
-    {%if lengthT1questions > 0 %}
-    <h3>T1 Questions:</h3>
-    {%endif%}
-    {%for question in t1questions%}
-        
-        {%if question.assessment_id == assessmentIds[count]%}
-            {%if t1Correct.get(question.q_t1_id) != None or t1Wrong.get(question.q_t1_id) != None  %}
-            <p>{{question.q_t1_id}}. {{question.question_text}}</p>
-            <p>Correct Answers: {{t1Correct.get(question.q_t1_id)}}
-                Wrong Answers: {{t1Wrong.get(question.q_t1_id)}}
-                Pass rate: {{t1percentages.pop(0)}}% </p>
-                
-                <div id="t1vis{{question.assessment_id}}{{question.q_t1_id}}"></div>
-                <script>
-                    var data = ["{{t1Wrong.get(question.q_t1_id)}}","{{t1Correct.get(question.q_t1_id)}}"];
-                    var svg = d3.select("#t1vis{{question.assessment_id}}{{question.q_t1_id}}").append('svg').attr("width",300).attr("height",200),
-                    width = svg.attr("width"),
-                    height = svg.attr("height"),
-                    radius = Math.min(width, height) / 2,
-                    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-                    var color = d3.scaleOrdinal(['red','green']);
-
-                    // Generate the pie
-                    var pie = d3.pie();
-
-                    // Generate the arcs
-                    var arc = d3.arc()
-                    .innerRadius(0)
-                    .outerRadius(radius);
-
-                    //Generate groups
-                    var arcs = g.selectAll("arc")
-                                .data(pie(data))
-                                .enter()
-                                .append("g")
-                                .attr("class", "arc")
-
-                    //Draw arc paths
-                    arcs.append("path")
-                        .attr("fill", function(d, i) {
-                            return color(i);
-                        })
-                        .attr("d", arc);
-
-                </script>
-            {%endif%}
-        {%endif%}
-    {%endfor%}
-
-    {%if lengthT2questions > 0 %}
-    <h3>T2 Question{%if lengthT2questions > 1%}s{%endif%}:</h3>
-    {%endif%}
+{%for assessment in moduleAssessments%}
     
-    {%for question in t2questions%}
-        {%if question.assessment_id == assessmentIds[count]%}
-            {%if t2Correct.get(question.q_t2_id) != None or t2Wrong.get(question.q_t2_id) != None  %}
-            <p>{{question.q_t2_id}}. {{question}}</p>  
-            <p>Correct Answers: {{t2Correct.get(question.q_t2_id)}} 
-                Wrong Answers: {{t2Wrong.get(question.q_t2_id)}}
-                Pass rate: {{t2percentages.pop(0)}}%</p>
-                <div id="t2vis{{question.assessment_id}}{{question.q_t2_id}}"></div>
+    <h2>{{assessment.get("assessment_title")}}: &nbsp;&nbsp;&nbsp; {%if assessment.get("your_assessment") == True%} Your Assessment {%else%} Not Your Assessment {%endif%} &nbsp;&nbsp;&nbsp; number of credits:{{assessment.get("number_of_credits")}}&nbsp;&nbsp;&nbsp;{%if assessment.get("is_summative") == True%} (Summative) {%else%} (Formative){%endif%} &nbsp;&nbsp;&nbsp; assessment id:{{assessment.get("assessment_id")}}
+    <a href="{{url_for('staff_stats.view_students', assessment = assessment.get('assessment_title'))}}">View Students</a>
+    </h2>
+    
+    {%for question in questions%}
+        {%set count = 0%}
+        {%if question.get("question_assessment_id") == assessment.get("assessment_id") %}
+        <p>{{question.get("questionId")}}.Question: {{question.get("question_text")}} &nbsp;&nbsp;&nbsp; Question Difficulty: {{question.get("question_difficulty")}} &nbsp;&nbsp;&nbsp Question Type: {{question.get("question_type")}} </p>
+        <p>Correct Answers: {{question.get("correct_answers")}}   Wrong Answers: {{question.get("wrong_answers")}}  {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate:{{question.get("pass_percentage")}}% {%endif%}</p>
+        {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %}
+        {%else%}
+        <div id='vis{{question.get("question_assessment_id")}}{{question.get("questionId")}}{{question.get("question_type")}}'></div>
                 <script>
-                    var data = ["{{t2Wrong.get(question.q_t2_id)}}","{{t2Correct.get(question.q_t2_id)}}"];
-                    var svg = d3.select("#t2vis{{question.assessment_id}}{{question.q_t2_id}}").append('svg').attr("width",300).attr("height",200),
+                    var data = ['{{question.get("wrong_answers")}}' ,'{{question.get("correct_answers")}}'];
+                    var svg = d3.select('#vis{{question.get("question_assessment_id")}}{{question.get("questionId")}}{{question.get("question_type")}}').append('svg').attr("width",300).attr("height",200),
                     width = svg.attr("width"),
                     height = svg.attr("height"),
                     radius = Math.min(width, height) / 2,
@@ -109,125 +49,13 @@
                         })
                         .attr("d", arc);
                 </script>           
-            {%endif%}
         {%endif%}
-    {%endfor%}
-
-    {%endfor%}
-
-
-
-
-
-    <h3>This Module's Other Assessments:</h3>
-{%for assessment in modulesOtherAssessments%}
-{%set count = loop.index0%}
-
-<h2>{{assessment}}
-    ({{OtherAssessmentsFormOrSumm[count]}})
-
-    <!--number of credits: {{assessment.num_of_credits}}. -->
-    Assessment id: {{modulesOtherAssessmentIds[count]}}
-    <a href="{{url_for('staff_stats.view_students',assessment = assessment)}}">View Students</a>
-</h2>
-   
-    {%if lengthOtherT1questions > 0 %}
-    <h3>T1 Questions:</h3>
-    {%endif%}
-    {%for question in otherAssessmentsQT1s%}
         
-        {%if question.assessment_id == modulesOtherAssessmentIds[count]%}
-            {%if OtherT1Correct.get(question.q_t1_id) != None or OtherT1Wrong.get(question.q_t1_id) != None  %}
-            <p>{{question.q_t1_id}}. {{question.question_text}}</p>
-            <p>Correct Answers: {{t1Correct.get(question.q_t1_id)}}
-                Wrong Answers: {{t1Wrong.get(question.q_t1_id)}}
-                Pass rate: {{OtherT1percentages.pop(0)}}% </p>
-                
-                <div id="OtherT1vis{{question.assessment_id}}{{question.q_t1_id}}"></div>
-                <script>
-                    var data = ["{{OtherT1Wrong.get(question.q_t1_id)}}","{{OtherT1Correct.get(question.q_t1_id)}}"];
-                    var svg = d3.select("#OtherT1vis{{question.assessment_id}}{{question.q_t1_id}}").append('svg').attr("width",300).attr("height",200),
-                    width = svg.attr("width"),
-                    height = svg.attr("height"),
-                    radius = Math.min(width, height) / 2,
-                    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-                    var color = d3.scaleOrdinal(['red','green']);
-
-                    // Generate the pie
-                    var pie = d3.pie();
-
-                    // Generate the arcs
-                    var arc = d3.arc()
-                    .innerRadius(0)
-                    .outerRadius(radius);
-
-                    //Generate groups
-                    var arcs = g.selectAll("arc")
-                                .data(pie(data))
-                                .enter()
-                                .append("g")
-                                .attr("class", "arc")
-
-                    //Draw arc paths
-                    arcs.append("path")
-                        .attr("fill", function(d, i) {
-                            return color(i);
-                        })
-                        .attr("d", arc);
-
-                </script>
-            {%endif%}
         {%endif%}
+
+        
     {%endfor%}
 
-    {%if lengthOtherT2questions > 0 %}
-    <h3>T2 Question{%if lengthOtherT2questions > 1%}s{%endif%}:</h3>
-    {%endif%}
-    
-    {%for question in OtherT2questions%}
-        {%if question.assessment_id == modulesOtherAssessmentIds[count]%}
-            {%if OtherT2Correct.get(question.q_t2_id) != None or OtherT2Wrong.get(question.q_t2_id) != None  %}
-            <p>{{question.q_t2_id}}. {{question}}</p>  
-            <p>Correct Answers: {{t2Correct.get(question.q_t2_id)}} 
-                Wrong Answers: {{t2Wrong.get(question.q_t2_id)}}
-                Pass rate: {{OtherT2percentages.pop(0)}}%</p>
-                <div id="OtherT2vis{{question.assessment_id}}{{question.q_t2_id}}"></div>
-                <script>
-                    var data = ["{{OtherT2Wrong.get(question.q_t2_id)}}","{{OtherT2Correct.get(question.q_t2_id)}}"];
-                    var svg = d3.select("#OtherT2vis{{question.assessment_id}}{{question.q_t2_id}}").append('svg').attr("width",300).attr("height",200),
-                    width = svg.attr("width"),
-                    height = svg.attr("height"),
-                    radius = Math.min(width, height) / 2,
-                    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+{%endfor%}
 
-                    var color = d3.scaleOrdinal(['red','green']);
-
-                    // Generate the pie
-                    var pie = d3.pie();
-
-                    // Generate the arcs
-                    var arc = d3.arc()
-                    .innerRadius(0)
-                    .outerRadius(radius);
-
-                    //Generate groups
-                    var arcs = g.selectAll("arc")
-                                .data(pie(data))
-                                .enter()
-                                .append("g")
-                                .attr("class", "arc")
-
-                    //Draw arc paths
-                    arcs.append("path")
-                        .attr("fill", function(d, i) {
-                            return color(i);
-                        })
-                        .attr("d", arc);
-                </script>           
-            {%endif%}
-        {%endif%}
-    {%endfor%}
-
-    {%endfor%}
 {% endblock %}

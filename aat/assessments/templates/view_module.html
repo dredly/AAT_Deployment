@@ -6,7 +6,7 @@
 {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
 <div class = "view_module_create">
 <button type="button" class="Create_Assessment_Button" role="button">
-    <a href="{{ url_for('assessments.new_assessment') }}" class="Create_Assessment_Link">Create Assessment</a>
+    <a href="{{ url_for('assessments.new_assessment', module_id=module.module_id) }}" class="Create_Assessment_Link">Create Assessment</a>
 </button>
 </div>
 
@@ -18,9 +18,7 @@
     {% for summative_assessment in summatives %}
         <div class="assessment-instance">
             <h3>{{ summative_assessment.title }}</h3>
-            
-            <p>Must be completed by: <b class="date">{{ summative_assessment.due_date }}</b></p>
-            
+            <p>Must be completed by: <b class="date">{% if summative_assessment.due_date != None %}{{ summative_assessment.due_date.strftime("%d/%m/%Y") }}{% endif %}{% if summative_assessment.due_date == None %}{{ summative_assessment.due_date }}{% endif %}</b></p>
             {% if current_user.can(Permission.ANSWER_ASSESSMENT) %}
             
                 {% if current_user.has_taken(summative_assessment) %}
@@ -37,7 +35,7 @@
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.edit_assessment', id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
                 </button>
-                <button type="button" class = "Assessment_Index_Child">
+                <button type="button" class = "Assessment_Index_Child delete-button">
                     <a href="{{ url_for('assessments.delete_assessment', id=summative_assessment.assessment_id) }}"class="Assessment_Index_Text">Delete Assessment</a>
                 </button>
             {% endif %}
@@ -68,8 +66,8 @@
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.edit_assessment', id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
                 </button>
-                <button type="button" class = "Assessment_Index_Child">
-                    <a href="{{ url_for('assessments.delete_assessment', id=formative_assessment.assessment_id) }}"class="Assessment_Index_Text" class="delete-button">Delete Assessment</a>
+                <button type="button" class = "Assessment_Index_Child delete-button">
+                    <a href="{{ url_for('assessments.delete_assessment', id=formative_assessment.assessment_id) }}"class="Assessment_Index_Text">Delete Assessment</a>
                 </button>
             {% endif %}
         </div>

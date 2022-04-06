@@ -1,20 +1,13 @@
 {% extends("layout.html") %} 
 {% block content %}
 <div class="block_contents">
- <h1> Create A New assessment</h1>
-
-	<button type="button" class="Create_Assessment_Button" role="button">
-		<a href="{{ url_for('assessments.new_assessment') }}" class="Create_Assessment_Link">Create Assessment</a>
-	</button>
-
-
 	<h1 class = "modules_title">Modules</h1>
 
 	{% for module in modules %}
 		<div class = "Assessment_Index_Parent">
 			<div class=" summary-page formative">
 				<h2>{{ module.title }}<h2> 
-				<h3>Module Credits: {{module.total_credits}}</h3>
+				<h3>Module Credits: {{module_credits[module.title]}}</h3>
 					<button type="button">
 						<a href="{{ url_for('assessments.view_module', module_id=module.module_id) }}" class="Assessment_Index_Text">View Module Breakdown</a>
 					</button>

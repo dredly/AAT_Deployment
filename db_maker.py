@@ -74,7 +74,7 @@ with app.app_context():
                 due_date=None,
                 time_limit=60 * 60 * 30,
                 num_of_credits=12,
-                is_summative=False,
+                is_summative=True,
             ),
             Assessment(  # 6
                 module_id=3,
@@ -91,7 +91,7 @@ with app.app_context():
                 title="ReactJS Basics",
                 due_date=None,
                 time_limit=60 * 60 * 20,
-                num_of_credits=40,
+                num_of_credits=0,
                 is_summative=False,
             ),
             Assessment(  # 8
@@ -109,6 +109,38 @@ with app.app_context():
                 due_date=None,
                 num_of_credits=20,
                 is_summative=True,
+            ),
+            Assessment(  # 10
+                module_id=1,
+                lecturer_id=7,
+                title="Git commands",
+                due_date=None,
+                num_of_credits=0,
+                is_summative=False,
+            ),
+            Assessment(  # 11
+                module_id=1,
+                lecturer_id=9,
+                title="Git and Github",
+                due_date=None,
+                num_of_credits=0,
+                is_summative=False,
+            ),
+            Assessment(  # 12
+                module_id=3,
+                lecturer_id=8,
+                title="Big O",
+                due_date=None,
+                num_of_credits=0,
+                is_summative=False,
+            ),
+            Assessment(  # 13
+                module_id=3,
+                lecturer_id=8,
+                title="Data Structures",
+                due_date=None,
+                num_of_credits=0,
+                is_summative=False,
             ),
         ]
     )
@@ -152,6 +184,7 @@ with app.app_context():
                 feedback_if_wrong="Make sure you understand the differencs between rebase and merge",
                 feedforward_if_correct="Well done. To learn more about the use cases for rebase see link https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
                 feedforward_if_wrong="Make sure you can complete all the question from the git basics assessment",
+                tag_id=5,
             ),
             QuestionT1(  # 3
                 assessment_id=2,
@@ -162,6 +195,7 @@ with app.app_context():
                 feedback_if_wrong="Not quite.",
                 feedforward_if_correct="Well done. To learn even more, look up the different ways of calling git stash, such as git stash list and git stash apply. ",
                 feedforward_if_wrong="Make sure to read through all lecture notes on advanced git commands",
+                tag_id=4,
             ),
             # Floating Questions
             QuestionT1(  # 4
@@ -172,6 +206,7 @@ with app.app_context():
                 feedback_if_wrong="Better luck next time :)",
                 feedforward_if_correct="Well done. For further reading, you could look up other similar data structures in Java, such as Lists and Linked Lists.",
                 feedforward_if_wrong="The official Java API documentation is a great place to find this information and much more.",
+                tag_id=4,
             ),
             QuestionT1(  # 5
                 num_of_marks=5,
@@ -181,6 +216,7 @@ with app.app_context():
                 feedback_if_wrong="I hope you didn't choose super quick lunch at least",
                 feedforward_if_correct="Well done. Look into Sqlite if you want to try using an SQL database.",
                 feedforward_if_wrong="Make sure to go over basic definitions",
+                tag_id=3,
             ),
         ]
     )
@@ -260,6 +296,7 @@ with app.app_context():
                 feedback_if_wrong="It's the same in CSS",
                 feedforward_if_correct="Well done. To see another way of selecting elements, check out this page on MDN: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById",
                 feedforward_if_wrong="It might be useful to revise CSS selectors first.",
+                tag_id=1,
             ),
             QuestionT2(  # 4
                 assessment_id=9,
@@ -271,6 +308,7 @@ with app.app_context():
                 feedback_if_wrong="It's not a trick question",
                 feedforward_if_correct="Well done. For other semantic div element names, see here: https://developer.mozilla.org/en-US/docs/Glossary/Semantics#semantics_in_html",
                 feedforward_if_wrong="Make sure you are comfortable with basic HTML first",
+                tag_id=2,
             ),
             # Floating Questions
             QuestionT2(  # 5
@@ -282,6 +320,7 @@ with app.app_context():
                 feedback_if_wrong="Not quite.",
                 feedforward_if_correct="Well done. For further reading, you could look up other types of NoSQL databases such as key value store and wide column.",
                 feedforward_if_wrong="Make sure to go over the introduction to NoSQL lecture",
+                tag_id=3,
             ),
             QuestionT2(  # 6
                 num_of_marks=4,
@@ -292,6 +331,7 @@ with app.app_context():
                 feedback_if_wrong="Wrong year",
                 feedforward_if_correct="Well done. To learn more about events in this sime period, check out this article about the Bayeux Tapestry: https://www.britannica.com/topic/Bayeux-Tapestry",
                 feedforward_if_wrong="Make sure to go over the lecture notes for Medieval History of Western Europe.",
+                tag_id=4,
             ),
             QuestionT2(  # 7
                 num_of_marks=5,
@@ -302,6 +342,7 @@ with app.app_context():
                 feedback_if_wrong="Think about which language it looks syntactically similar to.",
                 feedforward_if_correct="Well done. If you understand what JSON is, you may want to look into AJAX requests.",
                 feedforward_if_wrong="Make sure to go over the section on data transfer over the web",
+                tag_id=5,
             ),
             # More Questions (with Assessments)
             QuestionT2(  # 8
@@ -314,6 +355,7 @@ with app.app_context():
                 feedback_if_wrong="YOU SUCK",
                 feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                tag_id=6,
             ),
             QuestionT2(  # 9
                 assessment_id=9,
@@ -325,6 +367,7 @@ with app.app_context():
                 feedback_if_wrong="YOU SUCK",
                 feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                tag_id=1,
             ),
             QuestionT2(  # 10
                 assessment_id=9,
@@ -336,6 +379,7 @@ with app.app_context():
                 feedback_if_wrong="YOU SUCK",
                 feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                tag_id=2,
             ),
             QuestionT2(  # 11
                 assessment_id=9,
@@ -347,6 +391,7 @@ with app.app_context():
                 feedback_if_wrong="YOU SUCK",
                 feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                tag_id=3,
             ),
             QuestionT2(  # 12
                 assessment_id=9,
@@ -358,6 +403,7 @@ with app.app_context():
                 feedback_if_wrong="YOU SUCK",
                 feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                tag_id=4,
             ),
         ]
     )
@@ -441,21 +487,37 @@ with app.app_context():
                 selected_option=5,
                 is_correct=True,
             ),
-            ResponseT1(  # 1
-                attempt_number=1,
-                user_id=4,
-                assessment_id=1,
-                t1_question_id=1,
-                selected_option=1,
-                is_correct=True,
-            ),
-            ResponseT1(  # 2
+            ResponseT1(  # 3
                 attempt_number=1,
                 user_id=4,
                 assessment_id=2,
                 t1_question_id=2,
                 selected_option=5,
                 is_correct=True,
+            ),
+            ResponseT1(  # 4
+                attempt_number=1,
+                user_id=4,
+                assessment_id=1,
+                t1_question_id=1,
+                selected_option=2,
+                is_correct=False,
+            ),
+            ResponseT1(  # 5
+                attempt_number=2,
+                user_id=4,
+                assessment_id=1,
+                t1_question_id=1,
+                selected_option=1,
+                is_correct=True,
+            ),
+            ResponseT1(  # 6
+                attempt_number=3,
+                user_id=4,
+                assessment_id=1,
+                t1_question_id=1,
+                selected_option=3,
+                is_correct=False,
             ),
         ]
     )
@@ -475,7 +537,7 @@ with app.app_context():
             ),
             ResponseT2(  # 2
                 attempt_number=1,
-                user_id=1,
+                user_id=6,
                 assessment_id=1,
                 t2_question_id=2,
                 response_content="push",
@@ -483,7 +545,7 @@ with app.app_context():
             ),
             ResponseT2(  # 3
                 attempt_number=1,
-                user_id=2,
+                user_id=6,
                 assessment_id=1,
                 t2_question_id=1,
                 response_content="m",
@@ -495,11 +557,43 @@ with app.app_context():
                 user_id=4,
                 assessment_id=1,
                 t2_question_id=1,
-                response_content="m",
-                is_correct=True,
+                response_content="madada",
+                is_correct=False,
             ),
             ResponseT2(  # 5
                 attempt_number=1,
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=2,
+                response_content="adad",
+                is_correct=False,
+            ),
+            ResponseT2(  # 6
+                attempt_number=2,
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=1,
+                response_content="m",
+                is_correct=True,
+            ),
+            ResponseT2(  # 7
+                attempt_number=2,
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=2,
+                response_content="adad",
+                is_correct=True,
+            ),
+            ResponseT2(  # 8
+                attempt_number=3,
+                user_id=4,
+                assessment_id=1,
+                t2_question_id=1,
+                response_content="m",
+                is_correct=True,
+            ),
+            ResponseT2(  # 9
+                attempt_number=3,
                 user_id=4,
                 assessment_id=1,
                 t2_question_id=2,
@@ -512,24 +606,24 @@ with app.app_context():
             # THE POINTS WILL ADD TO THEIR RESULT
             # BUT THE QUESTION STILL WON'T SHOW IN THE
             # ASSESSMENT ITSELF
-            ResponseT2(  # 6
+            ResponseT2(  # 10
                 attempt_number=1,
                 user_id=4,
-                assessment_id=6,
+                assessment_id=3,
                 t2_question_id=3,
                 response_content="zzz",
                 is_correct=False,
             ),
-            ResponseT2(  # 7
+            ResponseT2(  # 11
                 attempt_number=1,
                 user_id=4,
-                assessment_id=4,
+                assessment_id=9,
                 t2_question_id=4,
                 response_content="zzz",
                 is_correct=False,
             ),
             # ASSESSMENT 9
-            ResponseT2(  # 8
+            ResponseT2(  # 12
                 attempt_number=1,
                 user_id=4,
                 assessment_id=9,
@@ -537,7 +631,7 @@ with app.app_context():
                 response_content="When it's a jar",
                 is_correct=True,
             ),
-            ResponseT2(  # 9
+            ResponseT2(  # 13
                 attempt_number=1,
                 user_id=4,
                 assessment_id=9,
@@ -545,7 +639,7 @@ with app.app_context():
                 response_content="When it's a jar",
                 is_correct=True,
             ),
-            ResponseT2(  # 10
+            ResponseT2(  # 14
                 attempt_number=1,
                 user_id=4,
                 assessment_id=9,
@@ -553,7 +647,7 @@ with app.app_context():
                 response_content="When it's a jar",
                 is_correct=True,
             ),
-            ResponseT2(  # 11
+            ResponseT2(  # 15
                 attempt_number=1,
                 user_id=4,
                 assessment_id=9,
@@ -561,7 +655,7 @@ with app.app_context():
                 response_content="Huh?",
                 is_correct=False,
             ),
-            ResponseT2(  # 11
+            ResponseT2(  # 16
                 attempt_number=1,
                 user_id=4,
                 assessment_id=9,
@@ -570,7 +664,7 @@ with app.app_context():
                 is_correct=False,
             ),
             # ATTEMPT 2: u_id=4, ass=9
-            ResponseT2(  # 12
+            ResponseT2(  # 17
                 attempt_number=2,
                 user_id=4,
                 assessment_id=9,
@@ -578,7 +672,7 @@ with app.app_context():
                 response_content="ad's a jar",
                 is_correct=False,
             ),
-            ResponseT2(  # 13
+            ResponseT2(  # 18
                 attempt_number=2,
                 user_id=4,
                 assessment_id=9,
@@ -586,7 +680,7 @@ with app.app_context():
                 response_content="ad it's a jar",
                 is_correct=False,
             ),
-            ResponseT2(  # 14
+            ResponseT2(  # 19
                 attempt_number=2,
                 user_id=4,
                 assessment_id=9,
@@ -594,7 +688,7 @@ with app.app_context():
                 response_content="ad it's a jar",
                 is_correct=False,
             ),
-            ResponseT2(  # 15
+            ResponseT2(  # 20
                 attempt_number=2,
                 user_id=4,
                 assessment_id=9,
@@ -602,7 +696,7 @@ with app.app_context():
                 response_content="Huh?",
                 is_correct=False,
             ),
-            ResponseT2(  # 16
+            ResponseT2(  # 21
                 attempt_number=2,
                 user_id=4,
                 assessment_id=9,
