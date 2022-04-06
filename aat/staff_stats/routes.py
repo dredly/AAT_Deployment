@@ -15,6 +15,9 @@ from ..models import (
 )
 from ..db_utils import *
 
+###################################################################
+##################### 1. MODULE SELET #############################
+###################################################################
 
 @staff_stats.route("/")
 def index():
@@ -41,7 +44,9 @@ def index():
     return render_template("Staff-stats.html", name = name, lecturersModules = lecturersModules)
 
 
-
+###################################################################
+##################### 2. COHORT VIEW ##############################
+###################################################################
 
 
 @staff_stats.route("/module/<string:Module_title>")
@@ -198,6 +203,11 @@ def module(Module_title):
         )
 
 
+###################################################################
+##################### 2.5 CSV DOWNLOAD ############################
+###################################################################
+
+
 @staff_stats.route("/download")
 def download():
     info =session["info"]
@@ -207,6 +217,7 @@ def download():
             "Assessment ID": element.get("question_assessment_id"),
             "Question": element.get("question_text"),
             "Difficulty": element.get("question_difficulty"),
+            "Question Type":element.get("question_type"),
             "Correct Answers": element.get("correct_answers"),
             "Wrong Answers": element.get("wrong_answers"),
             "Pass rate %": element.get("pass_percentage"),
@@ -227,9 +238,9 @@ def download():
     return output
 
 
-
-
-
+###################################################################
+##################### 3. STUDENT VIEW #############################
+###################################################################
 
 @staff_stats.route("/view-students/<string:assessment>")
 def view_students(assessment):
@@ -263,7 +274,7 @@ def view_students(assessment):
                 questions.append(question.get("question_type"))
                 attemptLists[question.get("attempt_number")-1].append(questions)          
             users2.append(attemptLists)
-    print(users2)
+    #print(users2)
     return render_template("view-students.html", Module_title = Module_title,
     assessment = assessment,
     users = users,
