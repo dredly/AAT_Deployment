@@ -361,7 +361,6 @@ def module_view(module_id=0):
         input_module_id=module_id,
         store_output_to_file=True,
     )
-    print(f"{all_assessment_marks_student=}")
     all_response_details = get_all_response_details(
         input_user_id=current_user.id,
         highest_scoring_attempt_only=True,
@@ -497,7 +496,7 @@ def assessment_view(assessment_id=0):
         highest_scoring_attempt_only=False,
         input_module_id=assessment_details["module_id"],
         input_assessment_id=assessment_id,
-        store_output_to_file=True,
+        store_output_to_file=False,
     )
 
     all_response_details = get_all_response_details(
@@ -505,7 +504,7 @@ def assessment_view(assessment_id=0):
         highest_scoring_attempt_only=False,
         input_module_id=assessment_details["module_id"],
         input_assessment_id=assessment_id,
-        store_output_to_file=True,
+        store_output_to_file=False,
     )
 
     ## Need to make dictionary of: {attempt_number : [all questions associated]}
@@ -566,6 +565,37 @@ def assessment_view(assessment_id=0):
     else:
         assessment_details["highest_scoring_attempt_passed"] = False
 
+    # QUESTION ANALYSIS
+    # question_id:
+    # > correct_answers_count: int
+    # > incorrect_answers_count: int
+    # > correct_answers_id_array: [int]
+    # > incorrect_answers_id_array: [int]
+    question_analysis_dict = {}
+    total_number_of_attempts = 0
+    for response in all_response_details:
+        if response["question_text"] not in question_analysis_dict:
+            question_analysis_dict[response["question_text"]] = {
+                "number_of_attempts": 0,
+                "correct_answers_count": 0,
+                "incorrect_answers_count": 0,
+                "correct_answers_attempt_array": [],
+                "incorrect_answers_attempt_array": [],
+                "array_of_success": [],
+            }
+        q = question_analysis_dict[response["question_text"]]
+        q["number_of_attempts"] += 1
+        if response["is_correct"]:
+            q["correct_answers_count"] += 1
+            q["correct_answers_attempt_array"].append(response["attempt_number"])
+        else:
+            q["incorrect_answers_count"] += 1
+            q["incorrect_answers_attempt_array"].append(response["attempt_number"])
+        q["array_of_success"].append(
+            {response["attempt_number"]: response["is_correct"]}
+        )
+        total_number_of_attempts = q["number_of_attempts"]
+
     ############
     # TAG DATA #
     ############
@@ -609,8 +639,6 @@ def assessment_view(assessment_id=0):
         data_for_bar_chart["y_axis_max"] = response["possible_marks"]
         data_for_bar_chart["pass_mark"].append(response["possible_marks"] / 2)
 
-    print(f"{assessment_details=}")
-
     return render_template(
         "3_student_stats_assessment_view.html",
         assessment_details=assessment_details,
@@ -621,91 +649,9 @@ def assessment_view(assessment_id=0):
         total_score_per_attempt=total_score_per_attempt,
         data_for_bar_chart=data_for_bar_chart,
         tag_dictionary=tag_dictionary,
+        question_analysis_dict=question_analysis_dict,
+        total_number_of_attempts=total_number_of_attempts,
     )
-
-
-############
-# TAG VIEW #
-############
-
-
-# @student_stats.route("/tag/")
-# def tag_view():
-#     # Checks if logged in
-#     if not current_user.is_authenticated:
-#         return redirect(url_for("auth.login"))
-
-#     # Get all responses
-#     all_response_details_for_tags = get_all_response_details(
-#         input_user_id=current_user.id
-#     )
-
-#     list_of_tags = Tag.query.all()
-
-#     dict_of_tags = {}
-#     for tag in list_of_tags:
-#         dict_of_tags[tag.name] = {"correct": 0, "incorrect": 0}
-
-#     dict_of_tags["untagged"] = {"correct": 0, "incorrect": 0}
-
-#     for response in all_response_details_for_tags:
-#         if response["tag_name"] is None:
-#             if response["is_correct"]:
-#                 dict_of_tags["untagged"]["correct"] += 1
-#             else:
-#                 dict_of_tags["untagged"]["incorrect"] += 1
-#         else:
-#             if response["is_correct"]:
-#                 dict_of_tags[response["tag_name"][0]]["correct"] += 1
-#             else:
-#                 dict_of_tags[response["tag_name"][0]]["incorrect"] += 1
-
-#     # Add perc and count_of_questions
-#     for tag in dict_of_tags:
-#         if dict_of_tags[tag]["correct"] + dict_of_tags[tag]["incorrect"] > 0:
-#             dict_of_tags[tag]["perc"] = dict_of_tags[tag]["correct"] / (
-#                 dict_of_tags[tag]["correct"] + dict_of_tags[tag]["incorrect"]
-#             )
-#             dict_of_tags[tag]["count_of_questions"] = (
-#                 dict_of_tags[tag]["correct"] + dict_of_tags[tag]["incorrect"]
-#             )
-#         else:
-#             dict_of_tags[tag]["perc"] = None
-
-#     # Add strongest and weakest flags
-#     strongest_val = 0  # to be HIGHEST
-#     weakest_val = 1  # to be LOWEST
-
-#     for tag in dict_of_tags:
-#         if dict_of_tags[tag]["perc"] != None:
-#             if dict_of_tags[tag]["perc"] > strongest_val:
-#                 strongest_val = dict_of_tags[tag]["perc"]
-#             if dict_of_tags[tag]["perc"] < weakest_val:
-#                 weakest_val = dict_of_tags[tag]["perc"]
-
-#     # Gives all tags a status of strongest, weakest or ""
-#     for tag in dict_of_tags:
-#         if dict_of_tags[tag]["perc"] != None:
-#             if dict_of_tags[tag]["perc"] == strongest_val:
-#                 dict_of_tags[tag]["status"] = "strongest"
-#             elif dict_of_tags[tag]["perc"] == weakest_val:
-#                 dict_of_tags[tag]["status"] = "weakest"
-#             else:
-#                 dict_of_tags[tag]["status"] = ""
-#         else:
-#             dict_of_tags[tag]["status"] = ""
-
-#     # MAKE TOTALS
-#     tag_totals = {"all_questions": 0, "all_correct": 0, "all_incorrect": 0}
-#     for tag in dict_of_tags:
-#         if dict_of_tags[tag]["correct"] + dict_of_tags[tag]["incorrect"] > 0:
-#             tag_totals["all_questions"] += dict_of_tags[tag]["count_of_questions"]
-#             tag_totals["all_correct"] += dict_of_tags[tag]["correct"]
-#             tag_totals["all_incorrect"] += dict_of_tags[tag]["incorrect"]
-
-#     return render_template(
-#         "4_tag.html", dict_of_tags=dict_of_tags, tag_totals=tag_totals
-#     )
 
 
 ######################

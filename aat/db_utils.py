@@ -92,8 +92,8 @@ def get_assessment_id_and_data(store_output_to_file=False, module_id=None):
         aid = assessment_id_and_data[a]
         if not aid["count_of_questions"]:
             continue
-        aid["average_difficulty"] = sum(aid["difficulty_array"]) / len(
-            aid["difficulty_array"]
+        aid["average_difficulty"] = round(
+            sum(aid["difficulty_array"]) / len(aid["difficulty_array"]), 1
         )
         aid["tag_array_counter"] = dict(Counter(aid["tag_array"]))
 

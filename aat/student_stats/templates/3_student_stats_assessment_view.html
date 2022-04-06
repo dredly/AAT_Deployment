@@ -32,9 +32,7 @@
         <h2>
             Highest Scoring Attempt
         </h2>
-        <p>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | {% if assessment_details["highest_scoring_attempt_passed"] %}PASSED{% else %}<span class="text_incorrect">FAILED</span>
-        
-        {% endif %}</p>
+        <p>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | {% if assessment_details["highest_scoring_attempt_passed"] %}<span class="text_correct">PASSED</span>{% else %}<span class="text_incorrect">FAILED</span>{% endif %}</p>
         <div class="content-block">
             <div class="chart-container">
                 <canvas id="myChart"></canvas>
@@ -49,15 +47,33 @@
         </div>
     </div>
 
-    <h2>Tag Analysis</h2>
-    <p class="todo">TODO: Stacked bar chart</p>
-    <h3>Tag Occurance</h3>
+    <h2>Attempt analysis</h2>
     <ul>
-        {% for t in tag_dictionary %}
-            <li>{{t}}: {{tag_dictionary[t]["count"]}}</li>
-        {% endfor %}
+        <table>
+            <tr>
+                <th>Question</th>
+                {% for i in range(total_number_of_attempts) %}
+                    <th>Attempt<br>{{i+1}}</th>
+                {% endfor %}
+            </tr>
+            {% for question_text, details in question_analysis_dict.items() %}
+            <tr>
+                <td>{{loop.index}}. {{question_text}}</td>
+                {% for i in range(details.number_of_attempts) %}
+                <th>
+                    {% if details.array_of_success[i][i+1]%}
+                        <h1><span class="text_correct">Y</span></h1>
+                    {% else %}
+                        <h1><span class="text_incorrect">N</span></h1>
+                    {% endif %}
+                </th>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
     </ul>
-    <h3>Tag Performance</h3>
+
+    <h2>Tag Analysis</h2>
     <ul>
         {% for t in tag_dictionary %}
             <li>{{t}}: {{tag_dictionary[t]["correct_in_highest"]}}/{{tag_dictionary[t]["count"]}} ({{ "%.2d" |
@@ -65,26 +81,21 @@
         {% endfor %}
     </ul>
 
-    <h2>Type Analysis</h2>
-    <p class="todo">TODO: Make similar analysis to Q1 vs Q2 as for Tags</p>
+    
 
-    <h2>Attempt analysis</h2>
-    <p class="todo">TODO: Over all the questions how many times did you get a specific question wrong</p>
-
-    <h2>Take Assessment</h2>
-
-    <p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details["assessment_id"])}}"><button> Take assessment</button></a></p>
 
 
     <h2>Attempts</h2>
     <ul>
         <h3>Highest scoring attempt</h3>
         <h3>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | {% if assessment_details["highest_scoring_attempt_passed"] %}<span class="text_correct">PASSED</span>{% else %}<span class="text_incorrect">FAILED</span>{% endif %} </h3>
+        {% if not assessment_details["highest_scoring_attempt_passed"] %}<p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Retake assessment</button></a></p>{% endif %}
+        
 
         {% for r in highest_scoring_response_details %}
             <div class="student_stats_container results_box {% if r.is_correct %} correct_answer {% else %} incorrect_answer {% endif %}">
                 <li>
-                    <b>Question: {{r.question_text}}</b>
+                    <b>Question: {{loop.index}}. {{r.question_text}}</b>
                 </li>
                 <li>Answer given: {{r.answer_given}}</li>
                 <li>Correct? 
@@ -107,7 +118,9 @@
                 <li>Feedback: {{r.feedback}}</li>
                 <li>Feedforward: {{r.feedforward}}</li>
                 <li>Marks: {% if r.is_correct %}{{r.num_of_marks}}{% else %}0{% endif %}/{{r.num_of_marks}}</li>
+                {% if not r.is_correct %}
                 <li><a href="mailto:{{r.lecturer_email}}?subject=Query from {{current_user.name}}"><button>Email lecturer to query</button></a></li>
+                {% endif %}
             </div>
         {% endfor %}
     </ul>
@@ -119,11 +132,12 @@
                     <li>
                         <h3>Attempt {{attempt_number}} | {{total_score_per_attempt[attempt_number]["correct_marks"]}}/{{total_score_per_attempt[attempt_number]["possible_marks"]}} = {{total_score_per_attempt[attempt_number]["mark_as_percentage"]}} | 
                             {% if total_score_per_attempt[attempt_number]["correct_marks"]/total_score_per_attempt[attempt_number]["possible_marks"]>=0.5 %}<span class="text_correct">PASSED</span>{% else %}<span class="text_incorrect">FAILED</span>{% endif %} </h3>
+                            {% if not total_score_per_attempt[attempt_number]["correct_marks"]/total_score_per_attempt[attempt_number]["possible_marks"]>=0.5 %}<p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Retake assessment</button></a></p>{% endif %}
                     </li>
                     {% for r in attempt_details %}
                         <div class="student_stats_container results_box {% if r.is_correct %} correct_answer {% else %} incorrect_answer {% endif %}">
                             <li>
-                                <b>Question: {{r.question_text}}</b>
+                                <b>Question: {{loop.index}}. {{r.question_text}}</b>
                             </li>
                             <li>Answer given: {{r.answer_given}}</li>
                             <li>Correct? 
@@ -147,7 +161,9 @@
                             <li>Feedforward: {{r.feedforward}}</li>
             
                             <li>Marks: {% if r.is_correct %}{{r.num_of_marks}}{% else %}0{% endif %}/{{r.num_of_marks}}</li>
+                            {% if not r.is_correct %}
                             <li><a href="mailto:{{r.lecturer_email}}?subject=Query from {{current_user.name}}"><button>Email lecturer to query</button></a></li>
+                            {% endif %}
                         </div>
                     {% endfor %}
             {% endif %}
