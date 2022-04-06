@@ -6,7 +6,7 @@ from sqlalchemy import (
     func,
 )  # https://docs.sqlalchemy.org/en/14/core/functions.html?highlight=func#module-sqlalchemy.sql.functions
 import json
-
+from collections import Counter
 
 """
 To use db_utils from inside a blueprint:
@@ -67,32 +67,35 @@ def get_assessment_id_and_data(store_output_to_file=False, module_id=None):
         a = Assessment.query.all()
     assessment_id_and_data = {}
     for q in a:
-        print(a)
         assessment_id_and_data[q.assessment_id] = {
             "total_marks_possible": 0,
             "count_of_questions": 0,
-            "array_of_difficulty": [],
-            "array_of_tags": [],
+            "difficulty_array": [],
+            "tag_array": [],
+            "tag_name": [],
         }
         for q1 in q.question_t1:
-            assessment_id_and_data[q.assessment_id][
-                "total_marks_possible"
-            ] += q1.num_of_marks
-            assessment_id_and_data[q.assessment_id]["count_of_questions"] += 1
-            assessment_id_and_data[q.assessment_id]["array_of_difficulty"].append(
-                q1.difficulty
-            )
-            assessment_id_and_data[q.assessment_id]["array_of_tags"].append(q1.tag_id)
+            aid = assessment_id_and_data[q.assessment_id]
+            aid["total_marks_possible"] += q1.num_of_marks
+            aid["count_of_questions"] += 1
+            aid["difficulty_array"].append(q1.difficulty)
+            aid["tag_array"].append(q1.tag.name)
 
         for q2 in q.question_t2:
-            assessment_id_and_data[q.assessment_id][
-                "total_marks_possible"
-            ] += q2.num_of_marks
-            assessment_id_and_data[q.assessment_id]["count_of_questions"] += 1
-            assessment_id_and_data[q.assessment_id]["array_of_difficulty"].append(
-                q2.difficulty
-            )
-            assessment_id_and_data[q.assessment_id]["array_of_tags"].append(q2.tag_id)
+            aid["total_marks_possible"] += q2.num_of_marks
+            aid["count_of_questions"] += 1
+            aid["difficulty_array"].append(q2.difficulty)
+            aid["tag_array"].append(q2.tag.name)
+
+    for a in assessment_id_and_data:
+        aid = assessment_id_and_data[a]
+        if not aid["count_of_questions"]:
+            continue
+        aid["average_difficulty"] = sum(aid["difficulty_array"]) / len(
+            aid["difficulty_array"]
+        )
+        aid["tag_array_counter"] = dict(Counter(aid["tag_array"]))
+
     if store_output_to_file:
         store_dictionary_as_file(
             assessment_id_and_data,

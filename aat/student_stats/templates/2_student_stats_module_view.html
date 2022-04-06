@@ -81,8 +81,13 @@
                                     <p>Passed: {{a.passed}}</p>
                                 <p>{% if a.formative %}Formative{% else %}Summative{% endif %} Assessment</p>
                                 <p>Credits Earned: {{a.credits_earned}}/{{a.num_of_credits}}</p>
-                                <p>Difficulty: </p>
-                                <p>Tags: </p>
+                                <p>Average Difficulty: {{a.average_difficulty}}</p>
+                                <p>Tags: 
+                                <ul>
+                                    {% for key, val in a.tag_array_counter.items() %}
+                                        <li>{{key}} ({{val}})</li>
+                                    {% endfor %}</p>
+                                </ul>
                             </div>
                         </a>
                     </li>
