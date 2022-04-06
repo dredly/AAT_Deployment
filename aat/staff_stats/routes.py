@@ -1,6 +1,8 @@
+from io import StringIO
 from . import staff_stats
 from flask_login import current_user
-from flask import render_template, url_for, session
+from flask import render_template, url_for, session, make_response
+import csv
 
 from ..models import (
     Module,
@@ -79,13 +81,13 @@ def module(Module_title):
     moduleAssessmentIds = []
     for assessment in moduleAssessments:
         moduleAssessmentIds.append(assessment.get("assessment_id"))
-    print(moduleAssessmentIds)
+    #print(moduleAssessmentIds)
     
     
     questions = []
     
     for question in userInfo:
-        print(question)
+        #print(question)
         questionDetails = {}
         questionAssessmentId = question.get("assessment_id")        
         questionId = question.get("question_id")
@@ -185,7 +187,8 @@ def module(Module_title):
             if question.get("question_assessment_id") == assessment.get("assessment_id"):
                 assessment["amount_of_questions"] = assessment.get("amount_of_questions") +1
     
-    #print("questions", questions2) 
+    session["info"] = questions2
+    #print("questions", questions2[0]) 
     #print(moduleAssessments)
 
     return render_template("module.html",
@@ -195,7 +198,33 @@ def module(Module_title):
         )
 
 
-
+@staff_stats.route("/download")
+def download():
+    info =session["info"]
+    print("info",info)
+    rows = [
+        {
+            "Assessment ID": element.get("question_assessment_id"),
+            "Question": element.get("question_text"),
+            "Difficulty": element.get("question_difficulty"),
+            "Correct Answers": element.get("correct_answers"),
+            "Wrong Answers": element.get("wrong_answers"),
+            "Pass rate %": element.get("pass_percentage"),
+            "Number of Students answered": element.get("students_answered_question")
+            
+        }
+        for element in info
+    ]
+    string_io = StringIO()
+    csv_writer = csv.DictWriter(string_io, rows[0].keys())
+    csv_writer.writeheader()
+    csv_writer.writerows(rows)
+    output = make_response(string_io.getvalue())
+    output.headers[
+        "Content-Disposition"
+    ] = f"attachment; filename={current_user.name}-aat-export.csv"
+    output.headers["Content-type"] = "text/csv"
+    return output
 
 
 
