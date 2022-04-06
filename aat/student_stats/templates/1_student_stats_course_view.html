@@ -19,6 +19,11 @@
     <p>{{overall_results_student["sum_of_marks_awarded"]}}/{{overall_results_student["sum_of_marks_possible"]}}
     ({{ "%.2d" |
     format((overall_results_student["sum_of_marks_awarded"]/overall_results_student["sum_of_marks_possible"])*100)}}%)</p>
+
+    <h2>Credits</h2>
+    <p>Total Credits Possible: {{overall_results_student["total_credits_possible"]}}</p>
+    <p>Total Credits Earned: {{overall_results_student["total_credits_earned"]}} (CORRECT)</p>
+    <p></p>
     <div class="content-block">
         <div
             class="chart-container"
@@ -60,9 +65,6 @@
                                     Total assessment credits: {{module.total_assessment_credits}}
                                 </p>
                                 <p>
-                                    Total module credits: {{module.total_module_credits}}
-                                </p>
-                                <p>
                                     Completed assessments: {{module.count_of_taken_assessments}}/{{ module.count_of_assessments}}
                                 </p>
                                 <p>
@@ -91,9 +93,6 @@
                                 Total assessment credits: {{module.total_assessment_credits}} 
                             </p>
                             <p>
-                                Total module credits: {{module.total_module_credits}}
-                            </p>
-                            <p>
                                 Completed assessments: {{module.count_of_taken_assessments}}/{{ module.count_of_assessments}}
                             </p>
                             <p>
@@ -117,9 +116,6 @@
                             </p>
                             <p>
                                 Total assessment credits: {{module.total_assessment_credits}} 
-                            </p>
-                            <p>
-                                Total module credits: {{module.total_module_credits}}
                             </p>
                             <p>
                                 Count of assessments: {{ module.count_of_assessments}}

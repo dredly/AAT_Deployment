@@ -52,7 +52,12 @@ def course_view():
 
     # OVERALL RESULTS
     # - STUDENT
-    overall_results_student = marks_dictionary.copy()
+    overall_results_student = {
+        "sum_of_marks_awarded": 0,
+        "sum_of_marks_possible": 0,
+        "total_credits_possible": 0,
+        "total_credits_earned": 0,
+    }
 
     for assessment_mark in all_assessment_marks_student:
         overall_results_student["sum_of_marks_awarded"] += assessment_mark[
@@ -60,6 +65,12 @@ def course_view():
         ]
         overall_results_student["sum_of_marks_possible"] += assessment_mark[
             "possible_marks"
+        ]
+        overall_results_student["total_credits_possible"] += assessment_mark[
+            "num_of_credits"
+        ]
+        overall_results_student["total_credits_earned"] += assessment_mark[
+            "credits_earned"
         ]
 
     list_of_assessments_completed_by_student = [
@@ -96,6 +107,7 @@ def course_view():
     for m in dict_of_assessment_counts:
         for a in all_assessment_marks_student:
             if m == a["module_id"]:
+                print(m)
                 dict_of_assessment_counts[m]["count_of_passed_assessments"] = (
                     dict_of_assessment_counts[m].get("count_of_passed_assessments", 0)
                     + 1
@@ -124,9 +136,6 @@ def course_view():
                 "total_assessment_credits"
             ] = module_ids_with_details[module]["total_assessment_credits"]
             module_stats_student[module][
-                "total_module_credits"
-            ] = module_ids_with_details[module]["total_module_credits"]
-            module_stats_student[module][
                 "count_of_assessments"
             ] = dict_of_assessment_counts[module]["count_of_assessments"]
             module_stats_student[module][
@@ -146,9 +155,6 @@ def course_view():
                 "taken_by_student": False,
                 "total_assessment_credits": module_ids_with_details[module][
                     "total_assessment_credits"
-                ],
-                "total_module_credits": module_ids_with_details[module][
-                    "total_module_credits"
                 ],
                 "count_of_assessments": dict_of_assessment_counts[module][
                     "count_of_assessments"
@@ -252,6 +258,8 @@ def course_view():
             tag_totals["all_questions"] += dict_of_tags[tag]["count_of_questions"]
             tag_totals["all_correct"] += dict_of_tags[tag]["correct"]
             tag_totals["all_incorrect"] += dict_of_tags[tag]["incorrect"]
+
+    print(f"{module_stats_student=}")
 
     return render_template(
         "1_student_stats_course_view.html",
