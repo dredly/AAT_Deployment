@@ -349,12 +349,26 @@ def module_view(module_id=0):
         input_module_id=module_id,
         store_output_to_file=True,
     )
+    print(f"{all_assessment_marks_student=}")
     all_response_details = get_all_response_details(
         input_user_id=current_user.id,
         highest_scoring_attempt_only=True,
         input_module_id=module_id,
         store_output_to_file=True,
     )
+
+    # "aid" -> assessment_id_and_data
+    assessment_id_and_data = get_assessment_id_and_data(module_id=module_id)
+
+    # Add assessment_data to all_assessment_marks_student
+    for item in all_assessment_marks_student:
+        aid_entry = assessment_id_and_data[item["assessment_id"]]
+        item["total_marks_possible"] = aid_entry["total_marks_possible"]
+        item["count_of_questions"] = aid_entry["count_of_questions"]
+        item["difficulty_array"] = aid_entry["difficulty_array"]
+        item["tag_array"] = aid_entry["tag_array"]
+        item["average_difficulty"] = aid_entry["average_difficulty"]
+        item["tag_array_counter"] = aid_entry["tag_array_counter"]
 
     # Takes details, unpacks based on module_id
     module_details = get_module_ids_with_details(input_module_id=module_id)[module_id]
@@ -401,18 +415,6 @@ def module_view(module_id=0):
         for a in m.assessments:
             if a.assessment_id not in list_of_assessments_completed_by_student:
                 assessments_not_taken_yet.append(a)
-
-    # For a module, go through each assessment and get questions
-
-    assessment_id_and_data = get_assessment_id_and_data()
-
-    # all_assessment_marks_student = list of dictionary
-    # print(all_assessment_marks_student)
-    # for assessment in all_assessment_marks_student:
-    #     a_id = assessment["assessment_id"]
-
-    # assessments_not_taken_yet: list_of_objects
-    # print(assessments_not_taken_yet)
 
     return render_template(
         "2_student_stats_module_view.html",
