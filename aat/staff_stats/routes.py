@@ -201,7 +201,7 @@ def module(Module_title):
 @staff_stats.route("/download")
 def download():
     info =session["info"]
-    print("info",info)
+    #print("info",info)
     rows = [
         {
             "Assessment ID": element.get("question_assessment_id"),

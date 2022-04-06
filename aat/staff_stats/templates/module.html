@@ -5,7 +5,7 @@
 <h1> Module: {{Module_title}}</h1><a href="{{ url_for('staff_stats.download')}}">Download CSV</a>
 {%for assessment in moduleAssessments%}
     
-    <h2>{{assessment.get("assessment_title")}}: &nbsp;&nbsp;&nbsp; {%if assessment.get("your_assessment") == True%} Your Assessment {%else%} Not Your Assessment {%endif%} &nbsp;&nbsp;&nbsp; number of credits:{{assessment.get("number_of_credits")}}&nbsp;&nbsp;&nbsp;{%if assessment.get("is_summative") == True%} (Summative) {%else%} (Formative){%endif%} &nbsp;&nbsp;&nbsp; assessment id:{{assessment.get("assessment_id")}}
+    <h2>{{assessment.get("assessment_title")}}: &nbsp;&nbsp;&nbsp; {%if assessment.get("your_assessment") == True%} Your Assessment {%else%} Not Your Assessment {%endif%} &nbsp;&nbsp;&nbsp;{%if assessment.get("is_summative") == True%} (Summative) {%else%} (Formative){%endif%} &nbsp;&nbsp;&nbsp; assessment id:{{assessment.get("assessment_id")}}
     <a href="{{url_for('staff_stats.view_students', assessment = assessment.get('assessment_title'))}}">View Students</a>
     </h2>
     {%if assessment.get("amount_of_questions") > 0%}
