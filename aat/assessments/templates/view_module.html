@@ -22,12 +22,13 @@
             <p>Must be completed by: <b class="date">{{ summative_assessment.due_date }}</b></p>
             
             {% if current_user.can(Permission.ANSWER_ASSESSMENT) %}
-            
+                <div>
                 {% if current_user.has_taken(summative_assessment) %}
                     <p>Highest Result Achieved: {{ marks_achieved[summative_assessment.title] }}</p>
                 {% endif %}
+                </div>
                 <button type="button" class = "Assessment_Index_Child">
-                    <a href="{{ url_for('assessments.assessment_summary', assessment_id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">Take Assessment</a>
+                    <a href="{{ url_for('assessments.assessment_summary', assessment_id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">{% if current_user.has_taken(summative_assessment) %}Retake Assessment{% else %}Take Assessment{% endif %}</a>
                 </button>
 
             {% elif current_user.can(Permission.WRITE_ASSESSMENT) %}
@@ -45,7 +46,9 @@
                 </button>
             {% endif %}
         </div>
+        {% if assess_tags[summative_assessment.title]|length > 0 %}
         <small>Assessment subject tags: {% for tag in assess_tags[summative_assessment.title] %}{{ tag }}, {% endfor %}</small>
+        {% endif %}
         <hr>
     {% endfor %}
 </section>
@@ -56,10 +59,11 @@
         <div class="assessment-instance">
             <h3>{{ formative_assessment.title }}</h3>
             {% if current_user.can(Permission.ANSWER_ASSESSMENT) %}
-            
-                {% if current_user.has_taken(formative_assessment) %}
+                <div>
+                    {% if current_user.has_taken(formative_assessment) %}
                     <p>Highest Result Achieved: {{ marks_achieved[formative_assessment.title] }}</p>
-                {% endif %}
+                    {% endif %}
+                </div>
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.assessment_summary', assessment_id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">Take Assessment</a>
                 </button>
@@ -77,7 +81,9 @@
                 </button>
             {% endif %}
         </div>
+        {% if assess_tags[formative_assessment.title]|length > 0 %}
         <small>Assessment subject tags: {% for tag in assess_tags[formative_assessment.title] %}{{ tag }}, {% endfor %}</small>
+        {% endif %}
         <hr>
     {% endfor %}
 </section>
