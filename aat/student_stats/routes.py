@@ -3,8 +3,7 @@ from flask_login import current_user
 from flask import render_template, redirect, url_for
 from sqlalchemy import func
 from io import StringIO
-import csv
-import pprint
+import csv, pprint, json
 from flask import make_response
 from werkzeug.exceptions import NotFound
 from .. import db
@@ -16,7 +15,11 @@ from ..models import *
 from ..db_utils import (
     get_all_assessment_marks,
     get_module_ids_with_details,
+    get_all_response_details,
 )
+
+# Generic marks_dictionary
+marks_dictionary = {"sum_of_marks_awarded": 0, "sum_of_marks_possible": 0}
 
 
 @student_stats.route("/rich")
@@ -38,11 +41,6 @@ def course_view():
     ############################################
     # NEW VERSION
     ############################################
-    # OVERALL RESULTS
-    # print("***")
-    # print("NEW")
-    # print("***")
-
     ##################
     # db_utils calls #
     ##################
@@ -52,22 +50,15 @@ def course_view():
     )
     module_ids_with_details = get_module_ids_with_details()
 
-    # Generic marks_dictionary
-    marks_dictionary = {"sum_of_marks_awarded": 0, "sum_of_marks_possible": 0}
-
     # OVERALL RESULTS
-    # - COHORT
-    overall_results_cohort = marks_dictionary.copy()
-    for assessment_mark in all_assessment_marks:
-        overall_results_cohort["sum_of_marks_awarded"] += assessment_mark[
-            "correct_marks"
-        ]
-        overall_results_cohort["sum_of_marks_possible"] += assessment_mark[
-            "possible_marks"
-        ]
-
     # - STUDENT
-    overall_results_student = marks_dictionary.copy()
+    overall_results_student = {
+        "sum_of_marks_awarded": 0,
+        "sum_of_marks_possible": 0,
+        "total_credits_possible": 0,
+        "total_credits_earned": 0,
+    }
+
     for assessment_mark in all_assessment_marks_student:
         overall_results_student["sum_of_marks_awarded"] += assessment_mark[
             "correct_marks"
@@ -75,12 +66,59 @@ def course_view():
         overall_results_student["sum_of_marks_possible"] += assessment_mark[
             "possible_marks"
         ]
+        overall_results_student["total_credits_possible"] += assessment_mark[
+            "num_of_credits"
+        ]
+        overall_results_student["total_credits_earned"] += assessment_mark[
+            "credits_earned"
+        ]
+
+    list_of_assessments_completed_by_student = [
+        item["assessment_id"] for item in all_assessment_marks_student
+    ]
+
+    # - COHORT
+    overall_results_cohort = marks_dictionary.copy()
+    for assessment_mark in all_assessment_marks:
+        if assessment_mark["assessment_id"] in list_of_assessments_completed_by_student:
+            # Filter out if the
+            overall_results_cohort["sum_of_marks_awarded"] += assessment_mark[
+                "correct_marks"
+            ]
+            overall_results_cohort["sum_of_marks_possible"] += assessment_mark[
+                "possible_marks"
+            ]
+
+    # Dict of modules, how many assessments are in it, how many you've completed
+    dict_of_assessment_counts = {}
+    for module in module_ids_with_details:
+        dict_of_assessment_counts[module] = {
+            "count_of_assessments": module_ids_with_details[module][
+                "count_of_assessments"
+            ],
+            "count_of_taken_assessments": 0,
+        }
+    for assessment_id in list_of_assessments_completed_by_student:
+        a = Assessment.query.filter_by(assessment_id=assessment_id).first()
+        dict_of_assessment_counts[a.module.module_id]["count_of_taken_assessments"] += 1
+
+    # Dict of modules passed
+    dict_of_modules_and_assessments_passed = {}
+    for m in dict_of_assessment_counts:
+        for a in all_assessment_marks_student:
+            if m == a["module_id"]:
+                print(m)
+                dict_of_assessment_counts[m]["count_of_passed_assessments"] = (
+                    dict_of_assessment_counts[m].get("count_of_passed_assessments", 0)
+                    + 1
+                )
 
     # MODULE RESULTS
     # - STUDENT
     module_stats_student = {}
     for assessment_mark in all_assessment_marks_student:
-        module_stats_student[assessment_mark["module_id"]] = {
+        k = assessment_mark["module_id"]
+        module_stats_student[k] = {
             "marks_awarded": assessment_mark["correct_marks"],
             "marks_possible": assessment_mark["possible_marks"],
             "taken_by_student": True,
@@ -88,6 +126,8 @@ def course_view():
 
     # - > ADD MODULE STATS
     for module in module_ids_with_details:
+        # Add stats for taken:
+
         if module in module_stats_student:
             module_stats_student[module]["module_title"] = module_ids_with_details[
                 module
@@ -96,8 +136,15 @@ def course_view():
                 "total_assessment_credits"
             ] = module_ids_with_details[module]["total_assessment_credits"]
             module_stats_student[module][
-                "total_module_credits"
-            ] = module_ids_with_details[module]["total_module_credits"]
+                "count_of_assessments"
+            ] = dict_of_assessment_counts[module]["count_of_assessments"]
+            module_stats_student[module][
+                "count_of_taken_assessments"
+            ] = dict_of_assessment_counts[module]["count_of_taken_assessments"]
+            module_stats_student[module][
+                "count_of_passed_assessments"
+            ] = dict_of_assessment_counts[module]["count_of_passed_assessments"]
+
         else:
             module_stats_student[module] = {
                 "module_title": module_ids_with_details[module]["module_title"],
@@ -109,10 +156,11 @@ def course_view():
                 "total_assessment_credits": module_ids_with_details[module][
                     "total_assessment_credits"
                 ],
-                "total_module_credits": module_ids_with_details[module][
-                    "total_module_credits"
+                "count_of_assessments": dict_of_assessment_counts[module][
+                    "count_of_assessments"
                 ],
             }
+
     # - COHORT
     # TODO: module_stats_cohort
     module_stats_cohort = {}
@@ -120,7 +168,6 @@ def course_view():
     # STORING OUTPUT AS .TXT FILES FOR EASE OF MY OWN USE
     # (if I was better I would only have this running in dev, not prod, but I'm not)
     # Write dictionary to CSV
-    import json
 
     try:
         with open(
@@ -142,103 +189,88 @@ def course_view():
     except:
         ...
 
-    # RETURN
+    # TAG
+
+    # Get all responses
+    all_response_details_for_tags = get_all_response_details(
+        input_user_id=current_user.id
+    )
+
+    list_of_tags = Tag.query.all()
+
+    dict_of_tags = {}
+    for tag in list_of_tags:
+        dict_of_tags[tag.name] = {"correct": 0, "incorrect": 0}
+
+    dict_of_tags["untagged"] = {"correct": 0, "incorrect": 0}
+
+    for response in all_response_details_for_tags:
+        if response["tag_name"] is None:
+            if response["is_correct"]:
+                dict_of_tags["untagged"]["correct"] += 1
+            else:
+                dict_of_tags["untagged"]["incorrect"] += 1
+        else:
+            if response["is_correct"]:
+                dict_of_tags[response["tag_name"][0]]["correct"] += 1
+            else:
+                dict_of_tags[response["tag_name"][0]]["incorrect"] += 1
+
+    # Add perc and count_of_questions
+    for tag in dict_of_tags:
+        if dict_of_tags[tag]["correct"] + dict_of_tags[tag]["incorrect"] > 0:
+            dict_of_tags[tag]["perc"] = dict_of_tags[tag]["correct"] / (
+                dict_of_tags[tag]["correct"] + dict_of_tags[tag]["incorrect"]
+            )
+            dict_of_tags[tag]["count_of_questions"] = (
+                dict_of_tags[tag]["correct"] + dict_of_tags[tag]["incorrect"]
+            )
+        else:
+            dict_of_tags[tag]["perc"] = None
+
+    # Add strongest and weakest flags
+    strongest_val = 0  # to be HIGHEST
+    weakest_val = 1  # to be LOWEST
+
+    for tag in dict_of_tags:
+        if dict_of_tags[tag]["perc"] != None:
+            if dict_of_tags[tag]["perc"] > strongest_val:
+                strongest_val = dict_of_tags[tag]["perc"]
+            if dict_of_tags[tag]["perc"] < weakest_val:
+                weakest_val = dict_of_tags[tag]["perc"]
+
+    # Gives all tags a status of strongest, weakest or ""
+    for tag in dict_of_tags:
+        if dict_of_tags[tag]["perc"] != None:
+            if dict_of_tags[tag]["perc"] == strongest_val:
+                dict_of_tags[tag]["status"] = "strongest"
+            elif dict_of_tags[tag]["perc"] == weakest_val:
+                dict_of_tags[tag]["status"] = "weakest"
+            else:
+                dict_of_tags[tag]["status"] = ""
+        else:
+            dict_of_tags[tag]["status"] = ""
+
+    # MAKE TOTALS
+    tag_totals = {"all_questions": 0, "all_correct": 0, "all_incorrect": 0}
+    for tag in dict_of_tags:
+        if dict_of_tags[tag]["correct"] + dict_of_tags[tag]["incorrect"] > 0:
+            tag_totals["all_questions"] += dict_of_tags[tag]["count_of_questions"]
+            tag_totals["all_correct"] += dict_of_tags[tag]["correct"]
+            tag_totals["all_incorrect"] += dict_of_tags[tag]["incorrect"]
+
+    print(f"{module_stats_student=}")
 
     return render_template(
-        "student_stats_course_view.html",
+        "1_student_stats_course_view.html",
         overall_results_cohort=overall_results_cohort,
         overall_results_student=overall_results_student,
         module_stats_student=module_stats_student,
         module_stats_cohort=module_stats_cohort,
+        dict_of_assessment_counts=dict_of_assessment_counts,
+        dict_of_tags=dict_of_tags,
+        tag_totals=tag_totals,
     )
-
-    # print(module_totals_student)
-    # ############################################
-    # # OLD VERSION
-    # ############################################
-    # print("***")
-    # print("OLD")
-    # print("***")
-
-    # ## T1_responses
-    # for response in current_user.t1_responses:
-    #     if response.assessment not in assessment_marks:
-    #         assessment_marks[response.assessment] = {
-    #             "marks_awarded": response.question.num_of_marks
-    #             if response.is_correct
-    #             else 0,
-    #             "marks_possible": response.question.num_of_marks,
-    #         }
-    #     else:
-    #         assessment_marks[response.assessment]["marks_awarded"] += (
-    #             response.question.num_of_marks if response.is_correct else 0
-    #         )
-    #         assessment_marks[response.assessment][
-    #             "marks_possible"
-    #         ] += response.question.num_of_marks
-
-    # ## T2_responses
-    # for response in current_user.t2_responses:
-    #     if response.assessment not in assessment_marks:
-    #         assessment_marks[response.assessment] = {
-    #             "marks_awarded": response.question.num_of_marks
-    #             if response.is_correct
-    #             else 0,
-    #             "marks_possible": response.question.num_of_marks,
-    #         }
-    #     else:
-    #         assessment_marks[response.assessment]["marks_awarded"] += (
-    #             response.question.num_of_marks if response.is_correct else 0
-    #         )
-    #         assessment_marks[response.assessment][
-    #             "marks_possible"
-    #         ] += response.question.num_of_marks
-
-    # # ADD THAT TO THE MODULE DICT
-    # module_dict = {}
-
-    # for module in Module.query.all():
-    #     for assessment, data in assessment_marks.items():
-    #         if assessment.module_id == module.module_id:
-    #             if module not in module_dict:
-    #                 module_dict[module] = {assessment: data}
-    #             else:
-    #                 module_dict[module][assessment] = data
-
-    # sum_of_marks_awarded = 0
-    # sum_of_marks_possible = 0
-
-    # for module in module_dict:
-    #     for assessment, data in assessment_marks.items():
-    #         sum_of_marks_awarded += data["marks_awarded"]
-    #         sum_of_marks_possible += data["marks_possible"]
-    #         # module_dict[module]["marks_awarded"] += data["marks_awarded"]
-    #         # module_dict[module]["marks_possible"] += data["marks_possible"]
-
-    # if sum_of_marks_possible == 0:
-    #     return render_template("no_questions_answered.html")
-
-    # overall_results = {
-    #     "sum_of_marks_awarded": sum_of_marks_awarded,
-    #     "sum_of_marks_possible": sum_of_marks_possible,
-    # }
-
-    # module_totals = {}
-
-    # for module, module_details in module_dict.items():
-    #     module_totals[module.title] = {"marks_awarded": 0, "marks_possible": 0}
-    #     for assessment, assessment_details in module_details.items():
-    #         module_totals[module.title]["marks_awarded"] += assessment_details[
-    #             "marks_awarded"
-    #         ]
-    #         module_totals[module.title]["marks_possible"] += assessment_details[
-    #             "marks_possible"
-    #         ]
-
-    # # print("Required fields:")
-    # # print(f"{overall_results=}")
-    # # print(f"{module_dict=}")
-    # # print(f"{module_totals=}")
 
 
 ###############
@@ -254,74 +286,73 @@ def module_view(module_id=0):
     if Module.query.filter_by(module_id=module_id).first() is None:
         return redirect(url_for("student_stats.module_not_found", module_id=module_id))
 
-    module_details = {
-        "module_id": module_id,
-        "module_name": Module.query.filter_by(module_id=module_id).first(),
-    }
+    # db_utils calls
+    all_assessment_marks_student = get_all_assessment_marks(
+        input_user_id=current_user.id,
+        highest_scoring_attempt_only=True,
+        input_module_id=module_id,
+        store_output_to_file=True,
+    )
+    all_response_details = get_all_response_details(
+        input_user_id=current_user.id,
+        highest_scoring_attempt_only=True,
+        input_module_id=module_id,
+        store_output_to_file=True,
+    )
 
-    # GET SUM OF QUESTIONS FOR EACH ASSESSMENT
-    assessment_marks = {}
+    # Takes details, unpacks based on module_id
+    module_details = get_module_ids_with_details(input_module_id=module_id)[module_id]
 
-    # T1_RESPONSES
-    for response in current_user.t1_responses:
-        if response.assessment.module_id == module_id:
-            if response.assessment not in assessment_marks:
-                assessment_marks[response.assessment] = {
-                    "marks_awarded": response.question.num_of_marks
-                    if response.is_correct
-                    else 0,
-                    "marks_possible": response.question.num_of_marks,
-                }
-            else:
-                assessment_marks[response.assessment]["marks_awarded"] += (
-                    response.question.num_of_marks if response.is_correct else 0
-                )
-                assessment_marks[response.assessment][
-                    "marks_possible"
-                ] += response.question.num_of_marks
+    # MODULE DETAILS:
+    module_details["sum_of_possible_marks_summative"] = 0
+    module_details["sum_of_correct_marks_summative"] = 0
+    module_details["sum_of_num_of_credits_summative"] = 0
+    module_details["sum_of_possible_marks_formative"] = 0
+    module_details["sum_of_correct_marks_formative"] = 0
+    module_details["sum_of_num_of_credits_formative"] = 0
 
-    # T2_RESPONSES
-    for response in current_user.t2_responses:
-        if response.assessment.module_id == module_id:
-            if response.assessment not in assessment_marks:
-                assessment_marks[response.assessment] = {
-                    "marks_awarded": response.question.num_of_marks
-                    if response.is_correct
-                    else 0,
-                    "marks_possible": response.question.num_of_marks,
-                }
-            else:
-                assessment_marks[response.assessment]["marks_awarded"] += (
-                    response.question.num_of_marks if response.is_correct else 0
-                )
-                assessment_marks[response.assessment][
-                    "marks_possible"
-                ] += response.question.num_of_marks
+    # Adds values for Formative and Summative (combined to be calculated)
+    for entry in all_assessment_marks_student:
+        if entry["is_summative"]:
+            module_details["sum_of_possible_marks_summative"] += entry["possible_marks"]
+            module_details["sum_of_correct_marks_summative"] += entry["correct_marks"]
+            module_details["sum_of_num_of_credits_summative"] += entry["num_of_credits"]
+        else:
+            module_details["sum_of_possible_marks_formative"] += entry["possible_marks"]
+            module_details["sum_of_correct_marks_formative"] += entry["correct_marks"]
+            module_details["sum_of_num_of_credits_formative"] += entry["num_of_credits"]
 
-    # ADD THAT TO THE MODULE DICT
-    module_dict = {module_id: assessment_marks}
+    # OVERALL RESULTS
+    # Module total marks
+    # - STUDENT
+    overall_results_student = marks_dictionary.copy()
+    for assessment_mark in all_assessment_marks_student:
+        overall_results_student["sum_of_marks_awarded"] += assessment_mark[
+            "correct_marks"
+        ]
+        overall_results_student["sum_of_marks_possible"] += assessment_mark[
+            "possible_marks"
+        ]
 
-    sum_of_marks_awarded = 0
-    sum_of_marks_possible = 0
+    list_of_assessments_completed_by_student = [
+        item["assessment_id"] for item in all_assessment_marks_student
+    ]
 
-    for module in module_dict:
-        for assessment, data in assessment_marks.items():
-            sum_of_marks_awarded += data["marks_awarded"]
-            sum_of_marks_possible += data["marks_possible"]
+    # All assessments associated with module:
+    q = Module.query.filter_by(module_id=module_id).all()
+    assessments_not_taken_yet = []
+    for m in q:
+        for a in m.assessments:
+            if a.assessment_id not in list_of_assessments_completed_by_student:
+                assessments_not_taken_yet.append(a)
 
-    if sum_of_marks_possible == 0:
-        return render_template("no_questions_answered.html")
-
-    overall_results = {
-        "sum_of_marks_awarded": sum_of_marks_awarded,
-        "sum_of_marks_possible": sum_of_marks_possible,
-    }
+    # print(assessments_not_taken_yet)
 
     return render_template(
-        "student_stats_module_view.html",
-        overall_results=overall_results,
+        "2_student_stats_module_view.html",
         module_details=module_details,
-        module_dict=module_dict,
+        all_assessment_marks_student=all_assessment_marks_student,
+        assessments_not_taken_yet=assessments_not_taken_yet,
     )
 
 
@@ -343,105 +374,234 @@ def assessment_view(assessment_id=0):
             url_for("student_stats.module_not_found", assessment_id=assessment_id)
         )
 
+    assessment_object = Assessment.query.filter_by(assessment_id=assessment_id).first()
+
     assessment_details = {
+        "module_id": assessment_object.module_id,
+        "module_title": assessment_object.module.title,
         "assessment_id": assessment_id,
-        "assessment_name": Assessment.query.filter_by(
-            assessment_id=assessment_id
-        ).first(),
+        "assessment_title": assessment_object.title,
+        "summative_or_formative": "Summative"
+        if assessment_object.is_summative
+        else "Formative",
+        "credits": assessment_object.num_of_credits,
     }
 
-    module_id = assessment_details["assessment_name"].module_id
+    # db_utils calls
+    all_assessment_marks_student = get_all_assessment_marks(
+        input_user_id=current_user.id,
+        highest_scoring_attempt_only=False,
+        input_module_id=assessment_details["module_id"],
+        input_assessment_id=assessment_id,
+        store_output_to_file=True,
+    )
 
-    # GET SUM OF QUESTIONS FOR EACH ASSESSMENT
-    assessment_marks = {}
+    all_response_details = get_all_response_details(
+        input_user_id=current_user.id,
+        highest_scoring_attempt_only=False,
+        input_module_id=assessment_details["module_id"],
+        input_assessment_id=assessment_id,
+        store_output_to_file=True,
+    )
 
-    # T1_RESPONSES
-    for response in current_user.t1_responses:
-        if response.assessment.assessment_id == assessment_id:
-            if response.question not in assessment_marks:
-                assessment_marks[response.question] = {
-                    "answer_given": response.chosen_option,
-                    "is_correct": response.is_correct,
-                    "marks_awarded": response.question.num_of_marks
-                    if response.is_correct
-                    else 0,
-                    "marks_possible": response.question.num_of_marks,
-                    "difficulty": response.question.difficulty,
-                }
-                # Check what correct answer was
-                for option in Option.query.filter_by(
-                    q_t1_id=response.question.q_t1_id
-                ).all():
-                    if option.is_correct:
-                        assessment_marks[response.question][
-                            "correct_answer"
-                        ] = option.option_text
-                # Check what feedback was given
-                if response.is_correct:
-                    assessment_marks[response.question][
-                        "feedback_given"
-                    ] = response.question.feedback_if_correct
-                else:
-                    assessment_marks[response.question][
-                        "feedback_given"
-                    ] = response.question.feedback_if_wrong
-            else:
-                # Rich: Unsure this step happens at a question level
-                assessment_marks[response.question]["marks_awarded"] += (
-                    response.question.num_of_marks if response.is_correct else 0
-                )
-                assessment_marks[response.question][
-                    "marks_possible"
-                ] += response.question.num_of_marks
+    ## Need to make dictionary of: {attempt_number : [all questions associated]}
+    all_response_details_grouped_by_attempt_number = {}
+    for r in all_response_details:
+        if not r["attempt_number"] in all_response_details_grouped_by_attempt_number:
+            all_response_details_grouped_by_attempt_number[r["attempt_number"]] = []
+        all_response_details_grouped_by_attempt_number[r["attempt_number"]].append(r)
 
-    # T2_RESPONSES
-    for response in current_user.t2_responses:
-        if response.assessment.assessment_id == assessment_id:
-            if response.question not in assessment_marks:
-                assessment_marks[response.question] = {
-                    "answer_given": response.response_content,
-                    "correct_answer": response.question.correct_answer,
-                    "is_correct": response.is_correct,
-                    "marks_awarded": response.question.num_of_marks
-                    if response.is_correct
-                    else 0,
-                    "marks_possible": response.question.num_of_marks,
-                    "difficulty": response.question.difficulty,
-                }
-                # Feedback given:
-                if response.is_correct:
-                    assessment_marks[response.question][
-                        "feedback_given"
-                    ] = response.question.feedback_if_correct
-                else:
-                    assessment_marks[response.question][
-                        "feedback_given"
-                    ] = response.question.feedback_if_wrong
+    total_score_per_attempt = (
+        {}
+    )  # dictionary of {attempt_id{correct_marks, possible_marks}}
+    for attempt_id, responses in all_response_details_grouped_by_attempt_number.items():
+        total_score_per_attempt[attempt_id] = {"correct_marks": 0, "possible_marks": 0}
+        for r in responses:
+            total_score_per_attempt[attempt_id]["correct_marks"] += (
+                r["num_of_marks"] if r["is_correct"] else 0
+            )
+            total_score_per_attempt[attempt_id]["possible_marks"] += r["num_of_marks"]
+        total_score_per_attempt[attempt_id][
+            "mark_as_percentage"
+        ] = f"{total_score_per_attempt[attempt_id]['correct_marks']/ total_score_per_attempt[attempt_id]['possible_marks']:.0%}"
 
-    # Average difficulty
+    highest_scoring_response_details = get_all_response_details(
+        input_user_id=current_user.id,
+        highest_scoring_attempt_only=True,
+        input_module_id=assessment_details["module_id"],
+        input_assessment_id=assessment_id,
+        store_output_to_file=True,
+    )
 
-    sum_of_marks_awarded = 0
-    sum_of_marks_possible = 0
+    # Add marks from highest scoring attempt:
+    ## loop over highest_scoring_response_details and get the marks
+    assessment_details["sum_of_marks_awarded"] = 0
+    assessment_details["sum_of_marks_possible"] = 0
+    assessment_details["highest_scoring_attempt_number"] = 0
 
-    for assessment, data in assessment_marks.items():
-        sum_of_marks_awarded += data["marks_awarded"]
-        sum_of_marks_possible += data["marks_possible"]
+    for response in highest_scoring_response_details:
+        assessment_details["sum_of_marks_possible"] += response["num_of_marks"]
+        assessment_details["sum_of_marks_awarded"] += (
+            response["num_of_marks"] if response["is_correct"] else 0
+        )
+        if assessment_details["highest_scoring_attempt_number"] == 0:
+            assessment_details["highest_scoring_attempt_number"] = response[
+                "attempt_number"
+            ]
 
-    if sum_of_marks_possible == 0:
-        return render_template("no_questions_answered.html")
+    if (
+        total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]][
+            "correct_marks"
+        ]
+        / total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]][
+            "possible_marks"
+        ]
+        >= 0.5
+    ):
+        assessment_details["highest_scoring_attempt_passed"] = True
+    else:
+        assessment_details["highest_scoring_attempt_passed"] = False
 
-    overall_results = {
-        "sum_of_marks_awarded": sum_of_marks_awarded,
-        "sum_of_marks_possible": sum_of_marks_possible,
+    ############
+    # TAG DATA #
+    ############
+
+    # Can use "highest_scoring_response_details" as it will go over each question ONCE
+    # TAG
+    tag_dictionary = {}
+    # Make all the empty dicts
+    for r in highest_scoring_response_details:
+        tag_dictionary[r["tag_name"][0]] = {
+            "count": 0,
+            "correct_in_highest": 0,
+            "correct_in_all": 0,
+        }
+
+    for r in highest_scoring_response_details:
+        tag_dictionary[r["tag_name"][0]]["count"] += 1
+        if r["is_correct"]:
+            tag_dictionary[r["tag_name"][0]]["correct_in_highest"] += 1
+
+    ##############
+    # CHART DATA #
+    ##############
+
+    data_for_bar_chart = {
+        "labels": [],  # Attempt names
+        "data": [],  # Attempt total marks achieved
+        "backgroundColor": [],  # Red if below 50%, Blue if above
+        "y_axis_max": 0,  # Highest marks
+        "pass_mark": [],
     }
+
+    # Sort all_response_details_grouped_by_attempt_number
+    for i in range(len(total_score_per_attempt)):
+        response = total_score_per_attempt[i + 1]
+        data_for_bar_chart["labels"].append(i + 1)
+        data_for_bar_chart["data"].append(response["correct_marks"])
+        data_for_bar_chart["backgroundColor"].append("54, 162, 235, 0.8") if (
+            response["correct_marks"] / response["possible_marks"]
+        ) > 0.5 else data_for_bar_chart["backgroundColor"].append("255, 99, 132, 0.8")
+        data_for_bar_chart["y_axis_max"] = response["possible_marks"]
+        data_for_bar_chart["pass_mark"].append(response["possible_marks"] / 2)
+
+    print(f"{assessment_details=}")
 
     return render_template(
-        "student_stats_assessment_view.html",
-        overall_results=overall_results,
-        module_id=module_id,
+        "3_student_stats_assessment_view.html",
         assessment_details=assessment_details,
-        assessment_marks=assessment_marks,
+        all_assessment_marks_student=all_assessment_marks_student,
+        all_response_details=all_response_details,
+        highest_scoring_response_details=highest_scoring_response_details,
+        all_response_details_grouped_by_attempt_number=all_response_details_grouped_by_attempt_number,
+        total_score_per_attempt=total_score_per_attempt,
+        data_for_bar_chart=data_for_bar_chart,
+        tag_dictionary=tag_dictionary,
     )
+
+
+############
+# TAG VIEW #
+############
+
+
+# @student_stats.route("/tag/")
+# def tag_view():
+#     # Checks if logged in
+#     if not current_user.is_authenticated:
+#         return redirect(url_for("auth.login"))
+
+#     # Get all responses
+#     all_response_details_for_tags = get_all_response_details(
+#         input_user_id=current_user.id
+#     )
+
+#     list_of_tags = Tag.query.all()
+
+#     dict_of_tags = {}
+#     for tag in list_of_tags:
+#         dict_of_tags[tag.name] = {"correct": 0, "incorrect": 0}
+
+#     dict_of_tags["untagged"] = {"correct": 0, "incorrect": 0}
+
+#     for response in all_response_details_for_tags:
+#         if response["tag_name"] is None:
+#             if response["is_correct"]:
+#                 dict_of_tags["untagged"]["correct"] += 1
+#             else:
+#                 dict_of_tags["untagged"]["incorrect"] += 1
+#         else:
+#             if response["is_correct"]:
+#                 dict_of_tags[response["tag_name"][0]]["correct"] += 1
+#             else:
+#                 dict_of_tags[response["tag_name"][0]]["incorrect"] += 1
+
+#     # Add perc and count_of_questions
+#     for tag in dict_of_tags:
+#         if dict_of_tags[tag]["correct"] + dict_of_tags[tag]["incorrect"] > 0:
+#             dict_of_tags[tag]["perc"] = dict_of_tags[tag]["correct"] / (
+#                 dict_of_tags[tag]["correct"] + dict_of_tags[tag]["incorrect"]
+#             )
+#             dict_of_tags[tag]["count_of_questions"] = (
+#                 dict_of_tags[tag]["correct"] + dict_of_tags[tag]["incorrect"]
+#             )
+#         else:
+#             dict_of_tags[tag]["perc"] = None
+
+#     # Add strongest and weakest flags
+#     strongest_val = 0  # to be HIGHEST
+#     weakest_val = 1  # to be LOWEST
+
+#     for tag in dict_of_tags:
+#         if dict_of_tags[tag]["perc"] != None:
+#             if dict_of_tags[tag]["perc"] > strongest_val:
+#                 strongest_val = dict_of_tags[tag]["perc"]
+#             if dict_of_tags[tag]["perc"] < weakest_val:
+#                 weakest_val = dict_of_tags[tag]["perc"]
+
+#     # Gives all tags a status of strongest, weakest or ""
+#     for tag in dict_of_tags:
+#         if dict_of_tags[tag]["perc"] != None:
+#             if dict_of_tags[tag]["perc"] == strongest_val:
+#                 dict_of_tags[tag]["status"] = "strongest"
+#             elif dict_of_tags[tag]["perc"] == weakest_val:
+#                 dict_of_tags[tag]["status"] = "weakest"
+#             else:
+#                 dict_of_tags[tag]["status"] = ""
+#         else:
+#             dict_of_tags[tag]["status"] = ""
+
+#     # MAKE TOTALS
+#     tag_totals = {"all_questions": 0, "all_correct": 0, "all_incorrect": 0}
+#     for tag in dict_of_tags:
+#         if dict_of_tags[tag]["correct"] + dict_of_tags[tag]["incorrect"] > 0:
+#             tag_totals["all_questions"] += dict_of_tags[tag]["count_of_questions"]
+#             tag_totals["all_correct"] += dict_of_tags[tag]["correct"]
+#             tag_totals["all_incorrect"] += dict_of_tags[tag]["incorrect"]
+
+#     return render_template(
+#         "4_tag.html", dict_of_tags=dict_of_tags, tag_totals=tag_totals
+#     )
 
 
 ######################

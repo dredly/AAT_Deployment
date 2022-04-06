@@ -26,12 +26,6 @@
 			<a href="{{ url_for('legendary_gamification.get_id') }}">Achievements</a>
 		</li>
 		{% endif %}
-		<li>
-			<a href="{{ url_for('staff_stats.index') }}">Staff Stats</a>
-		</li>
-		<li>
-			<a href="{{ url_for('student_stats.course_view') }}">Student Stats</a>
-		</li>
 		<!-- STATS -->
 		<li>
 			<a href="
@@ -41,8 +35,7 @@
 				{{ url_for('student_stats.course_view') }}
 			{% else %}
 				{{ url_for('staff_stats.index') }}
-			{% endif %}"
-			>StatsFromContext</a>
+			{% endif %}">Stats</a>
 		</li>
 		{# {% if current_user.can(Permission.ADMIN) %} #}
 		<li class="admin">

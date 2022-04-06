@@ -1,7 +1,18 @@
-a{
+/* PASS/FAIL COLORS */
+:root {
+	--color-correct: rgba(54, 162, 235,0.8);
+	--color-incorrect: rgba(255, 99, 132,0.8);
+	--color-unanswered: rgba(41, 230, 41, 0.8);
+	--color-todo: red;
+  }
+
+  .todo{
+	  color: var(--color-todo);
+  }
+/* a{
 	text-decoration: none;
 	color: black;
-}
+} */
 
 li{
 	list-style: none;
@@ -27,27 +38,40 @@ li{
 }
 
 .correct_answer{
-	border-color: rgba(54, 162, 235,0.8);
+	border-color: var(--color-correct);
 }
 .correct_answer:hover{
 	background: rgba(54, 162, 235,0.4);
 }
 .incorrect_answer{
-	border-color: rgba(255, 99, 132,0.8);
+	border-color: var(--color-incorrect);
 }
 .incorrect_answer:hover{
 	background: rgba(255, 99, 132,0.4);
 }
 .not_answered{
-	border-color: rgba(41, 230, 41, 0.8);
+	border-color: var(--color-unanswered);
 }
 .not_answered:hover{
 	background: rgba(41, 230, 41, 0.4);
 }
-
 
 .student_stats_container{
 	padding: 0.8rem;
 	margin: 0.8rem 0;
 }
 
+/* TEXT COLORS */
+.text_correct{
+	color: var(--color-correct);
+}
+
+.text_incorrect{
+	color: var(--color-incorrect);
+}
+
+/* CHARTS */
+.chart-container{
+	height: 20rem;
+	width: 20rem;
+}

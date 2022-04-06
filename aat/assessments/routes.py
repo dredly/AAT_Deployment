@@ -2,11 +2,35 @@ from datetime import date, datetime
 import math
 import random
 from stringprep import in_table_d2
-from flask import Response, redirect, render_template, request, url_for, abort, session
+from flask import Response, flash, redirect, render_template, request, url_for, abort, session
 from . import assessments
 
-from ..models import Assessment, QuestionT1, QuestionT2, Module, User, ResponseT2, ResponseT2, ResponseT1, Option, Tag
-from .forms import AddQuestionToAssessmentForm, CreateQuestionT1Form, CreateQuestionT2Form, DeleteQuestionsForm, AnswerType1Form, AnswerType2Form, AssessmentForm, DeleteAssessmentForm, EditAssessmentForm, FinishForm, RandomQuestionsForm, RemoveQuestionForm
+from ..models import (
+    Assessment,
+    QuestionT1,
+    QuestionT2,
+    Module,
+    User,
+    ResponseT2,
+    ResponseT2,
+    ResponseT1,
+    Option,
+    Tag,
+)
+from .forms import (
+    AddQuestionToAssessmentForm,
+    CreateQuestionT1Form,
+    CreateQuestionT2Form,
+    DeleteQuestionsForm,
+    AnswerType1Form,
+    AnswerType2Form,
+    AssessmentForm,
+    DeleteAssessmentForm,
+    EditAssessmentForm,
+    FinishForm,
+    RandomQuestionsForm,
+    RemoveQuestionForm,
+)
 from .. import db
 from flask_login import current_user
 
@@ -17,7 +41,24 @@ def index():
         return redirect(url_for("auth.login"))
     assessments = Assessment.query.all()
     modules = Module.query.all()
-    return render_template("index.html", assessments=assessments, modules=modules)
+    module_credits = dict()
+    for module in modules:
+        assessment_credits = 0
+        assessment_modules = Assessment.query.filter_by(
+            module_id=module.module_id
+        ).all()
+        for assessment in assessment_modules:
+            try:
+                assessment_credits += int(assessment.num_of_credits)
+            except:
+                assessment_credits += 0
+            module_credits[module.title] = assessment_credits
+    return render_template(
+        "index.html",
+        assessments=assessments,
+        modules=modules,
+        module_credits=module_credits,
+    )
 
 
 @assessments.route("/view_module/<int:module_id>")
@@ -97,7 +138,6 @@ def view_module(module_id):
             result = 0
 
         marks_achieved[assessment.title] = f"{result}/{marks_av}"
-
         if assessment.is_summative:
             summatives.append(assessment)
         else:
@@ -191,39 +231,47 @@ def delete_questions(id):
 # ---------------------------------  CRUD For Assessments ---------------------------------------
 
 
-@assessments.route("/assessment/new", methods=["GET", "POST"])
-def new_assessment():
+@assessments.route("/<int:module_id>/assessment/new", methods=["GET", "POST"])
+def new_assessment(module_id):
     session.pop("assessment_edit", None)
     session.pop("assessment_add", None)
+    module = Module.query.filter_by(module_id=module_id).first()
     form = AssessmentForm()
-    error = " "
     is_summative_1 = ""
     session["user"] = current_user.id
+    form.module_id.choices = [
+        (module.module_id, module.title) for module in Module.query.all()
+    ]
     if request.method == "POST":
         lecturer_id = session["user"]
         is_summative = False
         title = request.form["title"]
-        if form.validate_on_submit:
-            total_date = request.form["due_date"]
-            print(date.today().strftime("%Y-%m-%d"))
-            print(total_date)
-            if total_date >= date.today().strftime("%Y-%m-%d"):
-                year = int(total_date[:4])
-                month = int(total_date[5:7])
-                day = int(total_date[8:10])
-                due_date = datetime(year, month, day)
-            else:
-                error = "Due date cannot be in the past"
-                return render_template("new_assessment.html", form=form, error=error)
         time_limit = request.form["time_limit"]
+        module_id = form.module_id.data
         num_of_credits = request.form["num_of_credits"]
-        module_id = request.form["module_id"]
+        if form.validate_on_submit:
+            total_date = form.due_date.data
+            if total_date != None:
+                total_date = total_date.strftime("%Y-%m-%d")
+                if total_date >= date.today().strftime("%Y-%m-%d"):
+                    year = int(total_date[:4])
+                    month = int(total_date[5:7])
+                    day = int(total_date[8:10])
+                    due_date = datetime(year, month, day)
+                else:
+                    flash('Due date cannot be in the past', 'error')
+                    return render_template(
+                        "new_assessment.html", form=form, module_id=module_id
+                    )
+            else:
+                due_date = None
         try:
             is_summative_1 = request.form["is_summative"]
         except:
             pass
         if is_summative_1 == "y":
             is_summative = True
+
         new_assessment = Assessment(
             title=title,
             due_date=due_date,
@@ -238,10 +286,8 @@ def new_assessment():
         id = new_assessment.assessment_id
         session["assessment_add"] = id
         return redirect(url_for("assessments.add_questions", id=id))
-    form.module_id.choices = [
-        (module.module_id, module.title) for module in Module.query.all()
-    ]
-    return render_template("new_assessment.html", form=form)
+    form.module_id.data = str(module.module_id)
+    return render_template("new_assessment.html", form=form, module_id=module_id)
 
 
 @assessments.route("/<int:id>/edit_assessment", methods=["GET", "POST"])
@@ -251,13 +297,18 @@ def edit_assessment(id):
     assessment = Assessment.query.get_or_404(id)
     form = EditAssessmentForm()
     session["assessment_edit"] = id
-    error = " "
+    form.module_id.choices = [
+        (module.module_id, module.title) for module in Module.query.all()
+    ]
     if request.method == "POST":
         assessment.title = form.title.data
         assessment.module_id = form.module_id.data
         assessment.num_of_credits = form.num_of_credits.data
         time_limit = request.form["time_limit"]
-        assessment.time_limit = int(time_limit) * 60
+        try:
+            assessment.time_limit = int(time_limit) * 60
+        except:
+            pass
         assessment.is_summative = form.is_summative.data
         total_date = form.due_date.data
         if total_date == None:
@@ -275,32 +326,14 @@ def edit_assessment(id):
                 db.session.commit()
                 return redirect(url_for("assessments.add_questions", id=id))
             else:
-                error = "Due date cannot be in the past"
+                flash('Due date cannot be in the past', 'error')
                 return render_template(
                     "edit_assessments.html",
                     form=form,
                     assessment=assessment,
-                    error=error,
+                    id=id
                 )
-        # try:
-        #     year = int(total_date[:4])
-        #     month = int(total_date[5:7])
-        #     day = int(total_date[8:10])
-        #     assessment.due_date = datetime(year, month, day)
-        #     if assessment.due_date >= date.today().strftime("%Y-%m-%d"):
-        #         db.session.commit()
-        #         return redirect(url_for("assessments.add_questions", id=id))
-        #     else:
-        #         error = "Due date cannot be in the past"
-        #         return render_template("edit_assessments.html", form=form, assessment=assessment, error=error)
-        # except:
-        #     assessment.due_date = None
-        #     return redirect(url_for("assessments.add_questions", id=id))
-        db.session.commit()
-        return redirect(url_for("assessments.add_questions", id=id))
-    form.module_id.choices = [
-        (module.module_id, module.title) for module in Module.query.all()
-    ]
+    
     form.title.data = assessment.title
     form.module_id.data = str(assessment.module_id)
     form.due_date.data = assessment.due_date
@@ -325,6 +358,7 @@ def delete_assessment(id):
             request.form["submit"]
             db.session.delete(assessment)
             db.session.commit()
+            flash('Assessment Deleted', 'info')
             return redirect(url_for("assessments.view_module", module_id=module_id))
         except:
             request.form["cancel"]
@@ -348,6 +382,7 @@ def remove_question_t2(id, id2):
     if request.method == "POST" and form.is_submitted:
         question.assessment_id = None
         db.session.commit()
+        flash('Question removed', 'info')
         return redirect(url_for("assessments.edit_assessment", id=id))
     return render_template(
         "remove_question.html",
@@ -368,6 +403,7 @@ def remove_question_t1(id, id3):
     if request.method == "POST" and form.is_submitted:
         question.assessment_id = None
         db.session.commit()
+        flash('Question removed', 'info')
         return redirect(url_for("assessments.edit_assessment", id=id))
     return render_template(
         "remove_question.html", question=question, form=form, assessment=assessment
@@ -380,14 +416,15 @@ def add_questions(id):
         id = session.get("assessment_add")
     elif session.get("assessment_edit") != None:
         id = session.get("assessment_edit")
-    form=FinishForm()
+    form = FinishForm()
+    forms=[]
     randomiser = RandomQuestionsForm()
     assessment = Assessment.query.get_or_404(id)
     addQuestionForm = AddQuestionToAssessmentForm()
     questions = (
-            QuestionT1.query.filter(QuestionT1.assessment_id.is_(None)).all()
-            + QuestionT2.query.filter(QuestionT2.assessment_id.is_(None)).all()
-        )
+        QuestionT1.query.filter(QuestionT1.assessment_id.is_(None)).all()
+        + QuestionT2.query.filter(QuestionT2.assessment_id.is_(None)).all()
+    )
     if randomiser.validate_on_submit() and randomiser.random.data:
         difficulty_level = randomiser.question_difficulty.data
         difficulty_level = int(difficulty_level)
@@ -395,16 +432,39 @@ def add_questions(id):
             if difficulty_level == question.difficulty:
                 question.assessment_id = assessment.assessment_id
                 db.session.commit()
+        flash('Questions added to assessment', 'success')
         return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, randomiser=randomiser))
 
     for question in questions:
-        if addQuestionForm.validate_on_submit() and addQuestionForm.add.data:
-            question.assessment_id = id
-            db.session.commit()
-            return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, randomiser=randomiser))
+        try:
+            addForm = AddQuestionToAssessmentForm(prefix=str(question.q_t1_id))
+        except:
+            addForm = AddQuestionToAssessmentForm(prefix=str(question.q_t2_id))
+        forms.append(addForm)
+        for f in forms:
+            if f.validate_on_submit() and f.add.data:
+                question.assessment_id = assessment.assessment_id
+                db.session.commit()
+                flash('Question Added', 'success')
+                return redirect(url_for("assessments.add_questions", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, randomiser=randomiser))
+    questions_and_forms = zip(questions, forms)
     if form.validate_on_submit() and form.finish.data:
+        if session.get("assessment_edit") != None:
+            flash('Assessment Updated', 'success')
+        elif session.get("assessment_add") != None:
+            flash('Assessment Added', 'success')
         return redirect(url_for("assessments.show_assessment", id=id))
-    return render_template("add_questions.html", questions=questions, id=id, addQuestionForm=addQuestionForm, form=form, assessment=assessment, randomiser=randomiser)
+    return render_template(
+        "add_questions.html",
+        questions=questions,
+        id=id,
+        addQuestionForm=addQuestionForm,
+        form=form,
+        assessment=assessment,
+        randomiser=randomiser,
+        questions_and_forms=questions_and_forms
+    )
+
 
 @assessments.route("/<int:id>/type1/new", methods=["GET", "POST"])
 def create_questions_t1(id):
@@ -459,8 +519,10 @@ def create_questions_t1(id):
         db.session.add(option_c)
         db.session.commit()
         if session.get("assessment_edit") != None:
+            flash('Question added to Assessment', 'success')
             return redirect(url_for("assessments.add_questions", id=id))
         elif session.get("assessment_add") != None:
+            flash('Question added to Assessment', 'success')
             return redirect(url_for("assessments.add_questions", id=id))
     form.tag.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
     return render_template(

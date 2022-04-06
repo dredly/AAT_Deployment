@@ -1,3 +1,4 @@
+from tracemalloc import stop
 from . import staff_stats
 from flask_login import current_user
 from flask import render_template, url_for, session
@@ -45,339 +46,152 @@ def index():
 @staff_stats.route("/module/<string:Module_title>")
 def module(Module_title):
     # restablish user lecturer_id
+    session["Module_title"] = Module_title
     user = User.query.filter_by(name = current_user.name).first()
-    user_id = user.id
+    t1Response = ResponseT1.query.all()
+    t2Response = ResponseT2.query.all()
+    users = User.query.all()
     module = Module.query.filter_by(title = Module_title).first()
     moduleId = module.module_id
-    session["Module_title"] = Module_title
+    #print("moduleId",moduleId)
+    #print("user id", user.id)
+    userInfo = get_all_response_details(None,user.id,)
+    #print(userInfo)
     
+  
+
+    moduleAssessments = []
+    assessments = Assessment.query.filter_by(module_id = moduleId).all()
+    for assessment in assessments:
+        assessmentInfo = {}
+        if assessment.module_id == moduleId:
+            assessmentInfo["assessment_title"]=assessment.title
+            if assessment.lecturer_id == user.id:
+                assessmentInfo["your_assessment"] = True
+            else:
+                assessmentInfo["your_assessment"] = False
+            assessmentInfo["number_of_credits"] = assessment.num_of_credits
+            assessmentInfo["is_summative"] = assessment.is_summative
+            assessmentInfo["assessment_id"] = assessment.assessment_id
+            moduleAssessments.append(assessmentInfo)
+    print(moduleAssessments)
     
-
-    Assessments = Assessment.query.all()
-
-    lecturersAssessments = []
-    modulesOtherAssessments = []
-    for assessment in Assessments:
-        if assessment.lecturer_id == user_id and assessment.module_id == moduleId:
-            lecturersAssessments.append(assessment)
-        if assessment.module_id == moduleId and assessment not in lecturersAssessments:
-            modulesOtherAssessments.append(assessment) 
+    moduleAssessmentIds = []
+    for assessment in moduleAssessments:
+        moduleAssessmentIds.append(assessment.get("assessment_id"))
+    NoOfAssessments = len(moduleAssessments)
+    #print("number of assessments is", NoOfAssessments)
     
-    print("lecturers Assessments", lecturersAssessments)
-    print("Modules other assessments", modulesOtherAssessments)
-
-
-# finding the info of assessments assigned to / created by logged Lecturer 
-    assessmentIds = []
-    formOrSumm = []
-    for assessment in lecturersAssessments:
-        assessmentId = assessment.assessment_id
-        assessmentIds.append(assessmentId)
-
-        if assessment.is_summative == 1:
-            formOrSumm.append("Summative")
-        else:
-            formOrSumm.append("Formative")
+    questions = []
     
-    
-    modulesOtherAssessmentIds = []
-    OtherAssessmentsFormOrSumm = []
-    for assessment in modulesOtherAssessments:
-        assessmentId = assessment.assessment_id
-        modulesOtherAssessmentIds.append(assessmentId)
-
-        if assessment.is_summative == 1:
-            OtherAssessmentsFormOrSumm.append("Summative")
-        else:
-            OtherAssessmentsFormOrSumm.append("Formative")
-    
-    print("modulesOtherassessmentIds", modulesOtherAssessmentIds)
-    print("Other modules form or Sum", OtherAssessmentsFormOrSumm)
-
-    questionT1s = QuestionT1.query.all()
-    t1questions = []
-    for question in questionT1s:
-        if question.assessment_id in assessmentIds:
-            t1questions.append(question)
-    print ("t1questions",t1questions)
-    lengthT1questions = len(t1questions)
-    
-    otherAssessmentsQT1s = []
-    for question in questionT1s:
-        if question.assessment_id in modulesOtherAssessmentIds:
-            otherAssessmentsQT1s.append(question)
-    print ("other t1questions",otherAssessmentsQT1s)
-    lengthOtherT1questions = len(otherAssessmentsQT1s)
-
-    t1Responses = ResponseT1.query.all()
-
-    t1Correct = {}
-    t1Wrong = {}
-    for response in t1Responses:
-        if response.t1_question_id not in t1Correct:
-            t1Correct[response.t1_question_id] = 0
-        if response.t1_question_id not in t1Wrong:
-            t1Wrong[response.t1_question_id] = 0
-    
-    for response2 in t1Responses:
-        newResponse = response2.t1_question_id
-        if response2.is_correct == True:
-            t1Correct[newResponse] += 1
-        else:
-            t1Wrong[newResponse] += 1
-
-    print ("t1Correct",t1Correct)
-    print ("t1Wrong",t1Wrong)
-
-
-    OtherT1Correct = {}
-    OtherT1Wrong = {}
-    for response in t1Responses:
-        if response.t1_question_id not in OtherT1Correct:
-            OtherT1Correct[response.t1_question_id] = 0
-        if response.t1_question_id not in OtherT1Wrong:
-            OtherT1Wrong[response.t1_question_id] = 0
-    
-    for response2 in t1Responses:
-        newResponse = response2.t1_question_id
-        if response2.is_correct == True:
-            OtherT1Correct[newResponse] += 1
-        else:
-            OtherT1Wrong[newResponse] += 1
-    print ("Other t1Correct",OtherT1Correct)
-    print ("Other t1Wrong",OtherT1Wrong)
-
-# T1 percentages
-    t1correctAnswers = []
-    t1wrongAnswers = []
-
-    for question in questionT1s:
-        if question in t1questions:
-            correctAnswer = t1Correct.get(question.q_t1_id)
-            wrongAnswer = t1Wrong.get(question.q_t1_id)
-            if correctAnswer != None:
-                t1correctAnswers.append(correctAnswer)
-            if wrongAnswer != None:
-                t1wrongAnswers.append(wrongAnswer)
-    print("t1correct Answers", t1correctAnswers )
-    print("t1wrong Answers", t1wrongAnswers)
-
-    OtherT1correctAnswers = []
-    OtherT1wrongAnswers = []
-
-    for question in questionT1s:
-        if question in t1questions:
-            correctAnswer = OtherT1Correct.get(question.q_t1_id)
-            wrongAnswer = OtherT1Wrong.get(question.q_t1_id)
-            if correctAnswer != None:
-                OtherT1correctAnswers.append(correctAnswer)
-            if wrongAnswer != None:
-                OtherT1wrongAnswers.append(wrongAnswer)
-    print("other t1correct Answers", OtherT1correctAnswers )
-    print("other t1wrong Answers", OtherT1wrongAnswers)
-
-    t1TotalAnswers = []
-    count = 0
-    for answer in t1correctAnswers:
-        t1TotalAnswers.append(t1wrongAnswers[count] + answer) 
-        count += 1
+    for question in userInfo:
+        questionDetails = {}
+        questionAssessmentId = question.get("assessment_id")        
+        questionId = question.get("question_id")
+        questionDetails["question_assessment_id"] = questionAssessmentId
+        questionDetails["questionId"] = questionId
+        #print("question ID",questionId, "assessmentId",questionAssessmentId)
+        nay = 0
+        yay = 0
+        questionInfo = get_all_assessment_marks(None,None,None,questionAssessmentId,True)
+        for stat in questionInfo:
+            if stat.get("assessment_id") == questionAssessmentId:
+                assId = stat.get("assessment_id")
+                user = stat.get("user_id")
+                attempt = stat.get("attempt_number")
+                bestAttempt = stat.get("highest_scoring_attempt")
+                marks = stat.get("correct_marks")
+                if bestAttempt == True:
+                    bestAttempt = attempt
+                print("user",user,"assId",assId,"best attempt",bestAttempt, "questionID",questionId)
+                
+                
+                for user1 in users:
+                    if user1.id == user:
+                        userRole = user1.role_id
+                print("user role", userRole)
+                if userRole == 1:
+                    if question.get("question_type") == 2:
+                        for response in t2Response:
+                                       
+                            if response.user_id == user:
+                                if response.attempt_number == bestAttempt:
+                                    if response.assessment_id == assId:
+                                        if response.t2_question_id == questionId:
+                                            if response.is_correct == True:                                 
+                                                print("YAY")
+                                                yay += 1
+                                                break
+                                        
+                                            else:
+                                                print("NAY")
+                                                nay += 1
+                                                break
+                    else:
+                        for response in t1Response:
+                                       
+                            if response.user_id == user:
+                                if response.attempt_number == bestAttempt:
+                                    if response.assessment_id == assId:
+                                        if response.t1_question_id == questionId:
+                                            if response.is_correct == True:                                 
+                                                print("YAY")
+                                                yay += 1
+                                                break
+                                        
+                                        else:
+                                            print("NAY")
+                                            nay += 1
+                                            break                  
+                print("yay", yay)
+                print("nay",nay)
+                    
+                                        
         
-    print ("t1 total answers =",t1TotalAnswers)
-
-    OtherT1TotalAnswers = []
-    count = 0
-    for answer in OtherT1correctAnswers:
-        OtherT1TotalAnswers.append(OtherT1wrongAnswers[count] + answer) 
-        count += 1
         
-    print ("Other t1 total answers =",OtherT1TotalAnswers)
-
-    t1percentages = []
-    count = 0
-    for answer2 in t1TotalAnswers:
-        if t1correctAnswers[count] == 0:
-            percentage = 0
-        if t1wrongAnswers[count] == 0:
-            percentage = 100
+            
+        if yay == 0:
+            if nay == 0:
+                pass_percentage = "No attempts have been made"
+            else:
+                pass_percentage = 0
+        if nay == 0:
+            pass_percentage = 100
         else:
-            percentage = (t1correctAnswers[count]/answer2) * 100
-        t1percentages.append(int(percentage))
-        count += 1
-    print("t1 percentages",t1percentages)
-
-    OtherT1percentages = []
-    count = 0
-    for answer2 in OtherT1TotalAnswers:
-        if OtherT1correctAnswers[count] == 0:
-            percentage = 0
-        if OtherT1wrongAnswers[count] == 0:
-            percentage = 100
-        else:
-            percentage = (OtherT1correctAnswers[count]/answer2) * 100
-        OtherT1percentages.append(int(percentage))
-        count += 1
-    print("other t1 percentages",OtherT1percentages)
-
-    questionT2s = QuestionT2.query.all()
-    t2questions = []
-    for question in questionT2s:
-        if question.assessment_id in assessmentIds:
-            t2questions.append(question)
-    print("t2questions", t2questions)
-    lengthT2questions = len(t2questions)
-
-    OtherT2questions = []
-    for question in questionT2s:
-        if question.assessment_id in modulesOtherAssessmentIds:
-            OtherT2questions.append(question)
-    print("Other t2questions", OtherT2questions)
-    lengthOtherT2questions = len(OtherT2questions)
-
-
-    t2Responses = ResponseT2.query.all()
-
-    t2Correct = {}
-    t2Wrong = {}
-    for response in t2Responses:
-        if response.t2_question_id not in t2Correct:
-            t2Correct[response.t2_question_id] = 0
-        if response.t2_question_id not in t2Wrong:
-            t2Wrong[response.t2_question_id] = 0
-
-
-    for response2 in t2Responses:
-        newResponse = response2.t2_question_id 
-        #print(newResponse)
-        if response2.is_correct == True:
-            t2Correct[newResponse] += 1
-        else:
-            t2Wrong[newResponse] += 1    
+            total = yay+nay
+            pass_percentage = int((yay/total) * 100)
         
-    print ("t2Correct",t2Correct)
-    print ("t2Wrong",t2Wrong)
+        questionDetails["correct_answers"] = yay
+        questionDetails["wrong_answers"] = nay
+        questionDetails["pass_percentage"] = pass_percentage
+        questionDetails["question_text"] = question.get("question_text")
+        questionDetails["question_difficulty"] = question.get("question_difficulty")
+        questionDetails["question_type"] =question.get("question_type")
+        questions.append(questionDetails)
+    
 
-    OtherT2Correct = {}
-    OtherT2Wrong = {}
-    for response in t2Responses:
-        if response.t2_question_id not in OtherT2Correct:
-            OtherT2Correct[response.t2_question_id] = 0
-        if response.t2_question_id not in OtherT2Wrong:
-            OtherT2Wrong[response.t2_question_id] = 0
-
-
-    for response2 in t2Responses:
-        newResponse = response2.t2_question_id 
-        #print(newResponse)
-        if response2.is_correct == True:
-            OtherT2Correct[newResponse] += 1
-        else:
-            OtherT2Wrong[newResponse] += 1    
-        
-    print ("Other t2Correct",OtherT2Correct)
-    print ("Other t2Wrong",OtherT2Wrong)
-
-# T2 percentages
-    t2correctAnswers = []
-    t2wrongAnswers = []
-
-    for question in questionT2s:
-        
-        if question in t2questions:           
-            correctAnswer = t2Correct.get(question.q_t2_id)
-            wrongAnswer = t2Wrong.get(question.q_t2_id)          
-            if correctAnswer != None:
-                t2correctAnswers.append(correctAnswer)
-            if wrongAnswer != None:
-                t2wrongAnswers.append(wrongAnswer)
-    print("t2correct Answers", t2correctAnswers )
-    print("t2wrong Answers", t2wrongAnswers)
-
-    OtherT2correctAnswers = []
-    OtherT2wrongAnswers = []
-
-    for question in questionT2s:
-        
-        if question in OtherT2questions:           
-            correctAnswer = OtherT2Correct.get(question.q_t2_id)
-            wrongAnswer = OtherT2Wrong.get(question.q_t2_id)          
-            if correctAnswer != None:
-                OtherT2correctAnswers.append(correctAnswer)
-            if wrongAnswer != None:
-                OtherT2wrongAnswers.append(wrongAnswer)
-    print("other t2correct Answers", OtherT2correctAnswers )
-    print("other t2wrong Answers", OtherT2wrongAnswers)
-
-    t2TotalAnswers = []
-    count = 0
-    for answer in t2correctAnswers:
-        t2TotalAnswers.append(t2wrongAnswers[count] + answer) 
-        count += 1
-        
-    print ("T2 total answers =",t2TotalAnswers)
-
-    OtherT2TotalAnswers = []
-    count = 0
-    for answer in OtherT2correctAnswers:
-        OtherT2TotalAnswers.append(OtherT2wrongAnswers[count] + answer) 
-        count += 1
-        
-    print ("Other T2 total answers =",OtherT2TotalAnswers)
-
-    t2percentages = []
-    count = 0
-    for answer2 in t2TotalAnswers:
-        if t2correctAnswers[count] == 0:
-            percentage = 0
-        if t2wrongAnswers[count] == 0:
-            percentage = 100
-        else:
-            percentage = (t2correctAnswers[count]/answer2) * 100
-        t2percentages.append(int(percentage))
-        count += 1
-    print("T2 percentages",t2percentages)
-
-    OtherT2percentages = []
-    count = 0
-    for answer2 in OtherT2TotalAnswers:
-        if OtherT2correctAnswers[count] == 0:
-            percentage = 0
-        if OtherT2wrongAnswers[count] == 0:
-            percentage = 100
-        else:
-            percentage = (OtherT2correctAnswers[count]/answer2) * 100
-        OtherT2percentages.append(int(percentage))
-        count += 1
-    print("Other T2 percentages",OtherT2percentages)
+    # gets rid of dupped questions
+    seen = set()
+    questions2 = []
+    for question in questions:
+        t = tuple(question.items())
+        if t not in seen:
+            seen.add(t)
+            questions2.append(question)
+    
+    print("questions", questions2) 
 
     return render_template("module.html",
-     
         Module_title = Module_title,
-        lecturersAssessments = lecturersAssessments,
-        modulesOtherAssessments = modulesOtherAssessments,
-        assessmentIds = assessmentIds,
-        modulesOtherAssessmentIds = modulesOtherAssessmentIds,
-        formOrSumm = formOrSumm,
-        OtherAssessmentsFormOrSumm = OtherAssessmentsFormOrSumm,
-        t1questions = t1questions,
-        otherAssessmentsQT1s = otherAssessmentsQT1s,
-        lengthT1questions = lengthT1questions,
-        lengthOtherT1questions = lengthOtherT1questions,
-        t1Correct = t1Correct,
-        OtherT1Correct = OtherT1Correct,
-        t1Wrong = t1Wrong,
-        OtherT1Wrong = OtherT1Wrong,
-        t1percentages = t1percentages,
-        OtherT1percentages = OtherT1percentages,
-        t2questions = t2questions,
-        OtherT2questions = OtherT2questions,
-        lengthT2questions = lengthT2questions,
-        lengthOtherT2questions = lengthOtherT2questions,
-        t2Correct = t2Correct,
-        OtherT2Correct = OtherT2Correct,
-        t2Wrong = t2Wrong,
-        OtherT2Wrong = OtherT2Wrong,  
-        t2percentages = t2percentages,
-        OtherT2percentages = OtherT2percentages)
+        moduleAssessments = moduleAssessments,
+        questions = questions2,
+        )
+
+
+
+
+
+
 
 
 
@@ -413,8 +227,7 @@ def view_students(assessment):
                 questions.append(question.get("question_type"))
                 attemptLists[question.get("attempt_number")-1].append(questions)          
             users2.append(attemptLists)
-            
+    print(users2)
     return render_template("view-students.html", Module_title = Module_title,
     assessment = assessment,
-    assessmentID = assessmentID,
     users2 = users2,)
