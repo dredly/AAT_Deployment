@@ -306,7 +306,7 @@ def get_all_assessment_marks(
     for row in final_output:
         percentage_achieved = row["correct_marks"] / row["possible_marks"]
         row["passed"] = True if percentage_achieved >= 0.5 else False
-        row["credits_earned"] = round(row["num_of_credits"] * percentage_achieved)
+        row["credits_earned"] = row["num_of_credits"] if row["passed"] else 0
 
     ###########
     # FILTERS #

@@ -24,6 +24,12 @@
          > Assessment {{ assessment_details["assessment_id"]}} | {{assessment_details["assessment_title"] }}
     </p>
     <h2>Assessment: {{ assessment_details["assessment_id"]}} | {{assessment_details["assessment_title"] }}</h2>
+
+    <h3>Passed: <span class="{% if assessment_details['highest_scoring_attempt_passed'] %} text_correct {% else %} text_incorrect {% endif %}">{{ assessment_details["highest_scoring_attempt_passed"] }}</span> </h3>
+    <h3>Credits Earned: {% if assessment_details["highest_scoring_attempt_passed"] %}{{assessment_details["credits"]}}{% else %}0{% endif %}/{{assessment_details["credits"]}}</h3>
+
+
+
     <div class="student_stats_container results_box {% if assessment_details["highest_scoring_attempt_passed"] %} correct_answer {% else %} incorrect_answer {% endif %}">
         <h2>
             Highest Scoring Attempt
