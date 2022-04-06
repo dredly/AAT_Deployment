@@ -153,6 +153,8 @@ def get_all_assessment_marks(
     - 'assessment_title' (str)
     - 'passed' (bool)
     - 'credits_earned' (int)
+    - 'difficulty_average' (int)
+    ' 'list_of_tags' ([str])
 
     Optional filters added for student, lecturer, module and assessment id
     print statements are enabled/disabled through debug=True/False
@@ -394,6 +396,7 @@ def get_all_response_details(
     - lecturer_email (str)
     - tag_id (int)
     - tag_name (str)
+    - difficulty (int)
 
     Optional filters added for student, lecturer, module and assessment id
     """
@@ -423,6 +426,7 @@ def get_all_response_details(
             Module.title,  # 18
             Assessment.title,  # 19
             QuestionT1.tag_id,  # 20
+            QuestionT1.difficulty,  # 21
         )
         .select_from(User)
         .join(ResponseT1)
@@ -461,6 +465,7 @@ def get_all_response_details(
         output_dict["module_title"] = question[18]
         output_dict["assessment_title"] = question[19]
         output_dict["tag_id"] = question[20]
+        output_dict["difficulty"] = question[21]
 
         for answer in table_of_correct_t1_answers:
             if answer.q_t1_id == output_dict["question_id"]:
@@ -501,6 +506,7 @@ def get_all_response_details(
             Module.title,  # 18
             Assessment.title,  # 19
             QuestionT2.tag_id,
+            QuestionT2.difficulty,  # 21
         )
         .select_from(User)
         .join(ResponseT2)
@@ -538,6 +544,7 @@ def get_all_response_details(
         output_dict["module_title"] = question[18]
         output_dict["assessment_title"] = question[19]
         output_dict["tag_id"] = question[20]
+        output_dict["difficulty"] = question[21]
 
         ## ADD FEEDBACK/FEEDFORWARD IF CORRECT/INCORRECT
         output_dict["feedback"] = (
