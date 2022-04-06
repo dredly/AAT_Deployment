@@ -102,16 +102,66 @@ def course_view():
         a = Assessment.query.filter_by(assessment_id=assessment_id).first()
         dict_of_assessment_counts[a.module.module_id]["count_of_taken_assessments"] += 1
 
-    # Dict of modules passed
-    dict_of_modules_and_assessments_passed = {}
+    # print(f"{all_assessment_marks_student=}")
     for m in dict_of_assessment_counts:
         for a in all_assessment_marks_student:
             if m == a["module_id"]:
-                print(m)
+                # print(a)
                 dict_of_assessment_counts[m]["count_of_passed_assessments"] = (
                     dict_of_assessment_counts[m].get("count_of_passed_assessments", 0)
                     + 1
                 )
+
+    module_ids = module_ids_with_details.keys()
+
+    dictionary_of_module_credits = {}
+    for id in module_ids:
+        dictionary_of_module_credits[id] = {
+            "total_credits_possible": 0,
+            "total_credits_earned": 0,
+        }
+
+    for module_id in module_ids:
+        for assessment in all_assessment_marks_student:
+            if assessment["module_id"] == module_id:
+                dictionary_of_module_credits[module_id][
+                    "total_credits_earned"
+                ] += assessment["credits_earned"]
+
+    total_credits_possible = 0
+    query_of_assessments = Assessment.query.all()
+    for q in query_of_assessments:
+        dictionary_of_module_credits[q.module_id][
+            "total_credits_possible"
+        ] += q.num_of_credits
+        total_credits_possible += q.num_of_credits
+
+    total_credits_earned = sum(
+        [a["credits_earned"] for a in all_assessment_marks_student]
+    )
+    dictionary_of_module_credits["total"] = {
+        "total_credits_possible": total_credits_possible,
+        "total_credits_earned": total_credits_earned,
+    }
+
+    # dict_of_module_id_and_credits = []
+    # for module_id in :
+    #     total_credits_possible = 0
+    #     total_credits_earned = 0
+    #     for a in all_assessment_marks_student:
+    #         print("!!!!")
+    #         print(a)
+    #         print(all_assessment_marks_student)
+    #         if a["user_id"] == module_id:
+    #             total_credits_possible += a["num_of_credits"]
+    #             total_credits_earned += a["credits_earned"]
+    #     dict_of_module_id_and_credits.append(
+    #         {
+    #             "module_id": a["user_id"],
+    #             "total_credits_possible": total_credits_possible,
+    #             "total_credits_earned": total_credits_earned,
+    #         }
+    #     )
 
     # MODULE RESULTS
     # - STUDENT
@@ -160,6 +210,10 @@ def course_view():
                     "count_of_assessments"
                 ],
             }
+
+    for id in module_ids_with_details.keys():
+        entry = module_ids_with_details[id]
+        # Isn't this what I need?
 
     # - COHORT
     # TODO: module_stats_cohort
@@ -259,7 +313,7 @@ def course_view():
             tag_totals["all_correct"] += dict_of_tags[tag]["correct"]
             tag_totals["all_incorrect"] += dict_of_tags[tag]["incorrect"]
 
-    print(f"{module_stats_student=}")
+    # print(module_stats_student)
 
     return render_template(
         "1_student_stats_course_view.html",
@@ -270,6 +324,7 @@ def course_view():
         dict_of_assessment_counts=dict_of_assessment_counts,
         dict_of_tags=dict_of_tags,
         tag_totals=tag_totals,
+        dictionary_of_module_credits=dictionary_of_module_credits,
     )
 
 
@@ -345,8 +400,6 @@ def module_view(module_id=0):
         for a in m.assessments:
             if a.assessment_id not in list_of_assessments_completed_by_student:
                 assessments_not_taken_yet.append(a)
-
-    # print(assessments_not_taken_yet)
 
     return render_template(
         "2_student_stats_module_view.html",
