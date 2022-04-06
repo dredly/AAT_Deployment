@@ -1,4 +1,3 @@
-from tracemalloc import stop
 from . import staff_stats
 from flask_login import current_user
 from flask import render_template, url_for, session
@@ -73,14 +72,14 @@ def module(Module_title):
             assessmentInfo["number_of_credits"] = assessment.num_of_credits
             assessmentInfo["is_summative"] = assessment.is_summative
             assessmentInfo["assessment_id"] = assessment.assessment_id
+            assessmentInfo["amount_of_questions"] = 0
             moduleAssessments.append(assessmentInfo)
-    print(moduleAssessments)
+    #print(moduleAssessments)
     
     moduleAssessmentIds = []
     for assessment in moduleAssessments:
         moduleAssessmentIds.append(assessment.get("assessment_id"))
-    NoOfAssessments = len(moduleAssessments)
-    #print("number of assessments is", NoOfAssessments)
+    
     
     questions = []
     
@@ -100,16 +99,16 @@ def module(Module_title):
                 user = stat.get("user_id")
                 attempt = stat.get("attempt_number")
                 bestAttempt = stat.get("highest_scoring_attempt")
-                marks = stat.get("correct_marks")
+                
                 if bestAttempt == True:
                     bestAttempt = attempt
-                print("user",user,"assId",assId,"best attempt",bestAttempt, "questionID",questionId)
+                #print("user",user,"assId",assId,"best attempt",bestAttempt, "questionID",questionId)
                 
                 
                 for user1 in users:
                     if user1.id == user:
                         userRole = user1.role_id
-                print("user role", userRole)
+                #print("user role", userRole)
                 if userRole == 1:
                     if question.get("question_type") == 2:
                         for response in t2Response:
@@ -119,12 +118,12 @@ def module(Module_title):
                                     if response.assessment_id == assId:
                                         if response.t2_question_id == questionId:
                                             if response.is_correct == True:                                 
-                                                print("YAY")
+                                                #print("YAY")
                                                 yay += 1
                                                 break
                                         
                                             else:
-                                                print("NAY")
+                                                #print("NAY")
                                                 nay += 1
                                                 break
                     else:
@@ -135,25 +134,22 @@ def module(Module_title):
                                     if response.assessment_id == assId:
                                         if response.t1_question_id == questionId:
                                             if response.is_correct == True:                                 
-                                                print("YAY")
+                                                #print("YAY")
                                                 yay += 1
                                                 break
                                         
                                         else:
-                                            print("NAY")
+                                            #print("NAY")
                                             nay += 1
                                             break                  
-                print("yay", yay)
-                print("nay",nay)
+                #print("yay", yay)
+                #print("nay",nay)
                     
                                         
         
         
             
         if yay == 0:
-            if nay == 0:
-                pass_percentage = "No attempts have been made"
-            else:
                 pass_percentage = 0
         if nay == 0:
             pass_percentage = 100
@@ -167,19 +163,25 @@ def module(Module_title):
         questionDetails["question_text"] = question.get("question_text")
         questionDetails["question_difficulty"] = question.get("question_difficulty")
         questionDetails["question_type"] =question.get("question_type")
+        
         questions.append(questionDetails)
     
 
     # gets rid of dupped questions
     seen = set()
     questions2 = []
-    for question in questions:
+    for question in questions:   
         t = tuple(question.items())
         if t not in seen:
             seen.add(t)
             questions2.append(question)
+    for question in questions2:
+        for assessment in moduleAssessments: 
+            if question.get("question_assessment_id") == assessment.get("assessment_id"):
+                assessment["amount_of_questions"] = assessment.get("amount_of_questions") +1
     
-    print("questions", questions2) 
+    #print("questions", questions2) 
+    print(moduleAssessments)
 
     return render_template("module.html",
         Module_title = Module_title,
