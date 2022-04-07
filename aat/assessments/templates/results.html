@@ -1,18 +1,28 @@
 {% extends("layout.html") %}
 {% block content %}
-<h1>Results of assessment</h1>
-
-<p>Score: {{ result }} / {{ possible_total }}</p>
-
-<h2>Questions</h2>
-
+<h1 class="modules_title">Results of Assessment: {{ assessment.title }}</h1>
+<div class="top-banner-container">
+    <div class="result-container">
+        <p>Score: {{ result }} / {{ possible_total }}</p>
+        <p>Assessment <b>{% if passed %}Passed!{% else %}Failed.{% endif %}</b></p>
+        <p>Assessment Credit Value: {{ assessment.num_of_credits }}</p>
+    </div>
+    <div class="button-container">
+        <a class="take-assessment-button" href="{{ url_for('assessments.exit_assessment') }}">
+            Return to Module View</a>
+    </div>
+</div>
+<h2 class="result-header">Questions and Feedback:</h2>
 {% for i in no_questions %}
-<p>{{ i + 1 }}. {{ ordered_questions[i].question_text }}</p>
-<p>Your answer: {{ given_answers[i] }}</p>
-<p>Correct answer: {{ correct_answers[i] }}</p>
-<p>Total points: {% if is_correct[i] == True%}{{ ordered_questions[i].num_of_marks }}{% else %}0{% endif %}/{{
+<section class="assessment-summary summary-page"> 
+<h3>{{ i + 1 }}. {{ ordered_questions[i].question_text }}</h3>
+<small>Question difficulty: {{ ordered_questions[i].difficulty }}</small>
+<p>Result: <b>{% if is_correct[i] == True%}Correct!{% else %}Incorrect.{% endif %}</b>
+<p>Your answer: <em>{{ given_answers[i] }}</em></p>
+<p>Correct answer: <em>{{ correct_answers[i] }}</em></p>
+<p>Total points recieved: {% if is_correct[i] == True%}{{ ordered_questions[i].num_of_marks }}{% else %}0{% endif %}/{{
     ordered_questions[i].num_of_marks }}</p>
-<h3>Feedback</h3>
+<h4>Feedback</h4>
 {% if is_correct[i] == True%}
 <p class="feedback-or-feedforward">
     {{ ordered_questions[i].feedback_if_correct }}
@@ -21,14 +31,23 @@
 <p class="feedback-or-feedforward">
     {{ ordered_questions[i].feedback_if_wrong }}
 </p>
-
 {% endif %}
-
-<hr>
-
+<h4>Feed Forward</h4>
+{% if is_correct[i] == True%}
+<p class="feedback-or-feedforward">
+    {{ ordered_questions[i].feedforward_if_correct }}
+</p>
+{% else %}
+<p class="feedback-or-feedforward">
+    {{ ordered_questions[i].feedforward_if_wrong }}
+</p>
+{% endif %}
+</section>
 {% endfor %}
 
-<button type="button"><a href="{{ url_for('assessments.exit_assessment') }}">Return to Module View</a></button>
-
+<div class="button-container">
+    <a class="take-assessment-button" href="{{ url_for('assessments.exit_assessment') }}">
+        Return to Module View</a>
+</div>
 
 {% endblock %}

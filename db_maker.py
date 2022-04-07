@@ -1,4 +1,8 @@
 from aat import app, db, Role
+import datetime 
+date_1 = datetime.date(2022,4,2)
+date_2 = datetime.date(2022,5,13)
+date_3 = datetime.date(2022,5,19)
 
 from aat.models import *
 
@@ -30,13 +34,14 @@ with app.app_context():
     ###############
     # ASSESSMENTS #
     ###############
+
     db.session.add_all(
-        [
+        [   
             Assessment(  # 1
                 module_id=1,
                 lecturer_id=7,
                 title="Git Basics",
-                due_date=None,
+                due_date=date_1,
                 time_limit=60 * 60 * 30,
                 num_of_credits=12,
                 is_summative=True,
@@ -45,7 +50,7 @@ with app.app_context():
                 module_id=1,
                 lecturer_id=7,  # 1, #dont mind me I am for Jake testing purposes
                 title="Advanced Git",
-                due_date=None,
+                due_date=date_3,
                 time_limit=60 * 60 * 45,
                 num_of_credits=10,
                 is_summative=True,
@@ -54,7 +59,7 @@ with app.app_context():
                 module_id=2,
                 lecturer_id=9,
                 title="DOM Manipulation in JS",
-                due_date=None,
+                due_date=date_2,
                 time_limit=60 * 60 * 20,
                 num_of_credits=0,
                 is_summative=False,
@@ -855,7 +860,7 @@ with app.app_context():
                 assessment_id=1,
                 t2_question_id=2,
                 response_content="adad",
-                is_correct=True,
+                is_correct=False,
             ),
             ResponseT2(  # 8
                 attempt_number=3,
