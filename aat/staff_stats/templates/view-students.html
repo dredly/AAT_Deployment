@@ -4,26 +4,30 @@
 
 <h1>Student views for Asessment: {{assessment}}!</h1>
 {%for user in users2%}
-   
-    {%set users2Length = users2[count]|length %}
     
+    {%set users2Length = users2[count]|length %}
+    {%if user[0] | length == 0 %}
     <h1>Student Name: {{user[-1]}}&nbsp;&nbsp;&nbsp;Tier: {%for u in users%}{%if user[-1] == u.name%}  <span id = "staff_stats_{{u.tier}}" >{{u.tier}}</span>{%endif%}{%endfor%}{%set a = user.pop(-1)%}</h1>
+    <p>No questions have been answered</p>
+    {%else%}
+    <h1>Student Name: {{user[-2]}}&nbsp;&nbsp;&nbsp;Tier: {%for u in users%}{%if user[-2] == u.name%}  <span id = "staff_stats_{{u.tier}}" >{{u.tier}}</span>{%endif%}{%endfor%}{%set a = user.pop(-2)%}</h1>
     
     {%for allQuestions in user%}
         {%set allQuestionsLength = allQuestions|length%}
-        {%if allQuestionsLength > 0%}
+        {%if allQuestionsLength > 0%} 
             {%set attempt = loop.index%}
-            <h2>This is attempt: {{attempt}}</h2>
+            <h2>This is attempt: {{attempt}}{%if user[-1] == attempt%} (submitted attempt){% set a = user.pop(-1)%} {%endif%}</h2>
         
             {%for question in allQuestions%}      
                 <h3> Question: {{question[0]}} &nbsp;&nbsp;&nbsp; Question difficulty: {{question[1]}} &nbsp;&nbsp;&nbsp; Question Type: {{question[5]}} </h3>
                 <p> Answer given: {{question[2]}} &nbsp;&nbsp;&nbsp; {%if question[3] == True%} Answered Correctly {%else%} Answered Wrong {%endif%} </p>
             {%endfor%}
         {%else%}
-            <p>No questions have been answered</p>
+            
         {%endif%}
+   
     {%endfor%}
-
+ {%endif%}
 
 
 

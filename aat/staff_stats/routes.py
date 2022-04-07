@@ -274,7 +274,9 @@ def view_students(assessment):
                 questions.append(question.get("is_correct"))
                 questions.append(question.get("attempt_number"))
                 questions.append(question.get("question_type"))
-                attemptLists[question.get("")]
+                if question.get("highest_scoring_attempt"):
+                    if question.get("attempt_number") not in attemptLists:
+                        attemptLists.append(question.get("attempt_number"))
                 attemptLists[question.get("attempt_number")-1].append(questions)          
             users2.append(attemptLists)
             print("attemptLists",attemptLists)
