@@ -39,95 +39,27 @@ def achievements(user_id):
     all_challenge_friends = []
     for friend in all_friends:
         all_challenge_friends.append((User.query.filter_by(id=friend.friend_id).first().id, User.query.filter_by(id=friend.friend_id).first().name))
-    print(all_challenge_friends)
     all_challenge_friends_names = [item[1] for item in all_challenge_friends]
     all_takenChallenges = ChallengesTaken.query.all()
     takenChallengesIDs = ChallengesTaken.query.with_entities(ChallengesTaken.challenge_id).filter_by(user_id=user_id).all()
     takenChallengesList = [item[0] for item in takenChallengesIDs]
 
+    user_stats = []
     for user in all_users:
         if user.role_id == 1:
-            assessment_marks = {}
-            for response in user.t1_responses:
-                if response.assessment not in assessment_marks:
-                    assessment_marks[response.assessment] = {
-                        "marks_awarded": response.question.num_of_marks
-                        if response.is_correct
-                        else 0,
-                        "marks_possible": response.question.num_of_marks,
-                    }
-                else:
-                    assessment_marks[response.assessment]["marks_awarded"] += (
-                        response.question.num_of_marks if response.is_correct else 0
-                    )
-                    assessment_marks[response.assessment][
-                        "marks_possible"
-                    ] += response.question.num_of_marks
+            user_stats.append((get_all_assessment_marks(input_user_id=user.id, highest_scoring_attempt_only=True), user.name, user.id))
+    print("#####################################")
+    for stat in user_stats:
+        print(stat)
 
-            ## T2_responses
-            for response in user.t2_responses:
-                if response.assessment not in assessment_marks:
-                    assessment_marks[response.assessment] = {
-                        "marks_awarded": response.question.num_of_marks
-                        if response.is_correct
-                        else 0,
-                        "marks_possible": response.question.num_of_marks,
-                    }
-                else:
-                    assessment_marks[response.assessment]["marks_awarded"] += (
-                        response.question.num_of_marks if response.is_correct else 0
-                    )
-                    assessment_marks[response.assessment][
-                        "marks_possible"
-                    ] += response.question.num_of_marks
+    for user in user_stats:
+        user_score = 0
+        for stat in user[0]:
+            if not stat['is_summative']:
+                user_score += stat['correct_marks']
+        lines_ranks.append((user_score, user[1], user[2]))
 
-            module_dict = {}
 
-            for module in Module.query.all():
-                for assessment, data in assessment_marks.items():
-                    if assessment.module_id == module.module_id:
-                        if module not in module_dict:
-                            module_dict[module] = {assessment: data}
-                        else:
-                            module_dict[module][assessment] = data
-
-            sum_of_marks_awarded = 0
-            sum_of_marks_possible = 0
-
-            for module in module_dict:
-                for assessment, data in assessment_marks.items():
-                    sum_of_marks_awarded += data["marks_awarded"]
-                    sum_of_marks_possible += data["marks_possible"]
-                    # module_dict[module]["marks_awarded"] += data["marks_awarded"]
-                    # module_dict[module]["marks_possible"] += data["marks_possible"]
-
-            # if sum_of_marks_possible == 0:
-            #     return render_template("no_questions_answered.html")
-
-            overall_results = {
-                "sum_of_marks_awarded": sum_of_marks_awarded,
-                "sum_of_marks_possible": sum_of_marks_possible,
-            }
-
-            # print(user.name, overall_results)
-
-            lines_ranks.append((overall_results['sum_of_marks_awarded'], user.name, user.id))
-            # print(lines_ranks)
-
-            module_totals = {}
-
-            for module, module_details in module_dict.items():
-                module_totals[module.title] = {"marks_awarded": 0, "marks_possible": 0}
-                for assessment, assessment_details in module_details.items():
-                    module_totals[module.title]["marks_awarded"] += assessment_details[
-                        "marks_awarded"
-                    ]
-                    module_totals[module.title]["marks_possible"] += assessment_details[
-                        "marks_possible"
-                    ]
-
-    # print(f"{module_totals=}")
-    # print(lines_ranks)
 
     award_badges = Awarded_Badge.query.filter_by(user_id=user_id).all()
     # for awards in award_badges:
