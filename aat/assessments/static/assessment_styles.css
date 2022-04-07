@@ -23,3 +23,51 @@
     border: 5px solid black; 
     box-shadow:  10px 10px 30px #bebebe;
 }
+
+.assessment-summary { 
+    margin-top: 10px;
+}
+
+.button-container {
+    display: flex; 
+    align-items: center;
+}
+
+.take-assessment-button {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    text-decoration: none;
+    color: initial;
+    cursor: pointer; 
+    margin: auto;
+    padding: 10px;  
+    background-color: #ebebeb;
+    border: 1px solid black; 
+    border-radius: 5px;
+}
+
+.take-assessment-button:hover {
+    background-color: #bebebe;
+}
+
+.take-assessment-button a {
+    text-decoration: none;
+    padding: 10px; 
+}
+
+.answer-form {
+    display: flex; 
+    flex-direction: column;
+    align-items: baseline;
+}
+
+.answer-question-buttons {
+    margin-top: 20px; 
+}
+
+.answer-box {
+    width: 50%;
+    height: 100px; 
+}

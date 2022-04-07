@@ -1,27 +1,39 @@
 {% extends("layout.html") %} {% block content %}
-<h1>{{assessment.title}}</h1>
+<h1 class="modules_title">Assessment: {{assessment.title}}</h1>
 
-<p>{{ question.question_text }}</p>
+<section class="assessment-summary summary-page">
+<p>{{ question.question_text[0]|upper }}{{ question.question_text[1:] }}</p>
 <p>Marks available: {{ question.num_of_marks }}</p>
 
-<form method="POST" action="">
+<form method="POST" action="" class="answer-form">
 	{{ form.csrf_token }} 
 	{% if type == 1%}
 	{{ form.chosen_option }}
 	{% elif type == 2 %}
-	{{ form.answer }}
+	{{ form.answer(class_="answer-box") }}
 	{% endif %}
-	<button type="submit" value="Submit Answer">
+	<div class="answer-question-buttons">
+	{% if session['is_summative'] %}
+	{% if session['past_questions']|length > 1 %}
+	<button type="button" class="take-assessment-button">
+		<a href="{{ url_for('assessments.previous_question') }}"
+			>Previous Question</a
+		>
+	</button>
+	{% endif %} 
+	{% endif %}
+	<button type="submit" value="Submit Answer" class="take-assessment-button">
 		{% if session['is_summative'] %}
 			{% if session['questions']|length < 1 %}
-			Submit and End Assessment 
+				Submit and End Assessment 
 			{% else %}
-			Next Question
+				Next Question
 			{% endif %}
 		{% else %}
-		Submit and Mark Answer
+			Submit and Mark Answer
 		{% endif %}
 	</button>
+	</div>
 </form>
 
 <p>
@@ -29,13 +41,5 @@
 	session['no_questions'] }}
 </p>
 
-{% if session['is_summative'] %}
-	{% if session['past_questions']|length > 1 %}
-	<button type="button">
-		<a href="{{ url_for('assessments.previous_question') }}"
-			>Previous Question</a
-		>
-	</button>
-	{% endif %} 
-{% endif %}
+</section>
 {% endblock %}
