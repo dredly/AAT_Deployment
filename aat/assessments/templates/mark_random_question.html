@@ -1,0 +1,31 @@
+{% extends("layout.html") %} 
+{% block content %}
+<h1 class="modules_title">Random {{ topic.name|title }} Question</h1>
+<section class="assessment-summary summary-page">
+    <h2>{{ question.question_text }}</h2>
+    <small>Question difficulty: {{ question.difficulty }}</small>
+    <p>Result: {% if session["practice_q_answer"][1] %}Correct!{% else %}Incorrect{% endif %}</p>
+    <p>You answered: {{ session["practice_q_answer"][0] }}</p>
+    <h4>Feedback</h4>
+    <p class="feedback-or-feedforward">
+        {% if session["practice_q_answer"][1] %}
+        {{ question.feedback_if_correct }}
+        {% else %}
+        {{ question.feedback_if_wrong }}
+        {% endif %}
+    </p>
+    <h4>Feed Forward</h4>
+    <p class="feedback-or-feedforward">
+        {% if session["practice_q_answer"][1] %}
+        {{ question.feedforward_if_correct }}
+        {% else %}
+        {{ question.feedforward_if_wrong }}
+        {% endif %}
+    </p>
+</section>
+
+<div class="button-container">
+    <a class="take-assessment-button" href="{{ url_for('assessments.exit_assessment') }}">
+        Return to Module View</a>
+</div>
+{% endblock %}

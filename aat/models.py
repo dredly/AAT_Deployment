@@ -381,6 +381,8 @@ class User(UserMixin, db.Model):
             return True
 
     def current_attempts(self, assessment):
+        if not self.has_taken(assessment):
+            return 0 
         t1_responses = self.t1_responses.filter_by(
             assessment_id=assessment.assessment_id
         ).all()

@@ -1,0 +1,85 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1 class="modules_title">Summary of Highest Attempt on Assessment: {{ assessment.title }} </h1>
+
+<div class="top-banner-container">
+    <div class="result-container">
+        <p>Score: {{ result }} / {{ possible_total }}</p>
+        <p>Assessment <b>{% if passed %}Passed!{% else %}Failed.{% endif %}</b></p>
+        <p>Assessment Credit Value: {{ assessment.num_of_credits }}</p>
+    </div>
+    <div class="button-container">
+        <a class="take-assessment-button" href="{{ url_for('assessments.exit_assessment') }}">
+            Return to Module View</a>
+    </div>
+</div>
+<h2 class="result-header">Questions and Feedback:</h2>
+
+{% for q in t1_questions %}
+<section class="assessment-summary summary-page">
+    <h3>{{ q.question_text[0]|upper }}{{ q.question_text[1:] }}</h3>
+    <small>Question difficulty: {{ q.difficulty }}</small>
+    <p>Result: <b>{% if t1_answers[q.q_t1_id][2] %}Correct!{% else %}Incorrect{% endif %}</b></p>
+    <p>Marks Gained: {% if t1_answers[q.q_t1_id][2] %}{{ q.num_of_marks }}{% else %}0{% endif %}/{{ q.num_of_marks }}</p>
+    <p>Your Answer: <em>{{ t1_answers[q.q_t1_id][0] }}</em></p>
+    <p>Correct Answer: <em>{{ t1_answers[q.q_t1_id][1] }}</em></p>
+    <h4>Feedback</h4>
+    {% if t1_answers[q.q_t1_id][2] %}
+        <p class="feedback-or-feedforward">
+            {{ q.feedback_if_correct }}
+        </p>
+    {% else %}
+        <p class="feedback-or-feedforward">
+            {{ q.feedback_if_wrong }}
+        </p>
+    {% endif %}
+    <h4>Feed Forward</h4>
+    {% if t1_answers[q.q_t1_id][2] %}
+        <p class="feedback-or-feedforward">
+            {{ q.feedforward_if_correct }}
+        </p>
+    {% else %}
+        <p class="feedback-or-feedforward">
+            {{ q.feedforward_if_wrong }}
+        </p>
+    {% endif %}
+</section>
+{% endfor %}
+
+{% for q in t2_questions %}
+<section class="assessment-summary summary-page">
+    <h3>{{ q.question_text[0]|upper }}{{ q.question_text[1:] }}</h3>
+    <small>Question difficulty: {{ q.difficulty }}</small>
+    <p>Result: {% if t2_answers[q.q_t2_id][2] %}Correct!{% else %}Incorrect{% endif %}</p>
+    <p>Marks Gained: {% if t2_answers[q.q_t2_id][2] %}{{ q.num_of_marks }}{% else %}0{% endif %}/{{ q.num_of_marks }}</p>
+    <p>Your Answer: <em>{{ t2_answers[q.q_t2_id][0] }}</em></p>
+    <p>Correct Answer: <em>{{ t2_answers[q.q_t2_id][1] }}</em></p> 
+    <h4>Feedback</h4>
+    {% if t2_answers[q.q_t2_id][2] %}
+        <p class="feedback-or-feedforward">
+            {{ q.feedback_if_correct }}
+        </p>
+    {% else %}
+        <p class="feedback-or-feedforward">
+            {{ q.feedback_if_wrong }}
+        </p>
+    {% endif %}
+    <h4>Feed Forward</h4>
+    {% if t2_answers[q.q_t2_id][2] %}
+        <p class="feedback-or-feedforward">
+            {{ q.feedforward_if_correct }}
+        </p>
+    {% else %}
+        <p class="feedback-or-feedforward">
+            {{ q.feedforward_if_wrong }}
+        </p>
+    {% endif %}
+</section>
+{% endfor %}
+
+<div class="button-container">
+    <a class="take-assessment-button" href="{{ url_for('assessments.exit_assessment') }}">
+        Return to Module View</a>
+</div>
+
+{% endblock %}

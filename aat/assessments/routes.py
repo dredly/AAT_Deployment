@@ -2,6 +2,7 @@ from datetime import date, datetime
 import math
 import random
 from stringprep import in_table_d2
+from black import diff
 from flask import Response, flash, redirect, render_template, request, url_for, abort, session
 from . import assessments
 
@@ -66,11 +67,14 @@ def view_module(module_id):
     session["module_id"] = module_id
     module = Module.query.filter_by(module_id=module_id).first()
     assessments = Assessment.query.filter_by(module_id=module.module_id).all()
+    topic_tags = []
     summatives = []
     formatives = []
     marks_achieved = dict()
+    best_attempt= dict() 
     # ----> find all tags
     assess_tags = dict()
+    difficulties = dict()
     for assessment in assessments:
         # ----> find all questions
         qs = (
@@ -80,18 +84,25 @@ def view_module(module_id):
 
         # ---> calculate marks available
         marks_av = 0
-
+        difficulty_figures = []
         for q in qs:
             tag = Tag.query.filter_by(id=q.tag_id).first()
+            
             if tag is not None:
+                if not tag in topic_tags: 
+                    topic_tags.append(tag)
                 if assessment.title in assess_tags:
                     if not tag.name in assess_tags[assessment.title]:
                         assess_tags[assessment.title].append(tag.name)
                 else:
                     assess_tags[assessment.title] = [tag.name]
-
+            difficulty_figures.append(q.difficulty)
             marks_av += q.num_of_marks
-
+        if len(difficulty_figures) == 0: 
+            final_difficulty = 0
+        else: 
+            final_difficulty = round(sum(difficulty_figures) / len(difficulty_figures))
+        difficulties[assessment.title] = final_difficulty
         # ---> check if user has responded to assessment
         if current_user.has_taken(assessment):
             attempts_taken = current_user.current_attempts(assessment)
@@ -134,15 +145,18 @@ def view_module(module_id):
             # --- > find the highest result achieved across all attempts
             d_ref = max(result_of_attempts, key=result_of_attempts.get)
             result = result_of_attempts[d_ref]
+            best_attempt[assessment.title] = d_ref 
         else:
             result = 0
-
+            best_attempt[assessment.title] = 0 
         marks_achieved[assessment.title] = f"{result}/{marks_av}"
+        
         if assessment.is_summative:
             summatives.append(assessment)
         else:
             formatives.append(assessment)
     session["assessment_tags"] = assess_tags
+    session["prev_random"] = None 
     return render_template(
         "view_module.html",
         module=module,
@@ -151,6 +165,9 @@ def view_module(module_id):
         formatives=formatives,
         marks_achieved=marks_achieved,
         assess_tags=assess_tags,
+        best_attempt=best_attempt,
+        topic_tags=topic_tags,
+        difficulties=difficulties
     )
 
 
@@ -617,21 +634,15 @@ def assessment_summary(assessment_id):
     # ---- > create list of questions to cover in assessment
     question_ids = []
     difficulties = []
-    print(question_ids)
     for question in questions_t1:
-        print("now adding type 1...")
         difficulties.append(question.difficulty)
         question_info = (1, question.q_t1_id)
         question_ids.append(question_info)
-        print(question_info)
     for question in questions_t2:
-        print("now adding type 2...")
         difficulties.append(question.difficulty)
         question_info = (2, question.q_t2_id)
         question_ids.append(question_info)
-        print(question_info)
     random.shuffle(question_ids)
-    print(question_ids)
     final_difficulty = round(sum(difficulties) / len(difficulties))
     session["user"] = current_user.id
     session["questions"] = question_ids
@@ -647,9 +658,7 @@ def assessment_summary(assessment_id):
         session["attempt_number"] = 1
     else:
         current_no_attempts = current_user.current_attempts(assessment)
-        print(f"current number of attempts is: {current_no_attempts}")
         session["attempt_number"] = current_no_attempts + 1
-        print(session["attempt_number"])
 
     return render_template(
         "assessment_summary.html",
@@ -658,43 +667,36 @@ def assessment_summary(assessment_id):
         questions_t2=questions_t2,
         question_ids=question_ids,
         first_question=first_question,
-        type=first_question_type,
+        q_type=first_question_type,
         first_question_id=first_question_id,
         difficulty=final_difficulty,
     )
 
 
 @assessments.route(
-    "/answer_question/<int:type>/<int:question_id>", methods=["GET", "POST"]
+    "/answer_question/<int:q_type>/<int:question_id>", methods=["GET", "POST"]
 )
-def answer_question(type, question_id):
+def answer_question(q_type, question_id):
     ## find question to be answered
     assessment = Assessment.query.get_or_404(session.get("assessment"))
-    if type == 1:
+    if q_type == 1:
         question = QuestionT1.query.get_or_404(question_id)
         form = AnswerType1Form()
-        # QuestionT1.query.filter_by(assessment_id=id).all()
         form.chosen_option.choices = [
             (option.option_id, option.option_text)
             for option in Option.query.filter_by(q_t1_id=question_id).all()
         ]
-    elif type == 2:
+    elif q_type == 2:
         question = QuestionT2.query.get_or_404(question_id)
         form = AnswerType2Form(answer=None)
 
     ## check if there's a previous answer to prepopulate
     if request.method == "GET":
-        print("The current user has answered this question in this attempt: ")
-        print(
-            current_user.has_answered(
-                type, question, assessment, session["attempt_number"]
-            )
-        )
         if current_user.has_answered(
-            type, question, assessment, session["attempt_number"]
+            q_type, question, assessment, session["attempt_number"]
         ):
 
-            if type == 1:
+            if q_type == 1:
                 previous_response = (
                     current_user.t1_responses.filter_by(
                         assessment_id=session.get("assessment")
@@ -709,7 +711,7 @@ def answer_question(type, question_id):
                 form.chosen_option.default = selected_option_id
                 # then run form.process()
                 form.process()
-            elif type == 2:
+            elif q_type == 2:
                 previous_response = (
                     current_user.t2_responses.filter_by(
                         assessment_id=session.get("assessment")
@@ -724,14 +726,53 @@ def answer_question(type, question_id):
     ## actions to take on a post method - i.e. when user submits an answer to their question
     if request.method == "POST":
         ## if changing / resubmitting answer, ensures no duplicate responses by deleting the old
+        if session["is_summative"]:
+            if q_type == 1: 
+                if form.chosen_option.data is None: 
+                    if len(session["questions"]) < 1:
+                        complete = True 
+                        # need to check if every question has been answered. 
+                        t1s = QuestionT1.query.filter_by(assessment_id=assessment.assessment_id).all()
+                        t2s = QuestionT2.query.filter_by(assessment_id=assessment.assessment_id).all() 
+                        for q in t1s: 
+                            res = current_user.t1_responses.filter_by(assessment_id=assessment.assessment_id).filter_by(attempt_number=session["attempt_number"]).filter_by(t1_question_id=q.q_t1_id).first()
+                            if res == None: 
+                                complete = False 
+                        for q in t2s: 
+                            res = current_user.t2_responses.filter_by(assessment_id=assessment.assessment_id).filter_by(attempt_number=session["attempt_number"]).filter_by(t2_question_id=q.q_t2_id).first()
+                            if res == None: 
+                                complete = False 
+                        flash("All questions must be completed to submit an assessment - please answer the current question.")
+                        return redirect(url_for('assessments.cannot_submit'))
+                    else:
+                        return redirect(
+                            url_for(
+                                "assessments.answer_question",
+                                q_type=session["questions"][0][0],
+                                question_id=session["questions"][0][1],
+                            )
+                        )
+            elif q_type == 2: 
+                if form.answer.data.strip() is None or form.answer.data.strip() == '': 
+                    if len(session["questions"]) < 1:
+                        flash("All questions must be completed to submit an assessment - please answer the current question.")
+                        return redirect(url_for('assessments.cannot_submit'))
+                    else:
+                        return redirect(
+                            url_for(
+                                "assessments.answer_question",
+                                q_type=session["questions"][0][0],
+                                question_id=session["questions"][0][1],
+                            )
+                        )
         if current_user.has_answered(
-            type, question, assessment, session["attempt_number"]
+            q_type, question, assessment, session["attempt_number"]
         ):
             current_user.remove_answer(
-                type, question, assessment, session["attempt_number"]
+                q_type, question, assessment, session["attempt_number"]
             )
             db.session.commit()
-        if type == 1:
+        if q_type == 1:
             given_answer = Option.query.filter_by(
                 option_id=form.chosen_option.data
             ).first()
@@ -747,7 +788,7 @@ def answer_question(type, question_id):
                 selected_option=given_answer.option_id,
                 is_correct=result,
             )
-        elif type == 2:
+        elif q_type == 2:
             given_answer = form.answer.data.strip().lower()
             if given_answer == question.correct_answer.lower():
                 result = True
@@ -765,22 +806,42 @@ def answer_question(type, question_id):
         db.session.commit()
         if session["is_summative"]:
             if len(session["questions"]) < 1:
-                return redirect(
-                    url_for(
-                        "assessments.results", assessment_id=assessment.assessment_id
+                complete = True 
+                incomplete_qs = []
+                # need to check if every question has been answered. 
+                for idx, q in enumerate(session["past_questions"]):
+                    if q[0] == 1: 
+                        res = current_user.t1_responses.filter_by(assessment_id=assessment.assessment_id).filter_by(attempt_number=session["attempt_number"]).filter_by(t1_question_id=q[1]).first()
+                    elif q[0] == 2:
+                        res = current_user.t2_responses.filter_by(assessment_id=assessment.assessment_id).filter_by(attempt_number=session["attempt_number"]).filter_by(t2_question_id=q[1]).first()
+                    if res == None: 
+                        complete = False 
+                        incomplete_qs.append(idx+1)
+                if complete: 
+                    return redirect(
+                        url_for(
+                            "assessments.results", assessment_id=assessment.assessment_id
+                        )
                     )
-                )
+                else: 
+                    message = ''
+                    for i in incomplete_qs: 
+                        n = str(i)
+                        m = n + ', '
+                        message += m 
+                    flash(f"All questions must be completed to submit an assessment - use the 'previous question' button to answer the following questions: {message}.")
+                    return redirect(url_for('assessments.cannot_submit'))
             else:
                 return redirect(
                     url_for(
                         "assessments.answer_question",
-                        type=session["questions"][0][0],
+                        q_type=session["questions"][0][0],
                         question_id=session["questions"][0][1],
                     )
                 )
         else:
             return redirect(
-                url_for("assessments.mark_answer", type=type, question_id=question_id)
+                url_for("assessments.mark_answer", q_type=q_type, question_id=question_id)
             )
     current_questions = session.get("questions")
     previous = current_questions.pop(0)
@@ -791,7 +852,7 @@ def answer_question(type, question_id):
         question=question,
         assessment=assessment,
         form=form,
-        type=type,
+        q_type=q_type,
     )
 
 
@@ -809,16 +870,31 @@ def previous_question():
     return redirect(
         url_for(
             "assessments.answer_question",
-            type=session["questions"][0][0],
+            q_type=session["questions"][0][0],
             question_id=session["questions"][0][1],
         )
     )
 
+@assessments.route("/cannot_submit")
+def cannot_submit(): 
+    next_question = session["past_questions"].pop(-1)
+    session["questions"].insert(0, next_question)
+    # copy and overwrite existing session variables as otherwise insert would not remain permanent on next loaded page
+    copy_list_next = session["questions"]
+    copy_list_prev = session["past_questions"]
+    session["questions"] = copy_list_next
+    session["past_questions"] = copy_list_prev
+    return redirect(url_for(
+            "assessments.answer_question",
+            q_type=session["questions"][0][0],
+            question_id=session["questions"][0][1],
+        )
+    )
 
-@assessments.route("/mark_answer/<int:type>/<int:question_id>", methods=["GET", "POST"])
-def mark_answer(type, question_id):
+@assessments.route("/mark_answer/<int:q_type>/<int:question_id>", methods=["GET", "POST"])
+def mark_answer(q_type, question_id):
     assessment = Assessment.query.get_or_404(session.get("assessment"))
-    if type == 1:
+    if q_type == 1:
         question = QuestionT1.query.get_or_404(question_id)
         right_answer = (
             Option.query.filter_by(q_t1_id=question.q_t1_id)
@@ -834,8 +910,7 @@ def mark_answer(type, question_id):
         response = Option.query.filter_by(
             option_id=chosen_option.selected_option
         ).first()
-        print(response)
-    elif type == 2:
+    elif q_type == 2:
         question = QuestionT2.query.get_or_404(question_id)
         right_answer = question.correct_answer
         response = (
@@ -850,7 +925,7 @@ def mark_answer(type, question_id):
         response=response,
         assessment=assessment,
         right_answer=right_answer,
-        type=type,
+        q_type=q_type,
     )
 
 
@@ -904,7 +979,7 @@ def results(assessment_id):
     given_answers = []
     correct_answers = []
     is_correct = []
-
+    passed = True if result >= (possible_total / 2) else False 
     # ---- 3. iterate over the index list
     for idx in no_questions:
         current_question = session["past_questions"][idx]
@@ -948,7 +1023,6 @@ def results(assessment_id):
         given_answers.append(answer_content)
         correct_answers.append(correct_answer)
         is_correct.append(correct_test)
-    print("Ordered questions are: ", str(ordered_questions))
     return render_template(
         "results.html",
         no_questions=no_questions,
@@ -959,6 +1033,7 @@ def results(assessment_id):
         given_answers=given_answers,
         correct_answers=correct_answers,
         is_correct=is_correct,
+        passed=passed
     )
 
 
@@ -970,7 +1045,9 @@ def exit_assessment():
     session.pop("no_questions", None)
     session.pop("assessment", None)
     session.pop("takes_assessment_id", None)
-    module = session.pop("module_id", None)
+    module = session.pop("module_id")
+    print("Module ID is: ")
+    print(module)
     return redirect(url_for("assessments.view_module", module_id=module))
 
 
@@ -982,3 +1059,187 @@ def exit_assessment():
 @assessments.route("/empty_assessment")
 def empty_assessment():
     return render_template("empty_assessment.html")
+
+# ----------------------------------------------------------------------------------------------------
+# ---------------------------------  Duplicate Results Page  ---------------------------------------
+# -------------------------------- For access from module view ------------------------------------
+# ----------------------------------------------------------------------------------------------------
+
+@assessments.route("/results/<int:assessment_id>/<int:attempt_number>")
+def show_results(assessment_id, attempt_number): 
+    # --- > get all responses for given assessment and given attempt id 
+    assessment = Assessment.query.filter_by(assessment_id=assessment_id).first()
+    t1_responses = (
+                current_user.t1_responses.filter_by(
+                    assessment_id=assessment.assessment_id
+                )
+                .filter_by(attempt_number=attempt_number)
+                .all()
+            )
+    t2_responses = (
+        current_user.t2_responses.filter_by(
+            assessment_id=assessment.assessment_id
+        )
+        .filter_by(attempt_number=attempt_number)
+        .all()
+    )
+    # ----- find all questions asked
+    questions = (
+        QuestionT1.query.filter_by(assessment_id=assessment_id).all()
+        + QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+    )
+
+    # ----- find possible total marks
+    possible_total = 0
+    for question in questions:
+        possible_total += question.num_of_marks
+
+    # ----- find actual result achieved
+    result = 0
+    for response in t1_responses:
+        if response.is_correct:
+            answered_question = QuestionT1.query.filter_by(
+                q_t1_id=response.t1_question_id
+            ).first()
+            result += answered_question.num_of_marks
+    for response in t2_responses:
+        if response.is_correct:
+            answered_question = QuestionT2.query.filter_by(
+                q_t2_id=response.t2_question_id
+            ).first()
+            result += answered_question.num_of_marks
+    passed = True if result >= (possible_total / 2) else False 
+
+
+    # --- > Find all questions answered 
+    t1_questions =  QuestionT1.query.filter_by(assessment_id=assessment_id).all()
+    t2_questions = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+    
+    # --- > User answers 
+    t1_answers = dict()
+    t2_answers = dict()
+    for q in t1_questions:
+        user_answer = (
+                current_user.t1_responses.filter_by(
+                    assessment_id=assessment.assessment_id
+                )
+                .filter_by(t1_question_id=q.q_t1_id)
+                .filter_by(attempt_number=attempt_number)
+                .first()
+            )
+        correct_option = Option.query.filter_by(q_t1_id=q.q_t1_id
+                ).filter_by(is_correct=True).first()
+        selected_option_text = Option.query.filter_by(option_id=user_answer.selected_option).first()
+        t1_answers[q.q_t1_id] = [selected_option_text, 
+                                    correct_option.option_text,
+                                    user_answer.is_correct]  
+    for q in t2_questions: 
+        user_answer = (
+                current_user.t2_responses.filter_by(
+                    assessment_id=assessment.assessment_id
+                )
+                .filter_by(t2_question_id=q.q_t2_id)
+                .filter_by(attempt_number=attempt_number)
+                .first()
+            )
+        t2_answers[q.q_t2_id] = [user_answer.response_content, 
+                                    q.correct_answer, 
+                                    user_answer.is_correct]
+    return render_template("show_results.html", 
+                    t1_questions=t1_questions, 
+                    t1_answers=t1_answers,
+                    t2_questions=t2_questions,
+                    t2_answers=t2_answers,
+                    possible_total=possible_total,
+                    result=result, 
+                    passed=passed,
+                    assessment=assessment
+                    )
+
+# ----------------------------------------------------------------------------------------------------
+# -------------------------------- Random Q based on Topic ------------------------------------
+# ----------------------------------------------------------------------------------------------------
+
+@assessments.route("/random_question/<int:topic_id>", methods=['GET', 'POST'])
+def random_question(topic_id): 
+    if session["rand_q_details"][0] == 1:
+        past_form = AnswerType1Form()
+    elif session["rand_q_details"][0] == 2: 
+        past_form = AnswerType2Form()
+    topic = Tag.query.filter_by(id=topic_id).first()
+    t1qs = QuestionT1.query.filter_by(tag_id=topic_id).all()
+    t2qs = QuestionT2.query.filter_by(tag_id=topic_id).all()
+    total_question_options = len(t1qs) + len(t2qs)
+    if len(t1qs) == 0 and len(t2qs) > 0: 
+        q_type = 2
+    elif len(t2qs) == 0 and len(t1qs) > 0:
+        q_type = 1
+    elif len(t1qs) == 0 and len(t2qs) == 0:
+        flash("No questions of this topic available to answer.")
+        return redirect(url_for('assessments.index'))
+    else: 
+        q_type = random.randrange(2) + 1
+    
+    if q_type == 1:
+        if len(t1qs) == 1: 
+            final_q = t1qs[0]
+        else: 
+            r = random.randrange(len(t1qs))
+            final_q = t1qs[r]
+        q_ref = [1, final_q.q_t1_id]
+        form = AnswerType1Form()
+        form.chosen_option.choices = [
+            (option.option_id, option.option_text)
+            for option in Option.query.filter_by(q_t1_id=final_q.q_t1_id).all()
+        ]
+    elif q_type == 2: 
+        if len(t2qs) == 1: 
+            final_q = t2qs[0]
+        else: 
+            r = random.randrange(len(t2qs))
+            final_q = t2qs[r]
+        q_ref = [2, final_q.q_t2_id]
+        form = AnswerType2Form()
+    if request.method == "POST":
+        if session["rand_q_details"][0] == 1: 
+            worked_on_question = QuestionT1.query.filter_by(q_t1_id=session["rand_q_details"][1]).first()
+            given_answer = Option.query.filter_by(
+                    option_id=past_form.chosen_option.data
+                ).first()
+            if given_answer.is_correct:
+                result = True
+            else:
+                result = False
+            session["practice_q_answer"] = [given_answer.option_text, result] 
+            return redirect(url_for('assessments.mark_random_question', q_type=session["rand_q_details"][0], q_id=session["rand_q_details"][1], topic_id=topic_id))
+        elif session["rand_q_details"][0] == 2: 
+            given_answer = past_form.answer.data.strip().lower()
+            worked_on_question = QuestionT2.query.filter_by(q_t2_id=session["rand_q_details"][1]).first()
+            if given_answer == worked_on_question.correct_answer.lower():
+                result = True
+            else:
+                result = False
+            session["practice_q_answer"] = [given_answer, result]
+            return redirect(url_for('assessments.mark_random_question', q_type=session["rand_q_details"][0], q_id=session["rand_q_details"][1], topic_id=topic_id))
+
+    if q_type == 1: 
+        session["rand_q_details"] = [q_type, final_q.q_t1_id]
+    elif q_type == 2: 
+        session["rand_q_details"] = [q_type, final_q.q_t2_id]
+    return render_template("random_question.html",
+                            topic=topic,
+                            q_type=q_type,
+                            question=final_q, 
+                            form=form)
+
+@assessments.route("/random_question/mark/<int:q_type>/<int:q_id>/<int:topic_id>")
+def mark_random_question(q_type, q_id, topic_id):
+    topic = Tag.query.filter_by(id=topic_id).first()
+    if q_type == 1: 
+        question = QuestionT1.query.filter_by(q_t1_id=q_id).first()
+    elif q_type == 2:
+        question = QuestionT2.query.filter_by(q_t2_id=q_id).first()
+    return render_template("mark_random_question.html",
+                            question=question,
+                            topic=topic,
+                            q_type=q_type)

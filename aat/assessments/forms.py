@@ -33,7 +33,8 @@ class AnswerType1Form(FlaskForm):
 
 
 class AnswerType2Form(FlaskForm):
-    answer = TextAreaField(validators=[DataRequired()])
+    # answer = TextAreaField(validators=[DataRequired()])
+    answer = TextAreaField()
     submit = SubmitField("Submit Answer")
 
 
