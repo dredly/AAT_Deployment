@@ -82,6 +82,7 @@ def get_assessment_id_and_data(store_output_to_file=False, module_id=None):
             aid["tag_array"].append(q1.tag.name)
 
         for q2 in q.question_t2:
+            aid = assessment_id_and_data[q.assessment_id]
             aid["total_marks_possible"] += q2.num_of_marks
             aid["count_of_questions"] += 1
             aid["difficulty_array"].append(q2.difficulty)
@@ -91,8 +92,8 @@ def get_assessment_id_and_data(store_output_to_file=False, module_id=None):
         aid = assessment_id_and_data[a]
         if not aid["count_of_questions"]:
             continue
-        aid["average_difficulty"] = sum(aid["difficulty_array"]) / len(
-            aid["difficulty_array"]
+        aid["average_difficulty"] = round(
+            sum(aid["difficulty_array"]) / len(aid["difficulty_array"]), 1
         )
         aid["tag_array_counter"] = dict(Counter(aid["tag_array"]))
 
@@ -114,7 +115,9 @@ def get_module_ids_with_details(input_module_id=None, store_output_to_file=False
             total_assessment_credits (int),
             total_marks_possible (int),
             module (Module),
-            count_of_assessments (int)
+            count_of_assessments, (int)
+            count_of_formative_assessments, (int)
+            count_of_summative_assessments, (int)
             }]
     """
     q = (
@@ -131,6 +134,12 @@ def get_module_ids_with_details(input_module_id=None, store_output_to_file=False
             "total_assessment_credits": 0,
             "total_marks_possible": 0,
             "count_of_assessments": len(module.assessments),
+            "count_of_formative_assessments": len(
+                [m for m in module.assessments if not m.is_summative]
+            ),
+            "count_of_summative_assessments": len(
+                [m for m in module.assessments if m.is_summative]
+            ),
         }
         # Find all assessments connected
         for assessment in module.assessments:
