@@ -691,6 +691,42 @@ with app.app_context():
                 role_id=2,
             ),
             User(name="JSON Derulo", password="jd", is_admin=True, role_id=2),  # 10
+            User(
+                name="Claymore Jackson",
+                password="cj",
+                is_admin=False,
+                role_id=1
+                ),
+            User(
+                name="Santa Clause",
+                password="sc",
+                is_admin=False,
+                role_id=1
+                ),
+            User(
+                name="Gone Wick",
+                password="gw",
+                is_admin=False,
+                role_id=1
+                ),
+            User(
+                name="Jason Mourn",
+                password="jm",
+                is_admin=False,
+                role_id=1
+                ),
+            User(
+                name="Sherlock Holmeless",
+                password="sh",
+                is_admin=False,
+                role_id=1
+                ),
+            User(
+                name="Jack Leaver",
+                password="jl",
+                is_admin=False,
+                role_id=1
+                ),
         ]
     )
 
