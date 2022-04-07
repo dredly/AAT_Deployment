@@ -301,3 +301,16 @@ footer {
     border: 5px solid black; 
     box-shadow:  10px 10px 30px #bebebe;
 }
+
+/*  STAFF STATS */
+
+.staff_stats_module_select{
+	display:flex;
+	flex-direction: column;
+	align-items: center;
+	
+}
+
+#staff_stats_Bronze{
+	color: brown;
+}

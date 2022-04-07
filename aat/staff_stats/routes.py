@@ -90,7 +90,7 @@ def module(Module_title):
     
     
     questions = []
-    
+    students = []
     for question in userInfo:
         #print(question)
         questionDetails = {}
@@ -119,9 +119,10 @@ def module(Module_title):
                         userRole = user1.role_id
                 #print("user role", userRole)
                 if userRole == 1:
-                    if question.get("question_type") == 2:
-                        for response in t2Response:
-                                       
+                    if user not in students:
+                            students.append(user)
+                    if question.get("question_type") == 2:                    
+                        for response in t2Response:                                     
                             if response.user_id == user:
                                 if response.attempt_number == bestAttempt:
                                     if response.assessment_id == assId:
@@ -175,6 +176,7 @@ def module(Module_title):
         questionDetails["question_text"] = question.get("question_text")
         questionDetails["question_difficulty"] = question.get("question_difficulty")
         questionDetails["question_type"] =question.get("question_type")
+        questionDetails["number_of_students"]= len(students)
         
         questions.append(questionDetails)
     
@@ -272,8 +274,10 @@ def view_students(assessment):
                 questions.append(question.get("is_correct"))
                 questions.append(question.get("attempt_number"))
                 questions.append(question.get("question_type"))
+                attemptLists[question.get("")]
                 attemptLists[question.get("attempt_number")-1].append(questions)          
             users2.append(attemptLists)
+            print("attemptLists",attemptLists)
     #print(users2)
     return render_template("view-students.html", Module_title = Module_title,
     assessment = assessment,
