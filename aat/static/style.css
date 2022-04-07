@@ -314,3 +314,18 @@ footer {
 #staff_stats_Bronze{
 	color: brown;
 }
+#staff_stats_Silver{
+	color: silver;
+}
+#staff_stats_Gold{
+	color: gold ;
+}
+#staff_stats_Emerald{
+	color: rgb(39, 223, 39) ;
+}
+#staff_stats_Ruby{
+	color: rgb(206, 9, 9) ;
+}
+#staff_stats_Diamond{
+	color:rgb(126, 203, 255) ;
+}
