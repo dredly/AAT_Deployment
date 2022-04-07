@@ -1,0 +1,21 @@
+{% extends("layout.html") %}
+{% block content %}
+<h1 class="modules_title">Random {{ topic.name|title }} Question</h1>
+<section class="assessment-summary summary-page">
+    <p>{{ question.question_text[0]|upper }}{{ question.question_text[1:] }}</p>
+    <form method="POST" action="" class="answer-form">
+        {{ form.csrf_token }} 
+        {% if q_type == 1%}
+        {{ form.chosen_option }}
+        {% elif q_type == 2 %}
+        {{ form.answer(class_="answer-box") }}
+        {% endif %}
+        <div class="answer-question-buttons">
+        <button type="submit" value="Submit Answer" class="take-assessment-button">
+            Submit Answer 
+        </button>
+    </div>
+    </form>
+    
+</section>
+{% endblock %}

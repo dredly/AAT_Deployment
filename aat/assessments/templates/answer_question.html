@@ -1,16 +1,6 @@
 {% extends("layout.html") %} {% block content %}
 <h1 class="modules_title">Assessment: {{assessment.title}}</h1>
-<div>
-{#{% with messages = get_flashed_messages() %}
-	{% if messages %}
-	<ul class="flashes">
-		{% for message in messages %}
-		<li>{{ message }}</li>
-		{% endfor %}
-	</ul>
-	{% endif %}
-{% endwith %}#}
-</div>
+
 <section class="assessment-summary summary-page">
 <p>{{ question.question_text[0]|upper }}{{ question.question_text[1:] }}</p>
 <p>Marks available: {{ question.num_of_marks }}</p>

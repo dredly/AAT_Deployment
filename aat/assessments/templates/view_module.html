@@ -92,5 +92,20 @@
     {% endfor %}
 </section>
 
+{% if current_user.can(Permission.ANSWER_ASSESSMENT) %}
+<section class="summary-page formative">
+    <h2>Topics Covered in Module</h2>
+    <small><em>Take random practice questions on the topics covered in this module to prepare for the assessments. Your scores will not be saved, but the practice will prepare you for the real thing!</em></small>
+    {% for t in topic_tags %}
+    <div class="assessment-instance">
+        <h3>{{ t.name[0]|capitalize }}{{ t.name[1:] }}</h3>
+        <button type="button" class = "Assessment_Index_Child">
+            <a href="{{ url_for('assessments.random_question', topic_id=t.id) }}" class="Assessment_Index_Text">Take Practice Question</a>
+        </button>
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
+
 </div>
 {% endblock %}
