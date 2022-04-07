@@ -352,6 +352,10 @@ def get_id():
 @legendary_gamification.route("/correctement")
 def correct_answer():
     global question_counter
+    global rapid_responses
+    global correct_responses
+    correct_responses.append([item for item in challenge_options[question_counter] if item[2]])
+    rapid_responses.append((False, ""))
     question_counter += 1
     return redirect("rapid-fire")
 
