@@ -5,10 +5,42 @@
 {% endblock styles %}
 
 {% block content %}
-    <h1>Gone.</h1>
+    {% if reason == 'practice' %}
+        <h1>Completed Quiz</h1>
+    {% elif score_count == rapid_responses|length %}
+        <h1>Congratulations, you have ranked up!</h1>
+    {% else %}
+        <h1>Better luck next time</h1>
+    {% endif %}
+    <h2>Details</h2>
+    {% for i in range(rapid_responses|length) %}
+        {% if not rapid_responses[i][0] %}
+            <div class="feedback-container" style="border: 3px solid red;">
+                <div class="feedback">
+                    <h3>Wrong</h3>
+                    <h4>{{ challenge_questions[i][1] }}</h4>
+                    <p>You answered</p>
+                    <p> - {{ rapid_responses[i][1] }}</p>
+                    <p>Correct answer</p>
+                    <p> - {{ correct_responses[i][0][1] }}</p>
+                </div>
+            </div>
+        {% else %}
+            <div class="feedback-container" style="border: 3px solid greenyellow;">
+                <div class="feedback">
+                    <h3>Correct</h3>
+                    <h4>{{ challenge_questions[i][1] }}</h4>
+                    <p>You answered</p>
+                    <p> - {{ rapid_responses[i][1] }}</p>
+                    <p>Correct answer</p>
+                    <p> - {{ correct_responses[i][0][1] }}</p>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+    <h2>Press return to go back to the achievement's page</h2>
     <div class="reset-container">
         <form action="" method="POST" class="end-assess-form">
-            <input type="submit" name="button" value="reset" class="reset-button">
             <input type="submit" name="button" value="return" class="return-button">
         </form>
     </div>

@@ -19,7 +19,7 @@
                 <h4>{{ question[1] }}</h4>
                 <div class="question-options">
                     {% for option in options %}
-                        <div><input type="radio" name="options" value="{{ option[2] }}">{{ option[1] }}</option></div>
+                        <div><input type="radio" name="options" value="{{ option[2] }},{{ option[1] }}">{{ option[1] }}</option></div>
                     {% endfor %}
                     <input type="submit" name="button" value="send" class='send-button'>
                 </div>

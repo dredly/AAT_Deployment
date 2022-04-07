@@ -42,7 +42,11 @@
 
             <div class="collectables-section">
                 <div class="collect-title">
+                {% if leaderboard_user.id == current_user.id %}
                     <h3>Your Rewards</h3>
+                {% else %}
+                    <h3>{{ leaderboard_user.name }}'s Rewards</h3>
+                {% endif %}
                 </div>
                 <div class="divider"></div>
                 {% for badge in badges %}
@@ -74,43 +78,51 @@
         </div>
     </div>
     
-
-    <div class="ranks-rapid">
-        <div class="ranks-content">
-            <div class="rankup-container">
-                <div class="pie" style="--p:90;--b:20px;--c:rgb(0, 217, 255);">90%</div>
-                <div class="rank-up-button-container">
-                    <h3>You are one test away from ranking up!</h3>
+    {% if leaderboard_user.id == current_user.id %}
+        <div class="ranks-rapid">
+            <div class="ranks-content">
+                <div class="rankup-container">
+                    <div class="pie" style="--p:90;--b:20px;--c:rgb(0, 217, 255);">90%</div>
+                    <div class="rank-up-button-container">
+                        <h3>You are one test away from ranking up!</h3>
+                        <form action="" method='POST'>
+                            <input type="submit" name="button" value="Take Rank Up Test">
+                        </form>
+                    </div>
+                </div>
+                <div class="rapid-fire-test-container">
+                    <h3>Take practice tests to prepare for your next challenge</h3>
                     <form action="" method='POST'>
-                        <input type="submit" name="button" value="Take Rank Up Test">
+                        <input type="submit" name="button" value="Practice Rapid Fire Tests">
                     </form>
                 </div>
             </div>
-            <div class="rapid-fire-test-container">
-                <h3>Take practice tests to prepare for your next challenge</h3>
-                <form action="" method='POST'>
-                    <input type="submit" name="button" value="Practice Rapid Fire Tests">
-                </form>
-            </div>
         </div>
-    </div>
+    {% endif %}
 
     <div class="challenges-container">
         <div class="challenges-content">
             <div class="challenge-creator">
-                <h2>Challenge someone to a quiz</h2>
-                <form action="" method="POST">
-                    {{ challenge.difficulty.label }} {{ challenge.difficulty }}
-                    <div class="user-question">
-                        {{ challenge.challengee.label }}
-                        <select name="Users" id="">
-                            {% for friend in all_friends %}
-                                <option value="{{ friend[0] }}">{{ friend[1] }}</option>
-                            {% endfor %}
-                        </select>
+                {% if current_user.role_id == 1 %}
+                    <h2>Challenge someone to a quiz</h2>
+                    <form action="" method="POST">
+                        {{ challenge.difficulty.label }} {{ challenge.difficulty }}
+                        <div class="user-question">
+                            {{ challenge.challengee.label }}
+                            <select name="Users" id="">
+                                {% for friend in all_friends %}
+                                    <option value="{{ friend[0] }}">{{ friend[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input type="submit" name="button" value="Challenge User">
+                    </form>
+                {% else %}
+                    <h2>Contact Information</h2>
+                    <div class="contact-info-container">
+                        <p><strong>Email</strong>: {{ leaderboard_user.email }}</p>
                     </div>
-                    <input type="submit" name="button" value="Challenge User">
-                </form>
+                {% endif %}
             </div>
             <div class="challenge-notification">
                 {% if leaderboard_user.id == current_user.id %}
@@ -135,7 +147,11 @@
                             {% endif %}
                         </form>
                     {% else %}
-                        <p>You have no incoming challenges</p>
+                        {% if leaderboard_user.id == current_user.id %}
+                            <p>You have no incoming challenges</p>
+                        {% else %}
+                            <p>No incoming challenges</p>
+                        {% endif %}
                     {% endif %}
                 </div>
                 <div class="outgoing-challenges">
@@ -145,7 +161,11 @@
                             <p>{{ outgoing_challenges[i][1] }} {{ out_difficulty[i] }}</p>
                         {% endfor %}
                     {% else %}
-                        <p>You have no outgoing challenges</p>
+                        {% if leaderboard_user.id == current_user.id %}
+                            <p>You have no outgoing challenges</p>
+                        {% else %}
+                            <p>No outgoing challenges</p>
+                            {% endif %}
                     {% endif %}
                 </div>
                 <div class="active-challenges">
@@ -171,7 +191,11 @@
                             {% endif %}
                         </form>
                     {% else %}
-                        <p>You have no active challenges</p>
+                        {% if leaderboard_user.id == current_user.id %}
+                            <p>You have no active challenges</p>
+                        {% else %}
+                            <p>No active challenges</p>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
