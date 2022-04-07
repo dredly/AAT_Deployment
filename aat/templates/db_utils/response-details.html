@@ -8,19 +8,19 @@
 {% endblock extra_head %}
 {% block content %}
 <table>
-        <tr>
-            {% for thing in results | first %}
-                <th>{{thing}}</th>
-            {% endfor %}
-        </tr>
-
-        {% for thing in results %}
-            <tr>    
-                {% for i,j in thing.items() %}
-                    <td>{{j}}</td>
-                {% endfor %}
-
-            </tr>
+    <tr>
+        {% for thing in results | first %}
+            <th>{{thing}}</th>
         {% endfor %}
+    </tr>
+
+    {% for thing in results %}
+        <tr>    
+            {% for i,j in thing.items() %}
+                <td>{{j}}</td>
+            {% endfor %}
+
+        </tr>
+    {% endfor %}
 </table>
 {% endblock content %}

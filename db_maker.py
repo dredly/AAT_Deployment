@@ -305,7 +305,7 @@ with app.app_context():
             ),
             QuestionT2(  # 4
                 assessment_id=9,
-                num_of_marks=100,
+                num_of_marks=10,
                 question_text="What is the name of an element which denotes a section?",
                 correct_answer="section",
                 difficulty=1,

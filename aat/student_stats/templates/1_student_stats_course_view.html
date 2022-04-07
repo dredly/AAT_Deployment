@@ -37,6 +37,7 @@
         <canvas id="moduleCreditsStudentPi"></canvas>
     </div>
 </div>
+
 {# 
     <h2>
         Overall Marks - STUDENT
@@ -62,6 +63,13 @@
     #}
 
     <h2>Modules</h2>
+    <div class="content-block">
+        <div
+            class="chart-container"
+        >
+            <canvas id="moduleCreditsStudentPiSplit"></canvas>
+        </div>
+    </div>
     <ul>
     <li>
         <h3><span class="text_correct"><b>Passed</b></span></h3>
@@ -147,11 +155,6 @@
                                 <p><b>{{module.module_title}}</b>
                                 </p>
                                 <p>Credits Possible: {{dictionary_of_module_credits[module_key]["total_credits_possible"]}}</p>
-                                {# 
-                                <p>
-                                    Count of assessments: {{ module.count_of_assessments}}
-                                </p>
-                                #}
                                 <p>
                                     Summative assessments: {{module.count_of_summative_assessments}}
                                 </p>
@@ -234,7 +237,7 @@
         const totalCreditsUnattempted = '{{dictionary_of_module_credits["total"]["total_credits_unattempted"]}}';
         const moduleCreditsStudentPiElement = document.getElementById('moduleCreditsStudentPi').getContext('2d');
         const moduleCreditsStudentPi = new Chart(moduleCreditsStudentPiElement, {
-            type: 'pie',
+            type: 'doughnut',
             data: {
                 labels: ['Passed', 'Failed', 'Unattempted'],
                 datasets: [
@@ -242,6 +245,27 @@
                         label: 'Course View',
                         data: [totalCreditsPassed, totalCreditsFailed,
                         totalCreditsUnattempted
+                        ],
+                        backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)','rgb(150, 150, 150)'],
+                        hoverOffset: 4,
+                    },
+                ],
+            },
+        });
+        // OVERALL: STUDENT
+        const totalCreditsPassedSplit = '{{dictionary_of_module_credits["total"]["total_credits_earned"]}}';
+        const totalCreditsFailedSplit = '{{dictionary_of_module_credits["total"]["total_credits_failed"]}}';
+        const totalCreditsUnattemptedSplit = '{{dictionary_of_module_credits["total"]["total_credits_unattempted"]}}';
+        const moduleCreditsStudentPiElementSplit = document.getElementById('moduleCreditsStudentPiSplit').getContext('2d');
+        const moduleCreditsStudentPiSplit = new Chart(moduleCreditsStudentPiElementSplit, {
+            type: 'doughnut',
+            data: {
+                labels: ['Passed', 'Failed', 'Unattempted'],
+                datasets: [
+                    {
+                        label: 'Course View',
+                        data: [totalCreditsPassedSplit, totalCreditsFailedSplit,
+                        totalCreditsUnattemptedSplit
                         ],
                         backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)','rgb(150, 150, 150)'],
                         hoverOffset: 4,

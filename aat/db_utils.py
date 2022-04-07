@@ -686,3 +686,187 @@ def get_all_response_details(
     # print(f"Output AFTER filters: {final_output=}")
 
     return final_output
+
+
+######################
+# STATUS CALCULATORS #
+######################
+"""
+Only summative assessments are considered for the below (i.e. formative assessments do not contribute)
+
+An assessment's credit_weighting = credits_possible / total_credits_possible_for_the_module
+
+Overall weighted_percentage = (marks_earned/total_marks_for_assessment) * credit_weighting
+
+A module is passed if its assessment's total_weighted_percentages >= 50%
+
+You then earn all credits for that module
+
+A course is passed if all modules are passed (i.e. total_earned_credits==total_possible_credits)
+
+STATUS:
+- ASSESSMENT:
+-- pass: total_marks >= 50%
+-- fail: total_marks < 50%
+-- unattempted: student hasn't taken it
+
+- MODULE:
+-- pass: total_weighted_percentage >= 50%
+-- fail: total_weighted_percentage < 50% AND all assessments attempted
+-- in progress: total_weighted_percentage < 50% AND all assessments NOT attempted
+-- unattempted: no assessments have been attempted
+
+- COURSE:
+-- pass: all modules have "pass" status
+-- fail: all modules have "fail" status
+-- in progress: any modules have "in progress" status
+-- unattempted: all modules have "unattempted" status
+"""
+
+# UTIL
+def get_total_credits_for_module(module_id):
+    assessment_query = (
+        Assessment.query.filter_by(module_id=module_id)
+        .filter_by(is_summative=True)
+        .all()
+    )
+    total_credits_for_module = sum([a.num_of_credits for a in assessment_query])
+    return total_credits_for_module
+
+
+def get_total_marks_for_assessment(assessment_id):
+    assessment_query = (
+        Assessment.query.filter_by(assessment_id=assessment_id)
+        .filter_by(is_summative=True)
+        .all()
+    )
+    total_marks_for_assessment = 0
+    for q in assessment_query:
+        for q1 in q.question_t1:
+            total_marks_for_assessment += q1.num_of_marks
+    for q in assessment_query:
+        for q2 in q.question_t2:
+            total_marks_for_assessment += q2.num_of_marks
+
+    return total_marks_for_assessment
+
+
+def get_weighted_perc_calc(marks_earned, assessment_id):
+    """
+    Takes in the marks earned and the assessment ID
+    Returns the weighted mark based on the total credits possible in that module
+    """
+    assessment_query = Assessment.query.filter_by(assessment_id=assessment_id).first()
+
+    module_id = assessment_query.module_id
+    credits_for_assessment = assessment_query.num_of_credits
+
+    total_credits_for_module = get_total_credits_for_module(module_id)
+    total_marks_for_assessment = get_total_marks_for_assessment(assessment_id)
+
+    weighted_mark = (marks_earned / total_marks_for_assessment) * (
+        credits_for_assessment / total_credits_for_module
+    )
+
+    return weighted_mark
+
+
+# MAIN
+def get_assessment_status(assessment_id, user_id):
+    """
+    Takes in marks_earned, assessment_id and user_id and returns a status (string):
+    - "pass"
+    - "fail"
+    - "unattempted"
+    """
+    assessment_query = Assessment.query.filter_by(assessment_id=assessment_id).first()
+    # UNATTEMPTED
+    if (
+        ResponseT1.query.filter_by(assessment_id=assessment_id)
+        .filter_by(user_id=user_id)
+        .first()
+        is None
+        and ResponseT2.query.filter_by(assessment_id=assessment_id)
+        .filter_by(user_id=user_id)
+        .first()
+        is None
+    ):
+        return "unattempted"
+
+    # WHERE HAS MARKS EARNED GONE??
+    assessment_marks = get_all_assessment_marks(
+        input_user_id=user_id,
+        input_module_id=module_id,
+        input_assessment_id=assessment_id,
+        highest_scoring_attempt_only=True,
+        summative_only=True,
+    )
+
+    marks_earned = sum([q["correct_marks"] for q in all_assessment_marks])
+
+    # PASS OR FAIL
+    sum_of_all_marks_in_assessment = get_total_marks_for_assessment(assessment_id)
+    if (marks_earned / sum_of_all_marks_in_assessment) >= 0.5:
+        return "pass"
+    else:
+        return "fail"
+
+
+def get_module_status(module_id, user_id):
+    all_assessment_marks = get_all_assessment_marks(
+        input_user_id=user_id,
+        input_module_id=module_id,
+        highest_scoring_attempt_only=True,
+        summative_only=True,
+    )
+
+    # If there are no marks, an empty list is returned
+    if not all_assessment_marks:
+        return "unattempted"
+
+    assessments_taken = {
+        q["assessment_id"]: q["correct_marks"] for q in all_assessment_marks
+    }
+
+    total_weighted_perc = sum(
+        [
+            get_weighted_perc_calc(marks_earned, assessment_id)
+            for assessment_id, marks_earned in assessments_taken.items()
+        ]
+    )
+
+    # If they're above 50% at any point they've passed
+    if total_weighted_perc >= 0.5:
+        return "pass"
+
+    a = (
+        Assessment.query.filter_by(module_id=module_id)
+        .filter_by(is_summative=True)
+        .all()
+    )
+
+    list_of_all_assessment_ids = [a.assessment_id for a in a]
+
+    # If they've tried all assessments but they're still below 50%
+    if len(list_of_all_assessment_ids) == len(all_assessment_marks):
+        return "fail"
+    return "in progress"
+
+
+def get_course_status(user_id):
+    module_query = Module.query.all()
+    number_of_modules = len(module_query)
+    array_of_module_statuses = [
+        get_module_status(m.module_id, user_id) for m in module_query
+    ]
+
+    count_of_status = dict(Counter(array_of_module_statuses))
+
+    if count_of_status.get("pass") == number_of_modules:
+        return "pass"
+    elif count_of_status.get("fail") == number_of_modules:
+        return "fail"
+    elif count_of_status.get("in progress", 0) > 0:
+        return "in progress"
+    else:
+        return "unattempted"
