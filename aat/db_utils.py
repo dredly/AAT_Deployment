@@ -457,7 +457,8 @@ def get_all_response_details(
 
     Optional filters added for student, lecturer, module and assessment id
     """
-
+    q1_q = ResponseT1.query.all()
+    print(f"{q1_q=}")
     # TYPE 1
     question_totals_t1 = (
         db.session.query(User, QuestionT1, ResponseT1, Option, Module, Assessment)
@@ -497,6 +498,8 @@ def get_all_response_details(
         .group_by(Module.module_id)
         .group_by(Assessment.assessment_id)
     )
+
+    # print(f"RAW T1: {question_totals_t1.all()=}")
 
     table_of_correct_t1_answers = Option.query.filter(Option.is_correct == True)
 
@@ -648,7 +651,7 @@ def get_all_response_details(
                     "highest_scoring_attempt"
                 ]
 
-    print(f"Output BEFORE filters: {final_output=}")
+    # print(f"Output BEFORE filters: {final_output=}")
 
     # FILTERS
     if input_user_id:
@@ -680,6 +683,6 @@ def get_all_response_details(
             "aat/student_stats/data_dumps/all_response_details.txt",
         )
 
-    print(f"Output AFTER filters: {final_output=}")
+    # print(f"Output AFTER filters: {final_output=}")
 
     return final_output

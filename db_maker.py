@@ -524,7 +524,7 @@ with app.app_context():
                 user_id=4,
                 assessment_id=2,
                 t1_question_id=3,
-                selected_option=2,
+                selected_option=8,
                 is_correct=True,
             ),
         ]
