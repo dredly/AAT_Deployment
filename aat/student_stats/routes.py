@@ -41,6 +41,13 @@ def course_view():
         input_user_id=current_user.id, highest_scoring_attempt_only=True
     )
     module_ids_with_details = get_module_ids_with_details()
+    course_status = get_course_status(current_user.id)
+
+    for module in module_ids_with_details:
+        module_ids_with_details[module]["status"] = get_module_status(
+            module, current_user.id
+        )
+
     # OVERALL RESULTS
     # - STUDENT
     overall_results_student = {
@@ -335,16 +342,100 @@ def course_view():
         "passed_failed_unattempted":"str",
     }}
     """
+    # dict_of_assessment_results_for_pie = {}
+    # for key, values in module_stats_student.items():
+    #     total_credits = ...
+    #     if not values["taken_by_student"]:
+    #         passed_failed_unattempted = "unattempted"
+    #     elif (values["marks_awarded"] / values["marks_possible"]) < 0.5:
+    #         passed_failed_unattempted = "failed"
+    #     else:
+    #         passed_failed_unattempted = "passed"
+    #     dict_of_assessment_results_for_pie[f"{key}. {values['module_title']}"] = {}
+
     dict_of_assessment_results_for_pie = {}
-    for key, values in module_stats_student.items():
-        total_credits = ...
-        if not values["taken_by_student"]:
-            passed_failed_unattempted = "unattempted"
-        elif (values["marks_awarded"] / values["marks_possible"]) < 0.5:
-            passed_failed_unattempted = "failed"
-        else:
-            passed_failed_unattempted = "passed"
-        dict_of_assessment_results_for_pie[f"{key}. {values['module_title']}"] = {}
+
+    # ASSESSMENT STATS
+    query_of_assessments = Assessment.query.all()
+    list_of_assessment_overview_stats = []
+    for a in query_of_assessments:
+        status = get_assessment_status(a.assessment_id, current_user.id)
+        res = get_all_response_details(
+            input_user_id=current_user.id,
+            highest_scoring_attempt_only=True,
+            input_assessment_id=a.assessment_id,
+            input_module_id=a.module_id,
+        )
+        sum_of_marks_possible = sum([r["num_of_marks"] for r in res])
+        sum_of_marks_earned = sum([r["num_of_marks"] for r in res if r["is_correct"]])
+        list_of_assessment_overview_stats.append(
+            {
+                "assessment_id": a.assessment_id,
+                "assessment_title": a.title,
+                "module_id": a.module_id,
+                "module_title": a.module.title,
+                "status": status,
+                "status_class": f'text_{status.replace(" ", "_")}',
+                "sum_of_marks_earned": sum_of_marks_earned,
+                "sum_of_marks_possible": sum_of_marks_possible,
+                "num_of_credits": a.num_of_credits,
+                "summative": a.is_summative,
+            }
+        )
+    assessment_stats_overview = sorted(
+        list_of_assessment_overview_stats, key=lambda d: d["module_id"]
+    )
+
+    # MODULE STATS
+    query_of_modules = Module.query.all()
+    module_overview_stats = []
+    for m in query_of_modules:
+        list_of_assessments = m.assessments
+        # print(list_of_assessments)
+
+        status = get_module_status(m.module_id, current_user.id)
+        res = get_all_response_details(
+            input_user_id=current_user.id,
+            highest_scoring_attempt_only=True,
+            input_module_id=m.module_id,
+        )
+
+        num_of_credits_earned = 0
+        if status == "pass":
+            for assessment in m.assessments:
+                num_of_credits_earned += assessment.num_of_credits
+
+        count_of_sum_assessment_pass = 0
+        count_of_sum_asssessment_present = 0
+        count_of_form_assessment_pass = 0
+        count_of_form_asssessment_present = 0
+        num_of_credits_possible = 0
+
+        for a in list_of_assessments:
+            if a.is_summative:
+                count_of_sum_asssessment_present += 1
+                if get_assessment_status(a.assessment_id, current_user.id) == "pass":
+                    count_of_sum_assessment_pass += 1
+                num_of_credits_possible += a.num_of_credits
+            else:
+                count_of_form_asssessment_present += 1
+                if get_assessment_status(a.assessment_id, current_user.id) == "pass":
+                    count_of_form_assessment_pass += 1
+
+        module_overview_stats.append(
+            {
+                "module_id": m.module_id,
+                "module_title": m.title,
+                "status": status,
+                "status_class": f'text_{status.replace(" ", "_")}',
+                "num_of_credits_earned": num_of_credits_earned,
+                "num_of_credits_possible": num_of_credits_possible,
+                "count_of_sum_assessment_pass": count_of_sum_assessment_pass,
+                "count_of_sum_asssessment_present": count_of_sum_asssessment_present,
+                "count_of_form_assessment_pass": count_of_form_assessment_pass,
+                "count_of_form_asssessment_present": count_of_form_asssessment_present,
+            }
+        )
 
     return render_template(
         "1_student_stats_course_view.html",
@@ -356,6 +447,13 @@ def course_view():
         dict_of_tags=dict_of_tags,
         tag_totals=tag_totals,
         dictionary_of_module_credits=dictionary_of_module_credits,
+        module_ids_with_details=module_ids_with_details,
+        course_status=(
+            get_course_status(current_user.id),
+            f'text_{get_course_status(current_user.id).replace(" ", "_")}',
+        ),
+        assessment_stats_overview=assessment_stats_overview,
+        module_overview_stats=module_overview_stats,
     )
 
 
@@ -467,8 +565,6 @@ def module_view(module_id=0):
         "total_credits_failed": total_credits_failed,
         "total_credits_unattempted": total_credits_unattempted,
     }
-
-    print(f"{all_assessment_marks_student=}")
 
     return render_template(
         "2_student_stats_module_view.html",

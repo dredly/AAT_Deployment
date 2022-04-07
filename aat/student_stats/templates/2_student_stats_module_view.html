@@ -105,7 +105,7 @@
     <h2>Assessments</h2>
     <ul>
         <li>
-            <h3 class="text_correct">PASS</h3>
+            <h3 class="text_correct">PASSED</h3>
             {% if all_assessment_marks_student %}
                 <ul>
                     {% for a in all_assessment_marks_student %}
@@ -141,7 +141,7 @@
             {% endif %}
             </li>
         <li>
-            <h3 class="text_incorrect">FAIL</h3>
+            <h3 class="text_incorrect">FAILED</h3>
             {% if all_assessment_marks_student %}
                 <ul>
                     {% for a in all_assessment_marks_student %}
@@ -187,19 +187,22 @@
                             <a href="{{url_for('student_stats.assessment_view', assessment_id=a.assessment_id)}}">
                                 <div class="student_stats_container results_box not_answered {% if not a.formative %}summative{% endif %}">
                                     <h3>{{a.title}}</h3>
-                                    <p>Possible Marks: {{a.possible_marks}}</p>
-                                    <p>Possible Credits: {{a.num_of_credits}}</p>
-                                    <p>{% if a.formative %}Formative{% else %}Summative{% endif %} Assessment</p>
                                     <p>Count of questions: 
                                         {% if a.count_of_questions %}
-                                            {{a.count_of_questions}}
+                                            {{a.count_of_questions}}</p>
+                                            <p>Possible Marks: {{a.possible_marks}}</p>
+                                            <p>Possible Credits: {{a.num_of_credits}}</p>
+                                            <p>{% if a.formative %}Formative{% else %}Summative{% endif %} Assessment</p>
+                                            
+                                            <p>Difficulty: </p>
+                                            <p>Tags: </p>
+                                            <p><a href="{{url_for('assessments.assessment_summary', assessment_id=a.assessment_id)}}"><button> Take assessment</button></a></p>
+
                                         {% else %}
-                                            0
+                                            0</p>
                                         {% endif %}
-                                        </p>
-                                    <p>Difficulty: </p>
-                                    <p>Tags: </p>
-                                    <p><a href="{{url_for('assessments.assessment_summary', assessment_id=a.assessment_id)}}"><button> Take assessment</button></a></p>
+                                    
+                             
                                 </div>
                             </a>
                         </li>
