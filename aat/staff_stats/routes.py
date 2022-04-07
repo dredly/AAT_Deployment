@@ -159,8 +159,6 @@ def module(Module_title):
                 #print("nay",nay)
                     
                                         
-        
-        
             
         if yay == 0:
                 pass_percentage = 0
@@ -172,6 +170,17 @@ def module(Module_title):
             total = yay+nay
             pass_percentage = int((yay/total) * 100)
         
+        students_answered_question = total
+        number_of_students = len(students)
+        if total == 0:
+            taken_percentage = 0
+        if number_of_students == 0:
+            taken_percentage = 100
+        else:
+            taken_percentage = int((students_answered_question/number_of_students)* 100)
+        
+
+
         questionDetails["students_answered_question"] = total
         questionDetails["correct_answers"] = yay
         questionDetails["wrong_answers"] = nay
@@ -179,11 +188,14 @@ def module(Module_title):
         questionDetails["question_text"] = question.get("question_text")
         questionDetails["question_difficulty"] = question.get("question_difficulty")
         questionDetails["question_type"] =question.get("question_type")
+        questionDetails["taken_percentage"] = taken_percentage
         #questionDetails["number_of_students"]= len(students)
         
         questions.append(questionDetails)
-    
-    
+        
+
+
+
     # gets rid of dupped questions
     seen = set()
     questions2 = []
@@ -205,7 +217,7 @@ def module(Module_title):
         Module_title = Module_title,
         moduleAssessments = moduleAssessments,
         questions = questions2,
-        number_of_students = len(students)
+        number_of_students = number_of_students
         )
 
 
