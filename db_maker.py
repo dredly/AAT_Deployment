@@ -88,7 +88,7 @@ with app.app_context():
             Assessment(  # 7
                 module_id=2,
                 lecturer_id=9,
-                title="ReactJS Basics",
+                title="Basic JavaScript",
                 due_date=None,
                 time_limit=60 * 60 * 20,
                 num_of_credits=0,
@@ -218,6 +218,84 @@ with app.app_context():
                 feedforward_if_wrong="Make sure to go over basic definitions",
                 tag_id=3,
             ),
+            # Non floating questions
+            QuestionT1(  # 6
+                assessment_id=4,
+                num_of_marks=5,
+                question_text="Which of the following is not a stable sorting algorithm?",
+                difficulty=3,
+                feedback_if_correct="That's right! It is strong and stable.",
+                feedback_if_wrong="No, try again",
+                feedforward_if_correct="You seem to be quite good at sorting algorithms. Why not look at pathfinding algorithms next?",
+                feedforward_if_wrong="Sort it out",
+                tag_id=3,
+            ),
+            QuestionT1(  # 7
+                assessment_id=6,
+                num_of_marks=5,
+                question_text="In a weigted graph what is an edge?",
+                difficulty=1,
+                feedback_if_correct="Well done!",
+                feedback_if_wrong="No, try again",
+                feedforward_if_correct="For more on graphs, look up graphs on wikipedia",
+                feedforward_if_wrong="Go over the lecture notes again",
+                tag_id=3,
+            ),
+            QuestionT1(  # 8
+                assessment_id=8,
+                num_of_marks=5,
+                question_text="What does align-items do?",
+                difficulty=3,
+                feedback_if_correct="Well done!",
+                feedback_if_wrong="No, try again",
+                feedforward_if_correct="You can read more about this on the internet",
+                feedforward_if_wrong="Go over the lecture notes again",
+                tag_id=1,
+            ),
+            QuestionT1(  # 9
+                assessment_id=10,
+                num_of_marks=5,
+                question_text="How do you switch to another branch",
+                difficulty=3,
+                feedback_if_correct="Well done!",
+                feedback_if_wrong="No, try again",
+                feedforward_if_correct="You can read more about this on the internet",
+                feedforward_if_wrong="Go over the lecture notes again",
+                tag_id=6,
+            ),
+            QuestionT1(  # 10
+                assessment_id=7,
+                num_of_marks=5,
+                question_text="Which function prints to the console?",
+                difficulty=1,
+                feedback_if_correct="Well done!",
+                feedback_if_wrong="No, try again",
+                feedforward_if_correct="You can read more about this on the internet",
+                feedforward_if_wrong="Go over the lecture notes again",
+                tag_id=3,
+            ),
+            QuestionT1(  # 11
+                assessment_id=7,
+                num_of_marks=5,
+                question_text="Which keyword is used to declare a constant variable",
+                difficulty=1,
+                feedback_if_correct="Well done!",
+                feedback_if_wrong="No, try again",
+                feedforward_if_correct="You can read more about this on the internet",
+                feedforward_if_wrong="Go over the lecture notes again",
+                tag_id=3,
+            ),
+            QuestionT1(  # 12
+                assessment_id=13,
+                num_of_marks=10,
+                question_text="What is a sparse matrix?",
+                difficulty=3,
+                feedback_if_correct="Well done!",
+                feedback_if_wrong="No, try again",
+                feedforward_if_correct="You can read more about this on the internet",
+                feedforward_if_wrong="Go over the lecture notes again",
+                tag_id=3,
+            ),
         ]
     )
 
@@ -253,6 +331,36 @@ with app.app_context():
                 q_t1_id=5, option_text="Structured Query Language", is_correct=True
             ),  # 14
             Option(q_t1_id=5, option_text="Standard Query Language"),  # 15
+            Option(q_t1_id=6, option_text="merge sort"),  # 16
+            Option(q_t1_id=6, option_text="bubble sort"),  # 17
+            Option(q_t1_id=6, option_text="bubble sort", is_correct=True),  # 18
+            Option(q_t1_id=7, option_text="a node"),  # 19
+            Option(q_t1_id=7, option_text="a dot"),  # 20
+            Option(q_t1_id=7, option_text="a connecting line", is_correct=True),  # 21
+            Option(q_t1_id=8, option_text="aligns items on the main axis"),  # 22
+            Option(
+                q_t1_id=8, option_text="aligns items on the cross axis", is_correct=True
+            ),  # 23
+            Option(q_t1_id=8, option_text="opens a portal to the 4th dimension"),  # 24
+            Option(q_t1_id=9, option_text="git branch"),  # 25
+            Option(q_t1_id=9, option_text="git checkout", is_correct=True),  # 26
+            Option(q_t1_id=9, option_text="git merge"),  # 27
+            Option(q_t1_id=10, option_text="System.out.println()"),  # 28
+            Option(q_t1_id=10, option_text="console.log()", is_correct=True),  # 29
+            Option(q_t1_id=10, option_text="print()"),  # 30
+            Option(q_t1_id=11, option_text="const", is_correct=True),  # 31
+            Option(q_t1_id=11, option_text="let"),  # 32
+            Option(q_t1_id=11, option_text="var"),  # 33
+            Option(
+                q_t1_id=12,
+                option_text="A matrix in which most of the elements are 0",
+                is_correct=True,
+            ),  # 34
+            Option(q_t1_id=12, option_text="A matrix with no elements"),  # 35
+            Option(
+                q_t1_id=12,
+                option_text="A matrix where all elements aren't not positive",
+            ),  # 36
         ]
     )
 
@@ -404,6 +512,126 @@ with app.app_context():
                 feedforward_if_correct="Well done. Look at this book if you want to learn even more.",
                 feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
                 tag_id=4,
+            ),
+            QuestionT2(  # 13
+                assessment_id=4,
+                num_of_marks=3,
+                question_text="What shape represents a decision in a flow chart?",
+                correct_answer="diamond",
+                difficulty=2,
+                feedback_if_correct="Shine bright like a diamond",
+                feedback_if_wrong="What do you call a shiny piece of coal?",
+                feedforward_if_correct="Why not look into UML class diagrams?",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                tag_id=1,
+            ),
+            QuestionT2(  # 14
+                assessment_id=5,
+                num_of_marks=5,
+                question_text="What do you call the node at the top level?",
+                correct_answer="root",
+                difficulty=1,
+                feedback_if_correct="Well done",
+                feedback_if_wrong="What do plants have in the ground?",
+                feedforward_if_correct="Great job! You can use this knowledge to design databases",
+                feedforward_if_wrong="Make sure to go over the lecture notes for this topic before trying again.",
+                tag_id=3,
+            ),
+            QuestionT2(  # 15
+                assessment_id=5,
+                num_of_marks=5,
+                question_text="What do you call nodes at the bottom level?",
+                correct_answer="leaves",
+                difficulty=2,
+                feedback_if_correct="Well done",
+                feedback_if_wrong="What do you call the green part on a plant?",
+                feedforward_if_correct="Great job! You can LEAF this assessment now",
+                feedforward_if_wrong="Study harder",
+                tag_id=3,
+            ),
+            QuestionT2(  # 16
+                assessment_id=6,
+                num_of_marks=10,
+                question_text="Which Dutch computer scientist has a pathfinding algorithm named after them? Just write their last name.",
+                correct_answer="Dijkstra",
+                difficulty=2,
+                feedback_if_correct="Good job for spelling that right!",
+                feedback_if_wrong="Make sure you spelled that correctly.",
+                feedforward_if_correct="Next, look at the A* pathfinding algorithm",
+                feedforward_if_wrong="Look it up on youtube",
+                tag_id=5,
+            ),
+            QuestionT2(  # 17
+                assessment_id=8,
+                num_of_marks=10,
+                question_text="Which property is used to determine how elements are placed on the main axis?",
+                correct_answer="justify-content",
+                difficulty=2,
+                feedback_if_correct="Correct",
+                feedback_if_wrong="Wrong",
+                feedforward_if_correct="https://cssbattle.dev/ is a good site to practice you flexbox skills",
+                feedforward_if_wrong="Make sure to watch the lecture videos on responsive design",
+                tag_id=5,
+            ),
+            QuestionT2(  # 18
+                assessment_id=8,
+                num_of_marks=10,
+                question_text="Which property is used to determine how elements are placed on the cross axis?",
+                correct_answer="align-items",
+                difficulty=2,
+                feedback_if_correct="Correct",
+                feedback_if_wrong="Wrong",
+                feedforward_if_correct="https://cssbattle.dev/ is a good site to practice you flexbox skills",
+                feedforward_if_wrong="Make sure to watch the lecture videos on responsive design",
+                tag_id=5,
+            ),
+            QuestionT2(  # 19
+                assessment_id=10,
+                num_of_marks=4,
+                question_text="Which command shows the commit history of the current active branch?",
+                correct_answer="git log",
+                difficulty=2,
+                feedback_if_correct="Nice",
+                feedback_if_wrong="What do you get from trees (not branches)",
+                feedforward_if_correct="Try doing your own git logs for practice",
+                feedforward_if_wrong="Get yourself a cheat sheet, you'll thank me later",
+                tag_id=6,
+            ),
+            QuestionT2(  # 20
+                assessment_id=10,
+                num_of_marks=3,
+                question_text="How do you initialise an existing directory as a repository?",
+                correct_answer="git init",
+                difficulty=2,
+                feedback_if_correct="Great work innit",
+                feedback_if_wrong="What do British people say at the end of a sentence?",
+                feedforward_if_correct="Try initialising a repository now to practice",
+                feedforward_if_wrong="Go over the Git Basics assessmentagain.",
+                tag_id=6,
+            ),
+            QuestionT2(  # 21
+                assessment_id=11,
+                num_of_marks=10,
+                question_text="What do you call a merge request in GitHub?",
+                correct_answer="pull request",
+                difficulty=3,
+                feedback_if_correct="Thats right",
+                feedback_if_wrong="Thats wrong",
+                feedforward_if_correct="Read more about the differences between github and gitlab here: https://about.gitlab.com/devops-tools/github-vs-gitlab/",
+                feedforward_if_wrong="Go over the Git Basics assessment again.",
+                tag_id=6,
+            ),
+            QuestionT2(  # 22
+                assessment_id=13,
+                num_of_marks=5,
+                question_text="Are dictionaries ordered?",
+                correct_answer="no",
+                difficulty=1,
+                feedback_if_correct="Thats right, entries are found by looking up the keys in a hash table",
+                feedback_if_wrong="They are not ordered",
+                feedforward_if_correct="Read more about dictionaries in python here: https://www.w3schools.com/python/python_dictionaries.asp",
+                feedforward_if_wrong="I order you to read the slides",
+                tag_id=6,
             ),
         ]
     )
