@@ -20,6 +20,7 @@ class Challenge(db.Model):
     to_user = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Text, default="Pending")
     difficulty = db.Column(db.Integer, default=0)
+    number_of_questions = db.Column(db.Integer, default=3)
     challenge_questions_id = db.relationship(
         "ChallengeQuestions", backref="challenges", lazy=True
     )

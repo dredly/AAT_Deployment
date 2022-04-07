@@ -169,7 +169,7 @@ def achievements(user_id):
             return redirect(url_for(".rapid_fire"))
 
         elif choice == "Challenge User":
-            challenge_details = Challenge(from_user=user_id, to_user=int(request.form.get("Users")), difficulty=int(challenge.difficulty.data))
+            challenge_details = Challenge(from_user=user_id, to_user=int(request.form.get("Users")), difficulty=int(challenge.difficulty.data), number_of_questions=int(request.form.get("Question_Numbers")))
             db.session.add(challenge_details)
             db.session.commit()
             return redirect(url_for(".get_id"))
@@ -184,7 +184,7 @@ def achievements(user_id):
                 questions_t1 = QuestionT1.query.all()
                 max_questions = len(questions_t1)
                 question_ids = []
-                while len(question_ids) < 3:
+                while len(question_ids) < challenge_active.number_of_questions:
                     q_id = random.randrange(1, max_questions + 1)
                     if q_id not in question_ids:
                         question_ids.append(q_id)
@@ -227,6 +227,7 @@ def achievements(user_id):
                     )
                     challenge_options.append(option)
                 # print(challenge_options)
+                rapid_fire_reason = "practice"
                 return redirect(
                     url_for(
                         ".rapid_fire",

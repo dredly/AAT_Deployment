@@ -107,6 +107,14 @@
                     <h2>Challenge someone to a quiz</h2>
                     <form action="" method="POST">
                         {{ challenge.difficulty.label }} {{ challenge.difficulty }}
+                        <div class="question-number">
+                            <p style="display: inline;">Number of questions</p>
+                            <select name="Question_Numbers" id="">
+                                {% for i in range(1, 21) %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                         <div class="user-question">
                             {{ challenge.challengee.label }}
                             <select name="Users" id="">
