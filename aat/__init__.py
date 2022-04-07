@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 from flask import Flask, session, render_template
 
 # from flask_session import Session
@@ -17,7 +16,6 @@ from .legendary_gamification import legendary_gamification
 from flask_admin import Admin
 from .views import AdminView
 
-load_dotenv()
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Error handling
