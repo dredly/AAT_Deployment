@@ -3,10 +3,10 @@
 {% block content %}
 <div class="block_contents">
 
-<div class="form-container">
-    <h1>Edit {{assessment.title}}</h1>
-    <form method="POST" action="">
-        {{ form.csrf_token }}
+    <div class="form-container">
+        <h1>Edit {{assessment.title}}</h1>
+        <form method="POST" action="">
+            {{ form.csrf_token }}
             <div class="edit_submit_button">
                 <div>{{form.title.label}}</div>{{form.title}}
             </div>
@@ -24,46 +24,61 @@
                 <div>{{form.is_summative.label}}</div>{{form.is_summative}}
             </div>
             <hr />
-            <div>
+            <div id="credit-selection">
                 <div>{{form.num_of_credits.label}}</div>{{form.num_of_credits}}
             </div>
             <div class="edit_submit_button">
                 <div>{{form.submit}}</div>
             </div>
-    </form>
-</div>
+        </form>
+    </div>
 
-<h2>{{assessment.title}} Questions</h2>
-<div class = "Assessment_Edit_Parent">
+    <h2>{{assessment.title}} Questions</h2>
+    <div class="Assessment_Edit_Parent">
 
-    {% for question in assessment.question_t1 %}
-        <div class = "Assessment_Edit_Children">
+        {% for question in assessment.question_t1 %}
+        <div class="Assessment_Edit_Children">
             <h3>{{question}}</h3>
 
-                {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
-                <a href="{{url_for('assessments.remove_question_t1', id3=question.q_t1_id, id=assessment.assessment_id)}}"><button class="remove-button">Remove Question</button></a>
-                {% endif %}
+            {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
+            <a href="{{url_for('assessments.remove_question_t1', id3=question.q_t1_id, id=assessment.assessment_id)}}"><button
+                    class="remove-button">Remove Question</button></a>
+            {% endif %}
         </div>
         <p>{{question.num_of_marks}} marks</p>
         <p>Tag: {{question.tag}}</p>
         {% if assessment.is_summative == False %}
         <p> Difficulty = {{question.difficulty}}/3</p>
         {% endif %}
-    {% endfor %}
+        {% endfor %}
 
-    {% for question in assessment.question_t2 %}  
-        <div class = "Assessment_Edit_Children">
+        {% for question in assessment.question_t2 %}
+        <div class="Assessment_Edit_Children">
             <h3>{{question}}</h3>
-                    {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
-                    <a href="{{url_for('assessments.remove_question_t2', id2=question.q_t2_id, id=assessment.assessment_id)}}"><button class="remove-button">Remove Question</button></a>
-                    {% endif %}
+            {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
+            <a href="{{url_for('assessments.remove_question_t2', id2=question.q_t2_id, id=assessment.assessment_id)}}"><button
+                    class="remove-button">Remove Question</button></a>
+            {% endif %}
         </div>
         <p>{{question.num_of_marks}} marks</p>
         <p>Tag: {{question.tag}}</p>
         {% if assessment.is_summative == False %}
         <p> Difficulty = {{question.difficulty}}/3</p>
         {% endif %}
-    {% endfor %} 
+        {% endfor %}
+    </div>
 </div>
-</div>
+<script>
+    const isSumCheckBox = document.querySelector('#is_summative');
+    const creditSelection = document.querySelector('#credit-selection');
+    const creditInput = document.querySelector('#num_of_credits');
+    const originalCredits = creditInput.value;
+    creditSelection.style.visibility = isSumCheckBox.checked ? 'visible' : 'hidden';
+    creditInput.value = isSumCheckBox.checked ? originalCredits : '0';
+    isSumCheckBox.onchange = () => {
+        console.log('change');
+        creditSelection.style.visibility = isSumCheckBox.checked ? 'visible' : 'hidden';
+        creditInput.value = isSumCheckBox.checked ? originalCredits : '0';
+    }
+</script>
 {% endblock %}
