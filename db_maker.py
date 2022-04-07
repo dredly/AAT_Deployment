@@ -300,7 +300,7 @@ with app.app_context():
             ),
             QuestionT2(  # 4
                 assessment_id=9,
-                num_of_marks=100,
+                num_of_marks=10,
                 question_text="What is the name of an element which denotes a section?",
                 correct_answer="section",
                 difficulty=1,
@@ -518,6 +518,14 @@ with app.app_context():
                 t1_question_id=1,
                 selected_option=3,
                 is_correct=False,
+            ),
+            ResponseT1(  # 7
+                attempt_number=1,
+                user_id=4,
+                assessment_id=2,
+                t1_question_id=3,
+                selected_option=8,
+                is_correct=True,
             ),
         ]
     )

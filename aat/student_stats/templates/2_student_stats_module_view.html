@@ -19,6 +19,15 @@
     </p>   
     <h2>Module: {{module_details["module_title"]}}</h2>
 
+    <h2>Status: {% if dictionary_of_module_credits["total_credits_possible"] == dictionary_of_module_credits["total_credits_earned"] %}
+        <span class="text_correct">PASSED</span>
+    {% elif dictionary_of_module_credits["total_credits_earned"] < dictionary_of_module_credits["total_credits_failed"] %}
+    <span class="text_incorrect">FAILED</span>
+    {% elif dictionary_of_module_credits["total_credits_possible"] < dictionary_of_module_credits["total_credits_unattempted"] %}
+    <span class="text_unattempted">UNATTEMPTED</span>
+    {% else %}
+    <span>IN PROGRESS</span>
+    {% endif %}</h2>
     <h2>Credits</h2>
     <ul>
         <li>
@@ -222,7 +231,7 @@
                         data: [totalCreditsPassed, totalCreditsFailed,
                         totalCreditsUnattempted
                         ],
-                        backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)','rgb(41, 230, 41)'],
+                        backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)','rgb(150, 150, 150)'],
                         hoverOffset: 4,
                     },
                 ],
