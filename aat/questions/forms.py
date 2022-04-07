@@ -59,8 +59,8 @@ class FilterForm(FlaskForm):
             ("assigned", "Assigned"),
         ],
         validators=[DataRequired()],
+        render_kw={"onchange": "submit();"},
     )
-    submit = SubmitField("Update")
 
 
 class DeleteForm(FlaskForm):
