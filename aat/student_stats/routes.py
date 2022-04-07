@@ -12,12 +12,7 @@ from .. import db
 from ..models import *
 
 # Database Util Functions
-from ..db_utils import (
-    get_all_assessment_marks,
-    get_module_ids_with_details,
-    get_all_response_details,
-    get_assessment_id_and_data,
-)
+from ..db_utils import *
 
 # Generic marks_dictionary
 marks_dictionary = {"sum_of_marks_awarded": 0, "sum_of_marks_possible": 0}
@@ -54,6 +49,8 @@ def course_view():
         "total_credits_possible": 0,
         "total_credits_earned": 0,
     }
+
+    print(get_course_status(current_user.id))
 
     for assessment_mark in all_assessment_marks_student:
         overall_results_student["sum_of_marks_awarded"] += assessment_mark[
@@ -374,7 +371,7 @@ def module_view(module_id=0):
     # Module Error Handling
     if Module.query.filter_by(module_id=module_id).first() is None:
         return redirect(url_for("student_stats.module_not_found", module_id=module_id))
-
+    print(get_module_status(module_id, current_user.id))
     # db_utils calls
     all_assessment_marks_student = get_all_assessment_marks(
         input_user_id=current_user.id,
@@ -498,6 +495,7 @@ def assessment_view(assessment_id=0):
             url_for("student_stats.module_not_found", assessment_id=assessment_id)
         )
 
+    print(get_assessment_status(assessment_id, current_user.id))
     assessment_object = Assessment.query.filter_by(assessment_id=assessment_id).first()
 
     assessment_details = {

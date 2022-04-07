@@ -735,11 +735,7 @@ def get_total_credits_for_module(module_id):
 
 
 def get_total_marks_for_assessment(assessment_id):
-    assessment_query = (
-        Assessment.query.filter_by(assessment_id=assessment_id)
-        .filter_by(is_summative=True)
-        .all()
-    )
+    assessment_query = Assessment.query.filter_by(assessment_id=assessment_id).all()
     total_marks_for_assessment = 0
     for q in assessment_query:
         for q1 in q.question_t1:
@@ -793,19 +789,25 @@ def get_assessment_status(assessment_id, user_id):
     ):
         return "unattempted"
 
-    # WHERE HAS MARKS EARNED GONE??
-    assessment_marks = get_all_assessment_marks(
-        input_user_id=user_id,
-        input_module_id=module_id,
-        input_assessment_id=assessment_id,
-        highest_scoring_attempt_only=True,
-        summative_only=True,
+    marks_earned = sum(
+        [
+            q["correct_marks"]
+            for q in get_all_assessment_marks(
+                input_user_id=user_id,
+                input_assessment_id=assessment_id,
+                highest_scoring_attempt_only=True,
+                summative_only=True,
+            )
+        ]
     )
 
-    marks_earned = sum([q["correct_marks"] for q in all_assessment_marks])
+    # print(f"{marks_earned=}")
 
     # PASS OR FAIL
+    # print(f"{assessment_id=}")
     sum_of_all_marks_in_assessment = get_total_marks_for_assessment(assessment_id)
+    # print(f"{sum_of_all_marks_in_assessment=}")
+
     if (marks_earned / sum_of_all_marks_in_assessment) >= 0.5:
         return "pass"
     else:
