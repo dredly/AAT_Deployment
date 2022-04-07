@@ -5,18 +5,20 @@
 <h1> Module: {{Module_title}}</h1><a href="{{ url_for('staff_stats.download')}}">Download CSV</a>
 {%for assessment in moduleAssessments%}
     
-    <h2>{{assessment.get("assessment_title")}}: &nbsp;&nbsp;&nbsp; {%if assessment.get("your_assessment") == True%} Your Assessment {%else%} Not Your Assessment {%endif%} &nbsp;&nbsp;&nbsp;{%if assessment.get("is_summative") == True%} (Summative) {%else%} (Formative){%endif%} &nbsp;&nbsp;&nbsp; assessment id:{{assessment.get("assessment_id")}}
+    <h2>ass ID:{{assessment.get("assessment_id")}} &nbsp; {{assessment.get("assessment_title")}}{%if assessment.get("is_summative") == True%} (Summative) {%else%} (Formative){%endif%} : &nbsp;&nbsp;&nbsp; {%if assessment.get("your_assessment") == True%} Your Assessment {%else%} Not Your Assessment {%endif%} &nbsp;&nbsp;&nbsp;
     <a href="{{url_for('staff_stats.view_students', assessment = assessment.get('assessment_title'))}}">View Students</a>
     </h2>
     {%if assessment.get("amount_of_questions") > 0%}
         {%for question in questions%}  
             {%if question.get("question_assessment_id") == assessment.get("assessment_id") %}
-       
-            <p>Question: {{question.get("question_text")}} &nbsp;&nbsp;&nbsp; Question Difficulty: {{question.get("question_difficulty")}} &nbsp;&nbsp;&nbsp Question Type: {{question.get("question_type")}} </p>
-            <p>Correct Answers: {{question.get("correct_answers")}} &nbsp;&nbsp;&nbsp;  Wrong Answers: {{question.get("wrong_answers")}} &nbsp;&nbsp;&nbsp; {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate: {{question.get("pass_percentage")}}% {%endif%} &nbsp;&nbsp;&nbsp;  {{question.get("students_answered_question")}} out of {{question.get("number_of_students")}} students answered question</p>
-                {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %}
+            <section>
+            <div class ="staff_stats_cohort_answers">
+            <p>Question: {{question.get("question_text")}} &nbsp;&nbsp;&nbsp; Difficulty: {{question.get("question_difficulty")}} &nbsp;&nbsp;&nbsp Type: {{question.get("question_type")}} </p>
+            <p>Correct Answers: {{question.get("correct_answers")}} &nbsp;&nbsp;&nbsp;  Wrong Answers: {{question.get("wrong_answers")}} &nbsp;&nbsp;&nbsp; {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate: {{question.get("pass_percentage")}}% {%endif%} &nbsp;&nbsp;&nbsp;  {{question.get("students_answered_question")}} out of {{number_of_students}} students answered question</p>
+            </div>  
+            {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %}
                 {%else%}
-                    <div id='vis{{question.get("question_assessment_id")}}{{question.get("questionId")}}{{question.get("question_type")}}'></div>
+                    <div class ="staff_stats_cohort_answers" id='vis{{question.get("question_assessment_id")}}{{question.get("questionId")}}{{question.get("question_type")}}'></div>               
                 <script>
                     var data = ['{{question.get("wrong_answers")}}' ,'{{question.get("correct_answers")}}'];
                     var svg = d3.select('#vis{{question.get("question_assessment_id")}}{{question.get("questionId")}}{{question.get("question_type")}}').append('svg').attr("width",100).attr("height",100),
@@ -48,7 +50,8 @@
                             return color(i);
                         })
                         .attr("d", arc);
-                </script>           
+                </script>
+                </section>           
         {%endif%}
         
         {%endif%}

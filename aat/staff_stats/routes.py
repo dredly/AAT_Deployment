@@ -65,7 +65,11 @@ def module(Module_title):
     #print(userInfo)
     
   
-
+    students = []
+    for user_student in users:
+        if user_student.role_id == 1:
+            if user_student not in students:
+                students.append(user_student)
     moduleAssessments = []
     assessments = Assessment.query.filter_by(module_id = moduleId).all()
     for assessment in assessments:
@@ -90,7 +94,7 @@ def module(Module_title):
     
     
     questions = []
-    students = []
+    
     for question in userInfo:
         #print(question)
         questionDetails = {}
@@ -119,8 +123,7 @@ def module(Module_title):
                         userRole = user1.role_id
                 #print("user role", userRole)
                 if userRole == 1:
-                    if user not in students:
-                            students.append(user)
+                    
                     if question.get("question_type") == 2:                    
                         for response in t2Response:                                     
                             if response.user_id == user:
@@ -176,7 +179,7 @@ def module(Module_title):
         questionDetails["question_text"] = question.get("question_text")
         questionDetails["question_difficulty"] = question.get("question_difficulty")
         questionDetails["question_type"] =question.get("question_type")
-        questionDetails["number_of_students"]= len(students)
+        #questionDetails["number_of_students"]= len(students)
         
         questions.append(questionDetails)
     
@@ -202,6 +205,7 @@ def module(Module_title):
         Module_title = Module_title,
         moduleAssessments = moduleAssessments,
         questions = questions2,
+        number_of_students = len(students)
         )
 
 
@@ -212,6 +216,8 @@ def module(Module_title):
 
 @staff_stats.route("/download")
 def download():
+        
+    module_title = session["Module_title"]
     info =session["info"]
     #print("info",info)
     rows = [
@@ -227,6 +233,7 @@ def download():
             
         }
         for element in info
+            
     ]
     string_io = StringIO()
     csv_writer = csv.DictWriter(string_io, rows[0].keys())
@@ -235,7 +242,7 @@ def download():
     output = make_response(string_io.getvalue())
     output.headers[
         "Content-Disposition"
-    ] = f"attachment; filename={current_user.name}-aat-export.csv"
+    ] = f"attachment; filename={module_title}-aat-export.csv"
     output.headers["Content-type"] = "text/csv"
     return output
 
