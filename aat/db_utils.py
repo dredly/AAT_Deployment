@@ -686,3 +686,67 @@ def get_all_response_details(
     # print(f"Output AFTER filters: {final_output=}")
 
     return final_output
+
+
+######################
+# STATUS CALCULATORS #
+######################
+"""
+Only summative assessments are considered for the below (i.e. formative assessments do not contribute)
+
+An assessment's credit_weighting = credits_possible / total_credits_possible_for_the_module
+
+Overall weighted_mark = marks_earned * credit_weighting
+
+A module is passed if its assessment's total_weighted_marks >= 50%
+
+You then earn all credits for that module
+
+A course is passed if all modules are passed (i.e. total_earned_credits==total_possible_credits)
+
+STATUS:
+- ASSESSMENT:
+-- pass: total_marks >= 50%
+-- fail: total_marks < 50%
+-- unattempted: student hasn't taken it
+
+- MODULE:
+-- pass: total_weighted_mark >= 50%
+-- fail: total_weighted_mark < 50% AND all assessments attempted
+-- in progress: total_weighted_mark < 50% AND all assessments NOT attempted
+-- unattempted: no assessments have been attempted
+
+- COURSE:
+-- pass: all modules have "pass" status
+-- fail: all modules have "fail" status
+-- in progress: any modules have "in progress" status
+-- unattempted: all moudles have "unattempted" status
+"""
+
+
+def get_total_credits_for_module(module_id):
+    # Need total marks
+    assessment_query = (
+        Assessment.query.filter_by(module_id=module_id)
+        .filter_by(is_summative=True)
+        .all()
+    )
+    total_credits_for_module = sum([a.num_of_credits for a in assessment_query])
+    return total_credits_for_module
+
+
+def get_weighted_mark_calc(marks_earned, assessment_id):
+    """
+    Takes in the marks earned and the assessment ID
+    Returns the weighted mark based on the total credits possible in that module
+    """
+    assessment_query = Assessment.query.filter_by(assessment_id=assessment_id).first()
+
+    module_id = assessment_query.module_id
+    credits_for_assessment = assessment_query.num_of_credits
+
+    total_credits_for_module = get_total_credits_for_module(module_id)
+
+    weighted_mark = (marks_earned) * (credits_for_assessment / total_credits_for_module)
+
+    return weighted_mark

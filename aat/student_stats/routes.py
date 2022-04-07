@@ -326,7 +326,28 @@ def course_view():
             tag_totals["all_correct"] += dict_of_tags[tag]["correct"]
             tag_totals["all_incorrect"] += dict_of_tags[tag]["incorrect"]
 
-    # print(module_stats_student)
+    """
+    loop over module_stats_student
+    
+    passed:
+    failed:
+    unattempted:
+    
+    {module_name:{
+        "total_credits":0,
+        "passed_failed_unattempted":"str",
+    }}
+    """
+    dict_of_assessment_results_for_pie = {}
+    for key, values in module_stats_student.items():
+        total_credits = ...
+        if not values["taken_by_student"]:
+            passed_failed_unattempted = "unattempted"
+        elif (values["marks_awarded"] / values["marks_possible"]) < 0.5:
+            passed_failed_unattempted = "failed"
+        else:
+            passed_failed_unattempted = "passed"
+        dict_of_assessment_results_for_pie[f"{key}. {values['module_title']}"] = {}
 
     return render_template(
         "1_student_stats_course_view.html",
