@@ -662,19 +662,19 @@ def assessment_summary(assessment_id):
         questions_t2=questions_t2,
         question_ids=question_ids,
         first_question=first_question,
-        type=first_question_type,
+        q_type=first_question_type,
         first_question_id=first_question_id,
         difficulty=final_difficulty,
     )
 
 
 @assessments.route(
-    "/answer_question/<int:type>/<int:question_id>", methods=["GET", "POST"]
+    "/answer_question/<int:q_type>/<int:question_id>", methods=["GET", "POST"]
 )
-def answer_question(type, question_id):
+def answer_question(q_type, question_id):
     ## find question to be answered
     assessment = Assessment.query.get_or_404(session.get("assessment"))
-    if type == 1:
+    if q_type == 1:
         question = QuestionT1.query.get_or_404(question_id)
         form = AnswerType1Form()
         # QuestionT1.query.filter_by(assessment_id=id).all()
@@ -682,7 +682,7 @@ def answer_question(type, question_id):
             (option.option_id, option.option_text)
             for option in Option.query.filter_by(q_t1_id=question_id).all()
         ]
-    elif type == 2:
+    elif q_type == 2:
         question = QuestionT2.query.get_or_404(question_id)
         form = AnswerType2Form(answer=None)
 
@@ -691,14 +691,14 @@ def answer_question(type, question_id):
         print("The current user has answered this question in this attempt: ")
         print(
             current_user.has_answered(
-                type, question, assessment, session["attempt_number"]
+                q_type, question, assessment, session["attempt_number"]
             )
         )
         if current_user.has_answered(
-            type, question, assessment, session["attempt_number"]
+            q_type, question, assessment, session["attempt_number"]
         ):
 
-            if type == 1:
+            if q_type == 1:
                 previous_response = (
                     current_user.t1_responses.filter_by(
                         assessment_id=session.get("assessment")
@@ -713,7 +713,7 @@ def answer_question(type, question_id):
                 form.chosen_option.default = selected_option_id
                 # then run form.process()
                 form.process()
-            elif type == 2:
+            elif q_type == 2:
                 previous_response = (
                     current_user.t2_responses.filter_by(
                         assessment_id=session.get("assessment")
@@ -728,14 +728,53 @@ def answer_question(type, question_id):
     ## actions to take on a post method - i.e. when user submits an answer to their question
     if request.method == "POST":
         ## if changing / resubmitting answer, ensures no duplicate responses by deleting the old
+        if session["is_summative"]:
+            if q_type == 1: 
+                if form.chosen_option.data is None: 
+                    if len(session["questions"]) < 1:
+                        complete = True 
+                        # need to check if every question has been answered. 
+                        t1s = QuestionT1.query.filter_by(assessment_id=assessment.assessment_id).all()
+                        t2s = QuestionT2.query.filter_by(assessment_id=assessment.assessment_id).all() 
+                        for q in t1s: 
+                            res = current_user.t1_responses.filter_by(assessment_id=assessment.assessment_id).filter_by(attempt_number=session["attempt_number"]).filter_by(t1_question_id=q.q_t1_id).first()
+                            if res == None: 
+                                complete = False 
+                        for q in t2s: 
+                            res = current_user.t2_responses.filter_by(assessment_id=assessment.assessment_id).filter_by(attempt_number=session["attempt_number"]).filter_by(t2_question_id=q.q_t2_id).first()
+                            if res == None: 
+                                complete = False 
+                        flash("All questions must be completed to submit an assessment - please answer the current question.")
+                        return redirect(url_for('assessments.cannot_submit'))
+                    else:
+                        return redirect(
+                            url_for(
+                                "assessments.answer_question",
+                                q_type=session["questions"][0][0],
+                                question_id=session["questions"][0][1],
+                            )
+                        )
+            elif q_type == 2: 
+                if form.answer.data.strip() is None or form.answer.data.strip() == '': 
+                    if len(session["questions"]) < 1:
+                        flash("All questions must be completed to submit an assessment - please answer the current question.")
+                        return redirect(url_for('assessments.cannot_submit'))
+                    else:
+                        return redirect(
+                            url_for(
+                                "assessments.answer_question",
+                                q_type=session["questions"][0][0],
+                                question_id=session["questions"][0][1],
+                            )
+                        )
         if current_user.has_answered(
-            type, question, assessment, session["attempt_number"]
+            q_type, question, assessment, session["attempt_number"]
         ):
             current_user.remove_answer(
-                type, question, assessment, session["attempt_number"]
+                q_type, question, assessment, session["attempt_number"]
             )
             db.session.commit()
-        if type == 1:
+        if q_type == 1:
             given_answer = Option.query.filter_by(
                 option_id=form.chosen_option.data
             ).first()
@@ -751,7 +790,7 @@ def answer_question(type, question_id):
                 selected_option=given_answer.option_id,
                 is_correct=result,
             )
-        elif type == 2:
+        elif q_type == 2:
             given_answer = form.answer.data.strip().lower()
             if given_answer == question.correct_answer.lower():
                 result = True
@@ -769,22 +808,42 @@ def answer_question(type, question_id):
         db.session.commit()
         if session["is_summative"]:
             if len(session["questions"]) < 1:
-                return redirect(
-                    url_for(
-                        "assessments.results", assessment_id=assessment.assessment_id
+                complete = True 
+                incomplete_qs = []
+                # need to check if every question has been answered. 
+                for idx, q in enumerate(session["past_questions"]):
+                    if q[0] == 1: 
+                        res = current_user.t1_responses.filter_by(assessment_id=assessment.assessment_id).filter_by(attempt_number=session["attempt_number"]).filter_by(t1_question_id=q[1]).first()
+                    elif q[0] == 2:
+                        res = current_user.t2_responses.filter_by(assessment_id=assessment.assessment_id).filter_by(attempt_number=session["attempt_number"]).filter_by(t2_question_id=q[1]).first()
+                    if res == None: 
+                        complete = False 
+                        incomplete_qs.append(idx+1)
+                if complete: 
+                    return redirect(
+                        url_for(
+                            "assessments.results", assessment_id=assessment.assessment_id
+                        )
                     )
-                )
+                else: 
+                    message = ''
+                    for i in incomplete_qs: 
+                        n = str(i)
+                        m = n + ', '
+                        message += m 
+                    flash(f"All questions must be completed to submit an assessment - use the 'previous question' button to answer the following questions: {message}.")
+                    return redirect(url_for('assessments.cannot_submit'))
             else:
                 return redirect(
                     url_for(
                         "assessments.answer_question",
-                        type=session["questions"][0][0],
+                        q_type=session["questions"][0][0],
                         question_id=session["questions"][0][1],
                     )
                 )
         else:
             return redirect(
-                url_for("assessments.mark_answer", type=type, question_id=question_id)
+                url_for("assessments.mark_answer", q_type=q_type, question_id=question_id)
             )
     current_questions = session.get("questions")
     previous = current_questions.pop(0)
@@ -795,7 +854,7 @@ def answer_question(type, question_id):
         question=question,
         assessment=assessment,
         form=form,
-        type=type,
+        q_type=q_type,
     )
 
 
@@ -813,16 +872,31 @@ def previous_question():
     return redirect(
         url_for(
             "assessments.answer_question",
-            type=session["questions"][0][0],
+            q_type=session["questions"][0][0],
             question_id=session["questions"][0][1],
         )
     )
 
+@assessments.route("/cannot_submit")
+def cannot_submit(): 
+    next_question = session["past_questions"].pop(-1)
+    session["questions"].insert(0, next_question)
+    # copy and overwrite existing session variables as otherwise insert would not remain permanent on next loaded page
+    copy_list_next = session["questions"]
+    copy_list_prev = session["past_questions"]
+    session["questions"] = copy_list_next
+    session["past_questions"] = copy_list_prev
+    return redirect(url_for(
+            "assessments.answer_question",
+            q_type=session["questions"][0][0],
+            question_id=session["questions"][0][1],
+        )
+    )
 
-@assessments.route("/mark_answer/<int:type>/<int:question_id>", methods=["GET", "POST"])
-def mark_answer(type, question_id):
+@assessments.route("/mark_answer/<int:q_type>/<int:question_id>", methods=["GET", "POST"])
+def mark_answer(q_type, question_id):
     assessment = Assessment.query.get_or_404(session.get("assessment"))
-    if type == 1:
+    if q_type == 1:
         question = QuestionT1.query.get_or_404(question_id)
         right_answer = (
             Option.query.filter_by(q_t1_id=question.q_t1_id)
@@ -839,7 +913,7 @@ def mark_answer(type, question_id):
             option_id=chosen_option.selected_option
         ).first()
         print(response)
-    elif type == 2:
+    elif q_type == 2:
         question = QuestionT2.query.get_or_404(question_id)
         right_answer = question.correct_answer
         response = (
@@ -854,7 +928,7 @@ def mark_answer(type, question_id):
         response=response,
         assessment=assessment,
         right_answer=right_answer,
-        type=type,
+        q_type=q_type,
     )
 
 
