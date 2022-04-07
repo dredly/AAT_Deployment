@@ -109,7 +109,7 @@ def get_assessment_id_and_data(store_output_to_file=False, module_id=None):
 def get_module_ids_with_details(input_module_id=None, store_output_to_file=False):
     """
     Returns dictionary:
-        [module_id (int): {
+        {module_id (int): {
             module_title (string),
             total_module_credits (int),
             total_assessment_credits (int),
@@ -118,7 +118,8 @@ def get_module_ids_with_details(input_module_id=None, store_output_to_file=False
             count_of_assessments, (int)
             count_of_formative_assessments, (int)
             count_of_summative_assessments, (int)
-            }]
+            }
+        }
     """
     q = (
         Module.query.all()
@@ -458,7 +459,6 @@ def get_all_response_details(
     Optional filters added for student, lecturer, module and assessment id
     """
     q1_q = ResponseT1.query.all()
-    print(f"{q1_q=}")
     # TYPE 1
     question_totals_t1 = (
         db.session.query(User, QuestionT1, ResponseT1, Option, Module, Assessment)
@@ -692,18 +692,6 @@ def get_all_response_details(
 # STATUS CALCULATORS #
 ######################
 """
-Only summative assessments are considered for the below (i.e. formative assessments do not contribute)
-
-An assessment's credit_weighting = credits_possible / total_credits_possible_for_the_module
-
-Overall weighted_percentage = (marks_earned/total_marks_for_assessment) * credit_weighting
-
-A module is passed if its assessment's total_weighted_percentages >= 50%
-
-You then earn all credits for that module
-
-A course is passed if all modules are passed (i.e. total_earned_credits==total_possible_credits)
-
 STATUS:
 - ASSESSMENT:
 -- pass: total_marks >= 50%
@@ -721,9 +709,23 @@ STATUS:
 -- fail: all modules have "fail" status
 -- in progress: any modules have "in progress" status
 -- unattempted: all modules have "unattempted" status
+
+Only summative assessments are considered for the below (i.e. formative assessments do not contribute)
+
+An assessment's credit_weighting = credits_possible / total_credits_possible_for_the_module
+
+Overall weighted_percentage = (marks_earned/total_marks_for_assessment) * credit_weighting
+
+A module is passed if its assessment's total_weighted_percentages >= 50%
+
+You then earn all credits for that module
+
+A course is passed if all modules are passed (i.e. total_earned_credits==total_possible_credits)
+
+
 """
 
-# UTIL
+
 def get_total_credits_for_module(module_id):
     assessment_query = (
         Assessment.query.filter_by(module_id=module_id)
