@@ -908,7 +908,7 @@ def results(assessment_id):
     given_answers = []
     correct_answers = []
     is_correct = []
-
+    passed = True if result >= (possible_total / 2) else False 
     # ---- 3. iterate over the index list
     for idx in no_questions:
         current_question = session["past_questions"][idx]
@@ -963,6 +963,7 @@ def results(assessment_id):
         given_answers=given_answers,
         correct_answers=correct_answers,
         is_correct=is_correct,
+        passed=passed
     )
 
 
@@ -1035,6 +1036,8 @@ def show_results(assessment_id, attempt_number):
                 q_t2_id=response.t2_question_id
             ).first()
             result += answered_question.num_of_marks
+    passed = True if result >= (possible_total / 2) else False 
+
 
     # --- > Find all questions answered 
     t1_questions =  QuestionT1.query.filter_by(assessment_id=assessment_id).all()
@@ -1079,6 +1082,8 @@ def show_results(assessment_id, attempt_number):
                     t2_questions=t2_questions,
                     t2_answers=t2_answers,
                     possible_total=possible_total,
-                    result=result
+                    result=result, 
+                    passed=passed,
+                    assessment=assessment
                     )
 

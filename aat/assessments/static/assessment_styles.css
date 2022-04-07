@@ -31,6 +31,7 @@
 .button-container {
     display: flex; 
     align-items: center;
+    margin-bottom: 10px;
 }
 
 .take-assessment-button {
@@ -70,4 +71,32 @@
 .answer-box {
     width: 50%;
     height: 100px; 
+}
+
+.result-container {
+    margin-left: 10%; 
+}
+
+.top-banner-container .button-container {
+    margin-right: 10%; 
+}
+
+.top-banner-container {
+    width: 80%;
+    margin: auto; 
+    display: flex; 
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.result-header {
+    margin-left: 10%; 
+}
+
+.assess-nav {
+    margin-bottom: 20px; 
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
