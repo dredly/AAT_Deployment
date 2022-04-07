@@ -333,7 +333,7 @@ with app.app_context():
             Option(q_t1_id=5, option_text="Standard Query Language"),  # 15
             Option(q_t1_id=6, option_text="merge sort"),  # 16
             Option(q_t1_id=6, option_text="bubble sort"),  # 17
-            Option(q_t1_id=6, option_text="bubble sort", is_correct=True),  # 18
+            Option(q_t1_id=6, option_text="quick sort", is_correct=True),  # 18
             Option(q_t1_id=7, option_text="a node"),  # 19
             Option(q_t1_id=7, option_text="a dot"),  # 20
             Option(q_t1_id=7, option_text="a connecting line", is_correct=True),  # 21
@@ -690,6 +690,7 @@ with app.app_context():
                 is_admin=True,
                 role_id=2,
             ),
+            User(name="JSON Derulo", password="jd", is_admin=True, role_id=2),  # 10
         ]
     )
 
