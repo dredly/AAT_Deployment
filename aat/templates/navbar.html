@@ -25,7 +25,11 @@
 			<a href="{{ url_for('auth.logout') }}">Log Out User "{{current_user.name}}"</a>
 		</li>
 		<li>
-			<a href="{{ url_for('legendary_gamification.get_id') }}">Achievements</a>
+			{% if current_user.role_id == 1 %}
+				<a href="{{ url_for('legendary_gamification.get_id') }}">Achievements</a>
+			{% else %}
+				<a href="{{ url_for('legendary_gamification.test_leaderboard') }}">LeaderBoard</a>
+			{% endif %}
 		</li>
 		{% endif %}
 		<!-- STATS -->

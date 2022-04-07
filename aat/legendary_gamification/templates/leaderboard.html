@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('legendary_gamification.static', filename='styles.css') }}">
+{% endblock styles %}
+
+
+{% block content %}
+<h1>Leaderboard</h1>
+    <div class="lone-leaderboard-section">
+        <div class="leader-title">
+            <h3>LeaderBoard</h3>
+        </div>
+        <div class="divider"></div>
+        <div id="leaderboard">
+            {% for i in range(ranks | length) %}
+            <a href="{{ url_for('.achievements', user_id=ranks[i][2]) }}" class="leaderboard-links">
+                <div class="user-rank">
+                    <h4 id="user-leaderboard">
+                        {{ i + 1 }}. {{ ranks[i][1] }} - {{ ranks[i][0] }}
+                    </h4>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

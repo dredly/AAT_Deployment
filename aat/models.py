@@ -20,6 +20,7 @@ class Challenge(db.Model):
     to_user = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Text, default="Pending")
     difficulty = db.Column(db.Integer, default=0)
+    number_of_questions = db.Column(db.Integer, default=3)
     challenge_questions_id = db.relationship(
         "ChallengeQuestions", backref="challenges", lazy=True
     )
@@ -41,6 +42,14 @@ class ChallengesTaken(db.Model):
     challenge_id = db.Column(
         db.Integer, db.ForeignKey("challenges.challenge_id"), nullable=False
     )
+
+
+
+class Friends(db.Model):
+    __tablename__ = "friends"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    friend_id = db.Column(db.Integer, nullable=False)    
 
 
 class Tier(db.Model):
@@ -301,7 +310,7 @@ class User(UserMixin, db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
     email = db.Column(db.String(64), nullable=True, default="jacksonr16@cardiff.ac.uk")
     # --- Relationships ---
-
+    friends = db.relationship("Friends", backref="user", lazy=True)
     assessments = db.relationship("Assessment", backref="user", lazy=True)
     awarded_badge = db.relationship("Awarded_Badge", backref="user", lazy=True)
     awarded_achievement = db.relationship(
