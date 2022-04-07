@@ -9,6 +9,7 @@
 {% for q in t1_questions %}
     <h3>{{ q.question_text }}</h3>
     <p>Result: {% if t1_answers[q.q_t1_id][2] %}Correct!{% else %}Incorrect{% endif %}</p>
+    <p>Marks Gained: {% if t1_answers[q.q_t1_id][2] %}{{ q.num_of_marks }}{% else %}0{% endif %}</p>
     <p>Your Answer: {{ t1_answers[q.q_t1_id][0] }}</p>
     <p>Correct Answer: {{ t1_answers[q.q_t1_id][1] }}</p>
     <h4>Feedback</h4>
@@ -29,6 +30,7 @@
 {% for q in t2_questions %}
     <h3>{{ q.question_text }}</h3>
     <p>Result: {% if t2_answers[q.q_t2_id][2] %}Correct!{% else %}Incorrect{% endif %}</p>
+    <p>Marks Gained: {% if t2_answers[q.q_t2_id][2] %}{{ q.num_of_marks }}{% else %}0{% endif %}</p>
     <p>Your Answer: {{ t2_answers[q.q_t2_id][0] }}</p>
     <p>Correct Answer: {{ t2_answers[q.q_t2_id][1] }}</p> 
     <h4>Feedback</h4>

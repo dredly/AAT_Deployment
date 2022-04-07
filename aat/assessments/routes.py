@@ -135,11 +135,12 @@ def view_module(module_id):
             # --- > find the highest result achieved across all attempts
             d_ref = max(result_of_attempts, key=result_of_attempts.get)
             result = result_of_attempts[d_ref]
+            best_attempt[assessment.title] = d_ref 
         else:
             result = 0
-
+            best_attempt[assessment.title] = 0 
         marks_achieved[assessment.title] = f"{result}/{marks_av}"
-        best_attempt[assessment.title] = d_ref 
+        
         if assessment.is_summative:
             summatives.append(assessment)
         else:
