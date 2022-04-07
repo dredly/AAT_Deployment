@@ -11,136 +11,115 @@
 {% endblock extra_head %}
 {% block content %}
 <h1>Student Stats for {{current_user.name}} | Course View</h1>
+<h2>Status: <span class="{{course_status.1}}">{{course_status.0 | upper}}</h2>
 <p><a href="{{ url_for('legendary_gamification.get_id')}}"><button>Tier: {{current_user.tier}}</button></a></p>
     
-    <h2>
-        Overall Marks - STUDENT
-    </h2>
-    <p>{{overall_results_student["sum_of_marks_awarded"]}}/{{overall_results_student["sum_of_marks_possible"]}}
-    ({{ "%.2d" |
-    format((overall_results_student["sum_of_marks_awarded"]/overall_results_student["sum_of_marks_possible"])*100)}}%)</p>
+<h2>Credits</h2>
+<ul>
+    <li>
+        <p><b>Total Credits Possible: {{dictionary_of_module_credits["total"]["total_credits_possible"]}}</b></p>
+    </li>
+    <li>
+        <p>Total Credits <span class="text_correct"><b>Passed</b></span>: {{dictionary_of_module_credits["total"]["total_credits_earned"]}}/{{dictionary_of_module_credits["total"]["total_credits_possible"]}}</p>
+    </li>
+    <li>
+        <p>Total Credits <span class="text_incorrect"><b>Failed</b></span>: {{dictionary_of_module_credits["total"]["total_credits_failed"]}}/{{dictionary_of_module_credits["total"]["total_credits_possible"]}}</p>
+    </li>
+    <li>
+        <p>Total Credits <span class="text_unattempted"><b>Unattempted</b></span>: {{dictionary_of_module_credits["total"]["total_credits_unattempted"]}}/{{dictionary_of_module_credits["total"]["total_credits_possible"]}}</p>
+    </li>
+</ul>
 
-    <h2>Credits</h2>
-    <p>Total Credits Possible: {{overall_results_student["total_credits_possible"]}}</p>
-    <p>Total Credits Earned: {{overall_results_student["total_credits_earned"]}} (CORRECT)</p>
-    <p></p>
-    <div class="content-block">
-        <div
-            class="chart-container"
-        >
-            <canvas id="overallResultsStudentPi"></canvas>
-        </div>
+<p></p>
+<div class="content-block">
+    <div
+        class="chart-container"
+    >
+        <canvas id="moduleCreditsStudentPi"></canvas>
     </div>
-    {#
-    <h2>
-        Overall Marks - COHORT
-    </h2>
-    <p>{{overall_results_cohort["sum_of_marks_awarded"]}}/{{overall_results_cohort["sum_of_marks_possible"]}}
-    ({{ "%.2d" |
-    format((overall_results_cohort["sum_of_marks_awarded"]/overall_results_cohort["sum_of_marks_possible"])*100)}}%)</p>
-    <div class="content-block">
-        <div
-            class="chart-container"
-        >
-            <canvas id="overallResultsCohortPi"></canvas>
-        </div>
-    </div>
-    #}
+</div>
+    <h2>Module Overview</h2>
+        <ul>
+            <table>
+                <tr>
+                    <th>Module</th>
+                    <th>Status</th>
+                    <th>Credits</th>
+                    <th>Summative<br>Assessments Passed</th>
+                    <th>Formative<br>Assessments Passed</th>
+                </tr>
+                {% for m in module_overview_stats %}
+                    <tr>
+                        <td><a href="{{url_for('student_stats.module_view', module_id=m.module_id)}}">{{m.module_id}}. {{m.module_title}}</a></td>
+                        <td><span class="{{m.status_class}}">{{m.status}}</span></td>
+                        <td>
+                            {% if m.num_of_credits_possible %}
+                                {{m.num_of_credits_earned}}/{{m.num_of_credits_possible}}
+                            {% endif %}
+                        </td>
+                        <td>{% if m.count_of_sum_asssessment_present %}
+                            {{m.count_of_sum_assessment_pass}}/{{m.count_of_sum_asssessment_present}}
+                        {% endif %}</td>
+                        <td>{% if m.count_of_form_asssessment_present %}
+                            {{m.count_of_form_assessment_pass}}/{{m.count_of_form_asssessment_present}}
+                        {% endif %}</td>
+                        </tr>
+                {% endfor %}
+            </table>
+        </ul>
 
-    <h2>Modules</h2>
-    <h3>Modules completed:</h3>
-    <ul>
-        {% for module_key, module in module_stats_student.items() %}
-            {% if module.count_of_assessments == module.count_of_taken_assessments %}
-                <a href="{{url_for('student_stats.module_view', module_id=module_key)}}">
-                    <div class="student_stats_container results_box {% if module['marks_awarded']/module['marks_possible'] >= 0.5 %} correct_answer {% else %} incorrect_answer {% endif %}">
-                            <li>
-                                <p><b>{{module.module_title}}</b></p>
-                                <p>Your score:
-                                        {{module['marks_awarded']}}/{{module['marks_possible']}}
-                                        ({{ "%.2d" |
-                                        format((module['marks_awarded']/module['marks_possible'])*100)}}%)
-                                </p>
-                                <p>
-                                    Total assessment credits: {{module.total_assessment_credits}}
-                                </p>
-                                <p>
-                                    Completed assessments: {{module.count_of_taken_assessments}}/{{ module.count_of_assessments}}
-                                </p>
-                                <p>
-                                    Passed assessments: {{module.count_of_passed_assessments}}/{{ module.count_of_assessments}}
-                                </p>
-                            </li>
-                        </div>
-                    </a>
-                {% endif %}
-            {% endfor %}
-    </ul>
-    <h3>Modules started:</h3>
-    <ul>
-        {% for module_key, module in module_stats_student.items() %}
-            {% if module.taken_by_student and module.count_of_assessments != module.count_of_taken_assessments %}
-            <a href="{{url_for('student_stats.module_view', module_id=module_key)}}">
-                <div class="student_stats_container results_box {% if module['marks_awarded']/module['marks_possible'] >= 0.5 %} correct_answer {% else %} incorrect_answer {% endif %}">
-                        <li>
-                            <p><b>{{module.module_title}}</b></p>
-                            <p>Your score: 
-                                    {{module['marks_awarded']}}/{{module['marks_possible']}}
-                                    ({{ "%.2d" |
-                                    format((module['marks_awarded']/module['marks_possible'])*100)}}%)
-                            </p>
-                            <p>
-                                Total assessment credits: {{module.total_assessment_credits}} 
-                            </p>
-                            <p>
-                                Completed assessments: {{module.count_of_taken_assessments}}/{{ module.count_of_assessments}}
-                            </p>
-                            <p>
-                                Passed assessments: {{module.count_of_passed_assessments}}/{{ module.count_of_assessments}}
-                            </p>
-                        </li>
-                    </div> 
-                </a>
-            {% endif %}
-        {% endfor %}
-    </ul>
+    <h2>Assessment Overview</h2>      
+        <ul>
+            <table>
+                <tr>
+                    <th>Module</th>
+                    <th>Assessment</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Mark</th>
+                </tr>
+                {% for a in assessment_stats_overview %}
+                    <tr>
+                        <td><a href="{{url_for('student_stats.module_view', module_id=a.module_id)}}">{{a.module_id}}. {{a.module_title}}</a></td>
+                        <td><a href="{{url_for('student_stats.assessment_view', assessment_id=a.assessment_id)}}">{{a.assessment_id}}. {{a.assessment_title}}</a></td>
+                        <td>{% if a.summative %}
+                            <b>Summative</b>
+                        {% else %}
+                            Formative
+                        {% endif %}</td>
+                        <td><span class="{{a.status_class}}">{{a.status}}</span></td>
+                        <td>
+                            {% if a.sum_of_marks_possible %}
+                                {{a.sum_of_marks_earned}}/{{a.sum_of_marks_possible}}
+                            {% endif %}
+                        </td>
+                        </tr>
+                {% endfor %}
+            </table>
+        </ul>
+</ul>
+    <h2>Response Analysis</h2>
 
-    <h3>Modules not yet started:</h3>
-    <ul>
-        {% for module_key, module in module_stats_student.items() %}
-            {% if not module.taken_by_student %}
-                <a href="{{url_for('student_stats.module_view', module_id=module_key)}}">
-                    <div class="student_stats_container results_box not_answered">
-                        <li>
-                            <p><b>{{module.module_title}}</b>                 
-                            </p>
-                            <p>
-                                Total assessment credits: {{module.total_assessment_credits}} 
-                            </p>
-                            <p>
-                                Count of assessments: {{ module.count_of_assessments}}
-                            </p>
-                            
-                        </li>
-                    </div>
-                </a>
-            {% endif %}
-        {% endfor %}
-    </ul>
-
-    <h1>Tag Analysis</h1>
-    <h2>This looks at ALL your responses, not just those from the  highest scoring responses.</h2>
-    <ul>
+    <ul>       
         <li>
             <div class="results_box student_stats_container">
-                <h2>All Questions Answered</h2>
+                <h2>Correct answers split by tags</h2>
+                <p>Based on highest scoring attempts</p>
                 <ul>
-                    <li>Correct: {{tag_totals.all_correct}}/{{tag_totals.all_questions}}</li>
-                    <li>Incorrect: {{tag_totals.all_incorrect}}/{{tag_totals.all_questions}}</li>
+                    <li>
+                        <b>
+                            <p>All: {{tag_totals.all_correct}}/{{tag_totals.all_questions}}</p>
+                        </b>
+                    </li>
+
+                    {% for t, results in dict_of_tags.items() %}
+                        <li>
+                            <p>{{t}}: {{results.correct}}/{{results.count_of_questions}}</p>
+                        </li>
+                    {% endfor %}
                 </ul>
             </div>
         </li>
-        
         <li>
             <div class="results_box correct_answer student_stats_container">
                 <h2>Strongest Tags</h2>
@@ -148,11 +127,7 @@
                     {% for t, results in dict_of_tags.items() %}
                         <li>
                             {% if results.status=="strongest" %}
-                                <h3>{{t}}</h3>
-                                <ul>
-                                    <li>Correct: {{results.correct}}/{{results.count_of_questions}}</li>
-                                    <li>Incorrect: {{results.incorrect}}/{{results.count_of_questions}}</li>
-                                </ul>
+                                <p>{{t}}: {{results.correct}}/{{results.count_of_questions}}</p>
                             {% endif %}
                         </li>
                     {% endfor %}
@@ -167,11 +142,7 @@
                     {% for t, results in dict_of_tags.items() %}
                         <li>
                             {% if results.status=="weakest" %}
-                                <h3>{{t}}</h3>
-                                <ul>
-                                    <li>Correct: {{results.correct}}/{{results.count_of_questions}}</li>
-                                    <li>Incorrect: {{results.incorrect}}/{{results.count_of_questions}}</li>
-                                </ul>
+                                <p>{{t}}: {{results.correct}}/{{results.count_of_questions}}</p>
                             {% endif %}
                         </li>
                     {% endfor %}
@@ -179,22 +150,6 @@
             </div>
         </li>
         
-        <li>
-            <div class="results_box student_stats_container">
-                <h2>All Tags</h2>
-                <ul>
-                    {% for t, results in dict_of_tags.items() %}
-                        <li>
-                            <h3>{{t}}</h3>
-                            <ul>
-                                <li>Correct: {{results.correct}}/{{results.count_of_questions}}</li>
-                                <li>Incorrect: {{results.incorrect}}/{{results.count_of_questions}}</li>
-                            </ul>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </li>
     </ul>
 
     <h2>Download</h2>
@@ -205,18 +160,42 @@
     </button>
     <script>
         // OVERALL: STUDENT
-        const overallResultsStudentcorrect = '{{overall_results_student["sum_of_marks_awarded"]}}';
-        const overallResultsStudentincorrect = '{{overall_results_student["sum_of_marks_possible"]-overall_results_student["sum_of_marks_awarded"]}}';
-        const overallResultsStudentPiElement = document.getElementById('overallResultsStudentPi').getContext('2d');
-        const overallResultsStudentPi = new Chart(overallResultsStudentPiElement, {
-            type: 'pie',
+        const totalCreditsPassed = '{{dictionary_of_module_credits["total"]["total_credits_earned"]}}';
+        const totalCreditsFailed = '{{dictionary_of_module_credits["total"]["total_credits_failed"]}}';
+        const totalCreditsUnattempted = '{{dictionary_of_module_credits["total"]["total_credits_unattempted"]}}';
+        const moduleCreditsStudentPiElement = document.getElementById('moduleCreditsStudentPi').getContext('2d');
+        const moduleCreditsStudentPi = new Chart(moduleCreditsStudentPiElement, {
+            type: 'doughnut',
             data: {
-                labels: ['Correct', 'Incorrect'],
+                labels: ['Passed', 'Failed', 'Unattempted'],
                 datasets: [
                     {
                         label: 'Course View',
-                        data: [overallResultsStudentcorrect, overallResultsStudentincorrect],
-                        backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)'],
+                        data: [totalCreditsPassed, totalCreditsFailed,
+                        totalCreditsUnattempted
+                        ],
+                        backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)','rgb(150, 150, 150)'],
+                        hoverOffset: 4,
+                    },
+                ],
+            },
+        });
+        // OVERALL: STUDENT
+        const totalCreditsPassedSplit = '{{dictionary_of_module_credits["total"]["total_credits_earned"]}}';
+        const totalCreditsFailedSplit = '{{dictionary_of_module_credits["total"]["total_credits_failed"]}}';
+        const totalCreditsUnattemptedSplit = '{{dictionary_of_module_credits["total"]["total_credits_unattempted"]}}';
+        const moduleCreditsStudentPiElementSplit = document.getElementById('moduleCreditsStudentPiSplit').getContext('2d');
+        const moduleCreditsStudentPiSplit = new Chart(moduleCreditsStudentPiElementSplit, {
+            type: 'doughnut',
+            data: {
+                labels: ['Passed', 'Failed', 'Unattempted'],
+                datasets: [
+                    {
+                        label: 'Course View',
+                        data: [totalCreditsPassedSplit, totalCreditsFailedSplit,
+                        totalCreditsUnattemptedSplit
+                        ],
+                        backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)','rgb(150, 150, 150)'],
                         hoverOffset: 4,
                     },
                 ],

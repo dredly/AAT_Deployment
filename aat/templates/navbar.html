@@ -8,9 +8,11 @@
 		<li>
 			<a href="{{ url_for('assessments.index') }}">Assessments</a>
 		</li>
+		{% if current_user.can(Permission.WRITE_ASSESSMENT) %}
 		<li>
 			<a href="{{ url_for('questions.index') }}">Questions</a>
 		</li>
+		{% endif %}
 		{% if not current_user.is_authenticated %}
 		<li>
 			<a href="{{ url_for('auth.login') }}">Login</a>

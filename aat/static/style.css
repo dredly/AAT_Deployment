@@ -221,6 +221,9 @@ footer {
 	justify-content: flex-start;
 	padding-bottom: 1vh;
 }
+.credits_invisible{
+	visibility: hidden;
+}
 
 /* ----------------------------------------------------- CRUD QUESTIONS --------------------------------------------- */
 
@@ -300,4 +303,37 @@ footer {
 .summative { 
     border: 5px solid black; 
     box-shadow:  10px 10px 30px #bebebe;
+}
+
+/*  STAFF STATS */
+
+.staff_stats_module_select{
+	display:flex;
+	flex-direction: column;
+	align-items: center;
+	
+}
+
+.staff_stats_cohort_answers{
+	
+}
+
+
+#staff_stats_Bronze{
+	color: brown;
+}
+#staff_stats_Silver{
+	color: silver;
+}
+#staff_stats_Gold{
+	color: gold ;
+}
+#staff_stats_Emerald{
+	color: rgb(39, 223, 39) ;
+}
+#staff_stats_Ruby{
+	color: rgb(206, 9, 9) ;
+}
+#staff_stats_Diamond{
+	color:rgb(126, 203, 255) ;
 }

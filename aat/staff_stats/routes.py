@@ -1,7 +1,8 @@
-from tracemalloc import stop
+from io import StringIO
 from . import staff_stats
 from flask_login import current_user
-from flask import render_template, url_for, session
+from flask import render_template, url_for, session, make_response
+import csv
 
 from ..models import (
     Module,
@@ -14,6 +15,9 @@ from ..models import (
 )
 from ..db_utils import *
 
+###################################################################
+##################### 1. MODULE SELET #############################
+###################################################################
 
 @staff_stats.route("/")
 def index():
@@ -40,7 +44,9 @@ def index():
     return render_template("Staff-stats.html", name = name, lecturersModules = lecturersModules)
 
 
-
+###################################################################
+##################### 2. COHORT VIEW ##############################
+###################################################################
 
 
 @staff_stats.route("/module/<string:Module_title>")
@@ -55,11 +61,15 @@ def module(Module_title):
     moduleId = module.module_id
     #print("moduleId",moduleId)
     #print("user id", user.id)
-    userInfo = get_all_response_details(None,user.id,)
+    userInfo = get_all_response_details(None,None,moduleId)
     #print(userInfo)
     
   
-
+    students = []
+    for user_student in users:
+        if user_student.role_id == 1:
+            if user_student not in students:
+                students.append(user_student)
     moduleAssessments = []
     assessments = Assessment.query.filter_by(module_id = moduleId).all()
     for assessment in assessments:
@@ -73,18 +83,20 @@ def module(Module_title):
             assessmentInfo["number_of_credits"] = assessment.num_of_credits
             assessmentInfo["is_summative"] = assessment.is_summative
             assessmentInfo["assessment_id"] = assessment.assessment_id
+            assessmentInfo["amount_of_questions"] = 0
             moduleAssessments.append(assessmentInfo)
-    print(moduleAssessments)
+    #print(moduleAssessments)
     
     moduleAssessmentIds = []
     for assessment in moduleAssessments:
         moduleAssessmentIds.append(assessment.get("assessment_id"))
-    NoOfAssessments = len(moduleAssessments)
-    #print("number of assessments is", NoOfAssessments)
+    #print(moduleAssessmentIds)
+    
     
     questions = []
     
     for question in userInfo:
+        #print(question)
         questionDetails = {}
         questionAssessmentId = question.get("assessment_id")        
         questionId = question.get("question_id")
@@ -100,31 +112,31 @@ def module(Module_title):
                 user = stat.get("user_id")
                 attempt = stat.get("attempt_number")
                 bestAttempt = stat.get("highest_scoring_attempt")
-                marks = stat.get("correct_marks")
+                
                 if bestAttempt == True:
                     bestAttempt = attempt
-                print("user",user,"assId",assId,"best attempt",bestAttempt, "questionID",questionId)
+                #print("user",user,"assId",assId,"best attempt",bestAttempt, "questionID",questionId)
                 
                 
                 for user1 in users:
                     if user1.id == user:
                         userRole = user1.role_id
-                print("user role", userRole)
+                #print("user role", userRole)
                 if userRole == 1:
-                    if question.get("question_type") == 2:
-                        for response in t2Response:
-                                       
+                    
+                    if question.get("question_type") == 2:                    
+                        for response in t2Response:                                     
                             if response.user_id == user:
                                 if response.attempt_number == bestAttempt:
                                     if response.assessment_id == assId:
                                         if response.t2_question_id == questionId:
                                             if response.is_correct == True:                                 
-                                                print("YAY")
+                                                #print("YAY")
                                                 yay += 1
                                                 break
                                         
                                             else:
-                                                print("NAY")
+                                                #print("NAY")
                                                 nay += 1
                                                 break
                     else:
@@ -135,65 +147,109 @@ def module(Module_title):
                                     if response.assessment_id == assId:
                                         if response.t1_question_id == questionId:
                                             if response.is_correct == True:                                 
-                                                print("YAY")
+                                                #print("YAY")
                                                 yay += 1
                                                 break
                                         
                                         else:
-                                            print("NAY")
+                                            #print("NAY")
                                             nay += 1
                                             break                  
-                print("yay", yay)
-                print("nay",nay)
+                #print("yay", yay)
+                #print("nay",nay)
                     
                                         
         
         
             
         if yay == 0:
-            if nay == 0:
-                pass_percentage = "No attempts have been made"
-            else:
                 pass_percentage = 0
+                total = yay+nay
         if nay == 0:
             pass_percentage = 100
+            total = yay+nay
         else:
             total = yay+nay
             pass_percentage = int((yay/total) * 100)
         
+        questionDetails["students_answered_question"] = total
         questionDetails["correct_answers"] = yay
         questionDetails["wrong_answers"] = nay
         questionDetails["pass_percentage"] = pass_percentage
         questionDetails["question_text"] = question.get("question_text")
         questionDetails["question_difficulty"] = question.get("question_difficulty")
         questionDetails["question_type"] =question.get("question_type")
+        #questionDetails["number_of_students"]= len(students)
+        
         questions.append(questionDetails)
     
-
+    
     # gets rid of dupped questions
     seen = set()
     questions2 = []
-    for question in questions:
+    for question in questions:   
         t = tuple(question.items())
         if t not in seen:
             seen.add(t)
             questions2.append(question)
+    for question in questions2:
+        for assessment in moduleAssessments: 
+            if question.get("question_assessment_id") == assessment.get("assessment_id"):
+                assessment["amount_of_questions"] = assessment.get("amount_of_questions") +1
     
-    print("questions", questions2) 
+    session["info"] = questions2
+    #print("questions", questions2[0]) 
+    #print(moduleAssessments)
 
     return render_template("module.html",
         Module_title = Module_title,
         moduleAssessments = moduleAssessments,
         questions = questions2,
+        number_of_students = len(students)
         )
 
 
+###################################################################
+##################### 2.5 CSV DOWNLOAD ############################
+###################################################################
 
 
+@staff_stats.route("/download")
+def download():
+        
+    module_title = session["Module_title"]
+    info =session["info"]
+    #print("info",info)
+    rows = [
+        {
+            "Assessment ID": element.get("question_assessment_id"),
+            "Question": element.get("question_text"),
+            "Difficulty": element.get("question_difficulty"),
+            "Question Type":element.get("question_type"),
+            "Correct Answers": element.get("correct_answers"),
+            "Wrong Answers": element.get("wrong_answers"),
+            "Pass rate %": element.get("pass_percentage"),
+            "Number of Students answered": element.get("students_answered_question")
+            
+        }
+        for element in info
+            
+    ]
+    string_io = StringIO()
+    csv_writer = csv.DictWriter(string_io, rows[0].keys())
+    csv_writer.writeheader()
+    csv_writer.writerows(rows)
+    output = make_response(string_io.getvalue())
+    output.headers[
+        "Content-Disposition"
+    ] = f"attachment; filename={module_title}-aat-export.csv"
+    output.headers["Content-type"] = "text/csv"
+    return output
 
 
-
-
+###################################################################
+##################### 3. STUDENT VIEW #############################
+###################################################################
 
 @staff_stats.route("/view-students/<string:assessment>")
 def view_students(assessment):
@@ -225,9 +281,14 @@ def view_students(assessment):
                 questions.append(question.get("is_correct"))
                 questions.append(question.get("attempt_number"))
                 questions.append(question.get("question_type"))
+                if question.get("highest_scoring_attempt"):
+                    if question.get("attempt_number") not in attemptLists:
+                        attemptLists.append(question.get("attempt_number"))
                 attemptLists[question.get("attempt_number")-1].append(questions)          
             users2.append(attemptLists)
-    print(users2)
+            print("attemptLists",attemptLists)
+    #print(users2)
     return render_template("view-students.html", Module_title = Module_title,
     assessment = assessment,
+    users = users,
     users2 = users2,)
