@@ -793,7 +793,16 @@ def get_assessment_status(assessment_id, user_id):
     ):
         return "unattempted"
 
-    marks_earned = 0
+    # WHERE HAS MARKS EARNED GONE??
+    assessment_marks = get_all_assessment_marks(
+        input_user_id=user_id,
+        input_module_id=module_id,
+        input_assessment_id=assessment_id,
+        highest_scoring_attempt_only=True,
+        summative_only=True,
+    )
+
+    marks_earned = sum([q["correct_marks"] for q in all_assessment_marks])
 
     # PASS OR FAIL
     sum_of_all_marks_in_assessment = get_total_marks_for_assessment(assessment_id)
