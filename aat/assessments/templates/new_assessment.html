@@ -14,21 +14,36 @@
             <div class="edit_submit_button">
                 <div>{{form.time_limit.label}}</div>{{form.time_limit}}
             </div>
-            <hr />
-            <div>
-                <div>{{form.is_summative.label}}</div>{{form.is_summative}}
-            </div>
-            <hr />
-            <div>
+            <div class="edit_submit_button">
                 <div>{{form.due_date.label}}</div>{{form.due_date}}
             </div>
+            <hr />
             <div>
-                <div class="edit_submit_button">{{form.num_of_credits.label}}</div>{{form.num_of_credits}}
+                <div>{{form.is_summative.label}}</div><div id="click">{{form.is_summative}}</div>
+            </div>
+            <hr />
+            <div class="credits_invisible" id="credits">
+                <div>{{form.num_of_credits.label}}</div>{{form.num_of_credits}}
             </div>
             <div class="edit_submit_button">
                 <div>{{form.submit}}</div>
             </div>
         </form>
     </div>
-    
+    <script>
+        var visible = false,
+        action = document.getElementById("click");
+        credits = document.getElementById("credits");
+
+        action.onclick = function() {
+             if (visible === false) {
+                credits.style.visibility = "visible";
+                visible = true;
+        } else {
+                credits.style.visibility = "hidden";
+                visible = false;
+               }
+        }
+        
+    </script>
 {% endblock %}

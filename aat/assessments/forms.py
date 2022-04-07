@@ -52,7 +52,7 @@ class AssessmentForm(FlaskForm):
         "Enter time limit in minutes",
         validators=[NumberRange(min=0, message="Must enter a number greater than 0")],
     )
-    is_summative = BooleanField("Select if Assessment is summative")
+    is_summative = BooleanField("Select if Assessment is summative", id='check')
     submit = SubmitField("Add Questions")
 
     def validate_num_of_credits(form, num_of_credits):
