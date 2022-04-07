@@ -57,8 +57,6 @@ def course_view():
         "total_credits_earned": 0,
     }
 
-    print(get_course_status(current_user.id))
-
     for assessment_mark in all_assessment_marks_student:
         overall_results_student["sum_of_marks_awarded"] += assessment_mark[
             "correct_marks"
@@ -76,18 +74,6 @@ def course_view():
     list_of_assessments_completed_by_student = [
         item["assessment_id"] for item in all_assessment_marks_student
     ]
-
-    # - COHORT
-    overall_results_cohort = marks_dictionary.copy()
-    for assessment_mark in all_assessment_marks:
-        if assessment_mark["assessment_id"] in list_of_assessments_completed_by_student:
-            # Filter out if the
-            overall_results_cohort["sum_of_marks_awarded"] += assessment_mark[
-                "correct_marks"
-            ]
-            overall_results_cohort["sum_of_marks_possible"] += assessment_mark[
-                "possible_marks"
-            ]
 
     # Dict of modules, how many assessments are in it, how many you've completed
     dict_of_assessment_counts = {}
@@ -238,21 +224,12 @@ def course_view():
 
     for id in module_ids_with_details.keys():
         entry = module_ids_with_details[id]
-        # Isn't this what I need?
-
-    # - COHORT
-    # TODO: module_stats_cohort
-    module_stats_cohort = {}
 
     # STORING OUTPUT AS .TXT FILES FOR EASE OF MY OWN USE
     # (if I was better I would only have this running in dev, not prod, but I'm not)
     # Write dictionary to CSV
 
     try:
-        with open(
-            "aat/student_stats/data_dumps/overall_results_cohort.txt", "w"
-        ) as convert_file:
-            convert_file.write(json.dumps(overall_results_cohort))
         with open(
             "aat/student_stats/data_dumps/overall_results_student.txt", "w"
         ) as convert_file:
@@ -261,10 +238,6 @@ def course_view():
             "aat/student_stats/data_dumps/module_stats_student.txt", "w"
         ) as convert_file:
             convert_file.write(json.dumps(module_stats_student))
-        with open(
-            "aat/student_stats/data_dumps/module_stats_cohort.txt", "w"
-        ) as convert_file:
-            convert_file.write(json.dumps(module_stats_cohort))
     except:
         ...
 
@@ -330,31 +303,6 @@ def course_view():
             tag_totals["all_correct"] += dict_of_tags[tag]["correct"]
             tag_totals["all_incorrect"] += dict_of_tags[tag]["incorrect"]
 
-    """
-    loop over module_stats_student
-    
-    passed:
-    failed:
-    unattempted:
-    
-    {module_name:{
-        "total_credits":0,
-        "passed_failed_unattempted":"str",
-    }}
-    """
-    # dict_of_assessment_results_for_pie = {}
-    # for key, values in module_stats_student.items():
-    #     total_credits = ...
-    #     if not values["taken_by_student"]:
-    #         passed_failed_unattempted = "unattempted"
-    #     elif (values["marks_awarded"] / values["marks_possible"]) < 0.5:
-    #         passed_failed_unattempted = "failed"
-    #     else:
-    #         passed_failed_unattempted = "passed"
-    #     dict_of_assessment_results_for_pie[f"{key}. {values['module_title']}"] = {}
-
-    dict_of_assessment_results_for_pie = {}
-
     # ASSESSMENT STATS
     query_of_assessments = Assessment.query.all()
     list_of_assessment_overview_stats = []
@@ -366,8 +314,18 @@ def course_view():
             input_assessment_id=a.assessment_id,
             input_module_id=a.module_id,
         )
-        sum_of_marks_possible = sum([r["num_of_marks"] for r in res])
-        sum_of_marks_earned = sum([r["num_of_marks"] for r in res if r["is_correct"]])
+        if status == "unattempted":
+            sum_of_marks_earned = 0
+            sum_of_marks_possible = sum([q.num_of_marks for q in a.question_t1]) + sum(
+                [q.num_of_marks for q in a.question_t2],
+            )
+            if sum_of_marks_possible is None:
+                sum_of_marks_possible == 0
+        else:
+            sum_of_marks_possible = sum([r["num_of_marks"] for r in res])
+            sum_of_marks_earned = sum(
+                [r["num_of_marks"] for r in res if r["is_correct"]]
+            )
         list_of_assessment_overview_stats.append(
             {
                 "assessment_id": a.assessment_id,
@@ -401,6 +359,7 @@ def course_view():
         )
 
         num_of_credits_earned = 0
+
         if status == "pass":
             for assessment in m.assessments:
                 num_of_credits_earned += assessment.num_of_credits
@@ -411,11 +370,15 @@ def course_view():
         count_of_form_asssessment_present = 0
         num_of_credits_possible = 0
 
+        num_of_credits_failed = 0
+
         for a in list_of_assessments:
             if a.is_summative:
                 count_of_sum_asssessment_present += 1
                 if get_assessment_status(a.assessment_id, current_user.id) == "pass":
                     count_of_sum_assessment_pass += 1
+                elif get_assessment_status(a.assessment_id, current_user.id) == "fail":
+                    num_of_credits_failed += a.num_of_credits
                 num_of_credits_possible += a.num_of_credits
             else:
                 count_of_form_asssessment_present += 1
@@ -430,6 +393,7 @@ def course_view():
                 "status_class": f'text_{status.replace(" ", "_")}',
                 "num_of_credits_earned": num_of_credits_earned,
                 "num_of_credits_possible": num_of_credits_possible,
+                "num_of_credits_failed": num_of_credits_failed,
                 "count_of_sum_assessment_pass": count_of_sum_assessment_pass,
                 "count_of_sum_asssessment_present": count_of_sum_asssessment_present,
                 "count_of_form_assessment_pass": count_of_form_assessment_pass,
@@ -439,10 +403,8 @@ def course_view():
 
     return render_template(
         "1_student_stats_course_view.html",
-        overall_results_cohort=overall_results_cohort,
         overall_results_student=overall_results_student,
         module_stats_student=module_stats_student,
-        module_stats_cohort=module_stats_cohort,
         dict_of_assessment_counts=dict_of_assessment_counts,
         dict_of_tags=dict_of_tags,
         tag_totals=tag_totals,
@@ -566,6 +528,45 @@ def module_view(module_id=0):
         "total_credits_unattempted": total_credits_unattempted,
     }
 
+    # ASSESSMENT STATS
+    # "aid" -> assessment_id_and_data
+    aid = get_assessment_id_and_data(module_id=module_id)
+
+    query_of_assessments = Assessment.query.filter_by(module_id=module_id).all()
+    list_of_assessment_overview_stats = []
+
+    for a in query_of_assessments:
+        status = get_assessment_status(a.assessment_id, current_user.id)
+        res = get_all_response_details(
+            input_user_id=current_user.id,
+            highest_scoring_attempt_only=True,
+            input_assessment_id=a.assessment_id,
+            input_module_id=a.module_id,
+        )
+        sum_of_marks_possible = sum([r["num_of_marks"] for r in res])
+        sum_of_marks_earned = sum([r["num_of_marks"] for r in res if r["is_correct"]])
+        list_of_assessment_overview_stats.append(
+            {
+                "assessment_id": a.assessment_id,
+                "assessment_title": a.title,
+                "status": status,
+                "status_class": f'text_{status.replace(" ", "_")}',
+                "sum_of_marks_earned": sum_of_marks_earned,
+                "sum_of_marks_possible": sum_of_marks_possible,
+                "weighted_perc": get_weighted_perc_calc(
+                    sum_of_marks_earned, a.assessment_id
+                ),
+                "num_of_credits": a.num_of_credits,
+                "summative": a.is_summative,
+                "difficulty": aid[a.assessment_id].get("average_difficulty"),
+                "tags": aid[a.assessment_id].get("tag_array_counter"),
+            }
+        )
+
+    assessment_stats_overview = sorted(
+        list_of_assessment_overview_stats, key=lambda d: d["assessment_id"]
+    )
+
     return render_template(
         "2_student_stats_module_view.html",
         module_details=module_details,
@@ -574,6 +575,7 @@ def module_view(module_id=0):
         assessment_id_and_data=assessment_id_and_data,
         dictionary_of_module_credits=dictionary_of_module_credits,
         module_status=get_module_status(module_id, current_user.id),
+        assessment_stats_overview=assessment_stats_overview,
     )
 
 
@@ -595,7 +597,6 @@ def assessment_view(assessment_id=0):
             url_for("student_stats.module_not_found", assessment_id=assessment_id)
         )
 
-    print(get_assessment_status(assessment_id, current_user.id))
     assessment_object = Assessment.query.filter_by(assessment_id=assessment_id).first()
 
     assessment_details = {
@@ -625,8 +626,6 @@ def assessment_view(assessment_id=0):
         input_assessment_id=assessment_id,
         store_output_to_file=False,
     )
-
-    # print(f"{all_response_details=}")
 
     ## Need to make dictionary of: {attempt_number : [all questions associated]}
     all_response_details_grouped_by_attempt_number = {}
@@ -672,20 +671,26 @@ def assessment_view(assessment_id=0):
             assessment_details["highest_scoring_attempt_number"] = response[
                 "attempt_number"
             ]
-
-    if (
-        total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]][
-            "correct_marks"
-        ]
-        / total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]][
-            "possible_marks"
-        ]
-        >= 0.5
-    ):
-        assessment_details["highest_scoring_attempt_passed"] = True
-    else:
+    try:
+        if total_score_per_attempt[assessment_details].get(
+            "highest_scoring_attempt_number"
+        ):
+            if (
+                total_score_per_attempt[
+                    assessment_details["highest_scoring_attempt_number"]
+                ]["correct_marks"]
+                / total_score_per_attempt[
+                    assessment_details["highest_scoring_attempt_number"]
+                ]["possible_marks"]
+                >= 0.5
+            ):
+                assessment_details["highest_scoring_attempt_passed"] = True
+            else:
+                assessment_details["highest_scoring_attempt_passed"] = False
+        else:
+            assessment_details["highest_scoring_attempt_passed"] = False
+    except:
         assessment_details["highest_scoring_attempt_passed"] = False
-
     # QUESTION ANALYSIS
     # question_id:
     # > correct_answers_count: int
@@ -760,6 +765,29 @@ def assessment_view(assessment_id=0):
         data_for_bar_chart["y_axis_max"] = response["possible_marks"]
         data_for_bar_chart["pass_mark"].append(response["possible_marks"] / 2)
 
+    status = get_assessment_status(assessment_id, current_user.id)
+    status = (status, f'text_{status.replace(" ", "_")}')
+
+    assessment_stats_raw = get_assessment_id_and_data(assessment_id=assessment_id)[
+        assessment_id
+    ]
+    if len(assessment_stats_raw["difficulty_array"]) > 0:
+        diff = sum(assessment_stats_raw["difficulty_array"]) / len(
+            assessment_stats_raw["difficulty_array"]
+        )
+    else:
+        diff = None
+    if len(assessment_stats_raw["tag_array_counter"]):
+        tags = assessment_stats_raw["tag_array_counter"]
+    else:
+        tags = None
+    assessment_stats = {
+        "marks": assessment_stats_raw["total_marks_possible"],
+        "questions": assessment_stats_raw["count_of_questions"],
+        "difficulty": diff,
+        "tags": tags,
+    }
+
     return render_template(
         "3_student_stats_assessment_view.html",
         assessment_details=assessment_details,
@@ -772,6 +800,8 @@ def assessment_view(assessment_id=0):
         tag_dictionary=tag_dictionary,
         question_analysis_dict=question_analysis_dict,
         total_number_of_attempts=total_number_of_attempts,
+        status=status,
+        assessment_stats=assessment_stats,
     )
 
 

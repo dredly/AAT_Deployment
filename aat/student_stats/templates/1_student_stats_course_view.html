@@ -44,9 +44,10 @@
                 <tr>
                     <th>Module</th>
                     <th>Status</th>
-                    <th>Credits</th>
+                    <th>Credits<br><span class="text_correct">Passed</span></th>
+                    <th>Credits<br><span class="text_incorrect">Failed</span></th>
+                    <th>Credits<br><span class="text_unattempted">Unattempted</span></th>
                     <th>Summative<br>Assessments Passed</th>
-                    <th>Formative<br>Assessments Passed</th>
                 </tr>
                 {% for m in module_overview_stats %}
                     <tr>
@@ -57,12 +58,24 @@
                                 {{m.num_of_credits_earned}}/{{m.num_of_credits_possible}}
                             {% endif %}
                         </td>
+                        <td>
+                            {% if m.num_of_credits_possible %}
+                                {{m.num_of_credits_failed}}/{{m.num_of_credits_possible}}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if m.num_of_credits_possible %}
+                                {{m.num_of_credits_possible - m.num_of_credits_earned - m.num_of_credits_failed}}/{{m.num_of_credits_possible}}
+                            {% endif %}
+                        </td>
                         <td>{% if m.count_of_sum_asssessment_present %}
                             {{m.count_of_sum_assessment_pass}}/{{m.count_of_sum_asssessment_present}}
                         {% endif %}</td>
+                        {#
                         <td>{% if m.count_of_form_asssessment_present %}
                             {{m.count_of_form_assessment_pass}}/{{m.count_of_form_asssessment_present}}
                         {% endif %}</td>
+                        #}
                         </tr>
                 {% endfor %}
             </table>
@@ -89,9 +102,7 @@
                         {% endif %}</td>
                         <td><span class="{{a.status_class}}">{{a.status}}</span></td>
                         <td>
-                            {% if a.sum_of_marks_possible %}
-                                {{a.sum_of_marks_earned}}/{{a.sum_of_marks_possible}}
-                            {% endif %}
+                            {{a.sum_of_marks_earned}}/{{a.sum_of_marks_possible}}
                         </td>
                         </tr>
                 {% endfor %}
@@ -201,25 +212,6 @@
                 ],
             },
         });
-        /*
-         // OVERALL: COHORT
-         const overallResultsCohortcorrect = '{{overall_results_cohort["sum_of_marks_awarded"]}}';
-         const overallResultsCohortincorrect = '{{overall_results_cohort["sum_of_marks_possible"]-overall_results_cohort["sum_of_marks_awarded"]}}';
-         const overallResultsCohortPiElement = document.getElementById('overallResultsCohortPi').getContext('2d');
-         const overallResultsCohortPi = new Chart(overallResultsCohortPiElement, {
-             type: 'pie',
-             data: {
-                 labels: ['Correct', 'Incorrect'],
-                 datasets: [
-                     {
-                         label: 'Course View',
-                         data: [overallResultsCohortcorrect, overallResultsCohortincorrect],
-                         backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)'],
-                         hoverOffset: 4,
-                     },
-                 ],
-             },
-         });
-         */
+        
     </script>
 {% endblock content %}
