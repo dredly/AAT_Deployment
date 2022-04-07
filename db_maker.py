@@ -587,7 +587,7 @@ with app.app_context():
                 assessment_id=1,
                 t2_question_id=2,
                 response_content="adad",
-                is_correct=True,
+                is_correct=False,
             ),
             ResponseT2(  # 8
                 attempt_number=3,

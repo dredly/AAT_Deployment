@@ -25,7 +25,9 @@
                 <p>Attempts: 2/3</p>
                 <div>
                 {% if current_user.has_taken(summative_assessment) %}
-                    <p>Highest Result Achieved: {{ marks_achieved[summative_assessment.title] }}</p>
+                <a href="{{ url_for('assessments.show_results', assessment_id=summative_assessment.assessment_id, attempt_number=best_attempt[summative_assessment.title] ) }}">
+                    Highest Result Achieved: {{ marks_achieved[summative_assessment.title] }}
+                </a>
                 {% endif %}
                 </div>
                 <button type="button" class = "Assessment_Index_Child">

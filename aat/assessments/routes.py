@@ -69,6 +69,7 @@ def view_module(module_id):
     summatives = []
     formatives = []
     marks_achieved = dict()
+    best_attempt= dict() 
     # ----> find all tags
     assess_tags = dict()
     for assessment in assessments:
@@ -138,6 +139,7 @@ def view_module(module_id):
             result = 0
 
         marks_achieved[assessment.title] = f"{result}/{marks_av}"
+        best_attempt[assessment.title] = d_ref 
         if assessment.is_summative:
             summatives.append(assessment)
         else:
@@ -151,6 +153,7 @@ def view_module(module_id):
         formatives=formatives,
         marks_achieved=marks_achieved,
         assess_tags=assess_tags,
+        best_attempt=best_attempt
     )
 
 
@@ -982,3 +985,99 @@ def exit_assessment():
 @assessments.route("/empty_assessment")
 def empty_assessment():
     return render_template("empty_assessment.html")
+
+# ----------------------------------------------------------------------------------------------------
+# ---------------------------------  Duplicate Results Page  ---------------------------------------
+# -------------------------------- For access from module view ------------------------------------
+# ----------------------------------------------------------------------------------------------------
+
+@assessments.route("/results/<int:assessment_id>/<int:attempt_number>")
+def show_results(assessment_id, attempt_number): 
+    # --- > get all responses for given assessment and given attempt id 
+    assessment = Assessment.query.filter_by(assessment_id=assessment_id).first()
+    t1_responses = (
+                current_user.t1_responses.filter_by(
+                    assessment_id=assessment.assessment_id
+                )
+                .filter_by(attempt_number=attempt_number)
+                .all()
+            )
+    t2_responses = (
+        current_user.t2_responses.filter_by(
+            assessment_id=assessment.assessment_id
+        )
+        .filter_by(attempt_number=attempt_number)
+        .all()
+    )
+    # ----- find all questions asked
+    questions = (
+        QuestionT1.query.filter_by(assessment_id=assessment_id).all()
+        + QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+    )
+
+    # ----- find possible total marks
+    possible_total = 0
+    for question in questions:
+        possible_total += question.num_of_marks
+
+    # ----- find actual result achieved
+    result = 0
+    for response in t1_responses:
+        if response.is_correct:
+            answered_question = QuestionT1.query.filter_by(
+                q_t1_id=response.t1_question_id
+            ).first()
+            result += answered_question.num_of_marks
+    for response in t2_responses:
+        if response.is_correct:
+            answered_question = QuestionT2.query.filter_by(
+                q_t2_id=response.t2_question_id
+            ).first()
+            result += answered_question.num_of_marks
+
+    # --- > Find all questions answered 
+    t1_questions =  QuestionT1.query.filter_by(assessment_id=assessment_id).all()
+    t2_questions = QuestionT2.query.filter_by(assessment_id=assessment_id).all()
+    
+    # --- > User answers 
+    t1_answers = dict()
+    t2_answers = dict()
+    for q in t1_questions:
+        print(q.q_t1_id)
+        user_answer = (
+                current_user.t1_responses.filter_by(
+                    assessment_id=assessment.assessment_id
+                )
+                .filter_by(t1_question_id=q.q_t1_id)
+                .filter_by(attempt_number=attempt_number)
+                .first()
+            )
+        correct_option = Option.query.filter_by(q_t1_id=q.q_t1_id
+                ).filter_by(is_correct=True).first()
+        selected_option_text = Option.query.filter_by(option_id=user_answer.selected_option).first()
+        t1_answers[q.q_t1_id] = [selected_option_text, 
+                                    correct_option.option_text,
+                                    user_answer.is_correct]  
+    for q in t2_questions: 
+        user_answer = (
+                current_user.t2_responses.filter_by(
+                    assessment_id=assessment.assessment_id
+                )
+                .filter_by(t2_question_id=q.q_t2_id)
+                .filter_by(attempt_number=attempt_number)
+                .first()
+            )
+        t2_answers[q.q_t2_id] = [user_answer.response_content, 
+                                    q.correct_answer, 
+                                    user_answer.is_correct]
+    print(t1_answers)
+    print(t2_answers)
+    return render_template("show_results.html", 
+                    t1_questions=t1_questions, 
+                    t1_answers=t1_answers,
+                    t2_questions=t2_questions,
+                    t2_answers=t2_answers,
+                    possible_total=possible_total,
+                    result=result
+                    )
+
