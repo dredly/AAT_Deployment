@@ -8,7 +8,6 @@
 }
 
 .assessment-instance {
-    width: 80%;
     margin: auto;  
     display: flex; 
     justify-content: space-between;
@@ -99,4 +98,36 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.content-container {
+    width: 80%; 
+    margin: auto; 
+    margin-top: 10px;
+    margin-bottom: 10px; 
+}
+
+.assess-sub-text {
+    margin-right: 10%; 
+}
+
+
+.assessment-sub-detail {
+    display: flex; 
+    flex-direction: row;
+}
+
+.all-tags {
+    display: flex; 
+    flex-direction: row;
+}
+
+.assess-tag {
+    margin-left: 5px; 
+    margin-right: 5px; 
+    padding: 2px; 
+    border: 1px solid rgba(54, 162, 235,0.4); 
+    background-color: rgba(54, 162, 235,0.4);
+    border-radius: 3px;
+    font-size: 0.7rem;
 }

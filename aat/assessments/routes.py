@@ -2,6 +2,7 @@ from datetime import date, datetime
 import math
 import random
 from stringprep import in_table_d2
+from black import diff
 from flask import Response, flash, redirect, render_template, request, url_for, abort, session
 from . import assessments
 
@@ -73,6 +74,7 @@ def view_module(module_id):
     best_attempt= dict() 
     # ----> find all tags
     assess_tags = dict()
+    difficulties = dict()
     for assessment in assessments:
         # ----> find all questions
         qs = (
@@ -82,9 +84,10 @@ def view_module(module_id):
 
         # ---> calculate marks available
         marks_av = 0
-
+        difficulty_figures = []
         for q in qs:
             tag = Tag.query.filter_by(id=q.tag_id).first()
+            
             if tag is not None:
                 if not tag in topic_tags: 
                     topic_tags.append(tag)
@@ -93,9 +96,13 @@ def view_module(module_id):
                         assess_tags[assessment.title].append(tag.name)
                 else:
                     assess_tags[assessment.title] = [tag.name]
-
+            difficulty_figures.append(q.difficulty)
             marks_av += q.num_of_marks
-
+        if len(difficulty_figures) == 0: 
+            final_difficulty = 0
+        else: 
+            final_difficulty = round(sum(difficulty_figures) / len(difficulty_figures))
+        difficulties[assessment.title] = final_difficulty
         # ---> check if user has responded to assessment
         if current_user.has_taken(assessment):
             attempts_taken = current_user.current_attempts(assessment)
@@ -159,7 +166,8 @@ def view_module(module_id):
         marks_achieved=marks_achieved,
         assess_tags=assess_tags,
         best_attempt=best_attempt,
-        topic_tags=topic_tags
+        topic_tags=topic_tags,
+        difficulties=difficulties
     )
 
 
