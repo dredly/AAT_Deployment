@@ -1,16 +1,20 @@
 {% extends("layout.html") %} {% block content %}
-<h1>
+<h1 class="result-header">
 	Result: {% if response.is_correct %}Correct!{% else %}Incorrect{% endif %}
 </h1>
-{% if type == 1%}
+<section class="assessment-summary summary-page">
+	<small>Question difficulty: {{ question.difficulty }}</small>
+{% if q_type == 1%}
 <p>You answered: {{ response.option_text }}</p>
 <p>The correct answer was: {{ right_answer.option_text }}</p>
-{% elif type == 2 %}
+{% elif q_type == 2 %}
 <p>You answered: {{ response.response_content }}</p>
 <p>The correct answer was: {{ question.correct_answer }}</p>
 {% endif %}
+<p>Total points recieved: {% if response.is_correct %}{{ question.num_of_marks }}{% else %}0{% endif %}/{{
+    question.num_of_marks }}</p>
 
-<h2>Feedback</h2>
+<h4>Feedback</h4>
 <p class="feedback-or-feedforward">
 	{% if response.is_correct %}
 	{{ question.feedback_if_correct }}
@@ -18,14 +22,28 @@
 	{{ question.feedback_if_wrong }}
 	{% endif %}
 </p>
-
-{% if session['questions']|length < 1 %} <button type="button">
-	<a href="{{ url_for('assessments.results', assessment_id=assessment.assessment_id ) }}">End Assessment</a>
-	</button>
+<h4>Feed Forward</h4>
+<p class="feedback-or-feedforward">
+	{% if response.is_correct %}
+	{{ question.feedforward_if_correct }}
 	{% else %}
-	<button type="button">
-		<a
-			href="{{ url_for('assessments.answer_question', type=session['questions'][0][0], question_id=session['questions'][0][1]) }}">Next
-			Question</a>
-	</button>
-	{% endif %} {% endblock %}
+	{{ question.feedforward_if_wrong }}
+	{% endif %}
+</p>
+</section>
+
+<div class="assess-nav">
+	<div class="button-container">
+		{% if session['questions']|length < 1 %} <button type="button" class="take-assessment-button">
+			<a href="{{ url_for('assessments.results', assessment_id=assessment.assessment_id ) }}">End Assessment</a>
+			</button>
+		{% else %}
+			<button type="button" class="take-assessment-button">
+				<a
+					href="{{ url_for('assessments.answer_question', q_type=session['questions'][0][0], question_id=session['questions'][0][1]) }}">Next
+					Question</a>
+			</button>
+		{% endif %} 
+	</div>
+</div>
+{% endblock %}

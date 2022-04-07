@@ -20,6 +20,6 @@ timer.addEventListener('secondsUpdated', function(e) {
     if (timer.getTimeValues().seconds === 0) {
         timeBarRed.style.backgroundColor = "red";
         timeShow.style.color = "red";
-        setTimeout(() => {window.location.href = "http://127.0.0.1:5000/legendary_gamification/tortement";}, 500);
+        setTimeout(() => {window.location.href = "http://127.0.0.1:5000/legendary_gamification/correctement";}, 500);
     }
 });

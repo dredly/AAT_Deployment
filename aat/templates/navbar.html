@@ -5,9 +5,6 @@
 		<li>
 			<a href="{{ url_for('index') }}">Home</a>
 		</li>
-		<li>
-			<a href="{{ url_for('assessments.index') }}">Assessments</a>
-		</li>
 		{% if current_user.can(Permission.WRITE_ASSESSMENT) %}
 		<li>
 			<a href="{{ url_for('questions.index') }}">Questions</a>
@@ -22,10 +19,17 @@
 		</li>
 		{% else %}
 		<li>
+			<a href="{{ url_for('assessments.index') }}">Assessments</a>
+		</li>
+		<li>
 			<a href="{{ url_for('auth.logout') }}">Log Out User "{{current_user.name}}"</a>
 		</li>
 		<li>
-			<a href="{{ url_for('legendary_gamification.get_id') }}">Achievements</a>
+			{% if current_user.role_id == 1 %}
+				<a href="{{ url_for('legendary_gamification.get_id') }}">Achievements</a>
+			{% else %}
+				<a href="{{ url_for('legendary_gamification.test_leaderboard') }}">LeaderBoard</a>
+			{% endif %}
 		</li>
 		{% endif %}
 		<!-- STATS -->

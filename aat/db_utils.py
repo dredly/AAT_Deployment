@@ -56,13 +56,17 @@ def get_assessment_id_and_total_marks_possible(store_output_to_file=False):
     return assessment_id_and_total_marks_possible
 
 
-def get_assessment_id_and_data(store_output_to_file=False, module_id=None):
+def get_assessment_id_and_data(
+    store_output_to_file=False, module_id=None, assessment_id=None
+):
     """
     Returns dictionary: {assessment_id: total_possible_marks}
     (useful for combining question type 1 and type 2)
     """
     if module_id is not None:
         a = Assessment.query.filter_by(module_id=module_id).all()
+    elif assessment_id is not None:
+        a = Assessment.query.filter_by(assessment_id=assessment_id).all()
     else:
         a = Assessment.query.all()
     assessment_id_and_data = {}
@@ -762,9 +766,12 @@ def get_weighted_perc_calc(marks_earned, assessment_id):
     total_credits_for_module = get_total_credits_for_module(module_id)
     total_marks_for_assessment = get_total_marks_for_assessment(assessment_id)
 
-    weighted_mark = (marks_earned / total_marks_for_assessment) * (
-        credits_for_assessment / total_credits_for_module
-    )
+    if total_marks_for_assessment > 0:
+        weighted_mark = (marks_earned / total_marks_for_assessment) * (
+            credits_for_assessment / total_credits_for_module
+        )
+    else:
+        weighted_mark = None
 
     return weighted_mark
 

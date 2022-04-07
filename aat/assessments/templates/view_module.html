@@ -1,7 +1,7 @@
 {% extends("layout.html") %}
 {% block content %}
 <div class="block_contents">
-<h1>{{module.title}}</h1>
+<h1 class="modules_title">{{module.title}}</h1>
 
 {% if current_user.can(Permission.WRITE_ASSESSMENT) %}
 <div class = "view_module_create">
@@ -14,24 +14,34 @@
 
 <section class="summary-page summative">
     <h2>Summative Assessments</h2>
-    <small><em><b>Please note: summative assessments can only be completed once.</b></em></small>
+    {% if current_user.can(Permission.ANSWER_ASSESSMENT) %}
+    <small><em><b>Please note: summative assessments have a limited number of attempts. Do not start an assessment attempt if you are unable to finish in one sitting.</b></em></small>
+    {% endif %}
     {% for summative_assessment in summatives %}
         <div class="assessment-instance">
             <h3>{{ summative_assessment.title }}</h3>
-            <p>Must be completed by: <b class="date">{% if summative_assessment.due_date != None %}{{ summative_assessment.due_date.strftime("%d/%m/%Y") }}{% endif %}{% if summative_assessment.due_date == None %}{{ summative_assessment.due_date }}{% endif %}</b></p>
+            <p>Due: <b class="date">{% if summative_assessment.due_date != None %}{{ summative_assessment.due_date.strftime("%d/%m/%Y") }}{% endif %}{% if summative_assessment.due_date == None %}N/A{% endif %}</b></p>
             {% if current_user.can(Permission.ANSWER_ASSESSMENT) %}
-            
+                <p>Attempts: {{ current_user.current_attempts(summative_assessment) }}/3</p>
+                <div>
                 {% if current_user.has_taken(summative_assessment) %}
-                    <p>Highest Result Achieved: {{ marks_achieved[summative_assessment.title] }}</p>
+                <a href="{{ url_for('assessments.show_results', assessment_id=summative_assessment.assessment_id, attempt_number=best_attempt[summative_assessment.title] ) }}">
+                    Highest Result Achieved: {{ marks_achieved[summative_assessment.title] }}
+                </a>
                 {% endif %}
+                </div>
+                {% if not current_user.current_attempts(summative_assessment) >= 3 %}
                 <button type="button" class = "Assessment_Index_Child">
-                    <a href="{{ url_for('assessments.assessment_summary', assessment_id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">Take Assessment</a>
+                    <a href="{{ url_for('assessments.assessment_summary', assessment_id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">{% if current_user.has_taken(summative_assessment) %}Retake Assessment{% else %}Take Assessment{% endif %}</a>
                 </button>
-
+                {% endif %}
             {% elif current_user.can(Permission.WRITE_ASSESSMENT) %}
             <button type="button" class = "Assessment_Index_Child">
                 <a href="{{ url_for('assessments.show_assessment', id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">View Assessment</a>
             </button>   
+                <button type="button" class = "Assessment_Index_Child">
+                    <a href="{{ url_for('assessments.show_assessment', id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">View Assessment</a>
+                </button>
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.edit_assessment', id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
                 </button>
@@ -40,7 +50,15 @@
                 </button>
             {% endif %}
         </div>
-        <small>Assessment subject tags: {% for tag in assess_tags[summative_assessment.title] %}{{ tag }}, {% endfor %}</small>
+        <div class="assessment-sub-detail">
+            <small class="assess-sub-text">Assessment Difficulty: {{ difficulties[summative_assessment.title] }}</small>
+            {% if assess_tags[summative_assessment.title]|length > 0 %}
+            <div class="all-tags">
+                <small>Assessment subject tags: {% for tag in assess_tags[summative_assessment.title] %}<span class="assess-tag">{{ tag }}</span>{% endfor %}</small>
+            </div>
+            {% endif %}
+        </div>
+        
         <hr>
     {% endfor %}
 </section>
@@ -51,18 +69,23 @@
         <div class="assessment-instance">
             <h3>{{ formative_assessment.title }}</h3>
             {% if current_user.can(Permission.ANSWER_ASSESSMENT) %}
-            
-                {% if current_user.has_taken(formative_assessment) %}
-                    <p>Highest Result Achieved: {{ marks_achieved[formative_assessment.title] }}</p>
-                {% endif %}
+                <p>Due: <b class="date">{% if formative_assessment.due_date != None %}{{ formative_assessment.due_date.strftime("%d/%m/%Y") }}{% endif %}{% if formative_assessment.due_date == None %}N/A{% endif %}</b></p>
+                <p>Unlimited Attempts Allowed</p>
+                <div>
+                    {% if current_user.has_taken(formative_assessment) %}
+                    <a href="{{ url_for('assessments.show_results', assessment_id=formative_assessment.assessment_id, attempt_number=best_attempt[formative_assessment.title] ) }}">
+                        Highest Result Achieved: {{ marks_achieved[formative_assessment.title] }}
+                    </a>
+                    {% endif %}
+                </div>
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.assessment_summary', assessment_id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">Take Assessment</a>
                 </button>
-
             {% elif current_user.can(Permission.WRITE_ASSESSMENT) %}
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.show_assessment', id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">View Assessment</a>
-                </button>   
+                </button>
+
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.edit_assessment', id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">Edit Assessment</a>
                 </button>
@@ -71,10 +94,33 @@
                 </button>
             {% endif %}
         </div>
-        <small>Assessment subject tags: {% for tag in assess_tags[formative_assessment.title] %}{{ tag }}, {% endfor %}</small>
+        <div class="assessment-sub-detail">
+            <small class="assess-sub-text">Assessment Difficulty: {% if difficulties[formative_assessment.title] == 0 %}No questions added to be able to assess difficulty.{% else %}{{ difficulties[formative_assessment.title] }}{% endif %}</small>
+            {% if assess_tags[formative_assessment.title]|length > 0 %}
+            <div class="all-tags">
+                <small>Assessment subject tags: {% for tag in assess_tags[formative_assessment.title] %}<span class="assess-tag">{{ tag }}</span>{% endfor %}</small>
+            </div>
+            {% endif %}
+        </div>
         <hr>
     {% endfor %}
 </section>
+
+{% if current_user.can(Permission.ANSWER_ASSESSMENT) %}
+<section class="summary-page formative">
+    <h2>Topics Covered in Module</h2>
+    <small><em>Take random practice questions on the topics covered in this module to prepare for the assessments. Your scores will not be saved, but the practice will prepare you for the real thing!</em></small>
+    {% for t in topic_tags %}
+    <div class="assessment-instance">
+        <h3>{{ t.name[0]|capitalize }}{{ t.name[1:] }}</h3>
+        <button type="button" class = "Assessment_Index_Child">
+            <a href="{{ url_for('assessments.random_question', topic_id=t.id) }}" class="Assessment_Index_Text">Take Practice Question</a>
+        </button>
+    </div>
+    <hr>
+    {% endfor %}
+</section>
+{% endif %}
 
 </div>
 {% endblock %}

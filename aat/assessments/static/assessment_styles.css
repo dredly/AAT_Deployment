@@ -8,7 +8,6 @@
 }
 
 .assessment-instance {
-    width: 80%;
     margin: auto;  
     display: flex; 
     justify-content: space-between;
@@ -16,10 +15,119 @@
 }
 
 .assessment-instance button {
-    height: 20px; 
+    height: 100%; 
 }
 
 .summative { 
     border: 5px solid black; 
     box-shadow:  10px 10px 30px #bebebe;
+}
+
+.assessment-summary { 
+    margin-top: 10px;
+}
+
+.button-container {
+    display: flex; 
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.take-assessment-button {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    text-decoration: none;
+    color: initial;
+    cursor: pointer; 
+    margin: auto;
+    padding: 10px;  
+    background-color: #ebebeb;
+    border: 1px solid black; 
+    border-radius: 5px;
+}
+
+.take-assessment-button:hover {
+    background-color: #bebebe;
+}
+
+.take-assessment-button a {
+    text-decoration: none;
+    padding: 10px; 
+}
+
+.answer-form {
+    display: flex; 
+    flex-direction: column;
+    align-items: baseline;
+}
+
+.answer-question-buttons {
+    margin-top: 20px; 
+}
+
+.answer-box {
+    width: 50%;
+    height: 100px; 
+}
+
+.result-container {
+    margin-left: 10%; 
+}
+
+.top-banner-container .button-container {
+    margin-right: 10%; 
+}
+
+.top-banner-container {
+    width: 80%;
+    margin: auto; 
+    display: flex; 
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.result-header {
+    margin-left: 10%; 
+}
+
+.assess-nav {
+    margin-bottom: 20px; 
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-container {
+    width: 80%; 
+    margin: auto; 
+    margin-top: 10px;
+    margin-bottom: 10px; 
+}
+
+.assess-sub-text {
+    margin-right: 10%; 
+}
+
+
+.assessment-sub-detail {
+    display: flex; 
+    flex-direction: row;
+}
+
+.all-tags {
+    display: flex; 
+    flex-direction: row;
+}
+
+.assess-tag {
+    margin-left: 5px; 
+    margin-right: 5px; 
+    padding: 2px; 
+    border: 1px solid rgba(54, 162, 235,0.4); 
+    background-color: rgba(54, 162, 235,0.4);
+    border-radius: 3px;
+    font-size: 0.7rem;
 }
