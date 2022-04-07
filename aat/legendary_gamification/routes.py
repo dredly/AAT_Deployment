@@ -14,124 +14,52 @@ from aat.legendary_gamification.forms import ChallengeForm
 from . import legendary_gamification
 from werkzeug.exceptions import BadRequestKeyError
 from ..models import *
-
-questions = [
-    "How do you print things in python",
-    "How do you declare a function in python",
-    "How many mexicans does it take to unscrew a light bulb",
-]
-
-options = [
-    ["System.out.println()", "console.log()", "print()", "just type it lol"],
-    ["jeff", "def", "deaf", "public static void main(String[] args)"],
-    ["None", "one", "falsy", "Juan"],
-]
-
-answers = [
-    [False, False, True, False],
-    [False, True, False, False],
-    [False, False, False, True],
-]
+from ..db_utils import get_all_assessment_marks
 
 question_counter = 0
+score_counter = 0
 challenge_questions = []
 challenge_options = []
+rapid_responses = []
+correct_responses = []
+rapid_fire_reason = ""
 
 @legendary_gamification.route("/achievements/<int:user_id>", methods=["GET", "POST"])
 def achievements(user_id):
     global challenge_questions
     global challenge_options
+    global rapid_fire_reason
+    get_all_assessment_marks(debug=True)
     leaderboard_user = User.query.filter_by(id=user_id).first()
     badges = []
     achievements = []
     lines_ranks = []
     all_users = User.query.all()
+    all_friends = Friends.query.filter_by(user_id=current_user.id).all()
+    all_challenge_friends = []
+    for friend in all_friends:
+        all_challenge_friends.append((User.query.filter_by(id=friend.friend_id).first().id, User.query.filter_by(id=friend.friend_id).first().name))
+    all_challenge_friends_names = [item[1] for item in all_challenge_friends]
     all_takenChallenges = ChallengesTaken.query.all()
     takenChallengesIDs = ChallengesTaken.query.with_entities(ChallengesTaken.challenge_id).filter_by(user_id=user_id).all()
     takenChallengesList = [item[0] for item in takenChallengesIDs]
 
+    user_stats = []
     for user in all_users:
-        assessment_marks = {}
-        for response in user.t1_responses:
-            if response.assessment not in assessment_marks:
-                assessment_marks[response.assessment] = {
-                    "marks_awarded": response.question.num_of_marks
-                    if response.is_correct
-                    else 0,
-                    "marks_possible": response.question.num_of_marks,
-                }
-            else:
-                assessment_marks[response.assessment]["marks_awarded"] += (
-                    response.question.num_of_marks if response.is_correct else 0
-                )
-                assessment_marks[response.assessment][
-                    "marks_possible"
-                ] += response.question.num_of_marks
+        if user.role_id == 1:
+            user_stats.append((get_all_assessment_marks(input_user_id=user.id, highest_scoring_attempt_only=True), user.name, user.id))
+    print("#####################################")
+    for stat in user_stats:
+        print(stat)
 
-        ## T2_responses
-        for response in user.t2_responses:
-            if response.assessment not in assessment_marks:
-                assessment_marks[response.assessment] = {
-                    "marks_awarded": response.question.num_of_marks
-                    if response.is_correct
-                    else 0,
-                    "marks_possible": response.question.num_of_marks,
-                }
-            else:
-                assessment_marks[response.assessment]["marks_awarded"] += (
-                    response.question.num_of_marks if response.is_correct else 0
-                )
-                assessment_marks[response.assessment][
-                    "marks_possible"
-                ] += response.question.num_of_marks
+    for user in user_stats:
+        user_score = 0
+        for stat in user[0]:
+            if not stat['is_summative']:
+                user_score += stat['correct_marks']
+        lines_ranks.append((user_score, user[1], user[2]))
 
-        module_dict = {}
 
-        for module in Module.query.all():
-            for assessment, data in assessment_marks.items():
-                if assessment.module_id == module.module_id:
-                    if module not in module_dict:
-                        module_dict[module] = {assessment: data}
-                    else:
-                        module_dict[module][assessment] = data
-
-        sum_of_marks_awarded = 0
-        sum_of_marks_possible = 0
-
-        for module in module_dict:
-            for assessment, data in assessment_marks.items():
-                sum_of_marks_awarded += data["marks_awarded"]
-                sum_of_marks_possible += data["marks_possible"]
-                # module_dict[module]["marks_awarded"] += data["marks_awarded"]
-                # module_dict[module]["marks_possible"] += data["marks_possible"]
-
-        # if sum_of_marks_possible == 0:
-        #     return render_template("no_questions_answered.html")
-
-        overall_results = {
-            "sum_of_marks_awarded": sum_of_marks_awarded,
-            "sum_of_marks_possible": sum_of_marks_possible,
-        }
-
-        # print(user.name, overall_results)
-
-        lines_ranks.append((overall_results['sum_of_marks_awarded'], user.name, user.id))
-        print(lines_ranks)
-
-        module_totals = {}
-
-        for module, module_details in module_dict.items():
-            module_totals[module.title] = {"marks_awarded": 0, "marks_possible": 0}
-            for assessment, assessment_details in module_details.items():
-                module_totals[module.title]["marks_awarded"] += assessment_details[
-                    "marks_awarded"
-                ]
-                module_totals[module.title]["marks_possible"] += assessment_details[
-                    "marks_possible"
-                ]
-
-    # print(f"{module_totals=}")
-    # print(lines_ranks)
 
     award_badges = Awarded_Badge.query.filter_by(user_id=user_id).all()
     # for awards in award_badges:
@@ -181,7 +109,7 @@ def achievements(user_id):
             challenge.status = "Completed"
             db.session.add(challenge)
             db.session.commit()
-    print(active_users)
+    # print(active_users)
 
     # print(in_users)
     # print(out_users)
@@ -208,6 +136,10 @@ def achievements(user_id):
         except:
             pass
         if choice == "Practice Rapid Fire Tests" or choice == "Take Rank Up Test":
+            if choice == "Practice Rapid Fire Tests":
+                rapid_fire_reason = "practice"
+            else:
+                rapid_fire_reason = "rankup"
             questions_t1 = QuestionT1.query.all()
             max_questions = len(questions_t1)
             question_ids = []
@@ -237,7 +169,7 @@ def achievements(user_id):
             return redirect(url_for(".rapid_fire"))
 
         elif choice == "Challenge User":
-            challenge_details = Challenge(from_user=user_id, to_user=int(request.form.get("Users")), difficulty=int(challenge.difficulty.data))
+            challenge_details = Challenge(from_user=user_id, to_user=int(request.form.get("Users")), difficulty=int(challenge.difficulty.data), number_of_questions=int(request.form.get("Question_Numbers")))
             db.session.add(challenge_details)
             db.session.commit()
             return redirect(url_for(".get_id"))
@@ -252,7 +184,7 @@ def achievements(user_id):
                 questions_t1 = QuestionT1.query.all()
                 max_questions = len(questions_t1)
                 question_ids = []
-                while len(question_ids) < 3:
+                while len(question_ids) < challenge_active.number_of_questions:
                     q_id = random.randrange(1, max_questions + 1)
                     if q_id not in question_ids:
                         question_ids.append(q_id)
@@ -295,6 +227,7 @@ def achievements(user_id):
                     )
                     challenge_options.append(option)
                 # print(challenge_options)
+                rapid_fire_reason = "practice"
                 return redirect(
                     url_for(
                         ".rapid_fire",
@@ -303,13 +236,26 @@ def achievements(user_id):
                     )
                 )
             except BadRequestKeyError:
-                pass
+                pass       
+        elif choice == "Add Friend":
+            friend1 = Friends(user_id=current_user.id, friend_id=user_id)
+            friend2 = Friends(user_id=user_id, friend_id=current_user.id)
+            db.session.add_all([friend1, friend2])
+            db.session.commit()
+            return redirect(url_for(".get_id"))
+        elif choice == "Remove Friend":
+            friend1 = Friends.query.filter_by(user_id=current_user.id, friend_id=user_id).first()
+            friend2 = Friends.query.filter_by(user_id=user_id, friend_id=current_user.id).first()
+            db.session.delete(friend1)
+            db.session.delete(friend2)
+            db.session.commit()
+            return redirect(url_for(".get_id"))
     return render_template(
         "achievements.html", ranks=sorted(lines_ranks, key=lambda x: x[0], reverse=True), badges=badges,
         achievements=achievements, incoming_challenges=in_users, outgoing_challenges=out_users, challenge=challenge,
         all_users=all_users, challenge_ids=challenge_ids, in_difficulty=incoming_challenge_difficulty,
         out_difficulty=outgoing_challenge_difficulty, active_users=active_users, taken_challenges=takenChallengesList,
-        leaderboard_user=leaderboard_user
+        leaderboard_user=leaderboard_user, all_friends=all_challenge_friends, all_friends_names=all_challenge_friends_names
         )
 
 
@@ -320,35 +266,52 @@ def refresh():
 
 @legendary_gamification.route("/get-id-page-achievement")
 def get_id():
+    global question_counter
+    global challenge_questions
+    global challenge_options
+    global score_counter
+    global rapid_responses
+    global correct_responses
     current_user_id = current_user.id
+    question_counter = 0
+    challenge_questions = []
+    challenge_options = []
+    score_counter = 0
+    rapid_responses = []
+    correct_responses = []
     print(current_user_id)
     return redirect(url_for(".achievements", user_id=current_user_id))
 
 @legendary_gamification.route("/correctement")
 def correct_answer():
     global question_counter
+    global rapid_responses
+    global correct_responses
+    correct_responses.append([item for item in challenge_options[question_counter] if item[2]])
+    rapid_responses.append((False, ""))
     question_counter += 1
     return redirect("rapid-fire")
 
 
 @legendary_gamification.route("/rapid-fire-victory-royale", methods=["GET", "POST"])
 def assessment_success():
-    global question_counter
-    global challenge_questions
-    global challenge_options
     if request.method == "POST":
         try:
             choice = request.form["button"]
         except BadRequestKeyError:
             return redirect("rapid-fire-victory-royale")
-        question_counter = 0
-        challenge_questions = []
-        challenge_options = []
-        if choice == "reset":
+        if choice == "return":
             return redirect(url_for(".get_id"))
-        elif choice == "return":
-            return redirect(url_for(".get_id"))
-    return render_template("assess_success.html")
+    if rapid_fire_reason == "rankup":
+        if score_counter == len(rapid_responses):
+            current_user_tier = Tier.query.filter_by(name=current_user.tier).first()
+            new_tier_id = current_user_tier.tier_id + 1
+            new_user_tier = Tier.query.filter_by(tier_id=new_tier_id).first()
+            currentUser = User.query.filter_by(id=current_user.id).first()
+            currentUser.tier = new_user_tier.name
+            db.session.commit()
+    return render_template("assess_success.html", rapid_responses=rapid_responses, challenge_options=challenge_options, challenge_questions=challenge_questions, correct_responses=correct_responses, reason=rapid_fire_reason, score_count=score_counter)
+
 
 
 @legendary_gamification.route("/tortement")
@@ -364,17 +327,23 @@ def level_up():
 @legendary_gamification.route("/rapid-fire", methods=["GET", "POST"])
 def rapid_fire():
     global question_counter
+    global score_counter
+    global rapid_responses
+    global correct_responses
     try:
         if request.method == "POST":
             try:
-                choice = request.form["options"]
-                if choice == "True":
-                    return redirect("correctement")
+                choice = request.form["options"].split(",")
+                if choice[0] == "True":
+                    score_counter += 1
+                    rapid_responses.append((True, choice[1]))
                 else:
-                    return redirect("tortement")
+                    rapid_responses.append((False, choice[1]))
+                correct_responses.append([item for item in challenge_options[question_counter] if item[2]])
+                print(correct_responses)
+                question_counter += 1
             except BadRequestKeyError:
-                return redirect("tortement")
-
+                pass
         return render_template(
             "fire.html",
             question=challenge_questions[question_counter],
@@ -410,3 +379,90 @@ def profile():
     for badge in badges:
         print(badge.name)
     return render_template("profile.html", badges=badges, achievements=achievements)
+
+
+@legendary_gamification.route("/leaderboard-test")
+def test_leaderboard():
+    all_users = User.query.all()
+    lines_ranks = []
+    for user in all_users:
+        if user.role_id == 1:
+            assessment_marks = {}
+            for response in user.t1_responses:
+                if response.assessment not in assessment_marks:
+                    assessment_marks[response.assessment] = {
+                        "marks_awarded": response.question.num_of_marks
+                        if response.is_correct
+                        else 0,
+                        "marks_possible": response.question.num_of_marks,
+                    }
+                else:
+                    assessment_marks[response.assessment]["marks_awarded"] += (
+                        response.question.num_of_marks if response.is_correct else 0
+                    )
+                    assessment_marks[response.assessment][
+                        "marks_possible"
+                    ] += response.question.num_of_marks
+
+            ## T2_responses
+            for response in user.t2_responses:
+                if response.assessment not in assessment_marks:
+                    assessment_marks[response.assessment] = {
+                        "marks_awarded": response.question.num_of_marks
+                        if response.is_correct
+                        else 0,
+                        "marks_possible": response.question.num_of_marks,
+                    }
+                else:
+                    assessment_marks[response.assessment]["marks_awarded"] += (
+                        response.question.num_of_marks if response.is_correct else 0
+                    )
+                    assessment_marks[response.assessment][
+                        "marks_possible"
+                    ] += response.question.num_of_marks
+
+            module_dict = {}
+
+            for module in Module.query.all():
+                for assessment, data in assessment_marks.items():
+                    if assessment.module_id == module.module_id:
+                        if module not in module_dict:
+                            module_dict[module] = {assessment: data}
+                        else:
+                            module_dict[module][assessment] = data
+
+            sum_of_marks_awarded = 0
+            sum_of_marks_possible = 0
+
+            for module in module_dict:
+                for assessment, data in assessment_marks.items():
+                    sum_of_marks_awarded += data["marks_awarded"]
+                    sum_of_marks_possible += data["marks_possible"]
+                    # module_dict[module]["marks_awarded"] += data["marks_awarded"]
+                    # module_dict[module]["marks_possible"] += data["marks_possible"]
+
+            # if sum_of_marks_possible == 0:
+            #     return render_template("no_questions_answered.html")
+
+            overall_results = {
+                "sum_of_marks_awarded": sum_of_marks_awarded,
+                "sum_of_marks_possible": sum_of_marks_possible,
+            }
+
+            # print(user.name, overall_results)
+
+            lines_ranks.append((overall_results['sum_of_marks_awarded'], user.name, user.id))
+            # print(lines_ranks)
+
+            module_totals = {}
+
+            for module, module_details in module_dict.items():
+                module_totals[module.title] = {"marks_awarded": 0, "marks_possible": 0}
+                for assessment, assessment_details in module_details.items():
+                    module_totals[module.title]["marks_awarded"] += assessment_details[
+                        "marks_awarded"
+                    ]
+                    module_totals[module.title]["marks_possible"] += assessment_details[
+                        "marks_possible"
+                    ]
+    return render_template("leaderboard.html", ranks=lines_ranks)

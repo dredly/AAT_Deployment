@@ -1,11 +1,14 @@
 {% extends("layout.html") %}
 {% block content %}
+
 <h1 class="modules_title">{{assessment.title}}</h1>
 <section class="assessment-summary summary-page">
     <p>This assessment will include {{ session["no_questions"] }} questions. Questions will be a mix of multiple choice and written answers.</p>
     {% if assessment.time_limit %}
     <p>You will have {{ (assessment.time_limit / 60)|round|int }} minutes to complete this assessment.</p>
-    {% endif %}
+    {% else %}
+    <p> This assessment has no time limit.</p>
+    {%endif%}
     {% if assessment.due_date %}
     <p>The assessment must be completed by {{ assessment.due_date.strftime("%d/%m/%Y") }} at 11:59pm.</p>
     {% endif %}
@@ -13,6 +16,7 @@
     <p>This assessment has an average difficulty rating of: {{ difficulty }}.</p>
 
     <p>You will have unlimited attempts to complete this assessment. </p>
+
     {% if session["assessment_tags"]|length > 0 %}
     <p><em>Assessment subject tags: {% for tag in session["assessment_tags"][assessment.title] %}{{ tag }}, {% endfor %}</em></p>
     {% endif %}
@@ -22,7 +26,5 @@
     <a class="take-assessment-button" href="{{ url_for('assessments.answer_question', q_type=q_type, question_id=first_question_id) }}">
     Start Assessment</a>
 </div>
-
-
 
 {% endblock %}

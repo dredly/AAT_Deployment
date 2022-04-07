@@ -86,17 +86,14 @@
                 format((tag_dictionary[t]["correct_in_highest"]/tag_dictionary[t]["count"])*100)}}%)</li>
         {% endfor %}
     </ul>
-
-    
-
-
-
+ 
     <h2>Attempts</h2>
     <ul>
         <h3>Highest scoring attempt</h3>
-        <h3>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | {% if assessment_details["highest_scoring_attempt_passed"] %}<span class="text_correct">PASSED</span>{% else %}<span class="text_incorrect">FAILED</span>{% endif %} </h3>
-        {% if not assessment_details["highest_scoring_attempt_passed"] %}<p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Retake assessment</button></a></p>{% endif %}
         
+        <h3>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | {% if assessment_details["highest_scoring_attempt_passed"] %}<span class="text_correct">PASSED</span>{% else %}<span class="text_incorrect">FAILED</span>{% endif %} </h3>
+
+        {% if not assessment_details["highest_scoring_attempt_passed"] %}<p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Retake assessment</button></a></p>{% endif %}
 
         {% for r in highest_scoring_response_details %}
             <div class="student_stats_container results_box {% if r.is_correct %} correct_answer {% else %} incorrect_answer {% endif %}">
