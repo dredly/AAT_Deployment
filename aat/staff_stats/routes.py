@@ -66,6 +66,7 @@ def module(Module_title):
     
   
     students = []
+    number_of_students = 0
     for user_student in users:
         if user_student.role_id == 1:
             if user_student not in students:
@@ -105,6 +106,7 @@ def module(Module_title):
         #print("question ID",questionId, "assessmentId",questionAssessmentId)
         nay = 0
         yay = 0
+        
         questionInfo = get_all_assessment_marks(None,None,None,questionAssessmentId,True)
         for stat in questionInfo:
             if stat.get("assessment_id") == questionAssessmentId:
