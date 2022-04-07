@@ -648,6 +648,9 @@ def get_all_response_details(
                     "highest_scoring_attempt"
                 ]
 
+    print(f"Output BEFORE filters: {final_output=}")
+
+    # FILTERS
     if input_user_id:
         final_output = [
             item for item in final_output if item["user_id"] == input_user_id
@@ -676,5 +679,7 @@ def get_all_response_details(
             final_output,
             "aat/student_stats/data_dumps/all_response_details.txt",
         )
+
+    print(f"Output AFTER filters: {final_output=}")
 
     return final_output

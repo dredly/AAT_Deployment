@@ -519,6 +519,14 @@ with app.app_context():
                 selected_option=3,
                 is_correct=False,
             ),
+            ResponseT1(  # 7
+                attempt_number=1,
+                user_id=4,
+                assessment_id=2,
+                t1_question_id=3,
+                selected_option=2,
+                is_correct=True,
+            ),
         ]
     )
 

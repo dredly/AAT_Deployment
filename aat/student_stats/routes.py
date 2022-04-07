@@ -507,6 +507,8 @@ def assessment_view(assessment_id=0):
         store_output_to_file=False,
     )
 
+    # print(f"{all_response_details=}")
+
     ## Need to make dictionary of: {attempt_number : [all questions associated]}
     all_response_details_grouped_by_attempt_number = {}
     for r in all_response_details:
