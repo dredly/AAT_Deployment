@@ -18,16 +18,17 @@
     > Module View
     </p>   
     <h2>Module: {{module_details["module_title"]}}</h2>
-
-    <h2>Status: {% if dictionary_of_module_credits["total_credits_possible"] == dictionary_of_module_credits["total_credits_earned"] %}
-        <span class="text_correct">PASSED</span>
-    {% elif dictionary_of_module_credits["total_credits_earned"] < dictionary_of_module_credits["total_credits_failed"] %}
-    <span class="text_incorrect">FAILED</span>
-    {% elif dictionary_of_module_credits["total_credits_possible"] < dictionary_of_module_credits["total_credits_unattempted"] %}
-    <span class="text_unattempted">UNATTEMPTED</span>
+    
+    <h2>Status: <span class='{% if module_status=="pass" %}
+        text_correct
+    {% elif module_status=="fail" %}
+        text_incorrect
+    {% elif module_status=="unattempted" %}
+        text_unattempted
     {% else %}
-    <span>IN PROGRESS</span>
-    {% endif %}</h2>
+        text_in_progress
+    {% endif %}'>{{module_status | upper }}</span></h2>
+    
     <h2>Credits</h2>
     <ul>
         <li>
@@ -104,11 +105,11 @@
     <h2>Assessments</h2>
     <ul>
         <li>
-            <h3>Passed</h3>
+            <h3 class="text_correct">PASS</h3>
             {% if all_assessment_marks_student %}
                 <ul>
                     {% for a in all_assessment_marks_student %}
-                        {% if a.passed %}
+                        {% if a.status =="pass" %}
                             <li>
                                 <a href="{{url_for('student_stats.assessment_view', assessment_id=a.assessment_id)}}">
                                     <div class="student_stats_container results_box correct_answer {% if not a.formative %}summative{% endif %}">
@@ -140,12 +141,12 @@
             {% endif %}
             </li>
         <li>
-            <h3>Failed</h3>
+            <h3 class="text_incorrect">FAIL</h3>
             {% if all_assessment_marks_student %}
                 <ul>
                     {% for a in all_assessment_marks_student %}
-                        {% if not a.passed %}
-                            <li>
+                    {% if a.status =="fail" %}
+                        <li>
                                 <a href="{{url_for('student_stats.assessment_view', assessment_id=a.assessment_id)}}">
                                     <div class="student_stats_container results_box incorrect_answer {% if not a.formative %}summative{% endif %}">
                                         <h3>{{ a.assessment_title }}</h3>
@@ -178,7 +179,7 @@
         </li>
     
         <li>
-            <h3>Unattempted</h3>
+            <h3 class="text_unattempted">UNATTEMPTED</h3>
             {% if assessments_not_taken_yet %}
                 <ul>
                     {% for a in assessments_not_taken_yet %}
@@ -207,7 +208,6 @@
             {% else %}
                 <p>You have completed the module!</p>
             {% endif %}
-            
         </li>
     </ul>
 

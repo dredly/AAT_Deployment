@@ -371,7 +371,6 @@ def module_view(module_id=0):
     # Module Error Handling
     if Module.query.filter_by(module_id=module_id).first() is None:
         return redirect(url_for("student_stats.module_not_found", module_id=module_id))
-    print(get_module_status(module_id, current_user.id))
     # db_utils calls
     all_assessment_marks_student = get_all_assessment_marks(
         input_user_id=current_user.id,
@@ -385,6 +384,7 @@ def module_view(module_id=0):
         input_module_id=module_id,
         store_output_to_file=True,
     )
+    module_status = get_module_status(module_id, current_user.id)
 
     # "aid" -> assessment_id_and_data
     assessment_id_and_data = get_assessment_id_and_data(module_id=module_id)
@@ -398,6 +398,7 @@ def module_view(module_id=0):
         item["tag_array"] = aid_entry["tag_array"]
         item["average_difficulty"] = aid_entry["average_difficulty"]
         item["tag_array_counter"] = aid_entry["tag_array_counter"]
+        item["status"] = get_assessment_status(item["assessment_id"], current_user.id)
 
     # Takes details, unpacks based on module_id
     module_details = get_module_ids_with_details(input_module_id=module_id)[module_id]
@@ -467,6 +468,8 @@ def module_view(module_id=0):
         "total_credits_unattempted": total_credits_unattempted,
     }
 
+    print(f"{all_assessment_marks_student=}")
+
     return render_template(
         "2_student_stats_module_view.html",
         module_details=module_details,
@@ -474,6 +477,7 @@ def module_view(module_id=0):
         assessments_not_taken_yet=assessments_not_taken_yet,
         assessment_id_and_data=assessment_id_and_data,
         dictionary_of_module_credits=dictionary_of_module_credits,
+        module_status=get_module_status(module_id, current_user.id),
     )
 
 

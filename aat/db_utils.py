@@ -692,18 +692,6 @@ def get_all_response_details(
 # STATUS CALCULATORS #
 ######################
 """
-Only summative assessments are considered for the below (i.e. formative assessments do not contribute)
-
-An assessment's credit_weighting = credits_possible / total_credits_possible_for_the_module
-
-Overall weighted_percentage = (marks_earned/total_marks_for_assessment) * credit_weighting
-
-A module is passed if its assessment's total_weighted_percentages >= 50%
-
-You then earn all credits for that module
-
-A course is passed if all modules are passed (i.e. total_earned_credits==total_possible_credits)
-
 STATUS:
 - ASSESSMENT:
 -- pass: total_marks >= 50%
@@ -721,6 +709,20 @@ STATUS:
 -- fail: all modules have "fail" status
 -- in progress: any modules have "in progress" status
 -- unattempted: all modules have "unattempted" status
+
+Only summative assessments are considered for the below (i.e. formative assessments do not contribute)
+
+An assessment's credit_weighting = credits_possible / total_credits_possible_for_the_module
+
+Overall weighted_percentage = (marks_earned/total_marks_for_assessment) * credit_weighting
+
+A module is passed if its assessment's total_weighted_percentages >= 50%
+
+You then earn all credits for that module
+
+A course is passed if all modules are passed (i.e. total_earned_credits==total_possible_credits)
+
+
 """
 
 # UTIL
