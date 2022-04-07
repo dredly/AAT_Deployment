@@ -1,8 +1,14 @@
 /* PASS/FAIL COLORS */
 :root {
-	--color-correct: rgba(54, 162, 235,0.8);
-	--color-incorrect: rgba(255, 99, 132,0.8);
-	--color-unanswered: rgba(41, 230, 41, 0.8);
+	--color-correct: rgba(54, 162, 235,1);
+	--color-incorrect: rgba(255, 99, 132,1);
+	--color-unattempted: rgb(150, 150, 150);
+	--color-correct-op08: rgba(54, 162, 235,0.8);
+	--color-incorrect-op08: rgba(255, 99, 132,0.8);
+	--color-unattempted-op08: rgba(150, 150, 150, 0.8);
+	--color-correct-op04: rgba(54, 162, 235,0.4);
+	--color-incorrect-op04: rgba(255, 99, 132,0.4);
+	--color-unattempted-op04: rgba(150, 150, 150, 0.4);
 	--color-todo: red;
   }
 
@@ -41,19 +47,19 @@ li{
 	border-color: var(--color-correct);
 }
 .correct_answer:hover{
-	background: rgba(54, 162, 235,0.4);
+	background: var(--color-correct-op04);
 }
 .incorrect_answer{
 	border-color: var(--color-incorrect);
 }
 .incorrect_answer:hover{
-	background: rgba(255, 99, 132,0.4);
+	background: var(--color-incorrect-op04);
 }
 .not_answered{
-	border-color: var(--color-unanswered);
+	border-color: var(--color-unattempted);
 }
 .not_answered:hover{
-	background: rgba(41, 230, 41, 0.4);
+	background: var(--color-unattempted-op04);
 }
 
 .student_stats_container{
@@ -68,6 +74,10 @@ li{
 
 .text_incorrect{
 	color: var(--color-incorrect);
+}
+
+.text_unattempted{
+	color: var(--color-unattempted);
 }
 
 /* CHARTS */
