@@ -30,9 +30,11 @@
                 </a>
                 {% endif %}
                 </div>
+                {% if not current_user.current_attempts(summative_assessment) >= 3 %}
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.assessment_summary', assessment_id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">{% if current_user.has_taken(summative_assessment) %}Retake Assessment{% else %}Take Assessment{% endif %}</a>
                 </button>
+                {% endif %}
             {% elif current_user.can(Permission.WRITE_ASSESSMENT) %}
             <button type="button" class = "Assessment_Index_Child">
                 <a href="{{ url_for('assessments.show_assessment', id=summative_assessment.assessment_id) }}" class="Assessment_Index_Text">View Assessment</a>
@@ -79,7 +81,6 @@
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.assessment_summary', assessment_id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">Take Assessment</a>
                 </button>
-
             {% elif current_user.can(Permission.WRITE_ASSESSMENT) %}
                 <button type="button" class = "Assessment_Index_Child">
                     <a href="{{ url_for('assessments.show_assessment', id=formative_assessment.assessment_id) }}" class="Assessment_Index_Text">View Assessment</a>

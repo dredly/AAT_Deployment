@@ -1045,7 +1045,9 @@ def exit_assessment():
     session.pop("no_questions", None)
     session.pop("assessment", None)
     session.pop("takes_assessment_id", None)
-    module = session.pop("module_id", None)
+    module = session.pop("module_id")
+    print("Module ID is: ")
+    print(module)
     return redirect(url_for("assessments.view_module", module_id=module))
 
 
