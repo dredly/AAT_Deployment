@@ -221,6 +221,9 @@ footer {
 	justify-content: flex-start;
 	padding-bottom: 1vh;
 }
+.credits_invisible{
+	visibility: hidden;
+}
 
 /* ----------------------------------------------------- CRUD QUESTIONS --------------------------------------------- */
 
