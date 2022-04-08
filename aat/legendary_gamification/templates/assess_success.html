@@ -5,7 +5,7 @@
 {% endblock styles %}
 
 {% block content %}
-    {% if reason == 'practice' %}
+    {% if reason == 'practice' or current_user.tier == 'Diamond' %}
         <h1>Completed Quiz</h1>
     {% elif score_count == rapid_responses|length %}
         <h1>Congratulations, you have ranked up!</h1>
