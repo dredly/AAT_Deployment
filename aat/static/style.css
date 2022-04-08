@@ -313,6 +313,17 @@ footer {
 	align-items: center;
 	
 }
+
+.staff_stats_green_text{
+	color: rgb(5, 202, 5);
+}
+.staff_stats_red_text{
+	color: red;
+}
+.staff_stats_yellow_text{
+	color: rgb(206, 152, 4);
+}
+
 #staff_stats_Bronze{
 	color: brown;
 }

@@ -18,7 +18,7 @@
         {%set allQuestionsLength = allQuestions|length%}
         {%if allQuestionsLength > 0%} 
             {%set attempt = loop.index%}
-            <h2>This is attempt: {{attempt}}{%if user[-1] == attempt%} (submitted attempt){% set a = user.pop(-1)%} {%endif%}</h2>
+            <h2>This is attempt: {{attempt}}{%if user[-1] == attempt%} (<span class = "staff_stats_green_text">submitted attempt</span>){% set a = user.pop(-1)%} {%endif%}</h2>
         
             {%for question in allQuestions%}      
                 <h3> Question: {{question[0]}} &nbsp;&nbsp;&nbsp; Question difficulty: {{question[1]}} &nbsp;&nbsp;&nbsp; Question Type: {{question[5]}} </h3>
