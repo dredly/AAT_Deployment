@@ -8,10 +8,12 @@
     {%set users2Length = users2[count]|length %}
     {%if user[0] | length == 0 %}
     <h1>Student Name: {{user[-1]}}&nbsp;&nbsp;&nbsp;Tier: {%for u in users%}{%if user[-1] == u.name%}  <span id = "staff_stats_{{u.tier}}" >{{u.tier}}</span>{%endif%}{%endfor%}{%set a = user.pop(-1)%}</h1>
+    
     <p>No questions have been answered</p>
     {%else%}
     <h1>Student Name: {{user[-2]}}&nbsp;&nbsp;&nbsp;Tier: {%for u in users%}{%if user[-2] == u.name%}  <span id = "staff_stats_{{u.tier}}" >{{u.tier}}</span>{%endif%}{%endfor%}{%set a = user.pop(-2)%}</h1>
-    
+    <details>
+        <summary>Answers</summary>
     {%for allQuestions in user%}
         {%set allQuestionsLength = allQuestions|length%}
         {%if allQuestionsLength > 0%} 
@@ -27,6 +29,7 @@
         {%endif%}
    
     {%endfor%}
+</details>
  {%endif%}
 
 
