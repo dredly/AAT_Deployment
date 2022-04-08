@@ -14,7 +14,7 @@
             <section>
             <div class ="staff_stats_cohort_answers">
             <p>Question: {{question.get("question_text")}} &nbsp;&nbsp;&nbsp; Difficulty: {{question.get("question_difficulty")}} &nbsp;&nbsp;&nbsp Type: {{question.get("question_type")}} </p>
-            <p>Correct Answers: {{question.get("correct_answers")}} &nbsp;&nbsp;&nbsp;  Wrong Answers: {{question.get("wrong_answers")}} &nbsp;&nbsp;&nbsp; {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate: {{question.get("pass_percentage")}}% {%endif%} &nbsp;&nbsp;&nbsp;  {{question.get("students_answered_question")}} out of {{number_of_students}} students answered question</p>
+            <p>Correct Answers: {{question.get("correct_answers")}} &nbsp;&nbsp;&nbsp;  Wrong Answers: {{question.get("wrong_answers")}} &nbsp;&nbsp;&nbsp; {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate: {{question.get("pass_percentage")}}% {%endif%} &nbsp;&nbsp;&nbsp;  {{question.get("students_answered_question")}} out of {{number_of_students}} ({{question.get("taken_percentage")}}%) students answered question </p>
             </div>  
             {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %}
                 {%else%}
