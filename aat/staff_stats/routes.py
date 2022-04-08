@@ -62,7 +62,7 @@ def module(Module_title):
     #print("moduleId",moduleId)
     #print("user id", user.id)
     userInfo = get_all_response_details(None,None,moduleId)
-    #print(userInfo)
+    #print("userInfo",userInfo)
     
   
     students = []
@@ -97,10 +97,14 @@ def module(Module_title):
     questions = []
     
     for question in userInfo:
-        #print(question)
+        #print("question",question)
+        for assessment in moduleAssessments:
+            if assessment.get("assessment_id") == question.get("assessment_id"):  
+                assessment_title = assessment.get("assessment_title") 
         questionDetails = {}
         questionAssessmentId = question.get("assessment_id")        
         questionId = question.get("question_id")
+        questionDetails["question_assessment_title"] = assessment_title
         questionDetails["question_assessment_id"] = questionAssessmentId
         questionDetails["questionId"] = questionId
         #print("question ID",questionId, "assessmentId",questionAssessmentId)
@@ -237,7 +241,7 @@ def download():
     #print("info",info)
     rows = [
         {
-            "Assessment ID": element.get("question_assessment_id"),
+            "Assessment Title": element.get("question_assessment_title"),
             "Question": element.get("question_text"),
             "Difficulty": element.get("question_difficulty"),
             "Question Type":element.get("question_type"),
