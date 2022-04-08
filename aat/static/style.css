@@ -323,6 +323,9 @@ footer {
 .staff_stats_yellow_text{
 	color: rgb(206, 152, 4);
 }
+.staff_stats_orange_text{
+	color: orange;
+}
 
 #staff_stats_Bronze{
 	color: brown;

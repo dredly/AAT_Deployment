@@ -6,7 +6,7 @@
 <h1> Module: {{Module_title}}</h1><a href="{{ url_for('staff_stats.download')}}">Download CSV</a>
 {%for assessment in moduleAssessments%}
     
-    <h2>ass ID:{{assessment.get("assessment_id")}} &nbsp; {{assessment.get("assessment_title")}}{%if assessment.get("is_summative") == True%} (<span id ="staff_stats_Gold">Summative</span>) {%else%} (Formative){%endif%} : &nbsp;&nbsp;&nbsp; {%if assessment.get("your_assessment") == True%} <span class = "staff_stats_green_text"> Your Assessment </span> {%else%} Not Your Assessment {%endif%} &nbsp;&nbsp;&nbsp;
+    <h2>ass ID:{{assessment.get("assessment_id")}} &nbsp; {{assessment.get("assessment_title")}}{%if assessment.get("is_summative") == True%} (<span class ="staff_stats_orange_text">Summative</span>) {%else%} (Formative){%endif%} : &nbsp;&nbsp;&nbsp; {%if assessment.get("your_assessment") == True%} <span class = "staff_stats_green_text"> Your Assessment </span> {%else%} Not Your Assessment {%endif%} &nbsp;&nbsp;&nbsp;
     <a href="{{url_for('staff_stats.view_students', assessment = assessment.get('assessment_title'))}}">View Students</a>
     </h2>
     
@@ -17,7 +17,7 @@
             {%if question.get("question_assessment_id") == assessment.get("assessment_id") %}
             <section>
             <div class ="staff_stats_cohort_answers">
-            <p>Question: {{question.get("question_text")}} &nbsp;&nbsp;&nbsp; Difficulty: {{question.get("question_difficulty")}} &nbsp;&nbsp;&nbsp Type: {{question.get("question_type")}} </p>
+            <p>Question: <b>{{question.get("question_text")}}</b> &nbsp;&nbsp;&nbsp; Difficulty: {{question.get("question_difficulty")}} &nbsp;&nbsp;&nbsp Type: {{question.get("question_type")}} </p>
             <p>Correct Answers: <span class = "staff_stats_green_text">{{question.get("correct_answers")}}</span> &nbsp;&nbsp;&nbsp;  Wrong Answers: <span class = "staff_stats_red_text">{{question.get("wrong_answers")}}</span> &nbsp;&nbsp;&nbsp; {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate: {{question.get("pass_percentage")}}% {%endif%}</p>
               
             {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %}
@@ -101,7 +101,7 @@
     {%endfor%}
     </details> 
     {%else%}
-    <p>no questions have been created for this assessment</p>
+    <span class = "staff_stats_red_text"><p>no questions have been created for this assessment</p></span>
     <p><a href="{{url_for('questions.index')}}"><button>Create Question</button></a></p>
     {%endif%}
 {%endfor%}
