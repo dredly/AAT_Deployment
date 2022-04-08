@@ -8,7 +8,10 @@
     <h2>ass ID:{{assessment.get("assessment_id")}} &nbsp; {{assessment.get("assessment_title")}}{%if assessment.get("is_summative") == True%} (Summative) {%else%} (Formative){%endif%} : &nbsp;&nbsp;&nbsp; {%if assessment.get("your_assessment") == True%} Your Assessment {%else%} Not Your Assessment {%endif%} &nbsp;&nbsp;&nbsp;
     <a href="{{url_for('staff_stats.view_students', assessment = assessment.get('assessment_title'))}}">View Students</a>
     </h2>
+    
     {%if assessment.get("amount_of_questions") > 0%}
+    <details>
+    <summary>Questions Stats</summary>
         {%for question in questions%}  
             {%if question.get("question_assessment_id") == assessment.get("assessment_id") %}
             <section>
@@ -56,8 +59,9 @@
         
         {%endif%}
 
-        
+    
     {%endfor%}
+    </details> 
     {%else%}
     <p>no questions have been created for this assessment</p>
     <p><a href="{{url_for('questions.index')}}"><button>Create Question</button></a></p>
