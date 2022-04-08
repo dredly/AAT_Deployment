@@ -174,6 +174,7 @@ def module(Module_title):
         
         students_answered_question = total
         number_of_students = len(students)
+        students_not_answered_question = number_of_students - students_answered_question
         if total == 0:
             taken_percentage = 0
         if number_of_students == 0:
@@ -182,7 +183,7 @@ def module(Module_title):
             taken_percentage = int((students_answered_question/number_of_students)* 100)
         
 
-
+        questionDetails["students_not_answered_question"] = students_not_answered_question
         questionDetails["students_answered_question"] = total
         questionDetails["correct_answers"] = yay
         questionDetails["wrong_answers"] = nay
