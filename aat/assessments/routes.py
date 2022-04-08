@@ -1162,43 +1162,23 @@ def show_results(assessment_id, attempt_number):
 
 @assessments.route("/random_question/<int:topic_id>", methods=['GET', 'POST'])
 def random_question(topic_id): 
+    topic = Tag.query.filter_by(id=topic_id).first()
     if session["rand_q_details"][0] == 1:
         past_form = AnswerType1Form()
+        q_type = session["rand_q_details"][0]
     elif session["rand_q_details"][0] == 2: 
         past_form = AnswerType2Form()
-    topic = Tag.query.filter_by(id=topic_id).first()
-    t1qs = QuestionT1.query.filter_by(tag_id=topic_id).all()
-    t2qs = QuestionT2.query.filter_by(tag_id=topic_id).all()
-    total_question_options = len(t1qs) + len(t2qs)
-    if len(t1qs) == 0 and len(t2qs) > 0: 
-        q_type = 2
-    elif len(t2qs) == 0 and len(t1qs) > 0:
-        q_type = 1
-    elif len(t1qs) == 0 and len(t2qs) == 0:
-        flash("No questions of this topic available to answer.")
-        return redirect(url_for('assessments.index'))
-    else: 
-        q_type = random.randrange(2) + 1
+        q_type = session["rand_q_details"][0]
     
     if q_type == 1:
-        if len(t1qs) == 1: 
-            final_q = t1qs[0]
-        else: 
-            r = random.randrange(len(t1qs))
-            final_q = t1qs[r]
-        q_ref = [1, final_q.q_t1_id]
+        final_q = QuestionT1.query.filter_by(q_t1_id=session["rand_q_details"][1]).first()
         form = AnswerType1Form()
         form.chosen_option.choices = [
             (option.option_id, option.option_text)
             for option in Option.query.filter_by(q_t1_id=final_q.q_t1_id).all()
         ]
     elif q_type == 2: 
-        if len(t2qs) == 1: 
-            final_q = t2qs[0]
-        else: 
-            r = random.randrange(len(t2qs))
-            final_q = t2qs[r]
-        q_ref = [2, final_q.q_t2_id]
+        final_q = QuestionT2.query.filter_by(q_t2_id=session["rand_q_details"][1]).first()
         form = AnswerType2Form()
     if request.method == "POST":
         if session["rand_q_details"][0] == 1: 
@@ -1221,11 +1201,6 @@ def random_question(topic_id):
                 result = False
             session["practice_q_answer"] = [given_answer, result]
             return redirect(url_for('assessments.mark_random_question', q_type=session["rand_q_details"][0], q_id=session["rand_q_details"][1], topic_id=topic_id))
-
-    if q_type == 1: 
-        session["rand_q_details"] = [q_type, final_q.q_t1_id]
-    elif q_type == 2: 
-        session["rand_q_details"] = [q_type, final_q.q_t2_id]
     return render_template("random_question.html",
                             topic=topic,
                             q_type=q_type,
@@ -1243,3 +1218,39 @@ def mark_random_question(q_type, q_id, topic_id):
                             question=question,
                             topic=topic,
                             q_type=q_type)
+
+@assessments.route("/random_question/generate/<int:topic_id>")
+def generate_random(topic_id):
+    topic = Tag.query.filter_by(id=topic_id).first()
+    t1qs = QuestionT1.query.filter_by(tag_id=topic_id).all()
+    t2qs = QuestionT2.query.filter_by(tag_id=topic_id).all()
+    total_question_options = len(t1qs) + len(t2qs)
+    if len(t1qs) == 0 and len(t2qs) > 0: 
+        q_type = 2
+    elif len(t2qs) == 0 and len(t1qs) > 0:
+        q_type = 1
+    elif len(t1qs) == 0 and len(t2qs) == 0:
+        flash("No questions of this topic available to answer.")
+        return redirect(url_for('assessments.index'))
+    else: 
+        q_type = random.randrange(2) + 1
+
+    if q_type == 1:
+        if len(t1qs) == 1: 
+            final_q = t1qs[0]
+        else: 
+            r = random.randrange(len(t1qs))
+            final_q = t1qs[r]
+        q_ref = [1, final_q.q_t1_id]
+    elif q_type == 2: 
+        if len(t2qs) == 1: 
+            final_q = t2qs[0]
+        else: 
+            r = random.randrange(len(t2qs))
+            final_q = t2qs[r]
+        q_ref = [2, final_q.q_t2_id]
+    if q_type == 1: 
+        session["rand_q_details"] = [q_type, final_q.q_t1_id]
+    elif q_type == 2: 
+        session["rand_q_details"] = [q_type, final_q.q_t2_id]
+    return redirect(url_for('assessments.random_question', topic_id=topic_id))
