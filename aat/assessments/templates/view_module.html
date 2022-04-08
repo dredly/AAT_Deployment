@@ -114,7 +114,7 @@
     <div class="assessment-instance">
         <h3>{{ t.name[0]|capitalize }}{{ t.name[1:] }}</h3>
         <button type="button" class = "Assessment_Index_Child">
-            <a href="{{ url_for('assessments.random_question', topic_id=t.id) }}" class="Assessment_Index_Text">Take Practice Question</a>
+            <a href="{{ url_for('assessments.generate_random', topic_id=t.id) }}" class="Assessment_Index_Text">Take Practice Question</a>
         </button>
     </div>
     <hr>
