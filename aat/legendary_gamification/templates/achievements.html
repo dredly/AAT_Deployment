@@ -65,7 +65,7 @@
                 {% endfor %}
                 <div class="pie-container">
                     <div class="pie-information">
-                        {% if leaderboard_user.tier == "Gold" %}
+                        {% if leaderboard_user.tier == "Emerald" or leaderboard_user.tier == "Ruby" or leaderboard_user.tier == "Diamond" %}
                             <div class="pie" style="--p:{{ ((badges|length + achievements|length)/16 * 100) }};--b:20px;--c:rgb(43, 255, 0);">{{ ((badges|length + achievements|length)/16 * 100) }}%</div>
                             <p>{{ badges|length + achievements|length }} out of 16 rewards unlocked!</p>
                         {% else %}

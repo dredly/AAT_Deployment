@@ -700,31 +700,36 @@ with app.app_context():
                 name="Claymore Jackson",
                 password="cj",
                 is_admin=False,
-                role_id=1
+                role_id=1,
+                tier="Emerald"
                 ),
             User(
                 name="Santa Clause",
                 password="sc",
                 is_admin=False,
-                role_id=1
+                role_id=1,
+                tier="Ruby"
                 ),
             User(
                 name="Gone Wick",
                 password="gw",
                 is_admin=False,
-                role_id=1
+                role_id=1,
+                tier="Silver"
                 ),
             User(
                 name="Jason Mourn",
                 password="jm",
                 is_admin=False,
-                role_id=1
+                role_id=1,
+                tier="Gold"
                 ),
             User(
                 name="Sherlock Holmeless",
                 password="sh",
                 is_admin=False,
-                role_id=1
+                role_id=1,
+                tier="Diamond"
                 ),
             User(
                 name="Jack Leaver",
@@ -795,6 +800,30 @@ with app.app_context():
                 assessment_id=2,
                 t1_question_id=3,
                 selected_option=8,
+                is_correct=True,
+            ),
+            ResponseT1(  # 8
+                attempt_number=1,
+                user_id=12,
+                assessment_id=10,
+                t1_question_id=9,
+                selected_option=26,
+                is_correct=True,
+            ),
+            ResponseT1(  # 7
+                attempt_number=1,
+                user_id=14,
+                assessment_id=10,
+                t1_question_id=9,
+                selected_option=26,
+                is_correct=True,
+            ),
+            ResponseT1(  # 7
+                attempt_number=1,
+                user_id=12,
+                assessment_id=13,
+                t1_question_id=12,
+                selected_option=34,
                 is_correct=True,
             ),
         ]
@@ -1088,10 +1117,10 @@ with app.app_context():
     ##################
     db.session.add_all(
         [
-            Awarded_Badge(id=1, user_id=1, badge_id=1),
-            Awarded_Badge(id=2, user_id=2, badge_id=3),
-            Awarded_Badge(id=3, user_id=3, badge_id=5),
-            Awarded_Badge(id=4, user_id=2, badge_id=2),
+            Awarded_Badge(id=1, user_id=11, badge_id=1),
+            Awarded_Badge(id=2, user_id=12, badge_id=3),
+            Awarded_Badge(id=3, user_id=4, badge_id=5),
+            Awarded_Badge(id=4, user_id=6, badge_id=2),
         ]
     )
     #######################
@@ -1099,10 +1128,10 @@ with app.app_context():
     #######################
     db.session.add_all(
         [
-            Awarded_Achievement(id=1, user_id=2, achievement_id=6),
-            Awarded_Achievement(id=2, user_id=1, achievement_id=4),
-            Awarded_Achievement(id=3, user_id=2, achievement_id=9),
-            Awarded_Achievement(id=4, user_id=3, achievement_id=9),
+            Awarded_Achievement(id=1, user_id=12, achievement_id=6),
+            Awarded_Achievement(id=2, user_id=13, achievement_id=4),
+            Awarded_Achievement(id=3, user_id=13, achievement_id=9),
+            Awarded_Achievement(id=4, user_id=14, achievement_id=9),
         ]
     )
     ########

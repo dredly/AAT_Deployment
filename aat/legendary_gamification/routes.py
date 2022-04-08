@@ -303,13 +303,14 @@ def assessment_success():
         if choice == "return":
             return redirect(url_for(".get_id"))
     if rapid_fire_reason == "rankup":
-        if score_counter == len(rapid_responses):
-            current_user_tier = Tier.query.filter_by(name=current_user.tier).first()
-            new_tier_id = current_user_tier.tier_id + 1
-            new_user_tier = Tier.query.filter_by(tier_id=new_tier_id).first()
-            currentUser = User.query.filter_by(id=current_user.id).first()
-            currentUser.tier = new_user_tier.name
-            db.session.commit()
+        if current_user.tier != 'Diamond':
+            if score_counter == len(rapid_responses):
+                current_user_tier = Tier.query.filter_by(name=current_user.tier).first()
+                new_tier_id = current_user_tier.tier_id + 1
+                new_user_tier = Tier.query.filter_by(tier_id=new_tier_id).first()
+                currentUser = User.query.filter_by(id=current_user.id).first()
+                currentUser.tier = new_user_tier.name
+                db.session.commit()
     return render_template("assess_success.html", rapid_responses=rapid_responses, challenge_options=challenge_options, challenge_questions=challenge_questions, correct_responses=correct_responses, reason=rapid_fire_reason, score_count=score_counter)
 
 
