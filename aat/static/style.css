@@ -328,8 +328,11 @@ footer {
 	
 	 
 }
+.staff_stats_show_answers{
+	margin-top: 9%;
+}
 .staff_stats_taken_text{
-	margin-top: 10%;
+	margin-top: 12%;
 }
 .staff_stats_cohort_answers_graph{
 	padding-left: 20px;

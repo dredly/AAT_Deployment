@@ -14,15 +14,18 @@
     {%if assessment.get("amount_of_questions") > 0%}
     <details>
     <summary>Assessment Stats</summary>
+    <h3>number of students passed assessment: {{assessment.get("passed")}} out of {{assessment.get("pass_total")}}</h3>
         {%for question in questions%}  
             {%if question.get("question_assessment_id") == assessment.get("assessment_id") %}
             
             
             <p>Question: <b>{{question.get("question_text")}}</b></p>
+            <p> Difficulty: {{question.get("question_difficulty")}} &nbsp;&nbsp;&nbsp Type: {{question.get("question_type")}} </p>
             <section class ="staff_stats_cohort_answers_section">
-            <div class ="staff_stats_cohort_answers">
-                <p> Difficulty: {{question.get("question_difficulty")}} &nbsp;&nbsp;&nbsp Type: {{question.get("question_type")}} </p>
-                <p>Correct Answers: <span class = "staff_stats_green_text">{{question.get("correct_answers")}}</span> &nbsp;&nbsp;&nbsp;  Wrong Answers: <span class = "staff_stats_red_text">{{question.get("wrong_answers")}}</span> &nbsp;&nbsp;&nbsp; {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate: {{question.get("pass_percentage")}}% {%endif%}</p>
+                
+                <div class ="staff_stats_cohort_answers">
+                
+                <p class = "staff_stats_show_answers">Correct Answers: <span class = "staff_stats_green_text">{{question.get("correct_answers")}}</span> &nbsp;&nbsp;&nbsp;  Wrong Answers: <span class = "staff_stats_red_text">{{question.get("wrong_answers")}}</span> &nbsp;&nbsp;&nbsp; {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate: {{question.get("pass_percentage")}}% {%endif%}</p>
             </div>
             {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %}
                 {%else%}

@@ -85,6 +85,25 @@ def module(Module_title):
             assessmentInfo["is_summative"] = assessment.is_summative
             assessmentInfo["assessment_id"] = assessment.assessment_id
             assessmentInfo["amount_of_questions"] = 0
+            passed = 0
+            failed = 0
+            for user in users:
+                if user.role_id == 1:
+                    student_assessment_info = get_all_assessment_marks(user.id,None, None, assessment.assessment_id, True )
+                    try:
+                        student_assessment_info[0].get("passed")
+                        if student_assessment_info[0].get("passed"):
+                            passed += 1
+                        else:
+                            failed += 1
+                            
+                            
+                    except:
+                        pass
+            
+            assessmentInfo["pass_total"] = passed + failed
+            assessmentInfo["passed"] = passed
+
             moduleAssessments.append(assessmentInfo)
     #print(moduleAssessments)
     
