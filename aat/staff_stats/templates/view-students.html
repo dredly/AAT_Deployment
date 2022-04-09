@@ -1,6 +1,6 @@
 {% extends("layout.html") %}
 {% block content %}
-<a href="{{url_for('staff_stats.module', Module_title=Module_title )}}">BACK TO COG</a>
+<a href="{{url_for('staff_stats.module', Module_title=Module_title )}}">BACK TO COHORT VIEW</a>
 
 <h1>Student views for Asessment: {{assessment}}!</h1>
 {%for user in users2%}
@@ -11,7 +11,7 @@
     
     <span class = "staff_stats_red_text"><p>No questions have been answered</p></span>
     {%else%}
-    <h1>Student Name: {{user[-2]}}&nbsp;&nbsp;&nbsp;Tier: {%for u in users%}{%if user[-2] == u.name%}  <span id = "staff_stats_{{u.tier}}" >{{u.tier}}</span>{%endif%}{%endfor%}{%set a = user.pop(-2)%}</h1>
+    <h1>Student Name: {{user[-2]}} ({%if pass_fail[0] == "Failed" %} <span class = "staff_stats_red_text"> {{pass_fail.pop(0)}} </span> {%else%} <span class = "staff_stats_green_text"> {{pass_fail.pop(0)}} </span> {%endif%}) &nbsp;&nbsp;&nbsp;Tier: {%for u in users%}{%if user[-2] == u.name%}  <span id = "staff_stats_{{u.tier}}" >{{u.tier}}</span>{%endif%}{%endfor%}{%set a = user.pop(-2)%}</h1>
     <details>
         <summary>Answers</summary>
     {%for allQuestions in user%}

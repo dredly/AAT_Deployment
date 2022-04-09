@@ -292,6 +292,7 @@ def download():
 @staff_stats.route("/view-students/<string:assessment>")
 def view_students(assessment):
     Module_title = session["Module_title"]
+    pass_fail = []
     assessments= Assessment.query.all()
     assessmentID = 0
     for assessment2 in assessments:
@@ -302,10 +303,22 @@ def view_students(assessment):
     users2 = []
 
     for user in users:
+
         if user.role_id == 1:
             userInfo = get_all_response_details(user.id, None, None, assessmentID )
             student_assessment_info = get_all_assessment_marks(user.id,None, None, assessmentID, True )
             print(student_assessment_info)
+            try:
+                student_assessment_info[0].get("passed")        
+                if student_assessment_info[0].get("passed"):
+                    
+                        pass_fail.append("Passed")
+                    
+                else:
+                    
+                        pass_fail.append("Failed")
+            except:
+                pass
             attempts = 1
             for question in userInfo:
                 if question.get("attempt_number") > attempts:
@@ -325,24 +338,14 @@ def view_students(assessment):
                         attemptLists.append(question.get("attempt_number"))
                         
                 attemptLists[question.get("attempt_number")-1].append(questions)
-                
-                try:
-                    student_assessment_info[0].get("passed")        
-                    if student_assessment_info[0].get("passed"):
-                        if "Passed" not in attemptLists:
-                            pass
-                           # attemptLists.append("Passed")
-                    
-                    else:
-                        if "Failed" not in attemptLists:
-                            pass
-                          #  attemptLists.append("Failed")
-                except:
-                    pass          
+                print(user)
+                          
             users2.append(attemptLists)
             print("attemptLists",attemptLists)
     #print(users2)
+    print("pass fail",pass_fail)
     return render_template("view-students.html", Module_title = Module_title,
     assessment = assessment,
     users = users,
-    users2 = users2,)
+    users2 = users2,
+    pass_fail = pass_fail)
