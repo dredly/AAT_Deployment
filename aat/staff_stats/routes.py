@@ -30,6 +30,7 @@ def index():
     Modules = Module.query.all() 
 
     lecturersModules = []
+    other_modules = []
     lecturersAssessments = []
     for assessment in Assessments:
         if assessment.lecturer_id == user_id:
@@ -40,8 +41,10 @@ def index():
             for module in Modules:
                 if moduleId == module.module_id and module.title not in lecturersModules:
                         lecturersModules.append(module.title)
-
-    return render_template("Staff-stats.html", name = name, lecturersModules = lecturersModules)
+    for module in Modules:
+        if module.title not in lecturersModules:
+            other_modules.append(module.title)
+    return render_template("Staff-stats.html", name = name, lecturersModules = lecturersModules, other_modules = other_modules)
 
 
 ###################################################################
