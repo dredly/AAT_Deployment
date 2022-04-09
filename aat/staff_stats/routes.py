@@ -304,7 +304,8 @@ def view_students(assessment):
     for user in users:
         if user.role_id == 1:
             userInfo = get_all_response_details(user.id, None, None, assessmentID )
-          
+            student_assessment_info = get_all_assessment_marks(user.id,None, None, assessmentID, True )
+            print(student_assessment_info)
             attempts = 1
             for question in userInfo:
                 if question.get("attempt_number") > attempts:
@@ -322,7 +323,22 @@ def view_students(assessment):
                 if question.get("highest_scoring_attempt"):
                     if question.get("attempt_number") not in attemptLists:
                         attemptLists.append(question.get("attempt_number"))
-                attemptLists[question.get("attempt_number")-1].append(questions)          
+                        
+                attemptLists[question.get("attempt_number")-1].append(questions)
+                
+                try:
+                    student_assessment_info[0].get("passed")        
+                    if student_assessment_info[0].get("passed"):
+                        if "Passed" not in attemptLists:
+                            pass
+                           # attemptLists.append("Passed")
+                    
+                    else:
+                        if "Failed" not in attemptLists:
+                            pass
+                          #  attemptLists.append("Failed")
+                except:
+                    pass          
             users2.append(attemptLists)
             print("attemptLists",attemptLists)
     #print(users2)
