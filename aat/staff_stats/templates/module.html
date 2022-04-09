@@ -1,8 +1,9 @@
 <script src = "https://d3js.org/d3.v7.min.js" ></script>
-
+<!--<style>div{border: 1px solid grey;} </style>-->
 {% extends("layout.html") %}
 {% block content %}
-<a href="{{ url_for('staff_stats.index') }}">BACK</a>
+<a href="{{ url_for('staff_stats.index') }}">BACK TO MODULE SELECT</a>
+<section class = "staff_stats_assessment">
 <h1> Module: {{Module_title}}</h1><a href="{{ url_for('staff_stats.download')}}">Download CSV</a>
 {%for assessment in moduleAssessments%}
     
@@ -15,23 +16,26 @@
     <summary>Assessment Stats</summary>
         {%for question in questions%}  
             {%if question.get("question_assessment_id") == assessment.get("assessment_id") %}
-            <section>
+            
+            
+            <p>Question: <b>{{question.get("question_text")}}</b></p>
+            <section class ="staff_stats_cohort_answers_section">
             <div class ="staff_stats_cohort_answers">
-            <p>Question: <b>{{question.get("question_text")}}</b> &nbsp;&nbsp;&nbsp; Difficulty: {{question.get("question_difficulty")}} &nbsp;&nbsp;&nbsp Type: {{question.get("question_type")}} </p>
-            <p>Correct Answers: <span class = "staff_stats_green_text">{{question.get("correct_answers")}}</span> &nbsp;&nbsp;&nbsp;  Wrong Answers: <span class = "staff_stats_red_text">{{question.get("wrong_answers")}}</span> &nbsp;&nbsp;&nbsp; {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate: {{question.get("pass_percentage")}}% {%endif%}</p>
-              
+                <p> Difficulty: {{question.get("question_difficulty")}} &nbsp;&nbsp;&nbsp Type: {{question.get("question_type")}} </p>
+                <p>Correct Answers: <span class = "staff_stats_green_text">{{question.get("correct_answers")}}</span> &nbsp;&nbsp;&nbsp;  Wrong Answers: <span class = "staff_stats_red_text">{{question.get("wrong_answers")}}</span> &nbsp;&nbsp;&nbsp; {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %} <p> No attempts have been made </p> {%else%} Pass rate: {{question.get("pass_percentage")}}% {%endif%}</p>
+            </div>
             {%if question.get("correct_answers") == 0 and question.get("wrong_answers") == 0  %}
                 {%else%}
-                    <div class ="staff_stats_cohort_answers" id='vis{{question.get("question_assessment_id")}}{{question.get("questionId")}}{{question.get("question_type")}}'>             
+                    <div class ="staff_stats_cohort_answers_graph" id='vis{{question.get("question_assessment_id")}}{{question.get("questionId")}}{{question.get("question_type")}}'>             
                 <script>
-                    var data = ['{{question.get("correct_answers")}}','{{question.get("wrong_answers")}}' ,];
+                    var data = [,'{{question.get("wrong_answers")}}' ,'{{question.get("correct_answers")}}'];
                     var svg = d3.select('#vis{{question.get("question_assessment_id")}}{{question.get("questionId")}}{{question.get("question_type")}}').append('svg').attr("width",100).attr("height",100),
                     width = svg.attr("width"),
                     height = svg.attr("height"),
                     radius = Math.min(width, height) / 2,
                     g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-                    var color = d3.scaleOrdinal(['green','red',]);
+                    var color = d3.scaleOrdinal([,'red','green']);
 
                     // Generate the pie
                     var pie = d3.pie();
@@ -55,9 +59,12 @@
                         })
                         .attr("d", arc);
                 </script>
-                </div>  
-                <div>
-                    <p><span class = "staff_stats_yellow_text">{{question.get("students_answered_question")}}</span> out of {{number_of_students}} (<span class = "staff_stats_yellow_text">{{question.get("taken_percentage")}}%</span>) students answered question</p>
+                </div>
+                </section>
+                <section class ="staff_stats_cohort_answers_taken" >  
+                <div class ="staff_stats_cohort_answers">
+                    <p class= "staff_stats_taken_text"><span class = "staff_stats_yellow_text">{{question.get("students_answered_question")}}</span> out of {{number_of_students}} (<span class = "staff_stats_yellow_text">{{question.get("taken_percentage")}}%</span>) students answered question</p>
+                </div>
                     <div class ="staff_stats_cohort_answers" id='vis2{{question.get("question_assessment_id")}}{{question.get("questionId")}}{{question.get("question_type")}}'>             
                         <script>
                             var data = [,'{{question.get("students_not_answered_question")}}' ,'{{question.get("students_answered_question")}}'];
@@ -99,11 +106,12 @@
 
     
     {%endfor%}
-    </details> 
+    </details>
+     
     {%else%}
     <span class = "staff_stats_red_text"><p>no questions have been created for this assessment</p></span>
     <p><a href="{{url_for('questions.index')}}"><button>Create Question</button></a></p>
     {%endif%}
 {%endfor%}
-
+</section>
 {% endblock %}

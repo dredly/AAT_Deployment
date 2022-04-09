@@ -313,6 +313,31 @@ footer {
 	align-items: center;
 	
 }
+.staff_stats_assessment{
+	padding-left: 5px;
+	padding-bottom: 5px;
+}
+.staff_stats_cohort_answers_section{
+	display: flex;
+}
+.staff_stats_cohort_answers_taken{
+	display: flex;
+}
+.staff_stats_cohort_answers{
+	padding-left: 20px;
+	
+	 
+}
+.staff_stats_taken_text{
+	margin-top: 10%;
+}
+.staff_stats_cohort_answers_graph{
+	padding-left: 20px;
+	padding-top: 0px;
+	 
+}
+
+
 
 .staff_stats_green_text{
 	color: rgb(5, 202, 5);
