@@ -49,28 +49,36 @@ li{
 	transition: 0.4s background;
 }
 
-.correct_answer{
+.correct_answer,
+.border_text_pass{
 	border-color: var(--color-correct);
 }
-.correct_answer:hover{
+.correct_answer:hover,
+.border_text_pass:hover {
 	background: var(--color-correct-op04);
 }
-.in_progress{
+.in_progress,
+.border_text_in_progress{
 	border-color: var(--color-in-progress);
 }
-.in_progress:hover{
+.in_progress:hover,
+.border_text_in_progress:hover{
 	background: var(--color-in-progress-op04);
 }
-.incorrect_answer{
+.incorrect_answer,
+.border_text_fail{
 	border-color: var(--color-incorrect);
 }
-.incorrect_answer:hover{
+.incorrect_answer:hover,
+.border_text_fail:hover{
 	background: var(--color-incorrect-op04);
 }
-.not_answered{
+.not_answered,
+.text_unattempted{
 	border-color: var(--color-unattempted);
 }
-.not_answered:hover{
+.not_answered:hover,
+.text_unattempted:hover {
 	background: var(--color-unattempted-op04);
 }
 

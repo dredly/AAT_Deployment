@@ -1,8 +1,9 @@
 from aat import app, db, Role
-import datetime 
-date_1 = datetime.date(2022,4,2)
-date_2 = datetime.date(2022,5,13)
-date_3 = datetime.date(2022,5,19)
+import datetime
+
+date_1 = datetime.date(2022, 4, 2)
+date_2 = datetime.date(2022, 5, 13)
+date_3 = datetime.date(2022, 5, 19)
 
 from aat.models import *
 
@@ -36,7 +37,7 @@ with app.app_context():
     ###############
 
     db.session.add_all(
-        [   
+        [
             Assessment(  # 1
                 module_id=1,
                 lecturer_id=7,
@@ -701,42 +702,37 @@ with app.app_context():
                 password="cj",
                 is_admin=False,
                 role_id=1,
-                tier="Emerald"
-                ),
+                tier="Emerald",
+            ),
             User(
                 name="Santa Clause",
                 password="sc",
                 is_admin=False,
                 role_id=1,
-                tier="Ruby"
-                ),
+                tier="Ruby",
+            ),
             User(
                 name="Gone Wick",
                 password="gw",
                 is_admin=False,
                 role_id=1,
-                tier="Silver"
-                ),
+                tier="Silver",
+            ),
             User(
                 name="Jason Mourn",
                 password="jm",
                 is_admin=False,
                 role_id=1,
-                tier="Gold"
-                ),
+                tier="Gold",
+            ),
             User(
                 name="Sherlock Holmeless",
                 password="sh",
                 is_admin=False,
                 role_id=1,
-                tier="Diamond"
-                ),
-            User(
-                name="Jack Leaver",
-                password="jl",
-                is_admin=False,
-                role_id=1
-                ),
+                tier="Diamond",
+            ),
+            User(name="Jack Leaver", password="jl", is_admin=False, role_id=1),
         ]
     )
 
@@ -824,6 +820,15 @@ with app.app_context():
                 assessment_id=13,
                 t1_question_id=12,
                 selected_option=34,
+                is_correct=True,
+            ),
+            # User S taking formative 10. Git commands
+            ResponseT1(  # 7
+                attempt_number=1,
+                user_id=4,
+                assessment_id=10,
+                t1_question_id=19,
+                selected_option=26,
                 is_correct=True,
             ),
         ]
@@ -1010,6 +1015,23 @@ with app.app_context():
                 t2_question_id=12,
                 response_content="When it's a jar",
                 is_correct=False,
+            ),
+            # User S taking formative 10. Git commands
+            ResponseT2(  # 22
+                attempt_number=1,
+                user_id=4,
+                assessment_id=10,
+                t2_question_id=19,
+                response_content="git log",
+                is_correct=True,
+            ),
+            ResponseT2(  # 23
+                attempt_number=1,
+                user_id=4,
+                assessment_id=10,
+                t2_question_id=20,
+                response_content="git init",
+                is_correct=True,
             ),
         ]
     )

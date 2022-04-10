@@ -805,17 +805,12 @@ def get_assessment_status(assessment_id, user_id):
                 input_user_id=user_id,
                 input_assessment_id=assessment_id,
                 highest_scoring_attempt_only=True,
-                summative_only=True,
             )
         ]
     )
 
-    # print(f"{marks_earned=}")
-
     # PASS OR FAIL
-    # print(f"{assessment_id=}")
     sum_of_all_marks_in_assessment = get_total_marks_for_assessment(assessment_id)
-    # print(f"{sum_of_all_marks_in_assessment=}")
 
     if (marks_earned / sum_of_all_marks_in_assessment) >= 0.5:
         return "pass"

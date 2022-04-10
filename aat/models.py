@@ -44,12 +44,11 @@ class ChallengesTaken(db.Model):
     )
 
 
-
 class Friends(db.Model):
     __tablename__ = "friends"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    friend_id = db.Column(db.Integer, nullable=False)    
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    friend_id = db.Column(db.Integer, nullable=False)
 
 
 class Tier(db.Model):
@@ -382,7 +381,7 @@ class User(UserMixin, db.Model):
 
     def current_attempts(self, assessment):
         if not self.has_taken(assessment):
-            return 0 
+            return 0
         t1_responses = self.t1_responses.filter_by(
             assessment_id=assessment.assessment_id
         ).all()

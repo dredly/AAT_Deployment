@@ -25,7 +25,7 @@
     </p>
     <h2>Assessment: {{ assessment_details["assessment_id"]}} | {{assessment_details["assessment_title"] }}</h2>
 
-    <h3>Status: <span class="{{status.1}}">{{status.0}}</span>
+    <h3>Status: <span class="{{status.1}}">{{status.0 | upper}}</span>
 
     <h3>Credits Earned: {% if assessment_details["highest_scoring_attempt_passed"] %}{{assessment_details["credits"]}}{% else %}0{% endif %}/{{assessment_details["credits"]}}</h3>
 
@@ -45,11 +45,12 @@
 
     </ul>
     {% else %}
-        <div class="student_stats_container results_box {% if assessment_details["highest_scoring_attempt_passed"] %} correct_answer {% else %} incorrect_answer {% endif %}">
+        <div class="student_stats_container results_box border_{{status.1}}">
             <h2>
                 Highest Scoring Attempt
             </h2>
-            <p>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | {% if assessment_details["highest_scoring_attempt_passed"] %}<span class="text_correct">PASSED</span>{% else %}<span class="text_incorrect">FAILED</span>{% endif %}</p>
+            <p>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | 
+                <span class="{{status.1}}">{{ status.0 | upper}}</span></p>
             <div class="content-block">
                 <div class="chart-container">
                     <canvas id="myChart"></canvas>
@@ -102,7 +103,7 @@
         <ul>
             <h3>Highest scoring attempt</h3>
             
-            <h3>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | {% if assessment_details["highest_scoring_attempt_passed"] %}<span class="text_correct">PASSED</span>{% else %}<span class="text_incorrect">FAILED</span>{% endif %} </h3>
+            <h3>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | <span class="{{status.1}}">{{ status.0 | upper}}</span></h3>
 
             {% if not assessment_details["highest_scoring_attempt_passed"] %}<p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Retake assessment</button></a></p>{% endif %}
 
