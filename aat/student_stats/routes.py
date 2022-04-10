@@ -900,7 +900,9 @@ def download():
 
 @student_stats.route("/test")
 def test():
-    query = User.query.filter_by(id=current_user.id).all()
-    for u in query:
-        print(u.get_course_status())
+    query = Assessment.query.all()
+    for q in query:
+        print(
+            f"Initial list: {q.get_dict_of_tags_and_answers(current_user.id, attempt_number=10)}"
+        )
     return "."

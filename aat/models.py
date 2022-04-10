@@ -197,6 +197,56 @@ class Assessment(db.Model):
             for q in question
         )
 
+    def get_count_of_attempts_made(self, user_id):
+        return max(get_marks_for_user_and_assessment(user_id).keys())
+
+    def get_list_of_attempts_made(self, user_id):
+        return get_marks_for_user_and_assessment(user_id).keys()
+
+    def get_average_difficulty(self):
+        """
+        Returns average difficulty (string)
+        """
+        return sum(
+            q.difficulty
+            for question in [self.question_t1, self.question_t2]
+            for q in question
+        ) / count(
+            q.difficulty
+            for question in [self.question_t1, self.question_t2]
+            for q in question
+        )
+
+    def get_counter_of_tags(self):
+        """
+        Returns counter of tags found in assessment
+        """
+        return Counter(
+            [
+                q.tag
+                for question in [self.question_t1, self.question_t2]
+                for q in question
+            ]
+        )
+
+    def get_dict_of_tags_and_answers(self, user_id, attempt_number=None):
+        """
+        Returns tags and times the correct answer was given for the highest scoring attempt
+        Opt: takes in specific attempt - if not then uses highest scoring attempt
+        """
+        output_dict = {}
+        for question in [self.question_t1, self.question_t2]:
+            for q in question:
+                output_dict.setdefault(q.tag, {"correct": 0, "incorrect": 0})
+                check = q.get_was_user_right(user_id, attempt_number)
+                if check is None:
+                    continue
+                if check is True:
+                    output_dict[q.tag]["correct"] += 1
+                if check is False:
+                    output_dict[q.tag]["incorrect"] += 1
+        return output_dict
+
     def get_marks_for_user_and_assessment(self, user_id):
         """
         Returns dictionary of:
@@ -282,6 +332,9 @@ class Tag(db.Model):
     def __repr__(self):
         return self.name
 
+    def get_all_tags(self):
+        return [tag for tag in self.name]
+
 
 class QuestionT1(db.Model):
     __tablename__ = "QuestionT1"
@@ -322,14 +375,23 @@ class QuestionT1(db.Model):
         except:
             return None
 
-    def get_was_user_right(self, user_id, attempt_number):
+    def get_was_user_right(self, user_id, attempt_number=None):
         """
-        Looks at the user and the attempt
+        Looks at the user and their highest scoring attempt
         Checks if the user got the correct answer
         """
+        if attempt_number is None:
+            if not self.assessment.get_highest_scoring_attempt_and_mark(user_id):
+                return False
+            attempt_number = self.assessment.get_highest_scoring_attempt_and_mark(
+                user_id
+            ).get("highest_scoring_attempt")
+            if not attempt_number:
+                return False
         for r in self.responses:
             if r.user_id == user_id and r.attempt_number == attempt_number:
                 return r.is_correct
+        return None
 
 
 class QuestionT2(db.Model):
@@ -368,14 +430,23 @@ class QuestionT2(db.Model):
         except:
             return None
 
-    def get_was_user_right(self, user_id, attempt_number):
+    def get_was_user_right(self, user_id, attempt_number=None):
         """
-        Looks at the user and the attempt
+        Looks at the user and their highest scoring attempt
         Checks if the user got the correct answer
         """
+        if attempt_number is None:
+            if not self.assessment.get_highest_scoring_attempt_and_mark(user_id):
+                return False
+            attempt_number = self.assessment.get_highest_scoring_attempt_and_mark(
+                user_id
+            ).get("highest_scoring_attempt")
+            if not attempt_number:
+                return False
         for r in self.responses:
             if r.user_id == user_id and r.attempt_number == attempt_number:
                 return r.is_correct
+        return None
 
 
 class Option(db.Model):
@@ -562,14 +633,12 @@ class User(UserMixin, db.Model):
                 attempts[new_key] = attempts[new_key] + 1
             else:
                 attempts[new_key] = 1
-                # print(response)
         for response in t2_responses:
             new_key = f"t2_{response.t2_question_id}"
             if new_key in attempts:
                 attempts[new_key] = attempts[new_key] + 1
             else:
                 attempts[new_key] = 1
-            # print(response)
         highest_number_of_responses = max(attempts, key=attempts.get)
         taken_attempts = attempts[highest_number_of_responses]
         return taken_attempts
