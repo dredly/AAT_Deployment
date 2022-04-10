@@ -187,29 +187,92 @@ class Assessment(db.Model):
     def get_attempt_limit(self):
         return 3 if self.is_summative else None
 
-    def get_highest_scoring_attempt(self, user_id):
-        # TODO
-        ...
+    def get_total_marks_possible(self):
+        """
+        Returns the total number of marks an assessment is worth
+        """
+        return sum(q.num_of_marks for q in [self.question_t1, self.question_t2])
 
-    def get_marks_for_user(self, user_id):
-        response_t1_query = ResponseT1.query.filter_by(user_id=user_id).all()
-        list_of_attempts = list(set([r.attempt_number for r in response_t1_query]))
-        for index in list_of_attempts:
-            for r in response_t1_query:
-                try:
-                    if r.attempt_number == index:
-                        print("> GOOD")
-                        print(vars(r))
-                        # print(r.question.num_of_marks)
-                        print("ENDGOOD")
-                except:
-                    print("> PROBLEM")
-                    # print(r)
-                    print(vars(r))
-                    print("ENDPROBLEM")
-        # r2 = ResponseT1.query.filter_by(user_id=user_id).all()
+    def get_marks_for_user_and_assessment(self, user_id):
+        """
+        Returns dictionary of:
+        - attempt id (int)
+        - total marks received for that attempt
+        """
+        dict_of_attempt_and_marks = {}
+        for res in [self.responses_t1, self.responses_t2]:
+            for r in res:
+                if r.user_id == user_id:
+                    marks_awarded = r.question.num_of_marks if r.is_correct else 0
+                    dict_of_attempt_and_marks[r.attempt_number] = (
+                        dict_of_attempt_and_marks.setdefault(r.attempt_number, 0)
+                        + marks_awarded
+                    )
+        return dict_of_attempt_and_marks
 
-        return "HI!"
+    def get_highest_scoring_attempt_and_mark(self, user_id):
+        """
+        Returns a dictionary of:
+        - highest_scoring_attempt (int)
+        - highest_score (int)
+        """
+        dict_of_attempt_and_marks = self.get_marks_for_user_and_assessment(user_id)
+        if not dict_of_attempt_and_marks:
+            return None
+        # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
+        highest_scoring_attempt = max(
+            dict_of_attempt_and_marks,
+            key=dict_of_attempt_and_marks.get,
+        )
+        return {
+            "highest_scoring_attempt": highest_scoring_attempt,
+            "highest_score": dict_of_attempt_and_marks[highest_scoring_attempt],
+        }
+
+    def get_status(self, user_id):
+        """
+        Returns status based on a user's answers
+        - pass: total marks >= 50%
+        - fail: total marks < 50%
+        - unattempted: no attempt
+
+        """
+        highest_scoring_attempt_and_mark = self.get_highest_scoring_attempt_and_mark(
+            user_id
+        )
+        if not highest_scoring_attempt_and_mark:
+            return "unattempted"
+        if (
+            highest_scoring_attempt_and_mark["highest_score"]
+            / self.get_total_marks_possible()
+            >= 0.5
+        ):
+            return "pass"
+        return "fail"
+
+    def get_total_weighted_perc(self, user_id):
+        """
+        Works out total weighted perc for this assessment
+        Is not calculated if user hasn't attempted or if it's a formative assessment
+        """
+        if self.get_status(user_id=user_id) == "unattempted" or not self.is_summative:
+            return None
+        total_weighted_perc = 0
+        for question in [self.question_t1, self.question_t2]:
+            for q in question:
+                # Get highest Assessment attempt:
+                highest_attempt_details = self.get_highest_scoring_attempt_and_mark(
+                    user_id
+                )
+                if not highest_attempt_details:
+                    continue
+                marks_earned = q.num_of_marks * q.get_was_user_right(
+                    user_id, highest_attempt_details["highest_scoring_attempt"]
+                )
+                marks_as_perc = marks_earned / q.num_of_marks
+                # Get response for that for that attempt question
+                total_weighted_perc += q.get_weighted_marks() * marks_as_perc
+        return total_weighted_perc
 
 
 class Tag(db.Model):
@@ -253,6 +316,25 @@ class QuestionT1(db.Model):
     def __repr__(self):
         return self.question_text
 
+    def get_weighted_marks(self):
+        """
+        Looks at all marks in attached assessment
+        Calculates the relative weight of this question's num_of_marks (%)
+        """
+        try:
+            return self.num_of_marks / self.assessment.get_total_marks_possible()
+        except:
+            return None
+
+    def get_was_user_right(self, user_id, attempt_number):
+        """
+        Looks at the user and the attempt
+        Checks if the user got the correct answer
+        """
+        for r in self.responses:
+            if r.user_id == user_id and r.attempt_number == attempt_number:
+                return r.is_correct
+
 
 class QuestionT2(db.Model):
     __tablename__ = "QuestionT2"
@@ -279,6 +361,25 @@ class QuestionT2(db.Model):
 
     def __repr__(self):
         return self.question_text
+
+    def get_weighted_marks(self):
+        """
+        Looks at all marks in attached assessment
+        Calculates the relative weight of this question's num_of_marks (%)
+        """
+        try:
+            return self.num_of_marks / self.assessment.get_total_marks_possible()
+        except:
+            return None
+
+    def get_was_user_right(self, user_id, attempt_number):
+        """
+        Looks at the user and the attempt
+        Checks if the user got the correct answer
+        """
+        for r in self.responses:
+            if r.user_id == user_id and r.attempt_number == attempt_number:
+                return r.is_correct
 
 
 class Option(db.Model):
