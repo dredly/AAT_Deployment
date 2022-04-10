@@ -1,16 +1,23 @@
 {% extends("layout.html") %}
 
 {% block content %}
-<form method="POST" action="">
-    <p>Are you sure you want to delete this question? This will also remove it from any assessment it is on</p>
-    {{ form.csrf_token }}
-    {{ form.submit(class='delete-button') }}
-</form>
-{% if question.q_t1_id %}
-<a href="{{url_for('questions.show_question_t1', id=question.q_t1_id)}}"><button>Go back</button></a>
-{% endif %}
-{% if question.q_t2_id %}
-<a href="{{url_for('questions.show_question_t2', id=question.q_t2_id)}}"><button>Go back</button></a>
-{% endif %}
-
+<div class="block_contents">
+    <form method="POST" action="">
+        <p>Are you sure you want to delete this question? This will also remove it from any assessment it is on</p>
+        {{ form.csrf_token }}
+        {{ form.submit(class='delete-button') }}
+    </form>
+    {% if question.q_t1_id %}
+    <div class="back-button">
+        <a href="{{url_for('questions.show_question_t1', id=question.q_t1_id)}}"><button>Go
+                back</button></a>
+    </div>
+    {% endif %}
+    {% if question.q_t2_id %}
+    <div class="back-button">
+        <a href="{{url_for('questions.show_question_t2', id=question.q_t2_id)}}" class="back-button"><button>Go
+                back</button></a>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

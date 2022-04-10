@@ -1,7 +1,3 @@
-
-  
-
-
 body {
 	margin: 0;
 	height: 100vh;
@@ -9,7 +5,8 @@ body {
 	flex-direction: column;
 }
 
-body, body {
+body,
+body {
 	font-family: 'Work Sans', sans-serif;
 }
 
@@ -60,7 +57,7 @@ footer {
 }
 
 /* FORMS */
-.inline-label{
+.inline-label {
 	margin-right: 1rem;
 }
 
@@ -76,9 +73,14 @@ footer {
 .form-container h1 {
 	margin: 0;
 }
+
+.back-button {
+	margin-top: 0.5em;
+}
+
 /* --------------------CRUD ASSESSMENTS BELOW WILL MOVE TO SEPERATE FILE SOON---------------------------------- */
 
-.block_contents{
+.block_contents {
 	margin-left: 1vw;
 	margin-right: 1vw;
 	padding-bottom: 2vh;
@@ -86,7 +88,7 @@ footer {
 
 /* WARNING MESSAGE  */
 
-.warning{
+.warning {
 	color: red;
 }
 
@@ -94,37 +96,42 @@ footer {
 
 /* Create Assessment Button */
 
-.Create_Assessment_Link{
+.Create_Assessment_Link {
 	text-decoration: none;
 	color: black;
 }
-.modules_title{
-	padding-top:2vh;
+
+.modules_title {
+	padding-top: 2vh;
 	display: flex;
 	justify-content: center;
 }
-.remove-button{
+
+.remove-button {
 	background-color: red;
 	color: white;
 	text-decoration: none;
 }
 
 /* EDIT DELETE TAKE ASSESSMENT BUTTONS ON INDEX */
-.module_title{
+.module_title {
 	padding-left: 1vw;
 }
-.index_modules{
+
+.index_modules {
 	display: flex;
 	max-width: max-content;
 	align-items: center;
 	justify-content: space-between;
 	padding-left: 1vw;
 }
-.modules_child{
+
+.modules_child {
 	display: flex;
 	padding-left: 5vw;
 }
-.Assessment_Index_Parent{
+
+.Assessment_Index_Parent {
 	display: flex;
 	flex-direction: row;
 	justify-content: flex-start;
@@ -133,13 +140,15 @@ footer {
 }
 
 .Assessment_Index_Parent button {
-	height: 100%; 
+	height: 100%;
 }
-.Assessment_Index_Children{
+
+.Assessment_Index_Children {
 	display: flex;
 	align-items: center;
 }
-.Assessment_Index_Child{
+
+.Assessment_Index_Child {
 	display: flex;
 	margin-left: 2vw;
 	flex-wrap: nowrap;
@@ -147,11 +156,13 @@ footer {
 	padding-bottom: .5vh;
 
 }
-.Assessment_Index_Text{
+
+.Assessment_Index_Text {
 	text-decoration: none;
 	color: black;
 }
-.Assessment_show_button{
+
+.Assessment_show_button {
 	text-decoration: none;
 	color: black;
 	display: flex;
@@ -159,69 +170,76 @@ footer {
 }
 
 /* EDIT_ASSESSMENT.html */
-.Assessment_Edit_Parent{
+.Assessment_Edit_Parent {
 	display: flex;
 	justify-content: space-between;
 	flex-direction: column;
 }
-.Assessment_Edit_Children{
+
+.Assessment_Edit_Children {
 	display: flex;
-	align-items:center;
+	align-items: center;
 	justify-items: flex-start;
 	justify-content: space-between;
 	margin-right: 5vw;
 }
-.Assessment_Edit_Child{
+
+.Assessment_Edit_Child {
 	display: flex;
 	flex-wrap: wrap;
 	max-width: 6vw;
 	padding-bottom: .5vh;
-	background-color:red ;
+	background-color: red;
 
 }
-.edit_submit_button{
+
+.edit_submit_button {
 	padding-top: 1vh;
 }
 
-.show_assessment_title{
+.show_assessment_title {
 	display: flex;
 	flex-direction: column;
 	align-content: center;
 	align-items: center;
 }
-.show_assessment_edit{
-	display:flex;
+
+.show_assessment_edit {
+	display: flex;
 	justify-content: flex-end;
 }
-.show_assessment_parent{
+
+.show_assessment_parent {
 	display: flex;
 	justify-content: space-between;
 	flex-direction: column;
 }
 
-.show_assessment_children{
+.show_assessment_children {
 	display: flex;
 	justify-content: space-between;
 	max-width: 70vw;
 	margin: 10px auto;
 }
-.show_assessment_child{
+
+.show_assessment_child {
 	display: flex;
 	flex-wrap: nowrap;
 	margin-left: 2vw;
 }
 
-.add_questions_finish{
+.add_questions_finish {
 	display: flex;
 	padding-top: 2vh;
 }
 
-.view_module_create{
+.view_module_create {
 	display: flex;
 	justify-content: flex-start;
 	padding-bottom: 1vh;
 }
-.credits_invisible{
+
+.credits_invisible {
 	visibility: hidden;
 }
 
@@ -253,9 +271,9 @@ footer {
 	background-color: green;
 	color: white;
 	list-style-type: none;
-  }
-  
-  .alert.error {
+}
+
+.alert.error {
 	padding: 12px;
 	border-radius: 3px;
 	font-size: 1.2rem;
@@ -265,8 +283,9 @@ footer {
 	background-color: red;
 	color: white;
 	list-style-type: none;
-  }
-  .alert.info {
+}
+
+.alert.info {
 	padding: 12px;
 	border-radius: 3px;
 	font-size: 1.2rem;
@@ -276,7 +295,7 @@ footer {
 	background-color: yellow;
 	color: black;
 	list-style-type: none;
-  }
+}
 
 
 
@@ -293,83 +312,98 @@ footer {
 
 /* FOOTER */
 footer {
-	position:static;
-	bottom:0px;
+	position: static;
+	bottom: 0px;
 	text-align: center;
 	width: 100%;
 }
 
 /* SUMMATIVE STYLING ADDED FOR CONSISTENCY */
-.summative { 
-    border: 5px solid black; 
-    box-shadow:  10px 10px 30px #bebebe;
+.summative {
+	border: 5px solid black;
+	box-shadow: 10px 10px 30px #bebebe;
 }
 
 /*  STAFF STATS */
 
-.staff_stats_module_select{
-	display:flex;
+.staff_stats_module_select {
+	display: flex;
 	flex-direction: column;
 	align-items: center;
-	
+
 }
-.staff_stats_assessment{
+
+.staff_stats_assessment {
 	padding-left: 5px;
 	padding-bottom: 5px;
 }
-.staff_stats_cohort_answers_section{
+
+.staff_stats_cohort_answers_section {
 	display: flex;
 }
-.staff_stats_cohort_answers_taken{
+
+.staff_stats_cohort_answers_taken {
 	display: flex;
 }
-.staff_stats_cohort_answers{
+
+.staff_stats_cohort_answers {
 	padding-left: 20px;
-	
-	 
+
+
 }
-.staff_stats_show_answers{
+
+.staff_stats_show_answers {
 	margin-top: 9%;
 }
-.staff_stats_taken_text{
+
+.staff_stats_taken_text {
 	margin-top: 12%;
 }
-.staff_stats_cohort_answers_graph{
+
+.staff_stats_cohort_answers_graph {
 	padding-left: 20px;
 	padding-top: 0px;
-	 
+
 }
 
 
 
-.staff_stats_green_text{
+.staff_stats_green_text {
 	color: rgb(5, 202, 5);
 }
-.staff_stats_red_text{
+
+.staff_stats_red_text {
 	color: red;
 }
-.staff_stats_yellow_text{
+
+.staff_stats_yellow_text {
 	color: rgb(206, 152, 4);
 }
-.staff_stats_orange_text{
+
+.staff_stats_orange_text {
 	color: orange;
 }
 
-#staff_stats_Bronze{
+#staff_stats_Bronze {
 	color: brown;
 }
-#staff_stats_Silver{
+
+#staff_stats_Silver {
 	color: silver;
 }
-#staff_stats_Gold{
-	color: gold ;
+
+#staff_stats_Gold {
+	color: gold;
 }
-#staff_stats_Emerald{
-	color: rgb(39, 223, 39) ;
+
+#staff_stats_Emerald {
+	color: rgb(39, 223, 39);
 }
-#staff_stats_Ruby{
-	color: rgb(206, 9, 9) ;
+
+#staff_stats_Ruby {
+	color: rgb(206, 9, 9);
 }
-#staff_stats_Diamond{
-	color:rgb(126, 203, 255) ;
+
+#staff_stats_Diamond {
+	color: rgb(126, 203, 255);
 }
