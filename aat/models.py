@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
 from flask_login import LoginManager
-
+from collections import Counter
 
 # First trying to get it working without model inheritance
 
@@ -191,7 +191,11 @@ class Assessment(db.Model):
         """
         Returns the total number of marks an assessment is worth
         """
-        return sum(q.num_of_marks for q in [self.question_t1, self.question_t2])
+        return sum(
+            q.num_of_marks
+            for question in [self.question_t1, self.question_t2]
+            for q in question
+        )
 
     def get_marks_for_user_and_assessment(self, user_id):
         """
@@ -231,10 +235,10 @@ class Assessment(db.Model):
 
     def get_status(self, user_id):
         """
-        Returns status based on a user's answers
-        - pass: total marks >= 50%
-        - fail: total marks < 50%
-        - unattempted: no attempt
+        Returns status (string) based on a user's answers:
+        -- "pass": total_marks >= 50%
+        -- "fail": total_marks < 50%
+        -- "unattempted": student submitted any attempts
 
         """
         highest_scoring_attempt_and_mark = self.get_highest_scoring_attempt_and_mark(
@@ -250,29 +254,21 @@ class Assessment(db.Model):
             return "pass"
         return "fail"
 
-    def get_total_weighted_perc(self, user_id):
+    def get_weighted_perc_factor(self):
         """
         Works out total weighted perc for this assessment
         Is not calculated if user hasn't attempted or if it's a formative assessment
         """
-        if self.get_status(user_id=user_id) == "unattempted" or not self.is_summative:
-            return None
-        total_weighted_perc = 0
-        for question in [self.question_t1, self.question_t2]:
-            for q in question:
-                # Get highest Assessment attempt:
-                highest_attempt_details = self.get_highest_scoring_attempt_and_mark(
-                    user_id
-                )
-                if not highest_attempt_details:
-                    continue
-                marks_earned = q.num_of_marks * q.get_was_user_right(
-                    user_id, highest_attempt_details["highest_scoring_attempt"]
-                )
-                marks_as_perc = marks_earned / q.num_of_marks
-                # Get response for that for that attempt question
-                total_weighted_perc += q.get_weighted_marks() * marks_as_perc
-        return total_weighted_perc
+        return self.num_of_credits / self.module.get_total_assessment_credits()
+
+    def get_total_weighted_marks_as_perc(self, user_id):
+        weighted_factor = self.get_weighted_perc_factor()
+        # Get total marks earned
+        total_marks_earned = self.get_highest_scoring_attempt_and_mark(user_id=user_id)[
+            "highest_score"
+        ]
+        total_marks_as_percentage = total_marks_earned / self.get_total_marks_possible()
+        return weighted_factor * total_marks_as_percentage
 
 
 class Tag(db.Model):
@@ -408,12 +404,55 @@ class Module(db.Model):
     module_id = db.Column(db.Integer, primary_key=True)
     # --- Other Columns ---
     title = db.Column(db.String(120), unique=True, nullable=False)
-    total_credits = db.Column(db.Integer, nullable=False)
+    total_credits = db.Column(
+        db.Integer, nullable=False
+    )  # DO NOT USE - use get_total_assessment_credits() instead
     # --- Relationships ---
     assessments = db.relationship("Assessment", backref="module", lazy=True)
 
     def __repr__(self):
         return self.title
+
+    def get_total_assessment_credits(self):
+        """
+        Adds up total_credits
+        """
+        return sum([a.num_of_credits for a in self.assessments])
+
+    def get_total_weighted_marks_as_perc(self, user_id):
+        """
+        Returns weighted percentage for a user's performance based on summative assessments
+        """
+        return sum(
+            [
+                a.get_total_weighted_marks_as_perc(user_id)
+                for a in self.assessments
+                if a.get_status(user_id) != "unattempted" and a.is_summative
+            ]
+        )
+
+    def get_status(self, user_id):
+        """
+        Returns status (string) based on a user's answers:
+        -- pass: total_weighted_percentage >= 50%
+        -- fail: total_weighted_percentage < 50% AND all assessments attempted
+        -- in progress: total_weighted_percentage < 50% AND all assessments NOT attempted
+        -- unattempted: no assessments have been attempted
+        """
+        # Unattempted:
+        counter_of_status = Counter([a.get_status(user_id) for a in self.assessments])
+        if counter_of_status["unattempted"] == len(self.assessments):
+            return "unattempted"
+        # Pass:
+        if self.get_total_weighted_marks_as_perc(user_id) >= 0.5:
+            return "pass"
+
+        # Fail
+        if counter_of_status["unattempted"] == 0:
+            return "fail"
+
+        # Unattempted
+        return "in progress"
 
 
 class User(UserMixin, db.Model):
@@ -578,6 +617,29 @@ class User(UserMixin, db.Model):
             )
         if response:
             db.session.delete(response)
+
+    def get_course_status(self):
+        """
+        -- pass: all modules have "pass" status
+        -- fail: all modules have "fail" status
+        -- in progress: any modules have "in progress" status
+        -- unattempted: all modules have "unattempted" status
+        """
+        module_query = Module.query.all()
+        # Unattempted:
+        counter_of_modules = Counter(m.get_status(self.id) for m in module_query)
+        if counter_of_modules["unattempted"] == len(module_query):
+            return "unattempted"
+        # Pass:
+        if counter_of_modules["pass"] == len(module_query):
+            return "pass"
+
+        # Fail
+        if counter_of_modules["fail"] == len(module_query):
+            return "fail"
+
+        # Unattempted
+        return "in progress"
 
     def __repr__(self):
         return f"User: {self.name}"

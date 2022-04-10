@@ -900,10 +900,7 @@ def download():
 
 @student_stats.route("/test")
 def test():
-    # query = QuestionT1.query.all() + QuestionT2.query.all()
-    # for q in query:
-    #     print(q.get_weighted_marks())
-    query = Assessment.query.all()
-    for a in query:
-        print(a.get_total_weighted_perc(user_id=current_user.id))
+    query = User.query.filter_by(id=current_user.id).all()
+    for u in query:
+        print(u.get_course_status())
     return "."
