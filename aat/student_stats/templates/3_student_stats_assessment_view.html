@@ -1,32 +1,15 @@
 {% extends 'layout.html' %}
 {% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
-<link
-	rel="stylesheet"
-	href="{{url_for('static',filename='student-stats-style.css')}}"
-/>
+{% include 'includes/student_stats_head.html' %}
 {% endblock extra_head %}
 {% block title %}
     Student | Assessment View
 {% endblock title %}`
 {% block content %}
-
-<h1>Student Stats for {{current_user.id}} | {{current_user.name}}</h1> 
-<h1>Assessment {{ assessment_details["assessment_id"]}} | {{assessment_details["assessment_title"] }} ({{assessment_details["summative_or_formative"]}})</h1>
-    <p>
-        <a href="{{url_for('student_stats.course_view')}}">
-            Course View
-        </a> 
-        > 
-        <a href="{{url_for('student_stats.module_view', module_id=assessment_details['module_id'])}}">
-            Module {{assessment_details["module_id"]}} | {{assessment_details["module_title"]}}
-        </a>
-         > Assessment {{ assessment_details["assessment_id"]}} | {{assessment_details["assessment_title"] }}
-    </p>
-    <h2>Assessment: {{ assessment_details["assessment_id"]}} | {{assessment_details["assessment_title"] }}</h2>
-
-    <h3>Overview</h3>
-
+    <h2>Student stats for {{current_user.id}}: {{current_user.name}}</h2>
+    <p>Course View > Module {{a.module.module_id}} | {{a.module.title}} > Assessment {{ a.assessment_id}} | {{ a.title }}</p>
+    <h1>Assessment {{ a.assessment_id}} | {{ a.title }} ({% if a.is_summative %}summative{% else %}formative{% endif %})</h1>
+    <h2>Overview</h2>
     <table>
         <tr>
             <th>Type</th>
@@ -35,201 +18,117 @@
             <th>Credits<br>earned</th>
             <th>Attempts<br>made</th>
             <th>Attempts<br>allowed</th>
-            <th>Can {% if not status.0 == "unattempted" %}re{% endif%}take<br>assessment</th>
         </tr>
         <tr>
-            <td><span class="text_{{assessment_details["summative_or_formative"]}}">{{assessment_details["summative_or_formative"]|title}}</span></td>
-            {% if not status.0=="unattempted" %}
-                <td>
-                    {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}}</td>
-                <td><span class="{{status.1}}">{{status.0 | upper}}</span></td>
-                <td>{% if status.0=="pass" %}{{assessment_details["credits"]}}{% else %}0{% endif %}/{{assessment_details["credits"]}}</td>
-                <td>{{ assessment_details["number_of_attempts"]}}</td>
-                <td>{{ assessment_details["attempt_limit"]|title }}</td>
-                <td>{% if assessment_details["can_take_assessment"] %}Yes: <a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Take assessment</button></a>{% else %}No (attempt limit reached){% endif %}</td>
-            {% else %}
-                <td>-/{{assessment_stats["marks"]}}</td>
-                <td><span class="{{status.1}}">{{status.0 | upper}}</span></td>
-                <td>-</td>
-                <td>0</td>
-                <td>{{ assessment_details["attempt_limit"]|title }}</td>
-                <td>Yes: <a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Take assessment</button></a></td>
-            {% endif %}
+            <td>{% if a.is_summative %}Summative{% else %}Formative{% endif %}</td>
+            <td>{{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}}<br>
+            ({{ "%.2d" |
+            format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%)</td>
+            <td>{{a.get_status(current_user.id)}}</td>
+            <td>{{a.get_credits(current_user.id)}}/{{a.num_of_credits}}</td>
+            <td>{{a.get_count_of_attempts_made(current_user.id)}}</td>
+            <td>{{a.get_attempt_limit()}}</td>
         </tr>
     </table>
- 
+    <h2>Pie chart of highest scoring attempt</h2>
 
-
-    {% if status.0 == "unattempted" %}
-    <ul>
-        {% if assessment_stats["difficulty"] %}
-            <li>Difficulty: {{assessment_stats["difficulty"]}}</li>
-        {% endif %}
-        {% if assessment_stats["tags"] %}
-            <li>Tags: <ul>{% for k,v in assessment_stats["tags"].items() %}
-                {{k}} ({{v}})
-            {% endfor %}</ul></li>
-        {% endif %}
-
-    </ul>
-    {% else %}
-        <div class="student_stats_container results_box border_{{status.1}}">
-            <h2>
-                Highest Scoring Attempt
-            </h2>
-            <p>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | 
-                <span class="{{status.1}}">{{ status.0 | upper}}</span></p>
-            <div class="content-block">
-                <div class="chart-container">
-                    <canvas id="myChart"></canvas>
-                </div>
-            </div>
+    <div class="content-block">
+        <div class="chart-container">
+            <canvas id="myPieChart"></canvas>
         </div>
-
-        <h2>Progress Chart</h2>
-        <div class="content-block">
-            <div class="chart-container">
-                <canvas id="myBarChart"></canvas>
-            </div>
+    </div>
+    <h2>Attempt analysis</h2>
+    <div class="content-block">
+        <div class="chart-container">
+            <canvas id="myBarChart"></canvas>
         </div>
-
-        <h2>Attempt analysis</h2>
-        <ul>
-            <table>
-                <tr>
-                    <th>Question</th>
-                    {% for i in range(total_number_of_attempts) %}
-                        <th>Attempt<br>{{i+1}}</th>
-                    {% endfor %}
-                </tr>
-                {% for question_text, details in question_analysis_dict.items() %}
-                <tr>
-                    <td>{{loop.index}}. {{question_text}}</td>
-                    {% for i in range(details.number_of_attempts) %}
-                    <th>
-                        {% if details.array_of_success[i][i+1]%}
-                            <h1><span class="text_correct">Y</span></h1>
-                        {% else %}
-                            <h1><span class="text_incorrect">N</span></h1>
-                        {% endif %}
-                    </th>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-            </table>
-        </ul>
-
-        <h2>Tag Analysis</h2>
-        <ul>
-            {% for t in tag_dictionary %}
-                <li>{{t}}: {{tag_dictionary[t]["correct_in_highest"]}}/{{tag_dictionary[t]["count"]}} ({{ "%.2d" |
-                    format((tag_dictionary[t]["correct_in_highest"]/tag_dictionary[t]["count"])*100)}}%)</li>
+    </div>
+    <table>
+        <tr>
+            <th>Question</th>
+            {% for attempt in a.get_list_of_attempts_made(user_id=current_user.id) %}
+                <th>Attempt<br>{{attempt}}</th>
             {% endfor %}
-        </ul>
-    
-        <h2>Attempts</h2>
-        <ul>
-            <h3>Highest scoring attempt</h3>
-            
-            <h4>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | <span class="{{status.1}}">{{ status.0 | upper}}</span></h4>
-
-            {% if assessment_details["can_take_assessment"] %}<p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Retake assessment</button></a></p>{% endif %}
-
-            {% for r in highest_scoring_response_details %}
-                <div class="student_stats_container results_box {% if r.is_correct %} correct_answer {% else %} incorrect_answer {% endif %}">
-                    <li>
-                        <b>Question: {{loop.index}}. {{r.question_text}}</b>
-                    </li>
-                    <li>Answer given: {{r.answer_given}}</li>
-                    <li>Correct? 
-                        {% if r.is_correct %}
-                        <span class="text_correct">Correct</span>
-                        {% else %}
-                        <span class="text_incorrect">Incorrect</span>
-                        {% endif %}    
-                    </li>
-                    {% if not r.is_correct %}
-                        <li>Correct Answer: {{r.correct_answer}}</li>
-                    {% endif %}
-                    <li>Difficulty: {{r.question_difficulty}}</li>
-                    <li>Question Tag: {{r.tag_name[0]}}</li>
-                    <li>Question Type: {{r.question_type}}. {% if r.question_type==1 %}
-                        Multiple Choice
-                    {% else %}
-                        Text
-                    {% endif %}</li>
-                    <li>Feedback: {{r.feedback}}</li>
-                    <li>Feedforward: {{r.feedforward}}</li>
-                    <li>Marks: {% if r.is_correct %}{{r.num_of_marks}}{% else %}0{% endif %}/{{r.num_of_marks}}</li>
-                    {% if not r.is_correct %}
-                    <li><a href="mailto:{{r.lecturer_email}}?subject=Query from {{current_user.name}}"><button>Email lecturer to query</button></a></li>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        </ul>
-        <h3>Other attempts</h3>
-
-        <ul>
-            {% for attempt_number, attempt_details in all_response_details_grouped_by_attempt_number.items() %}
-                {% if attempt_number != assessment_details["highest_scoring_attempt_number"] %}
-                        <li>
-                            <h3>Attempt {{attempt_number}} | {{total_score_per_attempt[attempt_number]["correct_marks"]}}/{{total_score_per_attempt[attempt_number]["possible_marks"]}} = {{total_score_per_attempt[attempt_number]["mark_as_percentage"]}} | 
-                                {% if total_score_per_attempt[attempt_number]["correct_marks"]/total_score_per_attempt[attempt_number]["possible_marks"]>=0.5 %}<span class="text_correct">PASSED</span>{% else %}<span class="text_incorrect">FAILED</span>{% endif %} </h3>
-                                {% if assessment_details["can_take_assessment"] %}<p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Retake assessment</button></a></p>{% endif %}
-                            </li>
-                        {% for r in attempt_details %}
-                            <div class="student_stats_container results_box {% if r.is_correct %} correct_answer {% else %} incorrect_answer {% endif %}">
-                                <li>
-                                    <b>Question: {{loop.index}}. {{r.question_text}}</b>
-                                </li>
-                                <li>Answer given: {{r.answer_given}}</li>
-                                <li>Correct? 
-                                    {% if r.is_correct %}
-                                    <span class="text_correct">Correct</span>
-                                    {% else %}
-                                    <span class="text_incorrect">Incorrect</span>
-                                    {% endif %}    
-                                </li>
-                                {% if not r.is_correct %}
-                                <li>Correct Answer: {{r.correct_answer}}</li>
-                            {% endif %}
-                                <li>Difficulty: {{r.question_difficulty}}</li>
-                                <li>Question Tag: {{r.tag_name[0]}}</li>
-                                <li>Question Type: {{r.question_type}}. {% if r.question_type==1 %}
-                                    Multiple Choice
-                                {% else %}
-                                    Text
-                                {% endif %}</li>
-                                <li>Feedback: {{r.feedback}}</li>
-                                <li>Feedforward: {{r.feedforward}}</li>
-                
-                                <li>Marks: {% if r.is_correct %}{{r.num_of_marks}}{% else %}0{% endif %}/{{r.num_of_marks}}</li>
-                                {% if not r.is_correct %}
-                                <li><a href="mailto:{{r.lecturer_email}}?subject=Query from {{current_user.name}}"><button>Email lecturer to query</button></a></li>
-                                {% endif %}
-                            </div>
+        </tr>
+        {% for q in a.get_questions() %}
+            <tr>
+                <td>Question {{loop.index}}. {{q.question_text}}</td>
+                {% for attempt in a.get_list_of_attempts_made(user_id=current_user.id) %}
+                    <td>
+                        {% for r in q.get_responses_from_user(current_user.id,attempt) %}
+                            <b><span class="text_{% if r.is_correct %}pass">Y{% else %}fail">N{% endif %}</span></b>
                         {% endfor %}
-                {% endif %}
-            {% endfor %} 
-        </ul>
-    {% endif %}
-    <h2>Download</h2>
-    <p><a href="{{ url_for('student_stats.download')}}">Download CSV</a></p>
-    
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        <tr>
+            <th>Status</th>
+            {% for attempt in a.get_list_of_attempts_made(user_id=current_user.id) %}
+                <th><span class="text_{{a.get_status_of_attempt(current_user.id, attempt)}}">{{a.get_status_of_attempt(current_user.id, attempt)}}</span></th>
+            {% endfor %}
+        </tr>
+    </table>
+    <h2>Attempts</h2>
+    <h3>Highest scoring attempt</h3>
+    <p>Attempt {{a.get_highest_scoring_attempt_and_mark(current_user.id)["highest_scoring_attempt"]}} | {{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}} | {{a.get_status(current_user.id)}}</p>
 
+    {% for attempt in a.get_list_of_attempts_made(current_user.id) %}
+        <h4>Attempt: {{attempt}} {% if attempt == a.get_highest_scoring_attempt_and_mark(current_user.id)["highest_scoring_attempt"] %} (Highest scoring){%endif%} | 
+        Total marks: {{ a.get_marks_for_user_and_assessment(current_user.id)[attempt] }}/{{a.get_total_marks_possible()}} | <span class="text_{{a.get_status_of_attempt(current_user.id, attempt)}}">{{a.get_status_of_attempt(current_user.id, attempt)}}</span></h4>
+        <ul>
+            {% for r in a.get_responses(current_user.id, attempt) %}
+            <li>
+                <div class="results_box student_stats_container container_{{r.get_status()}}">
+                    <ul>
+                        <li>
+                            <b>Question {{loop.index}}. {{r.question}}</b>
+                        </li>
+                        <li>
+                            Answer given: {{r}}
+                        </li>
+                        <li>
+                            Tag: {{r.question.tag}}
+                        </li>
+                        <li>
+                            Type: {% if r.get_type() == 1 %}
+                                1 (multiple choice)
+                                {% else %}
+                                2 (text)
+                            {% endif %}
+                        </li>
+                        <li>Feedback: {{ r.get_feedback() }}</li>
+                        <li>Feedforward: {{ r.get_feedforward() }}</li>
+                        <li>Marks:
+                            {% if r.is_correct %}
+                                {{r.question.num_of_marks}}/{{r.question.num_of_marks}}
+                            {% else %}
+                            0/{{r.question.num_of_marks}}
+                            {% endif %}
+                        </li>
+                        {% if not r.is_correct %}
+                        <li><a href="mailto:{{a.user.email}}?subject=Query from {{current_user.name}}"><button>Email lecturer to query</button></a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+    
     <script>
         // PIE CHART
-        const correct = '{{assessment_details["sum_of_marks_awarded"]}}';
-        const incorrect = '{{assessment_details["sum_of_marks_possible"]-assessment_details["sum_of_marks_awarded"]}}';
+        const correct = {{a.get_highest_scoring_attempt_and_mark(current_user.id)["highest_score"]}};
+        const incorrect = {{a.get_total_marks_possible()}}-correct;
     
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const myChart = new Chart(ctx, {
+        const ctxPie = document.getElementById('myPieChart').getContext('2d');
+        const myPieChart = new Chart(ctxPie, {
             type: 'pie',
             data: {
                 labels: ['Correct', 'Incorrect'],
                 datasets: [
                     {
-                        label: 'Course View',
+                        label: 'Assessment View',
                         data: [correct, incorrect],
                         backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)'],
                         hoverOffset: 4,
@@ -240,6 +139,8 @@
 
         // BAR CHART
 
+        // BAR CHART
+
         // Variables required:
         // - labels: list of strings
         // - data: list of integers
@@ -247,26 +148,26 @@
         // - options (y axis should be total possible marks)
                 
         const ctxBar = document.getElementById('myBarChart');
-        const myChartBar = new Chart(ctxBar, {
+        const myBarChart = new Chart(ctxBar, {
             data: {
-                labels: {{data_for_bar_chart["labels"]}},
+                labels: {{data_for_bar_chart["barChartLabel"]}},
                 datasets: [{
                     type: 'bar',
                     label: 'Bar',
-                    data: {{data_for_bar_chart["data"]}},
-                    backgroundColor: [{% for color in data_for_bar_chart['backgroundColor'] %}'rgba({{color}})',{% endfor %}],  
+                    data: {{data_for_bar_chart["barChartData"]}},
+                    backgroundColor: [{% for color in data_for_bar_chart['barChartColor'] %}'rgba({{color}})',{% endfor %}],  
                     borderWidth: 1
                 }, {
                     type: 'line',
                     label: 'Line',
-                    data: {{data_for_bar_chart["data"]}},
-                    backgroundColor: [{% for color in data_for_bar_chart['backgroundColor'] %}'rgba({{color}})',{% endfor %}],  
+                    data: {{data_for_bar_chart["barChartLabel"]}},
+                    backgroundColor: [{% for color in data_for_bar_chart['barChartColor'] %}'rgba({{color}})',{% endfor %}],  
                     borderWidth: 1
                 }, {
                     type: 'line',
                     label: 'Pass Mark',
-                    data: {{data_for_bar_chart["pass_mark"]}},
-                    backgroundColor: [{% for color in data_for_bar_chart['backgroundColor'] %}'rgba(4,4,4,1)',{% endfor %}],  
+                    data: {{data_for_bar_chart["barChartPass"]}},
+                    backgroundColor: [{% for color in data_for_bar_chart['barChartColor'] %}'rgba(4,4,4,1)',{% endfor %}],  
                     borderWidth: 1
                 }
                 
@@ -283,7 +184,7 @@
                     },
                     y: {
                         beginAtZero: true,
-                        max: {{data_for_bar_chart["y_axis_max"]}}*1,
+                        max: {{data_for_bar_chart["barChartPass"][0]}}*2,
                         title: {
                             display: true,
                             text: "Marks"
@@ -293,5 +194,5 @@
             }
         });
     </script>
-  
-    {% endblock content %}
+
+{% endblock content %}

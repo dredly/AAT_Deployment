@@ -42,7 +42,7 @@ li{
 	margin-top: auto;
 }
 
-.results_box{ 
+.results_box { 
 	border-width: 8px;
 	border-style: solid;
 	border-radius: 1rem;
@@ -50,27 +50,27 @@ li{
 }
 
 .correct_answer,
-.border_text_pass{
+.container_pass{
 	border-color: var(--color-correct);
 }
 .correct_answer:hover,
-.border_text_pass:hover {
+.container_pass:hover {
 	background: var(--color-correct-op04);
 }
 .in_progress,
-.border_text_in_progress{
+.container_in_progress{
 	border-color: var(--color-in-progress);
 }
 .in_progress:hover,
-.border_text_in_progress:hover{
+.container_in_progress:hover{
 	background: var(--color-in-progress-op04);
 }
 .incorrect_answer,
-.border_text_fail{
+.container_fail{
 	border-color: var(--color-incorrect);
 }
 .incorrect_answer:hover,
-.border_text_fail:hover{
+.container_fail:hover{
 	background: var(--color-incorrect-op04);
 }
 .not_answered,

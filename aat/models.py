@@ -123,6 +123,26 @@ class ResponseT1(db.Model):
     def __repr__(self):
         return self.chosen_option.option_text
 
+    def get_type(self):
+        return 1
+
+    def get_feedback(self):
+        return (
+            self.question.feedback_if_correct
+            if self.is_correct
+            else self.question.feedback_if_wrong
+        )
+
+    def get_feedforward(self):
+        return (
+            self.question.feedforward_if_correct
+            if self.is_correct
+            else self.question.feedforward_if_wrong
+        )
+
+    def get_status(self):
+        return "pass" if self.is_correct else "fail"
+
 
 class ResponseT2(db.Model):
     """
@@ -147,6 +167,26 @@ class ResponseT2(db.Model):
 
     def __repr__(self):
         return self.response_content
+
+    def get_type(self):
+        return 2
+
+    def get_feedback(self):
+        return (
+            self.question.feedback_if_correct
+            if self.is_correct
+            else self.question.feedback_if_wrong
+        )
+
+    def get_feedforward(self):
+        return (
+            self.question.feedforward_if_correct
+            if self.is_correct
+            else self.question.feedforward_if_wrong
+        )
+
+    def get_status(self):
+        return "pass" if self.is_correct else "fail"
 
 
 class Assessment(db.Model):
@@ -184,6 +224,32 @@ class Assessment(db.Model):
     def __repr__(self):
         return self.title
 
+    def get_questions(self):
+        return [
+            q for question in [self.question_t1, self.question_t2] for q in question
+        ]
+
+    def get_responses(self, user_id=None, attempt_number=None):
+        if user_id and attempt_number:
+            return [
+                r
+                for response in [self.responses_t1, self.responses_t2]
+                for r in response
+                if r.user_id == user_id and r.attempt_number == attempt_number
+            ]
+
+        if user_id:
+            return [
+                r
+                for response in [self.responses_t1, self.responses_t2]
+                for r in response
+                if r.user_id == user_id
+            ]
+
+        return [
+            r for response in [self.responses_t1, self.responses_t2] for r in response
+        ]
+
     def get_attempt_limit(self):
         return 3 if self.is_summative else None
 
@@ -198,10 +264,10 @@ class Assessment(db.Model):
         )
 
     def get_count_of_attempts_made(self, user_id):
-        return max(get_marks_for_user_and_assessment(user_id).keys())
+        return max(self.get_marks_for_user_and_assessment(user_id).keys())
 
     def get_list_of_attempts_made(self, user_id):
-        return get_marks_for_user_and_assessment(user_id).keys()
+        return self.get_marks_for_user_and_assessment(user_id).keys()
 
     def get_average_difficulty(self):
         """
@@ -304,6 +370,22 @@ class Assessment(db.Model):
             return "pass"
         return "fail"
 
+    def get_status_of_attempt(self, user_id, attempt_number):
+        return (
+            "pass"
+            if (
+                self.get_marks_for_user_and_assessment(user_id)[attempt_number]
+                / self.get_total_marks_possible()
+            )
+            >= 0.5
+            else "fail"
+        )
+
+    def get_credits(self, user_id):
+        if self.get_status(user_id) == "pass":
+            return self.num_of_credits
+        return 0
+
     def get_weighted_perc_factor(self):
         """
         Works out total weighted perc for this assessment
@@ -365,6 +447,16 @@ class QuestionT1(db.Model):
     def __repr__(self):
         return self.question_text
 
+    def get_responses_from_user(self, user_id, attempt_number=None):
+        if not attempt_number:
+            return [r for r in self.responses if r.user_id == user_id]
+        else:
+            return [
+                r
+                for r in self.responses
+                if r.user_id == user_id and r.attempt_number == attempt_number
+            ]
+
     def get_weighted_marks(self):
         """
         Looks at all marks in attached assessment
@@ -374,6 +466,9 @@ class QuestionT1(db.Model):
             return self.num_of_marks / self.assessment.get_total_marks_possible()
         except:
             return None
+
+    def get_question_id(self):
+        return self.q_t1_id
 
     def get_was_user_right(self, user_id, attempt_number=None):
         """
@@ -419,6 +514,19 @@ class QuestionT2(db.Model):
 
     def __repr__(self):
         return self.question_text
+
+    def get_question_id(self):
+        return self.q_t2_id
+
+    def get_responses_from_user(self, user_id, attempt_number=None):
+        if not attempt_number:
+            return [r for r in self.responses if r.user_id == user_id]
+        else:
+            return [
+                r
+                for r in self.responses
+                if r.user_id == user_id and r.attempt_number == attempt_number
+            ]
 
     def get_weighted_marks(self):
         """
