@@ -876,3 +876,27 @@ def get_course_status(user_id):
         return "in progress"
     else:
         return "unattempted"
+
+
+def get_number_of_attempts(user_id, assessment_id):
+    """
+    Takes in:
+    - user_id (str)
+    - assessment_id (user)
+    Returns
+    - highest number of attempts for that assessment by that user (str)
+    """
+    return max(
+        (
+            ResponseT1.query.filter_by(user_id=user_id)
+            .filter_by(assessment_id=assessment_id)
+            .with_entities(ResponseT1.attempt_number)
+            .all()
+        )
+        + (
+            ResponseT2.query.filter_by(user_id=user_id)
+            .filter_by(assessment_id=assessment_id)
+            .with_entities(ResponseT2.attempt_number)
+            .all()
+        )
+    )[0]

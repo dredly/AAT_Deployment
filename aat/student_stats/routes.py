@@ -767,7 +767,10 @@ def assessment_view(assessment_id=0):
 
     status = get_assessment_status(assessment_id, current_user.id)
     status = (status, f'text_{status.replace(" ", "_")}')
-    print(f"{status=}")
+
+    # Assessment stats
+
+    get_current_number_of_attempts(user_id=current_user.id, assessment_id=assessment_id)
 
     assessment_stats_raw = get_assessment_id_and_data(assessment_id=assessment_id)[
         assessment_id
