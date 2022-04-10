@@ -54,76 +54,172 @@
 
     <h2>Assessments</h2>
 
+    <p class="todo">TODO: three tables, one for summative stats, formative stats, one for analysis (difficulty/tags etc.)</p>
+    <h3>Summative</h3>
     <table>
         <tr>
             <th>Assessment</th>
             <th>Type</th>
             <th>Status</th>
             <th>Mark</th>
-            <th>Weighted Perc.</th>
             <th>Credits</th>
-            <th>Difficulty</th>
-            <th>Tags</th>
+            <th>Weighted Perc.</th>
+            <th>Take</th>
         </tr>
         {% for a in assessment_stats_overview %}
-        <tr>
-            <td>
-                <li><a href="{{url_for('student_stats.assessment_view', assessment_id=a.assessment_id)}}">{{a.assessment_id}}. {{a.assessment_title}}</a></li>
-            </td>
-            <td>
-                <li>{% if a.summative %}
-                    <b>Summative</b>
-                    {% else %}
-                    Formative
-                {% endif %}</li>
-            </td>
-            <td>
-                <li><span class="{{a.status_class}}">{{a.status}}</span></li>
-            </td>
-            <td>
-                <li>
-                    {% if a.status=="unattempted" %}-{% else %}{{a.sum_of_marks_earned}}{% endif %}/{{a.sum_of_marks_possible}}</li>
-            </td>
-            <td>
-                {% if a.weighted_perc %}
-                <li>{{ "%.1f" |format(a.weighted_perc*100)}}%</li>
-                {% else %}
-                    <li>N/A</li>
-                {% endif %}
-                
-            </td>
-            <td>
-                <li>
-                    {% if a.summative %}
-                        {% if a.status=="pass" %}{{ a.num_of_credits }}{% else %}0{% endif %}/{{a.num_of_credits}}</li>
-                    {% else %}
-                        -
-                    {% endif %}
-            </td>
-            <td>
-                <li>{{ a.difficulty }}</li>
-            </td>
-            <td>
-                <li>
-                    {% if a.tags %}
-                        {% for k,v in a.tags.items() %}
-                            {{k}} ({{v}}){% if not loop.last %}, {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        None
-                    {% endif %}
-                   
-                </li>
-            </td>
-        </tr>
+            {% if a.summative %}
+                <tr>
+                    <td>
+                        <li><a href="{{url_for('student_stats.assessment_view', assessment_id=a.assessment_id)}}">{{a.assessment_id}}. {{a.assessment_title}}</a></li>
+                    </td>
+                    <td>
+                        <li><b>Summative</b></li>
+                    </td>
+                    <td>
+                        <li><span class="{{a.status_class}}">{{a.status}}</span></li>
+                    </td>
+                    <td>
+                        <li>
+                            {% if a.status=="unattempted" %}-{% else %}{{a.sum_of_marks_earned}}{% endif %}/{{a.sum_of_marks_possible}}</li>
+                    </td>
+                    <td>
+                        <li>
+                            {% if a.status=="pass" %}{{ a.num_of_credits }}{% else %}0{% endif %}/{{a.num_of_credits}}</li>
+                        </td>
+                        <td>
+                            {% if a.weighted_perc %}
+                            <li>{{ "%.1f" |format(a.weighted_perc*100)}}%</li>
+                            {% else %}
+                                <li>N/A</li>
+                            {% endif %}
+                            
+                        </td>
+                    <td>-</td>
+                </tr>
+            {% endif %}
         {% endfor %}
         <tr class="table_subtotal">
                 <td>MODULE TOTAL</td>
                 <td>-</td>
-                <td>{{module_status}}<br>TODO: add status_class</td>
-                <td>TODO</td>
+                <td><span class='{% if module_status=="pass" %}
+                    text_correct
+                {% elif module_status=="fail" %}
+                    text_incorrect
+                {% elif module_status=="unattempted" %}
+                    text_unattempted
+                {% else %}
+                    text_in_progress
+                {% endif %}'>{{module_status | upper }}</span></td>
                 <td>TODO</td>
                 <td>{{dictionary_of_module_credits["total_credits_earned"]}}/{{dictionary_of_module_credits["total_credits_possible"]}}</td>
+                <td>{{"%.1f" |format(module_details["total_weighted_perc"]*100)}}%</td>
+                <td>-</td>   
+        </tr>
+    </table>
+    <h3>Formative</h3>
+    <table>
+        <tr>
+            <th>Assessment</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Mark</th>
+            <th>Credits</th>
+            <th>Weighted Perc.</th>
+            <th>Take</th>
+        </tr>
+        {% for a in assessment_stats_overview %}
+            {% if not a.summative %}
+                <tr>
+                    <td>
+                        <li><a href="{{url_for('student_stats.assessment_view', assessment_id=a.assessment_id)}}">{{a.assessment_id}}. {{a.assessment_title}}</a></li>
+                    </td>
+                    <td>
+                        <li>Formative</li>
+                    </td>
+                    <td>
+                        <li><span class="{{a.status_class}}">{{a.status}}</span></li>
+                    </td>
+                    <td>
+                        <li>
+                            {% if a.status=="unattempted" %}-{% else %}{{a.sum_of_marks_earned}}{% endif %}/{{a.sum_of_marks_possible}}</li>
+                    </td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td> 
+                </tr>
+            {% endif %}
+        {% endfor %}
+        <tr class="table_subtotal">
+                <td>MODULE TOTAL</td>
+                <td>-</td>
+                <td><span class='{% if module_status=="pass" %}
+                    text_correct
+                {% elif module_status=="fail" %}
+                    text_incorrect
+                {% elif module_status=="unattempted" %}
+                    text_unattempted
+                {% else %}
+                    text_in_progress
+                {% endif %}'>{{module_status | upper }}</span></td>
+                <td>{{dictionary_of_module_credits["total_credits_earned"]}}/{{dictionary_of_module_credits["total_credits_possible"]}}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td> 
+        </tr>
+    </table>
+    <h3>Analysis</h3>
+    <table>
+        <tr>
+            <th>Assessment</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Difficulty</th>
+            <th>Tags</th>
+        </tr>
+        {% for a in assessment_stats_overview %}
+            <tr>
+                <td>
+                    <li><a href="{{url_for('student_stats.assessment_view', assessment_id=a.assessment_id)}}">{{a.assessment_id}}. {{a.assessment_title}}</a></li>
+                </td>
+                <td>
+                    <li>{% if a.summative %}
+                        <b>Summative</b>
+                        {% else %}
+                        Formative
+                    {% endif %}</li>
+    
+                </td>
+                <td>
+                    <li><span class="{{a.status_class}}">{{a.status}}</span></li>
+                </td>
+                <td>
+                    <li>{{ a.difficulty }}</li>
+                </td>
+                <td>
+                    <li>
+                        {% if a.tags %}
+                            {% for k,v in a.tags.items() %}
+                                {{k}} ({{v}}){% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            None
+                        {% endif %}
+                    </li>
+                </td>
+            </tr>
+        {% endfor %}
+        <tr class="table_subtotal">
+                <td>MODULE TOTAL</td>
+                <td>-</td>
+                <td><span class='{% if module_status=="pass" %}
+                    text_correct
+                {% elif module_status=="fail" %}
+                    text_incorrect
+                {% elif module_status=="unattempted" %}
+                    text_unattempted
+                {% else %}
+                    text_in_progress
+                {% endif %}'>{{module_status | upper }}</span></td>
                 <td>TODO</td>
                 <td>TODO</td>
                    

@@ -187,6 +187,30 @@ class Assessment(db.Model):
     def get_attempt_limit(self):
         return 3 if self.is_summative else None
 
+    def get_highest_scoring_attempt(self, user_id):
+        # TODO
+        ...
+
+    def get_marks_for_user(self, user_id):
+        response_t1_query = ResponseT1.query.filter_by(user_id=user_id).all()
+        list_of_attempts = list(set([r.attempt_number for r in response_t1_query]))
+        for index in list_of_attempts:
+            for r in response_t1_query:
+                try:
+                    if r.attempt_number == index:
+                        print("> GOOD")
+                        print(vars(r))
+                        # print(r.question.num_of_marks)
+                        print("ENDGOOD")
+                except:
+                    print("> PROBLEM")
+                    # print(r)
+                    print(vars(r))
+                    print("ENDPROBLEM")
+        # r2 = ResponseT1.query.filter_by(user_id=user_id).all()
+
+        return "HI!"
+
 
 class Tag(db.Model):
     __tablename__ = "Tag"

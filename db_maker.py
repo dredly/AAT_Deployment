@@ -239,7 +239,7 @@ with app.app_context():
             QuestionT1(  # 7
                 assessment_id=6,
                 num_of_marks=5,
-                question_text="In a weigted graph what is an edge?",
+                question_text="In a weighted graph what is an edge?",
                 difficulty=1,
                 feedback_if_correct="Well done!",
                 feedback_if_wrong="No, try again",
@@ -827,7 +827,7 @@ with app.app_context():
                 attempt_number=1,
                 user_id=4,
                 assessment_id=10,
-                t1_question_id=19,
+                t1_question_id=9,
                 selected_option=26,
                 is_correct=True,
             ),

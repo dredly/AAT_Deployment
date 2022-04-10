@@ -362,7 +362,11 @@ def course_view():
 
         if status == "pass":
             for assessment in m.assessments:
-                num_of_credits_earned += assessment.num_of_credits
+                print(f"{assessment=}")
+                print(f"{assessment=}")
+                print(f"{assessment.is_summative=}")
+                if assessment.is_summative:
+                    num_of_credits_earned += assessment.num_of_credits
 
         count_of_sum_assessment_pass = 0
         count_of_sum_asssessment_present = 0
@@ -398,6 +402,9 @@ def course_view():
                 "count_of_sum_asssessment_present": count_of_sum_asssessment_present,
                 "count_of_form_assessment_pass": count_of_form_assessment_pass,
                 "count_of_form_asssessment_present": count_of_form_asssessment_present,
+                "total_weighted_perc": get_total_weighted_perc_module(
+                    m.module_id, current_user.id
+                ),
             }
         )
 
@@ -445,7 +452,6 @@ def module_view(module_id=0):
         store_output_to_file=True,
     )
     module_status = get_module_status(module_id, current_user.id)
-
     # "aid" -> assessment_id_and_data
     assessment_id_and_data = get_assessment_id_and_data(module_id=module_id)
 
@@ -470,6 +476,9 @@ def module_view(module_id=0):
     module_details["sum_of_possible_marks_formative"] = 0
     module_details["sum_of_correct_marks_formative"] = 0
     module_details["sum_of_num_of_credits_formative"] = 0
+    module_details["total_weighted_perc"] = get_total_weighted_perc_module(
+        module_id, current_user.id
+    )
 
     # Adds values for Formative and Summative (combined to be calculated)
     for entry in all_assessment_marks_student:
@@ -887,3 +896,11 @@ def download():
     ] = f"attachment; filename={current_user.name}-aat-export.csv"
     output.headers["Content-type"] = "text/csv"
     return output
+
+
+@student_stats.route("/test")
+def test():
+    assessment_query = Assessment.query.all()
+    for a in assessment_query:
+        print(a.get_marks_for_user(current_user.id))
+    return "."

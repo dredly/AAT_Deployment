@@ -817,7 +817,8 @@ def get_assessment_status(assessment_id, user_id):
         return "fail"
 
 
-def get_module_status(module_id, user_id):
+def get_total_weighted_perc_module(module_id, user_id):
+    # Get list of all assessments user has taken
     all_assessment_marks = get_all_assessment_marks(
         input_user_id=user_id,
         input_module_id=module_id,
@@ -833,12 +834,27 @@ def get_module_status(module_id, user_id):
         q["assessment_id"]: q["correct_marks"] for q in all_assessment_marks
     }
 
-    total_weighted_perc = sum(
+    return sum(
         [
             get_weighted_perc_calc(marks_earned, assessment_id)
             for assessment_id, marks_earned in assessments_taken.items()
         ]
     )
+
+
+def get_module_status(module_id, user_id):
+    all_assessment_marks = get_all_assessment_marks(
+        input_user_id=user_id,
+        input_module_id=module_id,
+        highest_scoring_attempt_only=True,
+        summative_only=True,
+    )
+
+    # If there are no marks, an empty list is returned
+    if not all_assessment_marks:
+        return "unattempted"
+
+    total_weighted_perc = get_total_weighted_perc_module(module_id, user_id)
 
     # If they're above 50% at any point they've passed
     if total_weighted_perc >= 0.5:

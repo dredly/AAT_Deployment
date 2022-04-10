@@ -44,39 +44,31 @@
                 <tr>
                     <th>Module</th>
                     <th>Status</th>
-                    <th>Credits<br><span class="text_correct">Passed</span></th>
-                    <th>Credits<br><span class="text_incorrect">Failed</span></th>
-                    <th>Credits<br><span class="text_unattempted">Unattempted</span></th>
+                    <th>Credits<br><span class="text_correct">Earned</span></th>
+                    <th>Weighted<br>Perc.</th>
+
                     <th>Summative<br>Assessments Passed</th>
                 </tr>
                 {% for m in module_overview_stats %}
                     <tr>
                         <td><a href="{{url_for('student_stats.module_view', module_id=m.module_id)}}">{{m.module_id}}. {{m.module_title}}</a></td>
+                        
                         <td><span class="{{m.status_class}}">{{m.status}}</span></td>
                         <td>
                             {% if m.num_of_credits_possible %}
-                                {{m.num_of_credits_earned}}/{{m.num_of_credits_possible}}
+                            {{m.num_of_credits_earned}}/{{m.num_of_credits_possible}}
                             {% endif %}
                         </td>
-                        <td>
-                            {% if m.num_of_credits_possible %}
-                                {{m.num_of_credits_failed}}/{{m.num_of_credits_possible}}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if m.num_of_credits_possible %}
-                                {{m.num_of_credits_possible - m.num_of_credits_earned - m.num_of_credits_failed}}/{{m.num_of_credits_possible}}
-                            {% endif %}
+                        
+                        <td>{% if m.total_weighted_perc=="unattempted" %}-
+                        {% else %}
+                        {{"%.1f" |format(m.total_weighted_perc*100)}}%
+                        {% endif %}
                         </td>
                         <td>{% if m.count_of_sum_asssessment_present %}
                             {{m.count_of_sum_assessment_pass}}/{{m.count_of_sum_asssessment_present}}
                         {% endif %}</td>
-                        {#
-                        <td>{% if m.count_of_form_asssessment_present %}
-                            {{m.count_of_form_assessment_pass}}/{{m.count_of_form_asssessment_present}}
-                        {% endif %}</td>
-                        #}
-                        </tr>
+                    </tr>
                 {% endfor %}
             </table>
         </ul>
