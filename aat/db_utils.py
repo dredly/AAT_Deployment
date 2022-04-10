@@ -69,6 +69,7 @@ def get_assessment_id_and_data(
         a = Assessment.query.filter_by(assessment_id=assessment_id).all()
     else:
         a = Assessment.query.all()
+
     assessment_id_and_data = {}
     for q in a:
         assessment_id_and_data[q.assessment_id] = {
@@ -655,8 +656,6 @@ def get_all_response_details(
                     "highest_scoring_attempt"
                 ]
 
-    # print(f"Output BEFORE filters: {final_output=}")
-
     # FILTERS
     if input_user_id:
         final_output = [
@@ -886,17 +885,22 @@ def get_number_of_attempts(user_id, assessment_id):
     Returns
     - highest number of attempts for that assessment by that user (str)
     """
-    return max(
-        (
-            ResponseT1.query.filter_by(user_id=user_id)
-            .filter_by(assessment_id=assessment_id)
-            .with_entities(ResponseT1.attempt_number)
-            .all()
-        )
-        + (
-            ResponseT2.query.filter_by(user_id=user_id)
-            .filter_by(assessment_id=assessment_id)
-            .with_entities(ResponseT2.attempt_number)
-            .all()
-        )
-    )[0]
+    try:
+        number_of_attempts = max(
+            (
+                ResponseT1.query.filter_by(user_id=user_id)
+                .filter_by(assessment_id=assessment_id)
+                .with_entities(ResponseT1.attempt_number)
+                .all()
+            )
+            + (
+                ResponseT2.query.filter_by(user_id=user_id)
+                .filter_by(assessment_id=assessment_id)
+                .with_entities(ResponseT2.attempt_number)
+                .all()
+            )
+        )[0]
+    except:
+        number_of_attempts = 0
+
+    return number_of_attempts if number_of_attempts else 0

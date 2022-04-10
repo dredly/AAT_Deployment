@@ -81,10 +81,11 @@
                 <li><span class="{{a.status_class}}">{{a.status}}</span></li>
             </td>
             <td>
-                <li>{{a.sum_of_marks_earned}}/{{a.sum_of_marks_possible}}</li>
+                <li>
+                    {% if a.status=="unattempted" %}-{% else %}{{a.sum_of_marks_earned}}{% endif %}/{{a.sum_of_marks_possible}}</li>
             </td>
             <td>
-                {% if weighted_mark %}
+                {% if a.weighted_perc %}
                 <li>{{ "%.1f" |format(a.weighted_perc*100)}}%</li>
                 {% else %}
                     <li>N/A</li>
@@ -92,7 +93,12 @@
                 
             </td>
             <td>
-                <li>{% if a.status=="pass" %}{{ a.num_of_credits }}{% else %}0{% endif %}/{{a.num_of_credits}}</li>
+                <li>
+                    {% if a.summative %}
+                        {% if a.status=="pass" %}{{ a.num_of_credits }}{% else %}0{% endif %}/{{a.num_of_credits}}</li>
+                    {% else %}
+                        -
+                    {% endif %}
             </td>
             <td>
                 <li>{{ a.difficulty }}</li>
@@ -111,6 +117,17 @@
             </td>
         </tr>
         {% endfor %}
+        <tr class="table_subtotal">
+                <td>MODULE TOTAL</td>
+                <td>-</td>
+                <td>{{module_status}}<br>TODO: add status_class</td>
+                <td>TODO</td>
+                <td>TODO</td>
+                <td>{{dictionary_of_module_credits["total_credits_earned"]}}/{{dictionary_of_module_credits["total_credits_possible"]}}</td>
+                <td>TODO</td>
+                <td>TODO</td>
+                   
+        </tr>
     </table>
 </ul>
     <h2>Download</h2>

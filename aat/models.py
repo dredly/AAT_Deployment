@@ -184,6 +184,9 @@ class Assessment(db.Model):
     def __repr__(self):
         return self.title
 
+    def get_attempt_limit(self):
+        return 3 if self.is_summative else None
+
 
 class Tag(db.Model):
     __tablename__ = "Tag"

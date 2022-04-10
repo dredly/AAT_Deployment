@@ -599,15 +599,37 @@ def assessment_view(assessment_id=0):
 
     assessment_object = Assessment.query.filter_by(assessment_id=assessment_id).first()
 
+    # Assessment stats
+    number_of_attempts = get_number_of_attempts(
+        user_id=current_user.id, assessment_id=assessment_id
+    )
+
+    attempt_limit = (
+        assessment_object.get_attempt_limit()
+        if assessment_object.get_attempt_limit()
+        else "unlimited"
+    )
+
+    if (
+        assessment_object.get_attempt_limit()
+        and number_of_attempts == assessment_object.get_attempt_limit()
+    ):
+        can_take_assessment = False
+    else:
+        can_take_assessment = True
+
     assessment_details = {
         "module_id": assessment_object.module_id,
         "module_title": assessment_object.module.title,
         "assessment_id": assessment_id,
         "assessment_title": assessment_object.title,
-        "summative_or_formative": "Summative"
+        "summative_or_formative": "summative"
         if assessment_object.is_summative
-        else "Formative",
+        else "formative",
         "credits": assessment_object.num_of_credits,
+        "number_of_attempts": number_of_attempts,
+        "attempt_limit": attempt_limit,
+        "can_take_assessment": can_take_assessment,
     }
 
     # db_utils calls
@@ -768,10 +790,6 @@ def assessment_view(assessment_id=0):
     status = get_assessment_status(assessment_id, current_user.id)
     status = (status, f'text_{status.replace(" ", "_")}')
 
-    # Assessment stats
-
-    get_current_number_of_attempts(user_id=current_user.id, assessment_id=assessment_id)
-
     assessment_stats_raw = get_assessment_id_and_data(assessment_id=assessment_id)[
         assessment_id
     ]
@@ -785,6 +803,7 @@ def assessment_view(assessment_id=0):
         tags = assessment_stats_raw["tag_array_counter"]
     else:
         tags = None
+
     assessment_stats = {
         "marks": assessment_stats_raw["total_marks_possible"],
         "questions": assessment_stats_raw["count_of_questions"],

@@ -103,6 +103,10 @@ li{
 	color: var(--color-in-progress);
 }
 
+.text_summative{
+	font-weight: bold;
+}
+
 /* CHARTS */
 .chart-container{
 	height: 20rem;
@@ -112,4 +116,9 @@ li{
 table, th, td {
 	border: 1px solid;
 	padding: 0.8rem;
+	text-align: center;
   }
+
+.table_subtotal>*{
+	font-weight: bold;
+}

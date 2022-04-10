@@ -25,15 +25,43 @@
     </p>
     <h2>Assessment: {{ assessment_details["assessment_id"]}} | {{assessment_details["assessment_title"] }}</h2>
 
-    <h3>Status: <span class="{{status.1}}">{{status.0 | upper}}</span>
+    <h3>Overview</h3>
 
-    <h3>Credits Earned: {% if assessment_details["highest_scoring_attempt_passed"] %}{{assessment_details["credits"]}}{% else %}0{% endif %}/{{assessment_details["credits"]}}</h3>
+    <table>
+        <tr>
+            <th>Type</th>
+            <th>Mark</th>
+            <th>Status</th>
+            <th>Credits<br>earned</th>
+            <th>Attempts<br>made</th>
+            <th>Attempts<br>allowed</th>
+            <th>Can {% if not status.0 == "unattempted" %}re{% endif%}take<br>assessment</th>
+        </tr>
+        <tr>
+            <td><span class="text_{{assessment_details["summative_or_formative"]}}">{{assessment_details["summative_or_formative"]|title}}</span></td>
+            {% if not status.0=="unattempted" %}
+                <td>
+                    {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}}</td>
+                <td><span class="{{status.1}}">{{status.0 | upper}}</span></td>
+                <td>{% if status.0=="pass" %}{{assessment_details["credits"]}}{% else %}0{% endif %}/{{assessment_details["credits"]}}</td>
+                <td>{{ assessment_details["number_of_attempts"]}}</td>
+                <td>{{ assessment_details["attempt_limit"]|title }}</td>
+                <td>{% if assessment_details["can_take_assessment"] %}Yes: <a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Take assessment</button></a>{% else %}No (attempt limit reached){% endif %}</td>
+            {% else %}
+                <td>-/{{assessment_stats["marks"]}}</td>
+                <td><span class="{{status.1}}">{{status.0 | upper}}</span></td>
+                <td>-</td>
+                <td>0</td>
+                <td>{{ assessment_details["attempt_limit"]|title }}</td>
+                <td>Yes: <a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Take assessment</button></a></td>
+            {% endif %}
+        </tr>
+    </table>
+ 
+
 
     {% if status.0 == "unattempted" %}
-    <p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Take assessment</button></a></p>
     <ul>
-        <li>Marks: {{assessment_stats["marks"]}}</li>
-        <li>Questions: {{assessment_stats["questions"]}}</li>
         {% if assessment_stats["difficulty"] %}
             <li>Difficulty: {{assessment_stats["difficulty"]}}</li>
         {% endif %}
@@ -103,9 +131,9 @@
         <ul>
             <h3>Highest scoring attempt</h3>
             
-            <h3>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | <span class="{{status.1}}">{{ status.0 | upper}}</span></h3>
+            <h4>Attempt {{assessment_details["highest_scoring_attempt_number"]}} | {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["correct_marks"]}}/{{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["possible_marks"]}} = {{total_score_per_attempt[assessment_details["highest_scoring_attempt_number"]]["mark_as_percentage"]}} | <span class="{{status.1}}">{{ status.0 | upper}}</span></h4>
 
-            {% if not assessment_details["highest_scoring_attempt_passed"] %}<p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Retake assessment</button></a></p>{% endif %}
+            {% if assessment_details["can_take_assessment"] %}<p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Retake assessment</button></a></p>{% endif %}
 
             {% for r in highest_scoring_response_details %}
                 <div class="student_stats_container results_box {% if r.is_correct %} correct_answer {% else %} incorrect_answer {% endif %}">
@@ -147,8 +175,8 @@
                         <li>
                             <h3>Attempt {{attempt_number}} | {{total_score_per_attempt[attempt_number]["correct_marks"]}}/{{total_score_per_attempt[attempt_number]["possible_marks"]}} = {{total_score_per_attempt[attempt_number]["mark_as_percentage"]}} | 
                                 {% if total_score_per_attempt[attempt_number]["correct_marks"]/total_score_per_attempt[attempt_number]["possible_marks"]>=0.5 %}<span class="text_correct">PASSED</span>{% else %}<span class="text_incorrect">FAILED</span>{% endif %} </h3>
-                                {% if not total_score_per_attempt[attempt_number]["correct_marks"]/total_score_per_attempt[attempt_number]["possible_marks"]>=0.5 %}<p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Retake assessment</button></a></p>{% endif %}
-                        </li>
+                                {% if assessment_details["can_take_assessment"] %}<p><a href="{{url_for('assessments.assessment_summary', assessment_id=assessment_details['assessment_id'])}}"><button>Retake assessment</button></a></p>{% endif %}
+                            </li>
                         {% for r in attempt_details %}
                             <div class="student_stats_container results_box {% if r.is_correct %} correct_answer {% else %} incorrect_answer {% endif %}">
                                 <li>
