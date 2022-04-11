@@ -253,6 +253,13 @@ class Assessment(db.Model):
     def get_attempt_limit(self):
         return 3 if self.is_summative else None
 
+    def get_can_user_take_assessment(self, user_id):
+        return (
+            True
+            if not self.is_summative
+            else self.get_count_of_attempts_made(user_id) < self.get_attempt_limit()
+        )
+
     def get_total_marks_possible(self):
         """
         Returns the total number of marks an assessment is worth
@@ -598,6 +605,52 @@ class Module(db.Model):
         """
         return sum([a.num_of_credits for a in self.assessments])
 
+    def get_total_marks_possible(self, summative_only=False, formative_only=False):
+        if summative_only:
+            return sum(
+                [
+                    a.get_total_marks_possible()
+                    for a in self.assessments
+                    if a.is_summative
+                ]
+            )
+        if formative_only:
+            return sum(
+                [
+                    a.get_total_marks_possible()
+                    for a in self.assessments
+                    if not a.is_summative
+                ]
+            )
+        return sum([a.get_total_marks_possible() for a in self.assessments])
+
+    def get_total_marks_earned(
+        self, user_id, summative_only=False, formative_only=False
+    ):
+        if summative_only:
+            return sum(
+                [
+                    a.get_highest_scoring_attempt_and_mark(user_id)["highest_score"]
+                    for a in self.assessments
+                    if a.get_status(user_id) != "unattempted" and a.is_summative
+                ]
+            )
+        if formative_only:
+            return sum(
+                [
+                    a.get_highest_scoring_attempt_and_mark(user_id)["highest_score"]
+                    for a in self.assessments
+                    if a.get_status(user_id) != "unattempted" and not a.is_summative
+                ]
+            )
+        return sum(
+            [
+                a.get_highest_scoring_attempt_and_mark(user_id)["highest_score"]
+                for a in self.assessments
+                if a.get_status(user_id) != "unattempted"
+            ]
+        )
+
     def get_total_weighted_marks_as_perc(self, user_id):
         """
         Returns weighted percentage for a user's performance based on summative assessments
@@ -632,6 +685,70 @@ class Module(db.Model):
 
         # Unattempted
         return "in progress"
+
+    def get_assessments(self, summative_only=False, formative_only=False):
+        """
+        Returns list of all assessments attached to module
+        Can be filtered summative/formative
+        """
+        if summative_only:
+            return [a for a in self.assessments if a.is_summative]
+        if formative_only:
+            return [a for a in self.assessments if not a.is_summative]
+        return self.assessments
+
+    def get_dict_of_tags_and_assessments(self, user_id):
+        """
+        Returns {tags : [assessments]}
+        """
+        output = {}
+        tags_used = self.get_dict_of_tags_and_answers(user_id).keys()
+        for tag in tags_used:
+            output[tag] = []
+            for a in self.get_assessments(summative_only=True):
+                if tag in a.get_dict_of_tags_and_answers(user_id).keys():
+                    output[tag].append(a)
+        return output
+
+    def get_dict_of_tags_and_answers(self, user_id):
+        # Summative ONLY
+        output = {}
+        for a in self.get_assessments(summative_only=True):
+            input_dict = a.get_dict_of_tags_and_answers(user_id)
+            for key, value in input_dict.items():
+                if key not in output:
+                    output[key] = value
+                else:
+                    for v, val in value.items():
+                        output[key][v] += val
+        return output
+
+    def get_count_of_assessments(
+        self,
+        summative_only=False,
+        formative_only=False,
+        status_counter=False,
+        user_id=None,
+    ):
+        """
+        Returns count of assessments
+        Has filters for summative and formative
+        Also allows you to ask if passed (requires user_id)
+        """
+        if summative_only:
+            if status_counter:
+                return Counter(
+                    [a.get_status(user_id) for a in self.assessments if a.is_summative]
+                )
+            return len([a for a in self.assessments if a.is_summative])
+        if formative_only:
+            if status_counter:
+                return Counter([a.get_status(user_id) for a in self.assessments])
+            return len(
+                [a for a in self.assessments if not a.is_summative if a.is_summative]
+            )
+
+        return len(self.assessments)
 
 
 class User(UserMixin, db.Model):
