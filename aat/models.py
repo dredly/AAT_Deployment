@@ -13,6 +13,18 @@ login_manager = LoginManager()
 # Format for model: primary key, then all foreign keys, then all other columns, then all relationships
 
 
+class Course(db.Model):
+    __tablename__ = "Course"
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(
+        db.String(30), unique=True, nullable=False, default="MSc. Computing"
+    )
+    modules = db.relationship("Module", backref="course")
+
+    def __repr__(self):
+        return self.title
+
+
 class Challenge(db.Model):
     __tablename__ = "challenges"
     challenge_id = db.Column(db.Integer, primary_key=True)
@@ -678,6 +690,8 @@ class Module(db.Model):
     total_credits = db.Column(
         db.Integer, nullable=False
     )  # DO NOT USE - use get_total_assessment_credits() instead
+    # --- Foreign keys ---
+    course_id = db.Column(db.Integer, db.ForeignKey("course.id"), default=1)
     # --- Relationships ---
     assessments = db.relationship("Assessment", backref="module", lazy=True)
 

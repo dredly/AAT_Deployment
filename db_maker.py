@@ -12,10 +12,16 @@ with app.app_context():
     db.create_all()
     Role.insert_roles()
 
-    ###########
-    # MODULES #
-    ###########
     db.session.add_all(
+        ##########
+        # COURSE #
+        ##########
+        [Course()],  # 1)
+    )
+    db.session.add_all(
+        ###########
+        # MODULES #
+        ###########
         [
             Module(  # 1
                 title="Version Control and Large Projects",
@@ -29,7 +35,7 @@ with app.app_context():
                 title="Algorithms",
                 total_credits=80,
             ),
-        ]
+        ],
     )
 
     ###############
