@@ -276,19 +276,42 @@ class Assessment(db.Model):
     def get_list_of_attempts_made(self, user_id):
         return self.get_marks_for_user_and_assessment(user_id).keys()
 
-    def get_average_difficulty(self):
+    def get_average_difficulty(self, actual=False):
         """
         Returns average difficulty (string)
         """
-        return sum(
-            q.difficulty
-            for question in [self.question_t1, self.question_t2]
-            for q in question
-        ) / count(
-            q.difficulty
-            for question in [self.question_t1, self.question_t2]
-            for q in question
-        )
+
+        if actual:
+            return sum(
+                [
+                    q.difficulty
+                    for question in [self.question_t1, self.question_t2]
+                    for q in question
+                ]
+            ) / len(
+                [
+                    q.difficulty
+                    for question in [self.question_t1, self.question_t2]
+                    for q in question
+                ]
+            )
+        else:
+            round(
+                sum(
+                    [
+                        q.difficulty
+                        for question in [self.question_t1, self.question_t2]
+                        for q in question
+                    ]
+                )
+                / len(
+                    [
+                        q.difficulty
+                        for question in [self.question_t1, self.question_t2]
+                        for q in question
+                    ]
+                )
+            )
 
     def get_counter_of_tags(self):
         """

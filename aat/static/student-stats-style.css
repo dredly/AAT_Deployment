@@ -115,8 +115,15 @@ li{
 
 /* CHARTS */
 .chart-container{
+	display: inline;
 	height: 20rem;
 	width: 20rem;
+}
+
+.graph_holder{
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
 }
 /* Tables */
 table, th, td {
