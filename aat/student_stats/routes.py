@@ -45,9 +45,6 @@ def module_view(module_id=0):
     if m is None:
         return redirect(url_for("student_stats.module_not_found", module_id=module_id))
 
-    
-
-
     ## RETURN ##
     return render_template("2_student_stats_module_view.html", m=m)
 

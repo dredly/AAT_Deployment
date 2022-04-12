@@ -82,6 +82,12 @@ li{
 	background: var(--color-unattempted-op04);
 }
 
+.attempt_container.container_pass:hover,
+.attempt_container.container_in_progress:hover,
+.attempt_container.container_fail:hover {
+	background: none;
+}
+
 .student_stats_container{
 	padding: 0.8rem;
 	margin: 0.8rem 0;
@@ -121,4 +127,13 @@ table, th, td {
 
 .table_subtotal>*{
 	font-weight: bold;
+}
+
+/* Details / Summary: https://css-tricks.com/two-issues-styling-the-details-element-and-how-to-solve-them/ */
+details summary { 
+	cursor: pointer;
+}
+
+details summary > * {
+display: inline;
 }

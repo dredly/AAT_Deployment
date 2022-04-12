@@ -302,7 +302,9 @@ class Assessment(db.Model):
             ]
         )
 
-    def get_dict_of_tags_and_answers(self, user_id, attempt_number=None):
+    def get_dict_of_tags_and_answers(
+        self, user_id, attempt_number=None, all_attempts=False
+    ):
         """
         Returns tags and times the correct answer was given for the highest scoring attempt
         Opt: takes in specific attempt - if not then uses highest scoring attempt
@@ -311,13 +313,97 @@ class Assessment(db.Model):
         for question in [self.question_t1, self.question_t2]:
             for q in question:
                 output_dict.setdefault(q.tag, {"correct": 0, "incorrect": 0})
-                check = q.get_was_user_right(user_id, attempt_number)
-                if check is None:
-                    continue
-                if check is True:
-                    output_dict[q.tag]["correct"] += 1
-                if check is False:
-                    output_dict[q.tag]["incorrect"] += 1
+                if not all_attempts:
+                    check = q.get_was_user_right(user_id, attempt_number)
+                    if check is None:
+                        continue
+                    if check is True:
+                        output_dict[q.tag]["correct"] += 1
+                    if check is False:
+                        output_dict[q.tag]["incorrect"] += 1
+                else:
+                    # Get list of attempts
+                    for specific_attempt in range(
+                        self.get_count_of_attempts_made(user_id)
+                    ):
+                        check = q.get_was_user_right(user_id, specific_attempt + 1)
+                        if check is None:
+                            continue
+                        if check is True:
+                            output_dict[q.tag]["correct"] += 1
+                        if check is False:
+                            output_dict[q.tag]["incorrect"] += 1
+        return output_dict
+
+    def get_dict_of_difficulty_and_answers(
+        self, user_id, attempt_number=None, all_attempts=False
+    ):
+        """
+        Returns difficulty and times the correct answer was given for the highest scoring attempt
+        Opt: takes in specific attempt - if not then uses highest scoring attempt
+        """
+        output_dict = {
+            1: {"correct": 0, "incorrect": 0},
+            2: {"correct": 0, "incorrect": 0},
+            3: {"correct": 0, "incorrect": 0},
+        }
+        for question in [self.question_t1, self.question_t2]:
+            for q in question:
+                if not all_attempts:
+                    check = q.get_was_user_right(user_id, attempt_number)
+                    if check is None:
+                        continue
+                    if check is True:
+                        output_dict[q.difficulty]["correct"] += 1
+                    if check is False:
+                        output_dict[q.difficulty]["incorrect"] += 1
+                else:
+                    # Get list of attempts
+                    for specific_attempt in range(
+                        self.get_count_of_attempts_made(user_id)
+                    ):
+                        check = q.get_was_user_right(user_id, specific_attempt + 1)
+                        if check is None:
+                            continue
+                        if check is True:
+                            output_dict[q.difficulty]["correct"] += 1
+                        if check is False:
+                            output_dict[q.difficulty]["incorrect"] += 1
+        return output_dict
+
+    def get_dict_of_type_and_answers(
+        self, user_id, attempt_number=None, all_attempts=False
+    ):
+        """
+        Returns type and times the correct answer was given for the highest scoring attempt
+        Opt: takes in specific attempt - if not then uses highest scoring attempt
+        """
+        output_dict = {
+            1: {"correct": 0, "incorrect": 0},
+            2: {"correct": 0, "incorrect": 0},
+        }
+        for question in [self.question_t1, self.question_t2]:
+            for q in question:
+                if not all_attempts:
+                    check = q.get_was_user_right(user_id, attempt_number)
+                    if check is None:
+                        continue
+                    if check is True:
+                        output_dict[q.get_type()]["correct"] += 1
+                    if check is False:
+                        output_dict[q.get_type()]["incorrect"] += 1
+                else:
+                    # Get list of attempts
+                    for specific_attempt in range(
+                        self.get_count_of_attempts_made(user_id)
+                    ):
+                        check = q.get_was_user_right(user_id, specific_attempt + 1)
+                        if check is None:
+                            continue
+                        if check is True:
+                            output_dict[q.get_type()]["correct"] += 1
+                        if check is False:
+                            output_dict[q.get_type()]["incorrect"] += 1
         return output_dict
 
     def get_marks_for_user_and_assessment(self, user_id):
@@ -454,6 +540,12 @@ class QuestionT1(db.Model):
     def __repr__(self):
         return self.question_text
 
+    def get_question_id(self):
+        return self.q_t1_id
+
+    def get_type(self):
+        return 1
+
     def get_responses_from_user(self, user_id, attempt_number=None):
         if not attempt_number:
             return [r for r in self.responses if r.user_id == user_id]
@@ -473,9 +565,6 @@ class QuestionT1(db.Model):
             return self.num_of_marks / self.assessment.get_total_marks_possible()
         except:
             return None
-
-    def get_question_id(self):
-        return self.q_t1_id
 
     def get_was_user_right(self, user_id, attempt_number=None):
         """
@@ -524,6 +613,9 @@ class QuestionT2(db.Model):
 
     def get_question_id(self):
         return self.q_t2_id
+
+    def get_type(self):
+        return 1
 
     def get_responses_from_user(self, user_id, attempt_number=None):
         if not attempt_number:
