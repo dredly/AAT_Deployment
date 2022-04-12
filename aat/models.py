@@ -280,50 +280,20 @@ class Assessment(db.Model):
         """
         Returns average difficulty (string)
         """
-
-        if actual:
-            return sum(
-                [
-                    q.difficulty
-                    for question in [self.question_t1, self.question_t2]
-                    for q in question
-                ]
-            ) / len(
-                [
-                    q.difficulty
-                    for question in [self.question_t1, self.question_t2]
-                    for q in question
-                ]
-            )
-        else:
-            round(
-                sum(
-                    [
-                        q.difficulty
-                        for question in [self.question_t1, self.question_t2]
-                        for q in question
-                    ]
-                )
-                / len(
-                    [
-                        q.difficulty
-                        for question in [self.question_t1, self.question_t2]
-                        for q in question
-                    ]
-                )
-            )
-
-    def get_counter_of_tags(self):
-        """
-        Returns counter of tags found in assessment
-        """
-        return Counter(
+        sum_val = sum(
             [
-                q.tag
+                q.difficulty
                 for question in [self.question_t1, self.question_t2]
                 for q in question
             ]
         )
+
+        len_val = len([self.question_t1, self.question_t2])
+
+        if actual:
+            return sum_val / len_val
+        else:
+            return round(sum_val / len_val)
 
     def get_dict_of_tags_and_answers(
         self, user_id, attempt_number=None, all_attempts=False
@@ -837,6 +807,45 @@ class Module(db.Model):
                     for v, val in value.items():
                         output[key][v] += val
         return output
+
+    def get_dict_of_difficulty_and_answers(self, user_id):
+        output_dict = {
+            1: {"correct": 0, "incorrect": 0},
+            2: {"correct": 0, "incorrect": 0},
+            3: {"correct": 0, "incorrect": 0},
+        }
+
+        for a in self.assessments:
+            for key, value in output_dict.items():
+                for v in value:
+                    output_dict[key][v] += a.get_dict_of_difficulty_and_answers(
+                        user_id
+                    )[key][v]
+
+        return output_dict
+
+    def get_dict_of_type_and_answers(self, user_id):
+        output_dict = {
+            1: {"correct": 0, "incorrect": 0},
+            2: {"correct": 0, "incorrect": 0},
+        }
+
+        for a in self.assessments:
+            for key, value in output_dict.items():
+                for v in value:
+                    output_dict[key][v] += a.get_dict_of_type_and_answers(user_id)[key][
+                        v
+                    ]
+
+        return output_dict
+
+    def get_average_difficulty(self):
+        return round(
+            sum(
+                [a.get_average_difficulty() for a in self.assessments if a.is_summative]
+            )
+            / len([a for a in self.assessments if a.is_summative])
+        )
 
     def get_count_of_assessments(
         self,

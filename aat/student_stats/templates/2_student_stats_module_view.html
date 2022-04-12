@@ -27,6 +27,13 @@
                 {% endfor %}
             </tr>
         </table>
+
+    <h4>Module stats</h4>
+    <p>Average difficulty: {{m.get_average_difficulty()}}</p>
+    <p>Tags: {{m.get_dict_of_tags_and_answers(current_user.id)}}</p>
+    <p>Difficulty: {{m.get_dict_of_difficulty_and_answers(current_user.id)}}</p>
+    <p>Types: {{m.get_dict_of_type_and_answers(current_user.id)}}</p>
+        
     <h3>Module status explanation</h3>
     <ul><li><span class="text_pass">Pass</span>: weighted mark >= 50%</li>
     <li><span class="text_fail">Fail</span>: all assessments attempted, weighted mark < 50%</li>
@@ -45,7 +52,7 @@
 
 
     <h2>Assessment</h2>
-    <p class="todo">TODO: add average difficulty</p>
+    
     <h3>Summative</h3>
     <table>
         <tr>

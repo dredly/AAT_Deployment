@@ -10,15 +10,19 @@
     <p>Course View > <a href="{{url_for('student_stats.module_view', module_id = a.module.module_id)}}">Module {{a.module.module_id}} | {{a.module.title}}</a> > Assessment {{ a.assessment_id}} | {{ a.title }}</p>
     <h1>Assessment {{ a.assessment_id}} | {{ a.title }} ({% if a.is_summative %}summative{% else %}formative{% endif %})</h1>
     <h2>Overview</h2>
+    <p>Marks based on highest scoring attempt (attempt {{a.get_highest_scoring_attempt_and_mark(current_user.id)["highest_scoring_attempt"]}})</p>
+    <p class="todo">TODO: when done, make a version which works for NO assessments (routes to redirect)</p>
     <table>
         <tr>
             <th>Type</th>
             <th>Total<br>marks</th>
             <th>Status</th>
-            <th>Difficulty</th>
             <th>Credits<br>earned</th>
             <th>Attempts<br>made</th>
             <th>Attempts<br>allowed</th>
+            <th>Tags</th>
+            <th>Difficulty</th>
+            <th>Type</th>
         </tr>
         <tr>
             <td>{% if a.is_summative %}Summative{% else %}Formative{% endif %}</td>
@@ -26,10 +30,25 @@
             ({{ "%.2d" |
             format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%)</td>
             <td><span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span></td>
-            <td>{{a.get_average_difficulty()}}</td>
             <td>{{a.get_credits(current_user.id)}}/{{a.num_of_credits}}</td>
             <td>{{a.get_count_of_attempts_made(current_user.id)}}</td>
             <td>{{a.get_attempt_limit()}}</td>
+            <td>        
+                <ul>
+                    {% for tag, tag_data in a.get_dict_of_tags_and_answers(current_user.id).items() %}
+                        <li>{{tag}}: {{tag_data["correct"]}}/{{tag_data["correct"]+tag_data["incorrect"]}}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>{{a.get_average_difficulty()}}</td>
+            <td>
+                <ul>
+                    {% for type, type_data in a.get_dict_of_type_and_answers(current_user.id).items() %}
+                        <li>{% if type == 1 %}1 (multiple choice){% else %}2 (text){% endif %}: {{type_data["correct"]}}/{{type_data["correct"]+type_data["incorrect"]}}</li>
+                    {% endfor %}
+                </ul>
+
+            </td>
         </tr>
     </table>
     <h3>Assessment Status Explanation</h3>
@@ -135,7 +154,7 @@
     </div>
     
     <h2>Analysis</h2>
-    <p>(Analysis of ALL attempts)</p>
+    <p>Analysis of answers given ALL attempts</p>
     <h3>Tags</h3>
     <table>
         <tr>

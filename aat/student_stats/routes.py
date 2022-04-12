@@ -45,6 +45,12 @@ def module_view(module_id=0):
     if m is None:
         return redirect(url_for("student_stats.module_not_found", module_id=module_id))
 
+    # REDIRECT IF USER HASN'T ATTEMPTED YET:
+    if m.get_status(current_user.id) == "unattempted":
+        return render_template(
+            "no_questions_answered.html",
+        )
+
     ## RETURN ##
     return render_template("2_student_stats_module_view.html", m=m)
 
@@ -93,7 +99,15 @@ def assessment_view(assessment_id=0):
         "barChartLabel": barChartLabel,
     }
 
-    ## RETURN ##
+    ## RETURNS ##
+
+    # REDIRECT IF USER HASN'T ATTEMPTED YET:
+    if a.get_status(current_user.id) == "unattempted":
+        return render_template(
+            "no_questions_answered.html",
+        )
+
+    # MAIN #
     return render_template(
         "3_student_stats_assessment_view.html",
         a=a,
