@@ -7,7 +7,7 @@
 {% endblock title %}`
 {% block content %}
     <h2>Student stats for {{current_user.id}}: {{current_user.name}}</h2>
-    <p>Course View > <a href="{{url_for('student_stats.module_view', module_id = a.module.module_id)}}">Module {{a.module.module_id}} | {{a.module.title}}</a> > Assessment {{ a.assessment_id}} | {{ a.title }}</p>
+    <p><a href="{{url_for('student_stats.course_view')}}">Course View</a> > <a href="{{url_for('student_stats.module_view', module_id = a.module.module_id)}}">Module {{a.module.module_id}} | {{a.module.title}}</a> > Assessment {{ a.assessment_id}} | {{ a.title }}</p>
     <h1>Assessment {{ a.assessment_id}} | {{ a.title }} ({% if a.is_summative %}summative{% else %}formative{% endif %})</h1>
     <h2>Overview</h2>
     <p>Marks based on highest scoring attempt (attempt {{a.get_highest_scoring_attempt_and_mark(current_user.id)["highest_scoring_attempt"]}})</p>

@@ -7,11 +7,11 @@
 {% endblock title %}`
 {% block content %}
 <h2>Student stats for {{current_user.id}}: {{current_user.name}}</h2>
-<p>Course View > Module {{m.module_id}} | {{m.title}}</p>
+<p><a href="{{url_for('student_stats.course_view')}}">Course View</a> > Module {{m.module_id}} | {{m.title}}</p>
     <h1>Module {{ m.module_id}} | {{ m.title }}</h1>
         <!-- Module class: L581 -->
         <table>
-            <tr>
+        <tr>
                 <th>Status</th>
                 <th>Weighted<br>mark</th>
                 <th>Summative Assessments<br><span class="text_pass">Passed</span></th>

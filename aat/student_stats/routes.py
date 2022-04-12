@@ -24,9 +24,8 @@ def course_view():
     if not current_user.is_authenticated:
         return redirect(url_for("auth.login"))
     ## RETURN ##
-    return render_template(
-        "1_student_stats_course_view.html",
-    )
+    c = Course.query.first()
+    return render_template("1_student_stats_course_view.html", c=c)
 
 
 ###############

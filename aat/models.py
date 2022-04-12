@@ -24,6 +24,23 @@ class Course(db.Model):
     def __repr__(self):
         return self.title
 
+    def get_count_of_modules(self):
+        return len(self.modules)
+
+    def get_status_counter(self, user_id):
+        return Counter([m.get_status(user_id) for m in self.modules])
+
+    def get_status(self, user_id):
+        counter_of_module_status = self.get_status_counter(user_id)
+        count_of_modules = self.get_count_of_modules()
+        if counter_of_module_status.get("pass") == count_of_modules:
+            return "pass"
+        if counter_of_module_status.get("fail") == count_of_modules:
+            return "fail"
+        if counter_of_module_status.get("in progress", 0) > 0:
+            return "in progress"
+        return "unattempted"
+
 
 class Challenge(db.Model):
     __tablename__ = "challenges"
@@ -691,7 +708,7 @@ class Module(db.Model):
         db.Integer, nullable=False
     )  # DO NOT USE - use get_total_assessment_credits() instead
     # --- Foreign keys ---
-    course_id = db.Column(db.Integer, db.ForeignKey("course.id"), default=1)
+    course_id = db.Column(db.Integer, db.ForeignKey("Course.id"), default=1)
     # --- Relationships ---
     assessments = db.relationship("Assessment", backref="module", lazy=True)
 
@@ -795,6 +812,25 @@ class Module(db.Model):
         if formative_only:
             return [a for a in self.assessments if not a.is_summative]
         return self.assessments
+
+    def get_count_of_taken_assessments(
+        self, user_id, summative_only=False, formative_only=False
+    ):
+        if summative_only:
+            return len(
+                [
+                    a
+                    for a in self.get_assessments()
+                    if a.get_status(user_id) in ["pass", "fail"] and a.is_summative
+                ]
+            )
+        return len(
+            [
+                a
+                for a in self.get_assessments()
+                if a.get_status(user_id) in ["pass", "fail"]
+            ]
+        )
 
     def get_dict_of_tags_and_assessments(self, user_id):
         """

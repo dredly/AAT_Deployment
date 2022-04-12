@@ -57,11 +57,13 @@ li{
 .container_pass:hover {
 	background: var(--color-correct-op04);
 }
-.in_progress,
+.in,
+.container_in,
 .container_in_progress{
 	border-color: var(--color-in-progress);
 }
-.in_progress:hover,
+.in:hover,
+.container_in:hover,
 .container_in_progress:hover{
 	background: var(--color-in-progress-op04);
 }
@@ -74,17 +76,21 @@ li{
 	background: var(--color-incorrect-op04);
 }
 .not_answered,
-.text_unattempted{
+.text_unattempted,
+.container_unattempted{
 	border-color: var(--color-unattempted);
 }
 .not_answered:hover,
-.text_unattempted:hover {
+.text_unattempted:hover,
+.container_unattempted:hover {
 	background: var(--color-unattempted-op04);
 }
 
 .attempt_container.container_pass:hover,
 .attempt_container.container_in_progress:hover,
-.attempt_container.container_fail:hover {
+.attempt_container.container_in:hover,
+.attempt_container.container_fail:hover,
+.attempt_container.container_unattempted:hover {
 	background: none;
 }
 
@@ -105,7 +111,7 @@ li{
 .text_unattempted{
 	color: var(--color-unattempted);
 }
-.text_in_progress{
+.text_in{
 	color: var(--color-in-progress);
 }
 

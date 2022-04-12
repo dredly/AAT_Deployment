@@ -23,14 +23,11 @@ with app.app_context():
         # MODULES #
         ###########
         [
-            Module(  # 1
-                title="Version Control and Large Projects",
-                total_credits=120,
-            ),
-            Module(  # 2
+            Module(title="Version Control and Large Projects", total_credits=120),  # 1
+            Module(
                 title="Front End Web Development",
                 total_credits=30,
-            ),
+            ),  # 2
             Module(  # 3
                 title="Algorithms",
                 total_credits=80,
