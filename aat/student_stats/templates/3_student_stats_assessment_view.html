@@ -87,6 +87,9 @@
                                             Tag: {{r.question.tag}}
                                         </li>
                                         <li>
+                                            Difficulty: {{r.question.difficulty}}
+                                        </li>
+                                        <li>
                                             Type: {% if r.get_type() == 1 %}
                                                 1 (multiple choice)
                                                 {% else %}
@@ -154,7 +157,7 @@
     </div>
     
 
-    
+    <p class="todo">TODO: move this to other page</p>
     <p>Analysis of answers given ALL attempts</p>
     <h3>Tags</h3>
     <table>
