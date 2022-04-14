@@ -27,6 +27,26 @@ class Course(db.Model):
     def get_count_of_modules(self):
         return len(self.modules)
 
+    def get_count_of_all_correct_and_incorrect_responses(
+        self, user_id, summative_only=None, formative_only=None
+    ):
+        count = {"correct": 0, "incorrect": 0}
+        for response in [
+            ResponseT1.query.filter_by(user_id=user_id).all(),
+            ResponseT1.query.filter_by(user_id=user_id).all(),
+        ]:
+            for r in response:
+                if (
+                    (not summative_only and not formative_only)
+                    or (summative_only and r.assessment.is_summative)
+                    or (formative_only and not r.assessment.is_summative)
+                ):
+                    if r.is_correct:
+                        count["correct"] += 1
+                    else:
+                        count["incorrect"] += 1
+        return count
+
     def get_status_counter(self, user_id):
         return Counter([m.get_status(user_id) for m in self.modules])
 
@@ -102,30 +122,11 @@ class Course(db.Model):
         }
 
         for m in self.modules:
-            print(m.get_dict_of_type_and_answers(user_id))
-
-        # for m in self.modules:
-        #     for key, value in output_dict.items():
-        #         print(f"{key}:{value}")
-        #         for v in value:
-        #             print(
-        #                 m.get_dict_of_type_and_answers(
-        #                     user_id, summative_only, formative_only
-        #                 )
-        #             )
-        #             print(
-        #                 m.get_dict_of_type_and_answers(
-        #                     user_id, summative_only, formative_only
-        #                 )
-        #             )[key]
-        #             print(
-        #                 m.get_dict_of_type_and_answers(
-        #                     user_id, summative_only, formative_only
-        #                 )
-        #             )[key][v]
-        #             output_dict[key][v] += m.get_dict_of_type_and_answers(
-        #                 user_id, summative_only, formative_only
-        #             )[key][v]
+            for key, value in output_dict.items():
+                for v in value:
+                    output_dict[key][v] += m.get_dict_of_type_and_answers(
+                        user_id, summative_only, formative_only
+                    )[key][v]
 
         return output_dict
 
@@ -750,7 +751,7 @@ class QuestionT2(db.Model):
         return self.q_t2_id
 
     def get_type(self):
-        return 1
+        return 2
 
     def get_responses_from_user(self, user_id, attempt_number=None):
         if not attempt_number:

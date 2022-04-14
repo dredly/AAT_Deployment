@@ -7,9 +7,12 @@
 {% endblock title %}`
 {% block content %}
 <h2>Student stats for {{current_user.id}}: {{current_user.name}}</h2>
-    <h1>Course: {{ c.title }}</h1>
-    <h2>Course Analysis - {% if not summative_only and not formative_only %}All{% elif summative_only %}Summative{% else %}Formative{% endif %} questions</h2>
-    <p>All attempts are included (not just highest scoring)</p>
+<p><a href="{{url_for('student_stats.course_view')}}">Course View</a> > <a href="{{url_for('student_stats.module_view', module_id = a.module.module_id)}}">Module {{a.module.module_id}} | {{a.module.title}}</a> > Assessment {{ a.assessment_id}} | {{ a.title }}</p>
+
+<h1>Assessment {{ a.assessment_id }} | {{ a.title }}</h1>
+<h2>Assessnent Analysis - {% if not summative_only and not formative_only %}All{% elif summative_only %}Summative{% else %}Formative{% endif %} questions</h2>
+<p>All attempts are included (not just highest scoring)</p>
+
     <p>
         <form action="" method="post">Filter by assessment type: 
             <select name="analysis_filter" id="analysis_filter" onchange="this.form.submit()">
@@ -21,40 +24,26 @@
         </form>
     </p>
 
-
-    <!-- <h3>Questions</h3>
-    <table>
-        <tr>
-            <th><span class="">Count</span></th>
-            <th><span class="text_pass">Correct</span></th>
-            <th><span class="text_fail">Incorrect</span></th>    
-        </tr>
-        <tr>
-            <td>{{c.get_count_of_all_correct_and_incorrect_responses(current_user.id,summative_only=summative_only,formative_only=formative_only)["correct"]+c.get_count_of_all_correct_and_incorrect_responses(current_user.id,summative_only=summative_only,formative_only=formative_only)["incorrect"]}}</td>
-            <td>{{c.get_count_of_all_correct_and_incorrect_responses(current_user.id,summative_only=summative_only,formative_only=formative_only)["correct"]}}</td>
-            <td>{{c.get_count_of_all_correct_and_incorrect_responses(current_user.id,summative_only=summative_only,formative_only=formative_only)["incorrect"]}}</td>
-        </tr>
-    </table> -->
-    
-    <h3>Tag</h3>
+    <h2>Analysis</h2>
+    <p>All attempts are included (not just highest scoring)</p>
+    <h3>Tags</h3>
     <table>
         <tr>
             <th>Tag</th>
             <th><span class="">Count</span></th>
             <th><span class="text_pass">Correct</span></th>
             <th><span class="text_fail">Incorrect</span></th>
-
-        {% for tag, tag_stats in c.get_dict_of_tags_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
+        </tr>
+        {% for tag, tag_stats in a.get_dict_of_tags_and_answers(current_user.id, all_attempts=True).items() %}
             <tr>
                 <td>{{tag}}</td>
-                <td>{{tag_stats["correct"]+tag_stats["incorrect"]}}</td>
+                <td><span class="">{{tag_stats["correct"]+tag_stats["incorrect"]}}</span></td>
                 <td><span class="">{{tag_stats["correct"]}}</span></td>
-                <td><span class="">{{tag_stats["incorrect"]}}</span>
+                <td><span class="">{{tag_stats["incorrect"]}}</span></td>
             </tr>
         {% endfor %}
     </table>
-    
-    
+
     <h3>Difficulty</h3>
     <table>
         <tr>
@@ -63,7 +52,7 @@
             <th><span class="text_pass">Correct</span></th>
             <th><span class="text_fail">Incorrect</span></th>
         </tr>
-        {% for difficulty, difficulty_stats in c.get_dict_of_difficulty_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
+        {% for difficulty, difficulty_stats in a.get_dict_of_difficulty_and_answers(current_user.id, all_attempts=True).items() %}
             <tr>
                 <td>{{difficulty}}</td>
                 <td><span class="">{{difficulty_stats["correct"]+difficulty_stats["incorrect"]}}</span></td>
@@ -81,7 +70,7 @@
             <th><span class="text_pass">Correct</span></th>
             <th><span class="text_fail">Incorrect</span></th>
         </tr>
-        {% for type, type_stats in c.get_dict_of_type_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
+        {% for type, type_stats in a.get_dict_of_type_and_answers(current_user.id, all_attempts=True).items() %}
             <tr>
                 <td>{{type}} {% if type==1 %}
                     (multiple choice)
@@ -95,7 +84,7 @@
         {% endfor %}
     </table>
 
-    <h2><a href="{{url_for('student_stats.course_view')}}">Back to Course view</a></h2>
+    <h2><a href="{{url_for('student_stats.assessment_view', assessment_id=a.assessment_id)}}">Back to Assessment view</a></h2>
     <h2><a href="{{ url_for('student_stats.download')}}">Download CSV</a></h2>
 
 {% endblock content %}

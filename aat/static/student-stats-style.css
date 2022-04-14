@@ -146,6 +146,12 @@ table, th, td {
 	font-size: 1.2rem;
 }
 
+.chart-block{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+}
+
 
 
 /* Details / Summary: https://css-tricks.com/two-issues-styling-the-details-element-and-how-to-solve-them/ */
