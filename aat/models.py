@@ -41,6 +41,106 @@ class Course(db.Model):
             return "in progress"
         return "unattempted"
 
+    def get_modules(self, summative_only=False, formative_only=False):
+        """
+        Returns list of all assessments attached to module
+        Can be filtered summative/formative
+        """
+        if summative_only:
+            return [m.get_modules(summative_only) for m in self.modules]
+        if formative_only:
+            return [m.get_modules(formative_only) for m in self.modules]
+        return self.modules
+
+    def get_dict_of_tags_and_modules(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+    ):
+        """
+        Returns {tags : [assessments]}
+        """
+        output = {}
+        tags_used = self.get_dict_of_tags_and_answers(
+            user_id, summative_only, formative_only
+        ).keys()
+        for tag in tags_used:
+            output[tag] = []
+            for m in self.get_modules(summative_only, formative_only):
+                if (
+                    tag
+                    in m.get_dict_of_tags_and_answers(
+                        user_id, summative_only, formative_only
+                    ).keys()
+                ):
+                    output[tag].append(m)
+        return output
+
+    def get_dict_of_tags_and_answers(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+    ):
+        # Summative ONLY
+        output = {}
+        for m in self.get_modules(summative_only, formative_only):
+            output = m.get_dict_of_tags_and_answers(
+                user_id, summative_only, formative_only
+            )
+            input_dict = m.get_dict_of_tags_and_answers(
+                user_id, summative_only, formative_only
+            )
+            for key, value in input_dict.items():
+                if key not in output:
+                    output[key] = value
+                else:
+                    for v, val in value.items():
+                        output[key][v] += val
+        return output
+
+    def get_dict_of_difficulty_and_answers(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+    ):
+        output_dict = {
+            1: {"correct": 0, "incorrect": 0},
+            2: {"correct": 0, "incorrect": 0},
+            3: {"correct": 0, "incorrect": 0},
+        }
+
+        for m in self.get_modules(summative_only, formative_only):
+            for key, value in output_dict.items():
+                for v in value:
+                    output_dict[key][v] += m.get_dict_of_difficulty_and_answers(
+                        user_id, summative_only, formative_only
+                    )[key][v]
+
+        return output_dict
+
+    def get_dict_of_type_and_answers(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+    ):
+        output_dict = {
+            1: {"correct": 0, "incorrect": 0},
+            2: {"correct": 0, "incorrect": 0},
+        }
+
+        for m in self.get_modules(summative_only, formative_only):
+            for key, value in output_dict.items():
+                for v in value:
+                    output_dict[key][v] += m.get_dict_of_type_and_answers(
+                        user_id, summative_only, formative_only
+                    )[key][v]
+
+        return output_dict
+
 
 class Challenge(db.Model):
     __tablename__ = "challenges"

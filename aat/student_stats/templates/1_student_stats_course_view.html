@@ -10,14 +10,18 @@
 <p>Course View</p>
     <h1>Course: {{ c.title }}</h1>
     <p>Status: <span class="text_{{c.get_status(current_user.id)}}">{{c.get_status(current_user.id)}}</span></p>
-    <p class="todo">TODO: add defintions of passing a course</p>
-    
+    <h3>Module status explanation</h3>
+    <ul><li><span class="text_pass">Pass</span>: all modules have status of "pass"</li>
+    <li><span class="text_fail">Fail</span>: all modules have status of "fail"</li>
+    <li><span class="text_in_progress">In Progress</span>: at least one module attempted</li>
+    <li><span class="text_unattempted">Unattempted</span>: no modules attempted</li></ul>
+<!--     
     <h2>Stack Bar</h2>
     <div class="content-block">
         <div class="chart-container">
             <canvas id="myChart"></canvas>
         </div>
-    </div>
+    </div> -->
 
     <h2>Modules</h2>
     <ul>
@@ -61,6 +65,82 @@
             </div>
         {% endfor %}
     </ul>
+
+    <h2>Analysis</h2>
+
+    <p>
+        <form action="" method="post">Filter by assessment type: 
+            <select name="analysis_filter" id="analysis_filter" onchange="this.form.submit()">
+                <option value="all" {% if not summative_only and not formative_only %}selected="selected"
+                {% endif %}>All</option>
+                <option value="summative" {% if summative_only %}selected="selected"{% endif %}>Summative</option>
+                <option value="formative" {% if formative_only %}selected="selected"{% endif %}>Formative</option>
+            </select>
+        </form>
+    </p>
+
+    <h3>Tag</h3>
+    <table>
+        <tr>
+            <th>Tag</th>
+            <th><span class="text_pass">Correct</span></th>
+            <th><span class="text_fail">Incorrect</span></th>
+            <th>Assessments</th>
+
+        {% for tag, tag_stats in c.get_dict_of_tags_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
+            <tr>
+                <td>{{tag}}</td>
+                <td><span class="">{{tag_stats["correct"]}}/{{tag_stats["correct"]+tag_stats["incorrect"]}}</span></td>
+                <td><span class="">{{tag_stats["incorrect"]}}/{{tag_stats["correct"]+tag_stats["incorrect"]}}</span></td>
+                <td><ul>{% for tag_key, module_list in c.get_dict_of_tags_and_modules(current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
+{% if tag == tag_key %}
+<ul>
+    {% for m in module_list %}
+    <li>{{m}}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+                {% endfor %}</ul></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    
+    <h3>Difficulty</h3>
+    <table>
+        <tr>
+            <th>Difficulty</th>
+            <th><span class="">Count</span></th>
+            <th><span class="text_pass">Correct</span></th>
+            <th><span class="text_fail">Incorrect</span></th>
+        </tr>
+        {% for difficulty, difficulty_stats in c.get_dict_of_difficulty_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
+            <tr>
+                <td>{{difficulty}}</td>
+                <td><span class="">{{difficulty_stats["correct"]+difficulty_stats["incorrect"]}}</span></td>
+                <td><span class="">{{difficulty_stats["correct"]}}</span></td>
+                <td><span class="">{{difficulty_stats["incorrect"]}}</span></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h3>Question Type</h3>
+    <table>
+        <tr>
+            <th>Type</th>
+            <th><span class="">Count</span></th>
+            <th><span class="text_pass">Correct</span></th>
+            <th><span class="text_fail">Incorrect</span></th>
+        </tr>
+        {% for type, type_stats in c.get_dict_of_type_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
+            <tr>
+                <td>{{type}}</td>
+                <td><span class="">{{type_stats["correct"]+type_stats["incorrect"]}}</span></td>
+                <td><span class="">{{type_stats["correct"]}}</span></td>
+                <td><span class="">{{type_stats["incorrect"]}}</span></td>
+            </tr>
+        {% endfor %}
+    </table>
 
     <script>
         const ctx = document.getElementById('myChart').getContext('2d');
