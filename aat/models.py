@@ -102,11 +102,30 @@ class Course(db.Model):
         }
 
         for m in self.modules:
-            for key, value in output_dict.items():
-                for v in value:
-                    output_dict[key][v] += m.get_dict_of_type_and_answers(
-                        user_id, summative_only, formative_only
-                    )[key][v]
+            print(m.get_dict_of_type_and_answers(user_id))
+
+        # for m in self.modules:
+        #     for key, value in output_dict.items():
+        #         print(f"{key}:{value}")
+        #         for v in value:
+        #             print(
+        #                 m.get_dict_of_type_and_answers(
+        #                     user_id, summative_only, formative_only
+        #                 )
+        #             )
+        #             print(
+        #                 m.get_dict_of_type_and_answers(
+        #                     user_id, summative_only, formative_only
+        #                 )
+        #             )[key]
+        #             print(
+        #                 m.get_dict_of_type_and_answers(
+        #                     user_id, summative_only, formative_only
+        #                 )
+        #             )[key][v]
+        #             output_dict[key][v] += m.get_dict_of_type_and_answers(
+        #                 user_id, summative_only, formative_only
+        #             )[key][v]
 
         return output_dict
 
