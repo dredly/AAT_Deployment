@@ -6,7 +6,7 @@
     Student | Analysis | {% if not summative_only and not formative_only %}All{% elif summative_only %}Summative{% else %}Formative{% endif %} questions
 {% endblock title %}`
 {% block content %}
-<h2>Student stats for {{current_user.id}}: {{current_user.name}}</h2>
+<h2>Student stats for student ID {{current_user.id}}: {{current_user.name}}</h2>
 <p><a href="{{url_for('student_stats.course_view')}}">Course View</a> > Module {{m.module_id}} | {{m.title}}</p>
     <h1>Module {{ m.module_id}} | {{ m.title }}</h1>
     <h2>Module Analysis - {% if not summative_only and not formative_only %}All{% elif summative_only %}Summative{% else %}Formative{% endif %} questions</h2>

@@ -6,7 +6,7 @@
     Student | Module View
 {% endblock title %}`
 {% block content %}
-<h2>Student stats for {{current_user.id}}: {{current_user.name}}</h2>
+<h2>Student stats for student ID {{current_user.id}}: {{current_user.name}}</h2>
 <p><a href="{{url_for('student_stats.course_view')}}">Course View</a> > Module {{m.module_id}} | {{m.title}}</p>
     <h1>Module {{ m.module_id}} | {{ m.title }}</h1>
         <table>
@@ -26,7 +26,6 @@
                 {% endfor %}
             </tr>
         </table>
-        <p class="todo">TODO: when done, make a version which works for NO taken modules (routes to redirect)</p>
         
     <h3>Module status explanation</h3>
     <ul><li><span class="text_pass"><b>Pass</b></span>: weighted mark >= 50%</li>

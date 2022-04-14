@@ -6,7 +6,7 @@
     Student | Course View
 {% endblock title %}`
 {% block content %}
-<h2>Student stats for {{current_user.id}}: {{current_user.name}}</h2>
+<h2>Student stats for student ID {{current_user.id}}: {{current_user.name}}</h2>
 <p>Course View</p>
     <h1>Course: {{ c.title }}</h1>
     <p>Status: <span class="text_{{c.get_status(current_user.id)}}">{{c.get_status(current_user.id)}}</span></p>

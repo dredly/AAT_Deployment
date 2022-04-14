@@ -77,7 +77,7 @@ def module_view(module_id=0):
     # REDIRECT IF USER HASN'T ATTEMPTED YET:
     if m.get_status(current_user.id) == "unattempted":
         return render_template(
-            "no_questions_answered.html",
+            "no_assessments_answered.html",
         )
 
     ## RETURN ##
