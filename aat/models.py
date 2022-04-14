@@ -41,6 +41,106 @@ class Course(db.Model):
             return "in progress"
         return "unattempted"
 
+    def get_modules(self, summative_only=False, formative_only=False):
+        """
+        Returns list of all assessments attached to module
+        Can be filtered summative/formative
+        """
+        if summative_only:
+            return [m.get_modules(summative_only) for m in self.modules]
+        if formative_only:
+            return [m.get_modules(formative_only) for m in self.modules]
+        return self.modules
+
+    def get_dict_of_tags_and_modules(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+    ):
+        """
+        Returns {tags : [assessments]}
+        """
+        output = {}
+        tags_used = self.get_dict_of_tags_and_answers(
+            user_id, summative_only, formative_only
+        ).keys()
+        for tag in tags_used:
+            output[tag] = []
+            for m in self.get_modules(summative_only, formative_only):
+                if (
+                    tag
+                    in m.get_dict_of_tags_and_answers(
+                        user_id, summative_only, formative_only
+                    ).keys()
+                ):
+                    output[tag].append(m)
+        return output
+
+    def get_dict_of_tags_and_answers(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+    ):
+        # Summative ONLY
+        output = {}
+        for m in self.get_modules(summative_only, formative_only):
+            output = m.get_dict_of_tags_and_answers(
+                user_id, summative_only, formative_only
+            )
+            input_dict = m.get_dict_of_tags_and_answers(
+                user_id, summative_only, formative_only
+            )
+            for key, value in input_dict.items():
+                if key not in output:
+                    output[key] = value
+                else:
+                    for v, val in value.items():
+                        output[key][v] += val
+        return output
+
+    def get_dict_of_difficulty_and_answers(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+    ):
+        output_dict = {
+            1: {"correct": 0, "incorrect": 0},
+            2: {"correct": 0, "incorrect": 0},
+            3: {"correct": 0, "incorrect": 0},
+        }
+
+        for m in self.get_modules(summative_only, formative_only):
+            for key, value in output_dict.items():
+                for v in value:
+                    output_dict[key][v] += m.get_dict_of_difficulty_and_answers(
+                        user_id, summative_only, formative_only
+                    )[key][v]
+
+        return output_dict
+
+    def get_dict_of_type_and_answers(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+    ):
+        output_dict = {
+            1: {"correct": 0, "incorrect": 0},
+            2: {"correct": 0, "incorrect": 0},
+        }
+
+        for m in self.get_modules(summative_only, formative_only):
+            for key, value in output_dict.items():
+                for v in value:
+                    output_dict[key][v] += m.get_dict_of_type_and_answers(
+                        user_id, summative_only, formative_only
+                    )[key][v]
+
+        return output_dict
+
 
 class Challenge(db.Model):
     __tablename__ = "challenges"
@@ -324,8 +424,20 @@ class Assessment(db.Model):
         else:
             return round(sum_val / len_val)
 
+    def question_filter(self, question, summative_only, formative_only):
+        if summative_only:
+            return [q for q in question if q.assessment.is_summative]
+        if formative_only:
+            return [q for q in question if not q.assessment.is_summative]
+        return question
+
     def get_dict_of_tags_and_answers(
-        self, user_id, attempt_number=None, all_attempts=False
+        self,
+        user_id,
+        attempt_number=None,
+        all_attempts=False,
+        summative_only=None,
+        formative_only=None,
     ):
         """
         Returns tags and times the correct answer was given for the highest scoring attempt
@@ -333,6 +445,7 @@ class Assessment(db.Model):
         """
         output_dict = {}
         for question in [self.question_t1, self.question_t2]:
+            question = self.question_filter(question, summative_only, formative_only)
             for q in question:
                 output_dict.setdefault(q.tag, {"correct": 0, "incorrect": 0})
                 if not all_attempts:
@@ -358,7 +471,12 @@ class Assessment(db.Model):
         return output_dict
 
     def get_dict_of_difficulty_and_answers(
-        self, user_id, attempt_number=None, all_attempts=False
+        self,
+        user_id,
+        attempt_number=None,
+        all_attempts=False,
+        summative_only=None,
+        formative_only=None,
     ):
         """
         Returns difficulty and times the correct answer was given for the highest scoring attempt
@@ -370,6 +488,7 @@ class Assessment(db.Model):
             3: {"correct": 0, "incorrect": 0},
         }
         for question in [self.question_t1, self.question_t2]:
+            question = self.question_filter(question, summative_only, formative_only)
             for q in question:
                 if not all_attempts:
                     check = q.get_was_user_right(user_id, attempt_number)
@@ -394,7 +513,12 @@ class Assessment(db.Model):
         return output_dict
 
     def get_dict_of_type_and_answers(
-        self, user_id, attempt_number=None, all_attempts=False
+        self,
+        user_id,
+        attempt_number=None,
+        all_attempts=False,
+        summative_only=None,
+        formative_only=None,
     ):
         """
         Returns type and times the correct answer was given for the highest scoring attempt
@@ -405,6 +529,7 @@ class Assessment(db.Model):
             2: {"correct": 0, "incorrect": 0},
         }
         for question in [self.question_t1, self.question_t2]:
+            question = self.question_filter(question, summative_only, formative_only)
             for q in question:
                 if not all_attempts:
                     check = q.get_was_user_right(user_id, attempt_number)
@@ -832,7 +957,12 @@ class Module(db.Model):
             ]
         )
 
-    def get_dict_of_tags_and_assessments(self, user_id):
+    def get_dict_of_tags_and_assessments(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+    ):
         """
         Returns {tags : [assessments]}
         """
@@ -840,15 +970,22 @@ class Module(db.Model):
         tags_used = self.get_dict_of_tags_and_answers(user_id).keys()
         for tag in tags_used:
             output[tag] = []
-            for a in self.get_assessments(summative_only=True):
+            for a in self.get_assessments(
+                summative_only=summative_only, formative_only=formative_only
+            ):
                 if tag in a.get_dict_of_tags_and_answers(user_id).keys():
                     output[tag].append(a)
         return output
 
-    def get_dict_of_tags_and_answers(self, user_id):
+    def get_dict_of_tags_and_answers(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+    ):
         # Summative ONLY
         output = {}
-        for a in self.get_assessments(summative_only=True):
+        for a in self.get_assessments(summative_only, formative_only):
             input_dict = a.get_dict_of_tags_and_answers(user_id)
             for key, value in input_dict.items():
                 if key not in output:
@@ -858,14 +995,19 @@ class Module(db.Model):
                         output[key][v] += val
         return output
 
-    def get_dict_of_difficulty_and_answers(self, user_id):
+    def get_dict_of_difficulty_and_answers(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+    ):
         output_dict = {
             1: {"correct": 0, "incorrect": 0},
             2: {"correct": 0, "incorrect": 0},
             3: {"correct": 0, "incorrect": 0},
         }
 
-        for a in self.assessments:
+        for a in self.get_assessments(summative_only, formative_only):
             for key, value in output_dict.items():
                 for v in value:
                     output_dict[key][v] += a.get_dict_of_difficulty_and_answers(
@@ -874,13 +1016,18 @@ class Module(db.Model):
 
         return output_dict
 
-    def get_dict_of_type_and_answers(self, user_id):
+    def get_dict_of_type_and_answers(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+    ):
         output_dict = {
             1: {"correct": 0, "incorrect": 0},
             2: {"correct": 0, "incorrect": 0},
         }
 
-        for a in self.assessments:
+        for a in self.get_assessments(summative_only, formative_only):
             for key, value in output_dict.items():
                 for v in value:
                     output_dict[key][v] += a.get_dict_of_type_and_answers(user_id)[key][
