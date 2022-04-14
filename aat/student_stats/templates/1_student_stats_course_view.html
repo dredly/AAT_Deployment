@@ -10,29 +10,119 @@
 <p>Course View</p>
     <h1>Course: {{ c.title }}</h1>
     <p>Status: <span class="text_{{c.get_status(current_user.id)}}">{{c.get_status(current_user.id)}}</span></p>
+    <p class="todo">TODO: add defintions of passing a course</p>
+    
+    <h2>Stack Bar</h2>
+    <div class="content-block">
+        <div class="chart-container">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
 
     <h2>Modules</h2>
     <ul>
         {% for m in c.modules %}
         <div class="results_box student_stats_container attempt_container container_{{m.get_status(current_user.id)}}">
             <li><details>
-                    <summary>
+                    <summary class="course_module_headers">
                         <a href="{{url_for('student_stats.module_view', module_id=m.module_id)}}">{{m}}</a> | Status: <span class="text_{{m.get_status(current_user.id)}}">{{m.get_status(current_user.id)}}</span> | Mark: {% if m.get_status(current_user.id)=="unattempted" %}-{% else %}{{"%.0d" |
                             format(m.get_total_weighted_marks_as_perc(current_user.id)*100)}}%{% endif %} | Summative assessments completed: {{m.get_count_of_taken_assessments(current_user.id, summative_only=True)}}/{{m.get_assessments(summative_only=True)|length}}
                     </summary>
                     <ul>
-                        {% for a in m.get_assessments(current_user.id) %}
-                        <div class="results_box student_stats_container  container_{{a.get_status(current_user.id)}}">
-                            <p><a href="{{url_for('student_stats.assessment_view', assessment_id=a.module_id)}}">{{a}}</a> | Status: <span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span> | Marks: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}}
-                                ({{ "%.2d" |
-                                format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%){% endif %} | Credits: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{a.get_credits(current_user.id)}}{%endif%}/{{a.num_of_credits}} | Contribution to module mark: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{"%.2d" |
-                                format(a.get_total_weighted_marks_as_perc(current_user.id)*100)}}%{% endif %}
-                            </p>
-                        </div>
-                        {% endfor %}
+                        <li><b>Summative</b></li>
+                        <ul>
+                            {% for a in m.get_assessments(summative_only=True) %}
+                            <li>
+                                <div class="results_box student_stats_container container_{{a.get_status(current_user.id)}}">
+                                    <p>Assessment: <a href="{{url_for('student_stats.assessment_view', assessment_id=a.module_id)}}">{{a}}</a> | Status: <span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span> | Marks: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}}
+                                        ({{ "%.2d" |
+                                        format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%){% endif %} | Credits: {{a.num_of_credits}} | Contribution to module mark: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{"%.2d" |
+                                        format(a.get_total_weighted_marks_as_perc(current_user.id)*100)}}%{% endif %}
+                                    </p>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <li><b>Formative</b></li>
+                        <ul>
+                            {% for a in m.get_assessments(formative_only=True) %}
+                            <li>
+                                <div class="results_box student_stats_container container_{{a.get_status(current_user.id)}}">
+                                    <p>Assessment: <a href="{{url_for('student_stats.assessment_view', assessment_id=a.module_id)}}">{{a}}</a> | Status: <span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span> | Marks: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}}
+                                        ({{ "%.2d" |
+                                        format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%){% endif %} | Credits: - | Contribution to module mark: -
+                                    </p>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     </ul>
                 </details></li>
             </div>
         {% endfor %}
     </ul>
+
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                },{
+                    label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        </script>
+
+
 {% endblock content %}
