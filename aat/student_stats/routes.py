@@ -1,6 +1,6 @@
 from . import student_stats
 from flask_login import current_user
-from flask import render_template, redirect, url_for
+from flask import render_template, redirect, url_for, request
 from sqlalchemy import func
 from io import StringIO
 import csv, pprint, json
@@ -17,7 +17,7 @@ from ..db_utils import *
 ###############
 # COURSE VIEW #
 ###############
-@student_stats.route("/")
+@student_stats.route("/", methods=["POST", "GET"])
 def course_view():
     ## VALIDATION ##
     # Checks if logged in
@@ -31,14 +31,25 @@ def course_view():
 ###############
 # MODULE VIEW #
 ###############
-@student_stats.route("/module/")
-@student_stats.route("/module/<int:module_id>")
+@student_stats.route("/module/", methods=["POST", "GET"])
+@student_stats.route("/module/<int:module_id>", methods=["POST", "GET"])
 def module_view(module_id=0):
     # Checks if logged in
     if not current_user.is_authenticated:
         return redirect(url_for("auth.login"))
 
     m = Module.query.filter_by(module_id=module_id).first()
+
+    summative_only = None
+    formative_only = None
+
+    if request.method == "POST":
+        analysis_filter = request.form["analysis_filter"]
+        print(f"{analysis_filter=}")
+        if analysis_filter == "summative":
+            summative_only = True
+        elif analysis_filter == "formative":
+            formative_only = True
 
     # Module Error Handling
     if m is None:
@@ -51,14 +62,19 @@ def module_view(module_id=0):
         )
 
     ## RETURN ##
-    return render_template("2_student_stats_module_view.html", m=m)
+    return render_template(
+        "2_student_stats_module_view.html",
+        m=m,
+        summative_only=summative_only,
+        formative_only=formative_only,
+    )
 
 
 ###################
 # ASSESSMENT VIEW #
 ###################
-@student_stats.route("/assessment/")
-@student_stats.route("/assessment/<int:assessment_id>")
+@student_stats.route("/assessment/", methods=["POST", "GET"])
+@student_stats.route("/assessment/<int:assessment_id>", methods=["POST", "GET"])
 def assessment_view(assessment_id=0):
     ## VALIDATION ##
     # Checks if logged in

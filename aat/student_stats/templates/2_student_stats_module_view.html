@@ -28,11 +28,6 @@
             </tr>
         </table>
 
-    <h4>Module stats</h4>
-    <p>Average difficulty: {{m.get_average_difficulty()}}</p>
-    <p>Tags: {{m.get_dict_of_tags_and_answers(current_user.id)}}</p>
-    <p>Difficulty: {{m.get_dict_of_difficulty_and_answers(current_user.id)}}</p>
-    <p>Types: {{m.get_dict_of_type_and_answers(current_user.id)}}</p>
         
     <h3>Module status explanation</h3>
     <ul><li><span class="text_pass">Pass</span>: weighted mark >= 50%</li>
@@ -121,9 +116,21 @@
             <th>-</th>
         </tr>
     </table>
+    
+    <h2>Analysis</h2>
 
-    <h2>Tag Analysis</h2>
-    <p>(summative assessment only)</p>
+    <p>
+        <form action="" method="post">Filter by assessment type: 
+            <select name="analysis_filter" id="analysis_filter" onchange="this.form.submit()">
+                <option value="all" {% if not summative_only and not formative_only %}selected="selected"
+                {% endif %}>All</option>
+                <option value="summative" {% if summative_only %}selected="selected"{% endif %}>Summative</option>
+                <option value="formative" {% if formative_only %}selected="selected"{% endif %}>Formative</option>
+            </select>
+        </form>
+    </p>
+
+    <h3>Tag</h3>
     <table>
         <tr>
             <th>Tag</th>
@@ -131,18 +138,55 @@
             <th><span class="text_fail">Incorrect</span></th>
             <th>Assessments</th>
 
-        {% for tag, tag_stats in m.get_dict_of_tags_and_answers(current_user.id).items() %}
+        {% for tag, tag_stats in m.get_dict_of_tags_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
             <tr>
                 <td>{{tag}}</td>
                 <td><span class="">{{tag_stats["correct"]}}/{{tag_stats["correct"]+tag_stats["incorrect"]}}</span></td>
                 <td><span class="">{{tag_stats["incorrect"]}}/{{tag_stats["correct"]+tag_stats["incorrect"]}}</span></td>
-                <td><ul>{% for tag_key, assessments in m.get_dict_of_tags_and_assessments(current_user.id).items() %}
+                <td><ul>{% for tag_key, assessments in m.get_dict_of_tags_and_assessments(current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
                     {% if tag==tag_key %}
                         {% for a in assessments %}
                             <li><a href="{{url_for('student_stats.assessment_view', assessment_id=a.assessment_id)}}">{{a.assessment_id}}. {{a.title}}</a></li>
                         {% endfor %}
                     {% endif %}
                 {% endfor %}</ul></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    
+    <h3>Difficulty</h3>
+    <table>
+        <tr>
+            <th>Difficulty</th>
+            <th><span class="">Count</span></th>
+            <th><span class="text_pass">Correct</span></th>
+            <th><span class="text_fail">Incorrect</span></th>
+        </tr>
+        {% for difficulty, difficulty_stats in m.get_dict_of_tags_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
+            <tr>
+                <td>{{difficulty}}</td>
+                <td><span class="">{{difficulty_stats["correct"]+difficulty_stats["incorrect"]}}</span></td>
+                <td><span class="">{{difficulty_stats["correct"]}}</span></td>
+                <td><span class="">{{difficulty_stats["incorrect"]}}</span></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h3>Question Type</h3>
+    <table>
+        <tr>
+            <th>Type</th>
+            <th><span class="">Count</span></th>
+            <th><span class="text_pass">Correct</span></th>
+            <th><span class="text_fail">Incorrect</span></th>
+        </tr>
+        {% for type, type_stats in m.get_dict_of_type_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
+            <tr>
+                <td>{{type}}</td>
+                <td><span class="">{{type_stats["correct"]+type_stats["incorrect"]}}</span></td>
+                <td><span class="">{{type_stats["correct"]}}</span></td>
+                <td><span class="">{{type_stats["incorrect"]}}</span></td>
             </tr>
         {% endfor %}
     </table>
