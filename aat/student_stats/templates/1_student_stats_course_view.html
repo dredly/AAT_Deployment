@@ -11,18 +11,17 @@
     <h1>Course: {{ c.title }}</h1>
     <p>Status: <span class="text_{{c.get_status(current_user.id)}}">{{c.get_status(current_user.id)}}</span></p>
     <h3>Module status explanation</h3>
-    <ul><li><span class="text_pass">Pass</span>: all modules have status of "pass"</li>
-    <li><span class="text_fail">Fail</span>: all modules have status of "fail"</li>
-    <li><span class="text_in_progress">In Progress</span>: at least one module attempted</li>
-    <li><span class="text_unattempted">Unattempted</span>: no modules attempted</li></ul>
-<!--     
-    <h2>Stack Bar</h2>
+    <ul><li><span class="text_pass"><b>Pass</b></span>: all modules have status of "pass"</li>
+    <li><span class="text_fail"><b>Fail</b></span>: all modules have status of "fail"</li>
+    <li><span class="text_in"><b>In Progress</b></span>: at least one module attempted</li>
+    <li><span class="text_unattempted"><b>Unattempted</b></span>: no modules attempted</li></ul>
+
+    <h2>The Pie Of Progress</h2>
     <div class="content-block">
         <div class="chart-container">
-            <canvas id="myChart"></canvas>
+            <canvas id="myPieChart"></canvas>
         </div>
-    </div> -->
-
+    </div>
     <h2>Modules</h2>
     <ul>
         {% for m in c.modules %}
@@ -66,143 +65,43 @@
         {% endfor %}
     </ul>
 
-    <h2>Analysis</h2>
+    <h2><a href="{{url_for('student_stats.course_analysis')}}">Analysis</a></h2>
 
-    <p>
-        <form action="" method="post">Filter by assessment type: 
-            <select name="analysis_filter" id="analysis_filter" onchange="this.form.submit()">
-                <option value="all" {% if not summative_only and not formative_only %}selected="selected"
-                {% endif %}>All</option>
-                <option value="summative" {% if summative_only %}selected="selected"{% endif %}>Summative</option>
-                <option value="formative" {% if formative_only %}selected="selected"{% endif %}>Formative</option>
-            </select>
-        </form>
-    </p>
+    <h2><a href="{{ url_for('student_stats.download')}}">Download CSV</a></h2>
 
-    <h3>Tag</h3>
-    <table>
-        <tr>
-            <th>Tag</th>
-            <th><span class="text_pass">Correct</span></th>
-            <th><span class="text_fail">Incorrect</span></th>
-            <th>Assessments</th>
-
-        {% for tag, tag_stats in c.get_dict_of_tags_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
-            <tr>
-                <td>{{tag}}</td>
-                <td><span class="">{{tag_stats["correct"]}}/{{tag_stats["correct"]+tag_stats["incorrect"]}}</span></td>
-                <td><span class="">{{tag_stats["incorrect"]}}/{{tag_stats["correct"]+tag_stats["incorrect"]}}</span></td>
-                <td><ul>{% for tag_key, module_list in c.get_dict_of_tags_and_modules(current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
-{% if tag == tag_key %}
-<ul>
-    {% for m in module_list %}
-    <li>{{m}}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-                {% endfor %}</ul></td>
-            </tr>
-        {% endfor %}
-    </table>
-
-    
-    <h3>Difficulty</h3>
-    <table>
-        <tr>
-            <th>Difficulty</th>
-            <th><span class="">Count</span></th>
-            <th><span class="text_pass">Correct</span></th>
-            <th><span class="text_fail">Incorrect</span></th>
-        </tr>
-        {% for difficulty, difficulty_stats in c.get_dict_of_difficulty_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
-            <tr>
-                <td>{{difficulty}}</td>
-                <td><span class="">{{difficulty_stats["correct"]+difficulty_stats["incorrect"]}}</span></td>
-                <td><span class="">{{difficulty_stats["correct"]}}</span></td>
-                <td><span class="">{{difficulty_stats["incorrect"]}}</span></td>
-            </tr>
-        {% endfor %}
-    </table>
-
-    <h3>Question Type</h3>
-    <table>
-        <tr>
-            <th>Type</th>
-            <th><span class="">Count</span></th>
-            <th><span class="text_pass">Correct</span></th>
-            <th><span class="text_fail">Incorrect</span></th>
-        </tr>
-        {% for type, type_stats in c.get_dict_of_type_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
-            <tr>
-                <td>{{type}}</td>
-                <td><span class="">{{type_stats["correct"]+type_stats["incorrect"]}}</span></td>
-                <td><span class="">{{type_stats["correct"]}}</span></td>
-                <td><span class="">{{type_stats["incorrect"]}}</span></td>
-            </tr>
-        {% endfor %}
-    </table>
-
-    <script>
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const myChart = new Chart(ctx, {
-            type: 'bar',
+    <script>   
+        const ctxPie = document.getElementById('myPieChart').getContext('2d');
+        const myPieChart = new Chart(ctxPie, {
+            type: 'pie',
             data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                datasets: [{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                },{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    x: {
-                        stacked: true
+                labels: [{% for m in c.modules %}'{{m}}',{% endfor %}],
+                datasets: [
+                    {
+                        label: 'Assessment View',
+                        data: [{% for m in c.modules %}1,{% endfor %}],
+                        backgroundColor: [{% for m in c.modules %}
+                        {% if m.get_status(current_user.id)=='pass'%}'rgb(54, 162, 235)'
+                        {% elif m.get_status(current_user.id)=='fail'%}'rgb(255, 99, 132)'
+                        {% elif m.get_status(current_user.id)=='in progress'%}'rgb(150, 150, 150)'
+                        {% elif m.get_status(current_user.id)=='unattempted'%}'rgb(104, 28, 180)'
+                        {% else %}'rgb(54, 162, 235)'{% endif %},
+                            {% endfor %}],
+                        hoverOffset: 4,
                     },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true
+                ],
+            },
+            options:{
+                plugins: {
+                    tooltip: {
+                      callbacks: {
+                        label: function(context) {return context.label},
+                      }
                     }
-                }
+                  }
             }
         });
-        </script>
+    </script>
+
 
 
 {% endblock content %}

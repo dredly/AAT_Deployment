@@ -1,11 +1,9 @@
 from . import student_stats
 from flask_login import current_user
-from flask import render_template, redirect, url_for, request
-from sqlalchemy import func
+from flask import render_template, redirect, url_for, request, jsonify
 from io import StringIO
-import csv, pprint, json
+import csv, json
 from flask import make_response
-from werkzeug.exceptions import NotFound
 from .. import db
 
 # MODELS
@@ -24,8 +22,30 @@ def course_view():
     if not current_user.is_authenticated:
         return redirect(url_for("auth.login"))
     ## RETURN ##
+
     c = Course.query.first()
     return render_template("1_student_stats_course_view.html", c=c)
+
+
+@student_stats.route("/analysis/", methods=["POST", "GET"])
+def course_analysis():
+    summative_only = None
+    formative_only = None
+
+    if request.method == "POST":
+        analysis_filter = request.form["analysis_filter"]
+        if analysis_filter == "summative":
+            summative_only = True
+        elif analysis_filter == "formative":
+            formative_only = True
+
+    c = Course.query.first()
+    return render_template(
+        "course_analysis.html",
+        c=c,
+        summative_only=summative_only,
+        formative_only=formative_only,
+    )
 
 
 ###############
@@ -45,7 +65,6 @@ def module_view(module_id=0):
 
     if request.method == "POST":
         analysis_filter = request.form["analysis_filter"]
-        print(f"{analysis_filter=}")
         if analysis_filter == "summative":
             summative_only = True
         elif analysis_filter == "formative":

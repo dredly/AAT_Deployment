@@ -27,13 +27,13 @@
                 {% endfor %}
             </tr>
         </table>
-
+        <p class="todo">TODO: when done, make a version which works for NO taken modules (routes to redirect)</p>
         
     <h3>Module status explanation</h3>
-    <ul><li><span class="text_pass">Pass</span>: weighted mark >= 50%</li>
-    <li><span class="text_fail">Fail</span>: all assessments attempted, weighted mark < 50%</li>
-    <li><span class="text_in_progress">In Progress</span>: not all assessments attempted, weighted mark < 50%</li>
-    <li><span class="text_unattempted">Unattempted</span>: no assessments attempted</li></ul>
+    <ul><li><span class="text_pass"><b>Pass</b></span>: weighted mark >= 50%</li>
+    <li><span class="text_fail"><b>Fail</b></span>: all assessments attempted, weighted mark < 50%</li>
+    <li><span class="text_in_progress"><b>In Progress</b></span>: not all assessments attempted, weighted mark < 50%</li>
+    <li><span class="text_unattempted"><b>Unattempted</b></span>: no assessments attempted</li></ul>
     
     <h3>Weighted mark explanation</h3>
     <ul><li>weighted mark = marks earned/marks possible x credits/total assessment credits</li></ul>
@@ -189,6 +189,7 @@
             </tr>
         {% endfor %}
     </table>
+    <h2><a href="{{ url_for('student_stats.download')}}">Download CSV</a></h2>
 
     <script>
         // PIE CHART
