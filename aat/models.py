@@ -27,26 +27,6 @@ class Course(db.Model):
     def get_count_of_modules(self):
         return len(self.modules)
 
-    def get_count_of_all_correct_and_incorrect_responses(
-        self, user_id, summative_only=None, formative_only=None
-    ):
-        count = {"correct": 0, "incorrect": 0}
-        for response in [
-            ResponseT1.query.filter_by(user_id=user_id).all(),
-            ResponseT1.query.filter_by(user_id=user_id).all(),
-        ]:
-            for r in response:
-                if (
-                    (not summative_only and not formative_only)
-                    or (summative_only and r.assessment.is_summative)
-                    or (formative_only and not r.assessment.is_summative)
-                ):
-                    if r.is_correct:
-                        count["correct"] += 1
-                    else:
-                        count["incorrect"] += 1
-        return count
-
     def get_status_counter(self, user_id):
         return Counter([m.get_status(user_id) for m in self.modules])
 
@@ -68,15 +48,37 @@ class Course(db.Model):
         """
         return self.modules
 
+    def get_dict_of_questions_and_answers(
+        self, user_id, summative_only=None, formative_only=None, hsa_only=None
+    ):
+        print("***")
+        output_dict = {
+            "count": 0,
+            "correct": 0,
+            "incorrect": 0,
+        }
+
+        for m in self.get_modules():
+            for key in output_dict:
+                print(f"")
+                output_dict[key] += m.get_dict_of_questions_and_answers(
+                    user_id, summative_only, formative_only, hsa_only
+                )[key]
+                print(f"Course level | {key=} | {m=} | {output_dict=}")
+
+        print(output_dict)
+        print("***")
+
+        return output_dict
+
     def get_dict_of_tags_and_answers(
-        self,
-        user_id,
-        summative_only=None,
-        formative_only=None,
+        self, user_id, summative_only=None, formative_only=None, hsa_only=None
     ):
 
         list_of_module_values = [
-            m.get_dict_of_tags_and_answers(user_id, summative_only, formative_only)
+            m.get_dict_of_tags_and_answers(
+                user_id, summative_only, formative_only, hsa_only
+            )
             for m in self.modules
         ]
 
@@ -90,10 +92,7 @@ class Course(db.Model):
         return output_dict
 
     def get_dict_of_difficulty_and_answers(
-        self,
-        user_id,
-        summative_only=None,
-        formative_only=None,
+        self, user_id, summative_only=None, formative_only=None, hsa_only=None
     ):
         output_dict = {
             1: {"correct": 0, "incorrect": 0},
@@ -105,16 +104,13 @@ class Course(db.Model):
             for key, value in output_dict.items():
                 for v in value:
                     output_dict[key][v] += m.get_dict_of_difficulty_and_answers(
-                        user_id, summative_only, formative_only
+                        user_id, summative_only, formative_only, hsa_only
                     )[key][v]
 
         return output_dict
 
     def get_dict_of_type_and_answers(
-        self,
-        user_id,
-        summative_only=None,
-        formative_only=None,
+        self, user_id, summative_only=None, formative_only=None, hsa_only=None
     ):
         output_dict = {
             1: {"correct": 0, "incorrect": 0},
@@ -125,7 +121,7 @@ class Course(db.Model):
             for key, value in output_dict.items():
                 for v in value:
                     output_dict[key][v] += m.get_dict_of_type_and_answers(
-                        user_id, summative_only, formative_only
+                        user_id, summative_only, formative_only, hsa_only
                     )[key][v]
 
         return output_dict
@@ -380,7 +376,7 @@ class Assessment(db.Model):
     def get_can_user_take_assessment(self, user_id):
         return (
             True
-            if not self.is_summative
+            if (not self.is_summative or not self.get_count_of_attempts_made(user_id))
             else self.get_count_of_attempts_made(user_id) < self.get_attempt_limit()
         )
 
@@ -395,10 +391,18 @@ class Assessment(db.Model):
         )
 
     def get_count_of_attempts_made(self, user_id):
-        return max(self.get_marks_for_user_and_assessment(user_id).keys())
+        return (
+            max(self.get_marks_for_user_and_assessment(user_id).keys())
+            if len(self.get_marks_for_user_and_assessment(user_id).keys()) > 0
+            else None
+        )
 
     def get_list_of_attempts_made(self, user_id):
-        return self.get_marks_for_user_and_assessment(user_id).keys()
+        return (
+            self.get_marks_for_user_and_assessment(user_id).keys()
+            if len(self.get_marks_for_user_and_assessment(user_id).keys()) > 0
+            else None
+        )
 
     def get_average_difficulty(self, actual=False):
         """
@@ -444,8 +448,6 @@ class Assessment(db.Model):
                 if hsa_only:
                     #
                     check = q.get_was_user_right(user_id)
-                    if check is None:
-                        continue
                     if check is True:
                         output_dict["correct"] += 1
                         output_dict["count"] += 1
@@ -454,20 +456,18 @@ class Assessment(db.Model):
                         output_dict["count"] += 1
 
                 else:
-                    # Get list of attempts
-                    for specific_attempt in range(
-                        self.get_count_of_attempts_made(user_id)
-                    ):
-                        check = q.get_was_user_right(user_id, specific_attempt + 1)
-                        if check is None:
-                            continue
-                        if check is True:
-                            output_dict["correct"] += 1
-                            output_dict["count"] += 1
-
-                        if check is False:
-                            output_dict["incorrect"] += 1
-                            output_dict["count"] += 1
+                    if self.get_count_of_attempts_made(user_id):
+                        # Get list of attempts
+                        for specific_attempt in range(
+                            self.get_count_of_attempts_made(user_id)
+                        ):
+                            check = q.get_was_user_right(user_id, specific_attempt + 1)
+                            if check is True:
+                                output_dict["correct"] += 1
+                                output_dict["count"] += 1
+                            if check is False:
+                                output_dict["incorrect"] += 1
+                                output_dict["count"] += 1
         return output_dict
 
     def get_dict_of_tags_and_answers(
@@ -497,16 +497,17 @@ class Assessment(db.Model):
                         output_dict[q.tag]["incorrect"] += 1
                 else:
                     # Get list of attempts
-                    for specific_attempt in range(
-                        self.get_count_of_attempts_made(user_id)
-                    ):
-                        check = q.get_was_user_right(user_id, specific_attempt + 1)
-                        if check is None:
-                            continue
-                        if check is True:
-                            output_dict[q.tag]["correct"] += 1
-                        if check is False:
-                            output_dict[q.tag]["incorrect"] += 1
+                    if self.get_count_of_attempts_made(user_id):
+                        for specific_attempt in range(
+                            self.get_count_of_attempts_made(user_id)
+                        ):
+                            check = q.get_was_user_right(user_id, specific_attempt + 1)
+                            if check is None:
+                                continue
+                            if check is True:
+                                output_dict[q.tag]["correct"] += 1
+                            if check is False:
+                                output_dict[q.tag]["incorrect"] += 1
         return output_dict
 
     def get_dict_of_difficulty_and_answers(
@@ -537,17 +538,18 @@ class Assessment(db.Model):
                     if check is False:
                         output_dict[q.difficulty]["incorrect"] += 1
                 else:
-                    # Get list of attempts
-                    for specific_attempt in range(
-                        self.get_count_of_attempts_made(user_id)
-                    ):
-                        check = q.get_was_user_right(user_id, specific_attempt + 1)
-                        if check is None:
-                            continue
-                        if check is True:
-                            output_dict[q.difficulty]["correct"] += 1
-                        if check is False:
-                            output_dict[q.difficulty]["incorrect"] += 1
+                    if self.get_count_of_attempts_made(user_id):
+                        # Get list of attempts
+                        for specific_attempt in range(
+                            self.get_count_of_attempts_made(user_id)
+                        ):
+                            check = q.get_was_user_right(user_id, specific_attempt + 1)
+                            if check is None:
+                                continue
+                            if check is True:
+                                output_dict[q.difficulty]["correct"] += 1
+                            if check is False:
+                                output_dict[q.difficulty]["incorrect"] += 1
         return output_dict
 
     def get_dict_of_type_and_answers(
@@ -577,17 +579,18 @@ class Assessment(db.Model):
                     if check is False:
                         output_dict[q.get_type()]["incorrect"] += 1
                 else:
-                    # Get list of attempts
-                    for specific_attempt in range(
-                        self.get_count_of_attempts_made(user_id)
-                    ):
-                        check = q.get_was_user_right(user_id, specific_attempt + 1)
-                        if check is None:
-                            continue
-                        if check is True:
-                            output_dict[q.get_type()]["correct"] += 1
-                        if check is False:
-                            output_dict[q.get_type()]["incorrect"] += 1
+                    if self.get_count_of_attempts_made(user_id):
+                        # Get list of attempts
+                        for specific_attempt in range(
+                            self.get_count_of_attempts_made(user_id)
+                        ):
+                            check = q.get_was_user_right(user_id, specific_attempt + 1)
+                            if check is None:
+                                continue
+                            if check is True:
+                                output_dict[q.get_type()]["correct"] += 1
+                            if check is False:
+                                output_dict[q.get_type()]["incorrect"] += 1
         return output_dict
 
     def get_marks_for_user_and_assessment(self, user_id):
@@ -757,12 +760,12 @@ class QuestionT1(db.Model):
         """
         if attempt_number is None:
             if not self.assessment.get_highest_scoring_attempt_and_mark(user_id):
-                return False
+                return None
             attempt_number = self.assessment.get_highest_scoring_attempt_and_mark(
                 user_id
             ).get("highest_scoring_attempt")
             if not attempt_number:
-                return False
+                return None
         for r in self.responses:
             if r.user_id == user_id and r.attempt_number == attempt_number:
                 return r.is_correct
@@ -994,6 +997,24 @@ class Module(db.Model):
             ]
         )
 
+    def get_dict_of_questions_and_answers(
+        self, user_id, summative_only=None, formative_only=None, hsa_only=None
+    ):
+        output_dict = {
+            "count": 0,
+            "correct": 0,
+            "incorrect": 0,
+        }
+
+        for a in self.get_assessments():
+            for key in output_dict:
+                output_dict[key] += a.get_dict_of_questions_and_answers(
+                    user_id, summative_only, formative_only, hsa_only
+                )[key]
+            print(f"{a=} | {output_dict=}")
+
+        return output_dict
+
     def get_dict_of_tags_and_assessments(
         self,
         user_id,
@@ -1019,11 +1040,13 @@ class Module(db.Model):
         user_id,
         summative_only=None,
         formative_only=None,
+        hsa_only=None,
     ):
-        # Summative ONLY
         output = {}
-        for a in self.get_assessments(summative_only, formative_only):
-            input_dict = a.get_dict_of_tags_and_answers(user_id)
+        for a in self.get_assessments():
+            input_dict = a.get_dict_of_tags_and_answers(
+                user_id, summative_only, formative_only, hsa_only
+            )
             for key, value in input_dict.items():
                 if key not in output:
                     output[key] = value
@@ -1033,10 +1056,7 @@ class Module(db.Model):
         return output
 
     def get_dict_of_difficulty_and_answers(
-        self,
-        user_id,
-        summative_only=None,
-        formative_only=None,
+        self, user_id, summative_only=None, formative_only=None, hsa_only=None
     ):
         output_dict = {
             1: {"correct": 0, "incorrect": 0},
@@ -1044,32 +1064,29 @@ class Module(db.Model):
             3: {"correct": 0, "incorrect": 0},
         }
 
-        for a in self.get_assessments(summative_only, formative_only):
+        for a in self.get_assessments():
             for key, value in output_dict.items():
                 for v in value:
                     output_dict[key][v] += a.get_dict_of_difficulty_and_answers(
-                        user_id
+                        user_id, summative_only, formative_only, hsa_only
                     )[key][v]
 
         return output_dict
 
     def get_dict_of_type_and_answers(
-        self,
-        user_id,
-        summative_only=None,
-        formative_only=None,
+        self, user_id, summative_only=None, formative_only=None, hsa_only=None
     ):
         output_dict = {
             1: {"correct": 0, "incorrect": 0},
             2: {"correct": 0, "incorrect": 0},
         }
 
-        for a in self.get_assessments(summative_only, formative_only):
+        for a in self.get_assessments():
             for key, value in output_dict.items():
                 for v in value:
-                    output_dict[key][v] += a.get_dict_of_type_and_answers(user_id)[key][
-                        v
-                    ]
+                    output_dict[key][v] += a.get_dict_of_type_and_answers(
+                        user_id, summative_only, formative_only, hsa_only
+                    )[key][v]
 
         return output_dict
 

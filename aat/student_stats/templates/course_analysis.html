@@ -8,9 +8,22 @@
 {% block content %}
 <h2>Student stats for student ID {{current_user.id}}: {{current_user.name}}</h2>
     <h1>Course: {{ c.title }}</h1>
-    <h2>Course Analysis - {% if not summative_only and not formative_only %}All{% elif summative_only %}Summative{% else %}Formative{% endif %} questions</h2>
+    <h2>Course Analysis | {% if not summative_only and not formative_only %}All{% elif summative_only %}Summative{% else %}Formative{% endif %} questions | {% if hsa_only %}Highest scoring attempt only {% else %}All attempts{% endif %}</h2>
     {% include 'includes/analysis_filter.html' %}
 
+    <h3>Questions</h3>
+    <table>
+        <tr>
+            <th><span class="">Count</span></th>
+            <th><span class="text_pass">Correct</span></th>
+            <th><span class="text_fail">Incorrect</span></th>
+        </tr>
+        <tr>
+            <td><span class="">{{c.get_dict_of_questions_and_answers(current_user.id, summative_only=summative_only, formative_only=formative_only, hsa_only=hsa_only)["count"]}}</span></td>
+            <td><span class="">{{c.get_dict_of_questions_and_answers(current_user.id, summative_only=summative_only, formative_only=formative_only, hsa_only=hsa_only)["correct"]}}</td>
+            <td><span class="">{{c.get_dict_of_questions_and_answers(current_user.id, summative_only=summative_only, formative_only=formative_only, hsa_only=hsa_only)["incorrect"]}}</td>
+        </tr>
+    </table>
     
     <h3>Tag</h3>
     <table>
@@ -20,7 +33,7 @@
             <th><span class="text_pass">Correct</span></th>
             <th><span class="text_fail">Incorrect</span></th>
 
-        {% for tag, tag_stats in c.get_dict_of_tags_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
+        {% for tag, tag_stats in c.get_dict_of_tags_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only, hsa_only=hsa_only).items() %}
             <tr>
                 <td>{{tag}}</td>
                 <td>{{tag_stats["correct"]+tag_stats["incorrect"]}}</td>
@@ -39,7 +52,7 @@
             <th><span class="text_pass">Correct</span></th>
             <th><span class="text_fail">Incorrect</span></th>
         </tr>
-        {% for difficulty, difficulty_stats in c.get_dict_of_difficulty_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
+        {% for difficulty, difficulty_stats in c.get_dict_of_difficulty_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only, hsa_only=hsa_only).items() %}
             <tr>
                 <td>{{difficulty}}</td>
                 <td><span class="">{{difficulty_stats["correct"]+difficulty_stats["incorrect"]}}</span></td>
@@ -57,7 +70,7 @@
             <th><span class="text_pass">Correct</span></th>
             <th><span class="text_fail">Incorrect</span></th>
         </tr>
-        {% for type, type_stats in c.get_dict_of_type_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only).items() %}
+        {% for type, type_stats in c.get_dict_of_type_and_answers(user_id=current_user.id,summative_only=summative_only,formative_only=formative_only, hsa_only=hsa_only).items() %}
             <tr>
                 <td>{{type}} {% if type==1 %}
                     (multiple choice)

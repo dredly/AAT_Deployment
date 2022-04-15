@@ -10,7 +10,7 @@
 <p><a href="{{url_for('student_stats.course_view')}}">Course View</a> > <a href="{{url_for('student_stats.module_view', module_id = a.module.module_id)}}">Module {{a.module.module_id}} | {{a.module.title}}</a> > Assessment {{ a.assessment_id}} | {{ a.title }}</p>
 
 <h1>Assessment {{ a.assessment_id }} | {{ a.title }}</h1>
-<h2>Assessment Analysis - {% if not summative_only and not formative_only %}All{% elif summative_only %}Summative{% else %}Formative{% endif %} questions</h2>
+<h2>Assessment Analysis | {% if not summative_only and not formative_only %}All{% elif summative_only %}Summative{% else %}Formative{% endif %} questions | {% if hsa_only %}Highest scoring attempt only {% else %}All attempts{% endif %}</h2>
 
 {% include 'includes/analysis_filter.html' %}
 

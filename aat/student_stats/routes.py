@@ -31,6 +31,7 @@ def course_view():
 def course_analysis():
     summative_only = None
     formative_only = None
+    hsa_only = None
 
     if request.method == "POST":
         analysis_filter = request.form["analysis_filter"]
@@ -38,6 +39,7 @@ def course_analysis():
             summative_only = True
         elif analysis_filter == "formative":
             formative_only = True
+        hsa_only = True if request.form.get("hsa_only") == "on" else None
 
     c = Course.query.first()
     return render_template(
@@ -45,6 +47,7 @@ def course_analysis():
         c=c,
         summative_only=summative_only,
         formative_only=formative_only,
+        hsa_only=hsa_only,
     )
 
 
@@ -95,6 +98,7 @@ def module_analysis(module_id):
 
     summative_only = None
     formative_only = None
+    hsa_only = None
 
     if request.method == "POST":
         analysis_filter = request.form["analysis_filter"]
@@ -102,12 +106,14 @@ def module_analysis(module_id):
             summative_only = True
         elif analysis_filter == "formative":
             formative_only = True
+        hsa_only = True if request.form.get("hsa_only") == "on" else None
 
     return render_template(
         "module_analysis.html",
         m=m,
         summative_only=summative_only,
         formative_only=formative_only,
+        hsa_only=hsa_only,
     )
 
 
@@ -138,15 +144,16 @@ def assessment_view(assessment_id=0):
     pass_color = "54, 162, 235, 0.8"
     fail_color = "255, 99, 132, 0.8"
     total_marks_possible = a.get_total_marks_possible()
-    for attempt in a.get_list_of_attempts_made(current_user.id):
-        marks = a.get_marks_for_user_and_assessment(current_user.id)[attempt]
-        pass_mark = total_marks_possible / 2
-        barChartData.append(marks)
-        barChartPass.append(pass_mark)
-        barChartLabel.append(attempt)
-        barChartColor.append(
-            pass_color
-        ) if marks >= pass_mark else barChartColor.append(fail_color)
+    if a.get_list_of_attempts_made(current_user.id):
+        for attempt in a.get_list_of_attempts_made(current_user.id):
+            marks = a.get_marks_for_user_and_assessment(current_user.id)[attempt]
+            pass_mark = total_marks_possible / 2
+            barChartData.append(marks)
+            barChartPass.append(pass_mark)
+            barChartLabel.append(attempt)
+            barChartColor.append(
+                pass_color
+            ) if marks >= pass_mark else barChartColor.append(fail_color)
 
     data_for_bar_chart = {
         "barChartData": barChartData,
