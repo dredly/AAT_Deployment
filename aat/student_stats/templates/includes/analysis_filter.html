@@ -1,0 +1,14 @@
+<p>
+    <form action="" method="post">Filter by assessment type: 
+        <select name="analysis_filter" id="analysis_filter" onchange="this.form.submit()">
+            <option value="all" {% if not summative_only and not formative_only %}selected="selected"
+            {% endif %}>All</option>
+            <option value="summative" {% if summative_only %}selected="selected"{% endif %}>Summative</option>
+            <option value="formative" {% if formative_only %}selected="selected"{% endif %}>Formative</option>
+        </select>
+        | Highest attempt only: 
+        <input type="checkbox" name="hsa_only" id="hsa_only" onchange="this.form.submit()" {% if hsa_only %}
+            checked
+        {% endif %}>
+    </form>
+</p>

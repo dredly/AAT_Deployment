@@ -179,6 +179,7 @@ def assessment_analysis(assessment_id):
 
     summative_only = None
     formative_only = None
+    hsa_only = None  # hsa = "highest scoring attempt"
 
     if request.method == "POST":
         analysis_filter = request.form["analysis_filter"]
@@ -186,12 +187,14 @@ def assessment_analysis(assessment_id):
             summative_only = True
         elif analysis_filter == "formative":
             formative_only = True
+        hsa_only = True if request.form.get("hsa_only") == "on" else None
 
     return render_template(
         "assessment_analysis.html",
         a=a,
         summative_only=summative_only,
         formative_only=formative_only,
+        hsa_only=hsa_only,
     )
 
 
@@ -231,13 +234,18 @@ def module_not_found(module_id):
 def download():
     rows = [
         {
+            "Module": response.assessment.module,
             "Assessment": response.assessment,
             "Question": response.question,
-            "Response": response.response_content,
+            "Response": response.get_answer_given(),
             "Correct": response.is_correct,
             "Marks": response.question.num_of_marks,
+            "Feedback": response.get_feedback(),
+            "Feedforward": response.get_feedforward(),
         }
-        for response in current_user.t2_responses
+        # TODO: change this to be all responses
+        for responses in [current_user.t1_responses, current_user.t2_responses]
+        for response in responses
     ]
     string_io = StringIO()
     csv_writer = csv.DictWriter(string_io, rows[0].keys())

@@ -9,32 +9,8 @@
 <h2>Student stats for student ID {{current_user.id}}: {{current_user.name}}</h2>
     <h1>Course: {{ c.title }}</h1>
     <h2>Course Analysis - {% if not summative_only and not formative_only %}All{% elif summative_only %}Summative{% else %}Formative{% endif %} questions</h2>
-    <p>All attempts are included (not just highest scoring)</p>
-    <p>
-        <form action="" method="post">Filter by assessment type: 
-            <select name="analysis_filter" id="analysis_filter" onchange="this.form.submit()">
-                <option value="all" {% if not summative_only and not formative_only %}selected="selected"
-                {% endif %}>All</option>
-                <option value="summative" {% if summative_only %}selected="selected"{% endif %}>Summative</option>
-                <option value="formative" {% if formative_only %}selected="selected"{% endif %}>Formative</option>
-            </select>
-        </form>
-    </p>
+    {% include 'includes/analysis_filter.html' %}
 
-
-    <!-- <h3>Questions</h3>
-    <table>
-        <tr>
-            <th><span class="">Count</span></th>
-            <th><span class="text_pass">Correct</span></th>
-            <th><span class="text_fail">Incorrect</span></th>    
-        </tr>
-        <tr>
-            <td>{{c.get_count_of_all_correct_and_incorrect_responses(current_user.id,summative_only=summative_only,formative_only=formative_only)["correct"]+c.get_count_of_all_correct_and_incorrect_responses(current_user.id,summative_only=summative_only,formative_only=formative_only)["incorrect"]}}</td>
-            <td>{{c.get_count_of_all_correct_and_incorrect_responses(current_user.id,summative_only=summative_only,formative_only=formative_only)["correct"]}}</td>
-            <td>{{c.get_count_of_all_correct_and_incorrect_responses(current_user.id,summative_only=summative_only,formative_only=formative_only)["incorrect"]}}</td>
-        </tr>
-    </table> -->
     
     <h3>Tag</h3>
     <table>

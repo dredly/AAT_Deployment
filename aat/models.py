@@ -261,6 +261,9 @@ class ResponseT1(db.Model):
     def get_status(self):
         return "pass" if self.is_correct else "fail"
 
+    def get_answer_given(self):
+        return self.chosen_option.option_text
+
 
 class ResponseT2(db.Model):
     """
@@ -305,6 +308,9 @@ class ResponseT2(db.Model):
 
     def get_status(self):
         return "pass" if self.is_correct else "fail"
+
+    def get_answer_given(self):
+        return self.response_content
 
 
 class Assessment(db.Model):
@@ -420,13 +426,56 @@ class Assessment(db.Model):
             return [q for q in question if not q.assessment.is_summative]
         return question
 
+    def get_dict_of_questions_and_answers(
+        self,
+        user_id,
+        summative_only=None,
+        formative_only=None,
+        hsa_only=None,
+    ):
+        output_dict = {
+            "count": 0,
+            "correct": 0,
+            "incorrect": 0,
+        }
+        for question in [self.question_t1, self.question_t2]:
+            question = self.question_filter(question, summative_only, formative_only)
+            for q in question:
+                if hsa_only:
+                    #
+                    check = q.get_was_user_right(user_id)
+                    if check is None:
+                        continue
+                    if check is True:
+                        output_dict["correct"] += 1
+                        output_dict["count"] += 1
+                    if check is False:
+                        output_dict["incorrect"] += 1
+                        output_dict["count"] += 1
+
+                else:
+                    # Get list of attempts
+                    for specific_attempt in range(
+                        self.get_count_of_attempts_made(user_id)
+                    ):
+                        check = q.get_was_user_right(user_id, specific_attempt + 1)
+                        if check is None:
+                            continue
+                        if check is True:
+                            output_dict["correct"] += 1
+                            output_dict["count"] += 1
+
+                        if check is False:
+                            output_dict["incorrect"] += 1
+                            output_dict["count"] += 1
+        return output_dict
+
     def get_dict_of_tags_and_answers(
         self,
         user_id,
-        attempt_number=None,
-        all_attempts=False,
         summative_only=None,
         formative_only=None,
+        hsa_only=None,
     ):
         """
         Returns tags and times the correct answer was given for the highest scoring attempt
@@ -437,8 +486,9 @@ class Assessment(db.Model):
             question = self.question_filter(question, summative_only, formative_only)
             for q in question:
                 output_dict.setdefault(q.tag, {"correct": 0, "incorrect": 0})
-                if not all_attempts:
-                    check = q.get_was_user_right(user_id, attempt_number)
+                if hsa_only:
+                    #
+                    check = q.get_was_user_right(user_id)
                     if check is None:
                         continue
                     if check is True:
@@ -462,10 +512,9 @@ class Assessment(db.Model):
     def get_dict_of_difficulty_and_answers(
         self,
         user_id,
-        attempt_number=None,
-        all_attempts=False,
         summative_only=None,
         formative_only=None,
+        hsa_only=None,
     ):
         """
         Returns difficulty and times the correct answer was given for the highest scoring attempt
@@ -479,8 +528,8 @@ class Assessment(db.Model):
         for question in [self.question_t1, self.question_t2]:
             question = self.question_filter(question, summative_only, formative_only)
             for q in question:
-                if not all_attempts:
-                    check = q.get_was_user_right(user_id, attempt_number)
+                if hsa_only:
+                    check = q.get_was_user_right(user_id)
                     if check is None:
                         continue
                     if check is True:
@@ -504,10 +553,9 @@ class Assessment(db.Model):
     def get_dict_of_type_and_answers(
         self,
         user_id,
-        attempt_number=None,
-        all_attempts=False,
         summative_only=None,
         formative_only=None,
+        hsa_only=None,
     ):
         """
         Returns type and times the correct answer was given for the highest scoring attempt
@@ -520,8 +568,8 @@ class Assessment(db.Model):
         for question in [self.question_t1, self.question_t2]:
             question = self.question_filter(question, summative_only, formative_only)
             for q in question:
-                if not all_attempts:
-                    check = q.get_was_user_right(user_id, attempt_number)
+                if hsa_only:
+                    check = q.get_was_user_right(user_id)
                     if check is None:
                         continue
                     if check is True:
