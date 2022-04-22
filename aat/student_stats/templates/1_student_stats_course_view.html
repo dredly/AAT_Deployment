@@ -16,7 +16,7 @@
     <li><span class="text_in"><b>In Progress</b></span>: at least one module attempted</li>
     <li><span class="text_unattempted"><b>Unattempted</b></span>: no modules attempted</li></ul>
 
-    <h2>The Pie Of Progress</h2>
+    <h2>Course progress</h2>
     <div class="content-block">
         <div class="chart-container">
             <canvas id="myPieChart"></canvas>
@@ -94,7 +94,25 @@
                 plugins: {
                     tooltip: {
                       callbacks: {
-                        label: function(context) {return context.label},
+                        label: function(ctx) {
+                            const color = ctx.dataset.backgroundColor[ctx.dataIndex];
+                            let status = ""
+                            switch(color){
+                                case 'rgb(54, 162, 235)':
+                                    status = "Status: Pass";
+                                    break;
+                                case 'rgb(255, 99, 132)':
+                                    status = "Status: Fail";
+                                    break;
+                                case 'rgb(150, 150, 150)':
+                                    status = "Status: In progress";
+                                    break;
+                                case 'rgb(104, 28, 180)':
+                                    status = "Status: Unattempted";
+                                    break;
+                            }
+                            return [ctx.label, status]
+                        },
                       }
                     }
                   }
