@@ -29,6 +29,13 @@
                 {% endfor %}
             </tr>
         </table>
+
+        <h2>Weighted mark</h2>
+        <div class="content-block">
+            <div class="chart-container">
+                <canvas id="myPieChart"></canvas>
+            </div>
+        </div>
         
     <h3>Module status explanation</h3>
     <ul><li><span class="text_pass"><b>Pass</b></span>: weighted mark >= 50%</li>
@@ -39,12 +46,7 @@
     <h3>Weighted mark explanation</h3>
     <ul><li>weighted mark = marks earned/marks possible x credits/total assessment credits</li></ul>
     
-    <h2>Module progress</h2>
-    <div class="content-block">
-        <div class="chart-container">
-            <canvas id="myPieChart"></canvas>
-        </div>
-    </div>
+ 
 
     <h2>Assessment</h2>
     
@@ -171,6 +173,35 @@
                     },
                 ],
             },
+            options:{
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                console.log(ctx);
+                                const color = ctx.dataset.backgroundColor[ctx.dataIndex];
+                                console.log();
+                                let status = ""
+                                switch(color){
+                                    case 'rgb(54, 162, 235)':
+                                        status = "Status: Pass";
+                                        break;
+                                    case 'rgb(255, 99, 132)':
+                                        status = "Status: Fail";
+                                        break;
+                                    case 'rgb(150, 150, 150)':
+                                        status = "Status: In progress";
+                                        break;
+                                    case 'rgb(104, 28, 180)':
+                                        status = "Status: Unattempted";
+                                        break;
+                                }
+                                return [ctx.label, status, `Mark: ${Math.floor(ctx.parsed)}`]
+                            },
+                        }
+                    }
+                }
+            }
         });
     </script>
 

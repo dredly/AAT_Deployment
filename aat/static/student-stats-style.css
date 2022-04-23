@@ -126,6 +126,10 @@ li{
 	width: 20rem;
 }
 
+.chart-assessment{
+	padding-bottom: 3rem;
+}
+
 .graph_holder{
 	flex-direction: row;
 	justify-content: center;

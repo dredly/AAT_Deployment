@@ -10,54 +10,10 @@
     <p><a href="{{url_for('student_stats.course_view')}}">Course View</a> > <a href="{{url_for('student_stats.module_view', module_id = a.module.module_id)}}">Module {{a.module.module_id}} | {{a.module.title}}</a> > Assessment {{ a.assessment_id}} | {{ a.title }}</p>
     <h1>Assessment {{ a.assessment_id}} | {{ a.title }} ({% if a.is_summative %}summative{% else %}formative{% endif %})</h1>
     <h2>Overview</h2>
-    <p>Marks based on highest scoring attempt (attempt {{a.get_highest_scoring_attempt_and_mark(current_user.id)["highest_scoring_attempt"]}})</p>
-    <table>
-        <tr>
-            <th>Type</th>
-            <th>Mark</th>
-            <th>Status</th>
-            <th>Credits</th>
-            <th>Attempts<br>made</th>
-            <th>Attempts<br>allowed</th>
-            <th>Tags</th>
-            <th>Difficulty</th>
-            <th>Type</th>
-        </tr>
-        <tr>
-            <td>{% if a.is_summative %}Summative{% else %}Formative{% endif %}</td>
-            <td>{{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}}<br>
-            ({{ "%.2d" |
-            format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%)</td>
-            <td><span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span></td>
-            <td>{{a.num_of_credits}}</td>
-            <td>{{a.get_count_of_attempts_made(current_user.id)}}</td>
-            <td>{{a.get_attempt_limit()}}</td>
-            <td>        
-                <ul>
-                    {% for tag, tag_data in a.get_dict_of_tags_and_answers(current_user.id).items() %}
-                        <li>{{tag}}: {{tag_data["correct"]}}/{{tag_data["correct"]+tag_data["incorrect"]}}</li>
-                    {% endfor %}
-                </ul>
-            </td>
-            <td>{{a.get_average_difficulty()}}</td>
-            <td>
-                <ul>
-                    {% for type, type_data in a.get_dict_of_type_and_answers(current_user.id).items() %}
-                        <li>{% if type == 1 %}1 (multiple choice){% else %}2 (text){% endif %}: {{type_data["correct"]}}/{{type_data["correct"]+type_data["incorrect"]}}</li>
-                    {% endfor %}
-                </ul>
-
-            </td>
-        </tr>
-    </table>
-    <h3>Assessment Status Explanation</h3>
-    <ul><li><span class="text_pass">Pass</span>: total marks >= 50%</li>
-    <li><span class="text_fail">Fail</span>: total marks < 50%</li>
-    <li><span class="text_unattempted">Unattempted</span>: no attempts made</li></ul>
-    <div class="chart-block">
+    <div class="chart-block chart-assessment">
         <div class="content-block">
             <div class="chart-container">
-                <h3>Highest scoring attempt</h3>
+                <h3>Highest scoring attempt <br>(attempt {{a.get_highest_scoring_attempt_and_mark(current_user.id)["highest_scoring_attempt"]}})</h3>
                 <canvas id="myPieChart"></canvas>
             </div>
         </div>
@@ -68,6 +24,31 @@
             </div>
         </div>
     </div>
+    <table>
+        <tr>
+            <th>Type</th>
+            <th>Mark</th>
+            <th>Status</th>
+            <th>Credits</th>
+            <th>Attempts<br>made</th>
+            <th>Attempts<br>allowed</th>
+        </tr>
+        <tr>
+            <td>{% if a.is_summative %}Summative{% else %}Formative{% endif %}</td>
+            <td>{{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}}<br>
+            ({{ "%.2d" |
+            format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%)</td>
+            <td><span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span></td>
+            <td>{{a.num_of_credits}}</td>
+            <td>{{a.get_count_of_attempts_made(current_user.id)}}</td>
+            <td>{{a.get_attempt_limit()}}</td>
+        </tr>
+    </table>
+    <h3>Assessment Status Explanation</h3>
+    <ul><li><span class="text_pass">Pass</span>: total marks >= 50%</li>
+    <li><span class="text_fail">Fail</span>: total marks < 50%</li>
+    <li><span class="text_unattempted">Unattempted</span>: no attempts made</li></ul>
+    
     
 
     <h2>Attempt analysis</h2>
@@ -181,6 +162,33 @@
                     },
                 ],
             },
+            options:{
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                const color = ctx.dataset.backgroundColor[ctx.dataIndex];
+                                let status = ""
+                                switch(color){
+                                    case 'rgb(54, 162, 235)':
+                                        status = "Status: Pass";
+                                        break;
+                                    case 'rgb(255, 99, 132)':
+                                        status = "Status: Fail";
+                                        break;
+                                    case 'rgb(150, 150, 150)':
+                                        status = "Status: In progress";
+                                        break;
+                                    case 'rgb(104, 28, 180)':
+                                        status = "Status: Unattempted";
+                                        break;
+                                }
+                                return [ctx.label, status, `Mark: ${Math.floor(ctx.parsed)}/${ctx.dataset.data.reduce((a,b)=>a+b)}`]
+                            },
+                        }
+                    }
+                }
+            }
         });
 
         // BAR CHART               
@@ -221,6 +229,31 @@
                             text: "Marks"
                         },
                     },
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                const color = ctx.dataset.backgroundColor[ctx.dataIndex];
+                                let status = ""
+                                switch(color){
+                                    case 'rgba(54, 162, 235, 0.8)':
+                                        status = "Status: Pass";
+                                        break;
+                                    case 'rgba(255, 99, 132, 0.8)':
+                                        status = "Status: Fail";
+                                        break;
+                                    case 'rgba(150, 150, 150, 0.8)':
+                                        status = "Status: In progress";
+                                        break;
+                                    case 'rgba(104, 28, 180, 0.8)':
+                                        status = "Status: Unattempted";
+                                        break;
+                                }
+                                return [ctx.label, status, `Mark: ${ctx.raw}/{{a.get_total_marks_possible()}}`]
+                            },
+                        }
+                    }
                 }
             }
         });

@@ -37,10 +37,10 @@
                             {% for a in m.get_assessments(summative_only=True) %}
                             <li>
                                 <div class="results_box student_stats_container container_{{a.get_status(current_user.id)}}">
-                                    <p>Assessment: <a href="{{url_for('student_stats.assessment_view', assessment_id=a.module_id)}}">{{a}}</a> | Status: <span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span> | Mark: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}}
+                                    <p>Assessment: <a href="{{url_for('student_stats.assessment_view', assessment_id=a.module_id)}}">{{a}}</a> | Status: <span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span> | Credits: {{a.num_of_credits}} | Weighted mark contribution: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{"%.2d" |
+                                        format(a.get_total_weighted_marks_as_perc(current_user.id)*100)}}%{% endif %} |  Mark: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}}
                                         ({{ "%.2d" |
-                                        format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%){% endif %} | Credits: {{a.num_of_credits}} | Contribution to module mark: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{"%.2d" |
-                                        format(a.get_total_weighted_marks_as_perc(current_user.id)*100)}}%{% endif %}
+                                        format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%){% endif %} 
                                     </p>
                                 </div>
                             </li>
@@ -51,9 +51,9 @@
                             {% for a in m.get_assessments(formative_only=True) %}
                             <li>
                                 <div class="results_box student_stats_container container_{{a.get_status(current_user.id)}}">
-                                    <p>Assessment: <a href="{{url_for('student_stats.assessment_view', assessment_id=a.module_id)}}">{{a}}</a> | Status: <span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span> | Marks: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}}
+                                    <p>Assessment: <a href="{{url_for('student_stats.assessment_view', assessment_id=a.module_id)}}">{{a}}</a> | Status: <span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span> | Marks: {% if a.get_status(current_user.id)=="unattempted" %}-/{{a.get_total_marks_possible()}}{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}}
                                         ({{ "%.2d" |
-                                        format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%){% endif %} | Credits: - | Contribution to module mark: -
+                                        format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%){% endif %}
                                     </p>
                                 </div>
                             </li>
@@ -93,29 +93,29 @@
             options:{
                 plugins: {
                     tooltip: {
-                      callbacks: {
-                        label: function(ctx) {
-                            const color = ctx.dataset.backgroundColor[ctx.dataIndex];
-                            let status = ""
-                            switch(color){
-                                case 'rgb(54, 162, 235)':
-                                    status = "Status: Pass";
-                                    break;
-                                case 'rgb(255, 99, 132)':
-                                    status = "Status: Fail";
-                                    break;
-                                case 'rgb(150, 150, 150)':
-                                    status = "Status: In progress";
-                                    break;
-                                case 'rgb(104, 28, 180)':
-                                    status = "Status: Unattempted";
-                                    break;
-                            }
-                            return [ctx.label, status]
-                        },
-                      }
+                        callbacks: {
+                            label: function(ctx) {
+                                const color = ctx.dataset.backgroundColor[ctx.dataIndex];
+                                let status = ""
+                                switch(color){
+                                    case 'rgb(54, 162, 235)':
+                                        status = "Status: Pass";
+                                        break;
+                                    case 'rgb(255, 99, 132)':
+                                        status = "Status: Fail";
+                                        break;
+                                    case 'rgb(150, 150, 150)':
+                                        status = "Status: In progress";
+                                        break;
+                                    case 'rgb(104, 28, 180)':
+                                        status = "Status: Unattempted";
+                                        break;
+                                }
+                                return [ctx.label, status]
+                            },
+                        }
                     }
-                  }
+                }
             }
         });
     </script>
