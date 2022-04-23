@@ -104,8 +104,8 @@
                                                 2 (text)
                                             {% endif %}
                                         </li>
-                                        <li>Feedback: {{ r.get_feedback() }}</li>
-                                        <li>Feedforward: {{ r.get_feedforward() }}</li>
+                                        <li class="feedback-or-feedforward">Feedback: {{ r.get_feedback() }}</li>
+                                        <li class="feedback-or-feedforward">Feedforward: {{ r.get_feedforward() }}</li>
                                         <li>Marks:
                                             {% if r.is_correct %}
                                                 {{r.question.num_of_marks}}/{{r.question.num_of_marks}}
