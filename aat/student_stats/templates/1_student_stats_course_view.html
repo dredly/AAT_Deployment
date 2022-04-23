@@ -28,7 +28,7 @@
         <div class="results_box student_stats_container attempt_container container_{{m.get_status(current_user.id)}}">
             <li><details>
                     <summary class="course_module_headers">
-                        <a href="{{url_for('student_stats.module_view', module_id=m.module_id)}}">{{m}}</a> | Status: <span class="text_{{m.get_status(current_user.id)}}">{{m.get_status(current_user.id)}}</span> | Mark: {% if m.get_status(current_user.id)=="unattempted" %}-{% else %}{{"%.0d" |
+                        <a href="{{url_for('student_stats.module_view', module_id=m.module_id)}}">{{m}}</a> | Status: <span class="text_{{m.get_status(current_user.id)}}">{{m.get_status(current_user.id)}}</span> | Weighted mark: {% if m.get_status(current_user.id)=="unattempted" %}-{% else %}{{"%.0d" |
                             format(m.get_total_weighted_marks_as_perc(current_user.id)*100)}}%{% endif %} | Summative assessments completed: {{m.get_count_of_taken_assessments(current_user.id, summative_only=True)}}/{{m.get_assessments(summative_only=True)|length}}
                     </summary>
                     <ul>
@@ -37,7 +37,7 @@
                             {% for a in m.get_assessments(summative_only=True) %}
                             <li>
                                 <div class="results_box student_stats_container container_{{a.get_status(current_user.id)}}">
-                                    <p>Assessment: <a href="{{url_for('student_stats.assessment_view', assessment_id=a.module_id)}}">{{a}}</a> | Status: <span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span> | Marks: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}}
+                                    <p>Assessment: <a href="{{url_for('student_stats.assessment_view', assessment_id=a.module_id)}}">{{a}}</a> | Status: <span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span> | Mark: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']}}/{{a.get_total_marks_possible()}}
                                         ({{ "%.2d" |
                                         format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%){% endif %} | Credits: {{a.num_of_credits}} | Contribution to module mark: {% if a.get_status(current_user.id)=="unattempted" %}-{% else %}{{"%.2d" |
                                         format(a.get_total_weighted_marks_as_perc(current_user.id)*100)}}%{% endif %}

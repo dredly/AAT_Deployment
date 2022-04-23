@@ -51,7 +51,7 @@ class Course(db.Model):
     def get_dict_of_questions_and_answers(
         self, user_id, summative_only=None, formative_only=None, hsa_only=None
     ):
-        print("***")
+        # print("***")
         output_dict = {
             "count": 0,
             "correct": 0,
@@ -60,14 +60,14 @@ class Course(db.Model):
 
         for m in self.get_modules():
             for key in output_dict:
-                print(f"")
+                # print(f"")
                 output_dict[key] += m.get_dict_of_questions_and_answers(
                     user_id, summative_only, formative_only, hsa_only
                 )[key]
-                print(f"Course level | {key=} | {m=} | {output_dict=}")
+                # print(f"Course level | {key=} | {m=} | {output_dict=}")
 
-        print(output_dict)
-        print("***")
+        # print(output_dict)
+        # print("***")
 
         return output_dict
 
@@ -1011,7 +1011,7 @@ class Module(db.Model):
                 output_dict[key] += a.get_dict_of_questions_and_answers(
                     user_id, summative_only, formative_only, hsa_only
                 )[key]
-            print(f"{a=} | {output_dict=}")
+            # print(f"{a=} | {output_dict=}")
 
         return output_dict
 

@@ -19,8 +19,11 @@
             </tr>
             <tr>
                 <td><span class="text_{{m.get_status(current_user.id)}}">{{m.get_status(current_user.id)}}</span></td>
-                <td>{{"%.0d" |
-                    format(m.get_total_weighted_marks_as_perc(current_user.id)*100)}}%</td>
+                <td>
+                    {{"%.0d" |
+                    format(m.get_total_weighted_marks_as_perc(current_user.id)*100)}}/100
+                    <br>({{"%.0d" |
+                    format(m.get_total_weighted_marks_as_perc(current_user.id)*100)}}%)</td>
                 {% for status in ["pass","fail","unattempted"] %}
                     <td>{{m.get_count_of_assessments(summative_only=True, status_counter=True, user_id=current_user.id)[status]}}/{{m.get_count_of_assessments(summative_only=True)}}</td>
                 {% endfor %}
@@ -43,7 +46,6 @@
         </div>
     </div>
 
-
     <h2>Assessment</h2>
     
     <h3>Summative</h3>
@@ -63,9 +65,19 @@
                 <td>{% if a.is_summative %}<span class="text_summative">Summative</span>{% else %}Formative{% endif %}</td>
                 <td><span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span></td>
                 <td>{{a.num_of_credits}}</td>
-                <td>{% if a.get_status(current_user.id)=="unattempted"%}0{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)["highest_score"]}}{% endif %}/{{a.get_total_marks_possible()}}</td>
+                <td>{% if a.get_status(current_user.id)=="unattempted"%}0{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)["highest_score"]}}{% endif %}/{{a.get_total_marks_possible()}} 
+                    {% if a.get_status(current_user.id)!="unattempted"%}
+                    <br>
+                    ({{ "%.2d" |
+            format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%)
+                    {% endif %}
+                </td>
                 <td>
                     {% if a.get_status(current_user.id)=="unattempted"%}0{% else %}{{"%.0d" | format(a.get_total_weighted_marks_as_perc(current_user.id)*100)}}{% endif %}/{{"%.0d" | format(a.get_weighted_perc_factor()*100)}}
+                    {% if a.get_status(current_user.id)!="unattempted"%}
+                    <br>
+                    ({{ "%.0d" | format(a.get_total_weighted_marks_as_perc(current_user.id)/a.get_weighted_perc_factor()*100)}}%)
+                    {% endif %}
                 </td>
                 <td>{% if a.get_can_user_take_assessment(current_user.id) %}Yes: <a href="{{url_for('assessments.assessment_summary', assessment_id=a.assessment_id)}}"><button>Take assessment</button></a>{% else %}No: attempt limit reached{% endif %}</td>
             </tr>
@@ -75,9 +87,21 @@
             <th>Summative</th>
             <th><span class="text_{{m.get_status(current_user.id)}}">{{m.get_status(current_user.id)}}</span></th>
             <th>{{m.get_total_assessment_credits()}}</th>
-            <th>{{m.get_total_marks_earned(user_id=current_user.id, summative_only=True)}}/{{m.get_total_marks_possible(summative_only=True)}}</th>
+            <th>{{m.get_total_marks_earned(user_id=current_user.id, summative_only=True)}}/{{m.get_total_marks_possible(summative_only=True)}}
+
+                <br>
+                ({{ "%.2d" |
+        format((m.get_total_marks_earned(user_id=current_user.id, summative_only=True)/m.get_total_marks_possible(summative_only=True))*100)}}%)
+
+            </th>
             <th>{{"%.0d" |
-                format(m.get_total_weighted_marks_as_perc(current_user.id)*100)}}/100</th>
+                format(m.get_total_weighted_marks_as_perc(current_user.id)*100)}}/100
+                <br>
+                ({{"%.0d" |
+                format(m.get_total_weighted_marks_as_perc(current_user.id)*100)}}%)
+            
+            
+            </th>
             <th>-</th>
         </tr>
     </table>
@@ -99,7 +123,10 @@
                 <td>{% if a.is_summative %}<span class="text_summative">Summative</span>{% else %}Formative{% endif %}</td>
                 <td><span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span></td>
                 <td>-</td>
-                <td>{% if a.get_status(current_user.id)=="unattempted"%}0{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)["highest_score"]}}{% endif %}/{{a.get_total_marks_possible()}}</td>
+                <td>{% if a.get_status(current_user.id)=="unattempted"%}0{% else %}{{a.get_highest_scoring_attempt_and_mark(current_user.id)["highest_score"]}}{% endif %}/{{a.get_total_marks_possible()}}<br>
+                    ({% if a.get_status(current_user.id)=="unattempted" %}0{% else %}{{"%.0d" |
+                format((a.get_highest_scoring_attempt_and_mark(current_user.id)["highest_score"]/a.get_total_marks_possible())*100)}}{% endif %}%)
+                </td>
                 <td>-</td>
                 <td>{% if a.get_can_user_take_assessment(current_user.id)%}Yes: <a href="{{url_for('assessments.assessment_summary', assessment_id=a.assessment_id)}}"><button>Take assessment</button></a>{% else %}No: attempt limit reached{% endif %}</td>
             </tr>
@@ -109,7 +136,13 @@
             <th>Formative</th>
             <th><span class="text_{{m.get_status(current_user.id)}}">{{m.get_status(current_user.id)}}</span></th>
             <th>-</th>
-            <th>{{m.get_total_marks_earned(user_id=current_user.id, formative_only=True)}}/{{m.get_total_marks_possible(formative_only=True)}}</th>
+            <th>
+                {% if not m.get_total_marks_possible(formative_only=True) %}-
+                {% else %}
+                {{m.get_total_marks_earned(user_id=current_user.id, formative_only=True)}}/{{m.get_total_marks_possible(formative_only=True)}}<br>({{"%.0d" |
+                format((m.get_total_marks_earned(user_id=current_user.id, formative_only=True)/m.get_total_marks_possible(formative_only=True))*100)}}%)
+                {% endif %}
+                </th>
             <th>-</th>
             <th>-</th>
         </tr>

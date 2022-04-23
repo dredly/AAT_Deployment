@@ -24,6 +24,7 @@ rapid_responses = []
 correct_responses = []
 rapid_fire_reason = ""
 
+
 @legendary_gamification.route("/achievements/<int:user_id>", methods=["GET", "POST"])
 def achievements(user_id):
     global challenge_questions
@@ -38,16 +39,33 @@ def achievements(user_id):
     all_friends = Friends.query.filter_by(user_id=current_user.id).all()
     all_challenge_friends = []
     for friend in all_friends:
-        all_challenge_friends.append((User.query.filter_by(id=friend.friend_id).first().id, User.query.filter_by(id=friend.friend_id).first().name))
+        all_challenge_friends.append(
+            (
+                User.query.filter_by(id=friend.friend_id).first().id,
+                User.query.filter_by(id=friend.friend_id).first().name,
+            )
+        )
     all_challenge_friends_names = [item[1] for item in all_challenge_friends]
     all_takenChallenges = ChallengesTaken.query.all()
-    takenChallengesIDs = ChallengesTaken.query.with_entities(ChallengesTaken.challenge_id).filter_by(user_id=user_id).all()
+    takenChallengesIDs = (
+        ChallengesTaken.query.with_entities(ChallengesTaken.challenge_id)
+        .filter_by(user_id=user_id)
+        .all()
+    )
     takenChallengesList = [item[0] for item in takenChallengesIDs]
 
     user_stats = []
     for user in all_users:
         if user.role_id == 1:
-            user_stats.append((get_all_assessment_marks(input_user_id=user.id, highest_scoring_attempt_only=True), user.name, user.id))
+            user_stats.append(
+                (
+                    get_all_assessment_marks(
+                        input_user_id=user.id, highest_scoring_attempt_only=True
+                    ),
+                    user.name,
+                    user.id,
+                )
+            )
     print("#####################################")
     for stat in user_stats:
         print(stat)
@@ -55,11 +73,9 @@ def achievements(user_id):
     for user in user_stats:
         user_score = 0
         for stat in user[0]:
-            if not stat['is_summative']:
-                user_score += stat['correct_marks']
+            if not stat["is_summative"]:
+                user_score += stat["correct_marks"]
         lines_ranks.append((user_score, user[1], user[2]))
-
-
 
     award_badges = Awarded_Badge.query.filter_by(user_id=user_id).all()
     # for awards in award_badges:
@@ -73,9 +89,24 @@ def achievements(user_id):
             achievement_id=awards.achievement_id
         ).first()
         achievements.append(achievement)
-    
-    in_challenges = Challenge.query.with_entities(Challenge.from_user, Challenge.to_user, Challenge.challenge_id, Challenge.difficulty).filter_by(to_user=user_id, status="Pending").all()
-    out_challenges = Challenge.query.with_entities(Challenge.from_user, Challenge.to_user, Challenge.difficulty).filter_by(from_user=user_id, status="Pending").all()
+
+    in_challenges = (
+        Challenge.query.with_entities(
+            Challenge.from_user,
+            Challenge.to_user,
+            Challenge.challenge_id,
+            Challenge.difficulty,
+        )
+        .filter_by(to_user=user_id, status="Pending")
+        .all()
+    )
+    out_challenges = (
+        Challenge.query.with_entities(
+            Challenge.from_user, Challenge.to_user, Challenge.difficulty
+        )
+        .filter_by(from_user=user_id, status="Pending")
+        .all()
+    )
     active_challenges = Challenge.query.filter_by(status="Active").all()
     in_users = []
     out_users = []
@@ -94,9 +125,14 @@ def achievements(user_id):
         out_users.append((user_to.id, user_to.name))
         outgoing_challenge_difficulty.append(challenge[2])
     for challenge in active_challenges:
-        all_taken = ChallengesTaken.query.filter_by(challenge_id=challenge.challenge_id).all()
+        all_taken = ChallengesTaken.query.filter_by(
+            challenge_id=challenge.challenge_id
+        ).all()
         all_taken_users = [item.user_id for item in all_taken]
-        if not (challenge.from_user in all_taken_users and challenge.to_user in all_taken_users):
+        if not (
+            challenge.from_user in all_taken_users
+            and challenge.to_user in all_taken_users
+        ):
             if challenge.from_user == user_id:
                 user = User.query.filter_by(id=challenge.to_user).first()
                 difficulty = challenge.difficulty
@@ -169,15 +205,22 @@ def achievements(user_id):
             return redirect(url_for(".rapid_fire"))
 
         elif choice == "Challenge User":
-            challenge_details = Challenge(from_user=user_id, to_user=int(request.form.get("Users")), difficulty=int(challenge.difficulty.data), number_of_questions=int(request.form.get("Question_Numbers")))
+            challenge_details = Challenge(
+                from_user=user_id,
+                to_user=int(request.form.get("Users")),
+                difficulty=int(challenge.difficulty.data),
+                number_of_questions=int(request.form.get("Question_Numbers")),
+            )
             db.session.add(challenge_details)
             db.session.commit()
             return redirect(url_for(".get_id"))
 
         elif choice == "Accept Challenge":
             try:
-                chosen_challenge = request.form['accept_options']
-                challenge_active = Challenge.query.filter_by(challenge_id=chosen_challenge).first()
+                chosen_challenge = request.form["accept_options"]
+                challenge_active = Challenge.query.filter_by(
+                    challenge_id=chosen_challenge
+                ).first()
                 challenge_active.status = "Active"
                 db.session.add(challenge_active)
                 db.session.commit()
@@ -200,10 +243,14 @@ def achievements(user_id):
                 pass
         elif choice == "Take Challenge":
             try:
-                chosen_challenge = request.form['active_options']
-                challenge_question_all = ChallengeQuestions.query.filter_by(challenge_id=chosen_challenge).all()
-                
-                takenChallenge = ChallengesTaken(user_id=user_id, challenge_id=chosen_challenge)
+                chosen_challenge = request.form["active_options"]
+                challenge_question_all = ChallengeQuestions.query.filter_by(
+                    challenge_id=chosen_challenge
+                ).all()
+
+                takenChallenge = ChallengesTaken(
+                    user_id=user_id, challenge_id=chosen_challenge
+                )
                 db.session.add(takenChallenge)
                 db.session.commit()
 
@@ -236,7 +283,7 @@ def achievements(user_id):
                     )
                 )
             except BadRequestKeyError:
-                pass       
+                pass
         elif choice == "Add Friend":
             friend1 = Friends(user_id=current_user.id, friend_id=user_id)
             friend2 = Friends(user_id=user_id, friend_id=current_user.id)
@@ -244,19 +291,34 @@ def achievements(user_id):
             db.session.commit()
             return redirect(url_for(".get_id"))
         elif choice == "Remove Friend":
-            friend1 = Friends.query.filter_by(user_id=current_user.id, friend_id=user_id).first()
-            friend2 = Friends.query.filter_by(user_id=user_id, friend_id=current_user.id).first()
+            friend1 = Friends.query.filter_by(
+                user_id=current_user.id, friend_id=user_id
+            ).first()
+            friend2 = Friends.query.filter_by(
+                user_id=user_id, friend_id=current_user.id
+            ).first()
             db.session.delete(friend1)
             db.session.delete(friend2)
             db.session.commit()
             return redirect(url_for(".get_id"))
     return render_template(
-        "achievements.html", ranks=sorted(lines_ranks, key=lambda x: x[0], reverse=True), badges=badges,
-        achievements=achievements, incoming_challenges=in_users, outgoing_challenges=out_users, challenge=challenge,
-        all_users=all_users, challenge_ids=challenge_ids, in_difficulty=incoming_challenge_difficulty,
-        out_difficulty=outgoing_challenge_difficulty, active_users=active_users, taken_challenges=takenChallengesList,
-        leaderboard_user=leaderboard_user, all_friends=all_challenge_friends, all_friends_names=all_challenge_friends_names
-        )
+        "achievements.html",
+        ranks=sorted(lines_ranks, key=lambda x: x[0], reverse=True),
+        badges=badges,
+        achievements=achievements,
+        incoming_challenges=in_users,
+        outgoing_challenges=out_users,
+        challenge=challenge,
+        all_users=all_users,
+        challenge_ids=challenge_ids,
+        in_difficulty=incoming_challenge_difficulty,
+        out_difficulty=outgoing_challenge_difficulty,
+        active_users=active_users,
+        taken_challenges=takenChallengesList,
+        leaderboard_user=leaderboard_user,
+        all_friends=all_challenge_friends,
+        all_friends_names=all_challenge_friends_names,
+    )
 
 
 @legendary_gamification.route("/redirect-page-achievement")
@@ -282,12 +344,15 @@ def get_id():
     print(current_user_id)
     return redirect(url_for(".achievements", user_id=current_user_id))
 
+
 @legendary_gamification.route("/correctement")
 def correct_answer():
     global question_counter
     global rapid_responses
     global correct_responses
-    correct_responses.append([item for item in challenge_options[question_counter] if item[2]])
+    correct_responses.append(
+        [item for item in challenge_options[question_counter] if item[2]]
+    )
     rapid_responses.append((False, ""))
     question_counter += 1
     return redirect("rapid-fire")
@@ -303,7 +368,7 @@ def assessment_success():
         if choice == "return":
             return redirect(url_for(".get_id"))
     if rapid_fire_reason == "rankup":
-        if current_user.tier != 'Diamond':
+        if current_user.tier != "Diamond":
             if score_counter == len(rapid_responses):
                 current_user_tier = Tier.query.filter_by(name=current_user.tier).first()
                 new_tier_id = current_user_tier.tier_id + 1
@@ -311,8 +376,15 @@ def assessment_success():
                 currentUser = User.query.filter_by(id=current_user.id).first()
                 currentUser.tier = new_user_tier.name
                 db.session.commit()
-    return render_template("assess_success.html", rapid_responses=rapid_responses, challenge_options=challenge_options, challenge_questions=challenge_questions, correct_responses=correct_responses, reason=rapid_fire_reason, score_count=score_counter)
-
+    return render_template(
+        "assess_success.html",
+        rapid_responses=rapid_responses,
+        challenge_options=challenge_options,
+        challenge_questions=challenge_questions,
+        correct_responses=correct_responses,
+        reason=rapid_fire_reason,
+        score_count=score_counter,
+    )
 
 
 @legendary_gamification.route("/tortement")
@@ -340,7 +412,9 @@ def rapid_fire():
                     rapid_responses.append((True, choice[1]))
                 else:
                     rapid_responses.append((False, choice[1]))
-                correct_responses.append([item for item in challenge_options[question_counter] if item[2]])
+                correct_responses.append(
+                    [item for item in challenge_options[question_counter] if item[2]]
+                )
                 print(correct_responses)
                 question_counter += 1
             except BadRequestKeyError:
@@ -452,7 +526,9 @@ def test_leaderboard():
 
             # print(user.name, overall_results)
 
-            lines_ranks.append((overall_results['sum_of_marks_awarded'], user.name, user.id))
+            lines_ranks.append(
+                (overall_results["sum_of_marks_awarded"], user.name, user.id)
+            )
             # print(lines_ranks)
 
             module_totals = {}

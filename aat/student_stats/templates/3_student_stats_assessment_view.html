@@ -14,9 +14,9 @@
     <table>
         <tr>
             <th>Type</th>
-            <th>Total<br>marks</th>
+            <th>Mark</th>
             <th>Status</th>
-            <th>Credits<br>earned</th>
+            <th>Credits</th>
             <th>Attempts<br>made</th>
             <th>Attempts<br>allowed</th>
             <th>Tags</th>
@@ -29,7 +29,7 @@
             ({{ "%.2d" |
             format((a.get_highest_scoring_attempt_and_mark(current_user.id)['highest_score']/a.get_total_marks_possible())*100)}}%)</td>
             <td><span class="text_{{a.get_status(current_user.id)}}">{{a.get_status(current_user.id)}}</span></td>
-            <td>{{a.get_credits(current_user.id)}}/{{a.num_of_credits}}</td>
+            <td>{{a.num_of_credits}}</td>
             <td>{{a.get_count_of_attempts_made(current_user.id)}}</td>
             <td>{{a.get_attempt_limit()}}</td>
             <td>        
