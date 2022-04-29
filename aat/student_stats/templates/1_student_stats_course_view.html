@@ -68,7 +68,6 @@
     <h2><a href="{{url_for('student_stats.course_analysis')}}">Course Analysis</a></h2>
 
     <h2><a href="{{ url_for('student_stats.download')}}">Download CSV</a></h2>
-
     <script>   
         const ctxPie = document.getElementById('myPieChart').getContext('2d');
         const myPieChart = new Chart(ctxPie, {
@@ -82,8 +81,8 @@
                         backgroundColor: [{% for m in c.modules %}
                         {% if m.get_status(current_user.id)=='pass'%}'rgb(54, 162, 235)'
                         {% elif m.get_status(current_user.id)=='fail'%}'rgb(255, 99, 132)'
-                        {% elif m.get_status(current_user.id)=='in progress'%}'rgb(150, 150, 150)'
-                        {% elif m.get_status(current_user.id)=='unattempted'%}'rgb(104, 28, 180)'
+                        {% elif m.get_status(current_user.id)=='in progress'%}'rgb(104, 28, 180)'
+                        {% elif m.get_status(current_user.id)=='unattempted'%}'rgb(150, 150, 150)'
                         {% else %}'rgb(54, 162, 235)'{% endif %},
                             {% endfor %}],
                         hoverOffset: 4,
@@ -104,10 +103,10 @@
                                     case 'rgb(255, 99, 132)':
                                         status = "Status: Fail";
                                         break;
-                                    case 'rgb(150, 150, 150)':
+                                    case 'rgb(104, 28, 180)':
                                         status = "Status: In progress";
                                         break;
-                                    case 'rgb(104, 28, 180)':
+                                    case 'rgb(150, 150, 150)':
                                         status = "Status: Unattempted";
                                         break;
                                 }
