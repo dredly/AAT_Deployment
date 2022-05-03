@@ -4,7 +4,17 @@ by Team S
 ## Site URL:
 https://aat-app-team-pizza-party.herokuapp.com/
 
+### Log-in credentials:
 
+Student:
+
+- Username "s" Password "s"
+
+Lecturer:
+
+- Username "l" Password "l"
+
+## Contents
 [[_TOC_]]
 
 ## TEAM ETHOS:
