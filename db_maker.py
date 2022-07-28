@@ -35,6 +35,100 @@ with app.app_context():
         ],
     )
 
+    #########
+    # USERS #
+    #########
+    db.session.add_all(
+        [
+            User(  # 1
+                name="Jim", password="j", is_admin=True, role_id=1, tier="Silver"
+            ),
+            User(name="Kate", password="k", is_admin=True, role_id=1, tier="Gold"),  # 2
+            User(  # 3
+                name="Al",
+                password="a",
+                is_admin=True,
+                role_id=1,
+            ),
+            # made one letter accounts for ease of logging in as different roles (student=s, lecturer=l, admin=a)
+            # NOTE: is_admin must be set to false, otherwise role will be overriden and User will be given lecturer role
+            User(  # 4
+                name="s",
+                password="s",
+                is_admin=False,
+                role_id=1,
+            ),
+            User(  # 5
+                name="l",
+                password="l",
+                is_admin=True,
+                role_id=2,
+            ),
+            User(  # 6
+                name="a",
+                password="a",
+                is_admin=False,
+                role_id=3,
+            ),
+            # Making some more realistic sounding lecturers
+            User(  # 7
+                name="John Branchman",
+                password="j",
+                is_admin=True,
+                role_id=2,
+            ),
+            User(  # 8
+                name="Alice Bubblesort",
+                password="a",
+                is_admin=True,
+                role_id=2,
+            ),
+            User(  # 9
+                name="Jean Consolog",
+                password="j",
+                is_admin=True,
+                role_id=2,
+            ),
+            User(name="JSON Derulo", password="jd", is_admin=True, role_id=2),  # 10
+            User(
+                name="Claymore Jackson",
+                password="cj",
+                is_admin=False,
+                role_id=1,
+                tier="Emerald",
+            ),
+            User(
+                name="Santa Clause",
+                password="sc",
+                is_admin=False,
+                role_id=1,
+                tier="Ruby",
+            ),
+            User(
+                name="Gone Wick",
+                password="gw",
+                is_admin=False,
+                role_id=1,
+                tier="Silver",
+            ),
+            User(
+                name="Jason Mourn",
+                password="jm",
+                is_admin=False,
+                role_id=1,
+                tier="Gold",
+            ),
+            User(
+                name="Sherlock Holmeless",
+                password="sh",
+                is_admin=False,
+                role_id=1,
+                tier="Diamond",
+            ),
+            User(name="Jack Leaver", password="jl", is_admin=False, role_id=1),
+        ]
+    )
+
     ###############
     # ASSESSMENTS #
     ###############
@@ -642,100 +736,6 @@ with app.app_context():
                 feedforward_if_wrong="I order you to read the slides",
                 tag_id=6,
             ),
-        ]
-    )
-
-    #########
-    # USERS #
-    #########
-    db.session.add_all(
-        [
-            User(  # 1
-                name="Jim", password="j", is_admin=True, role_id=1, tier="Silver"
-            ),
-            User(name="Kate", password="k", is_admin=True, role_id=1, tier="Gold"),  # 2
-            User(  # 3
-                name="Al",
-                password="a",
-                is_admin=True,
-                role_id=1,
-            ),
-            # made one letter accounts for ease of logging in as different roles (student=s, lecturer=l, admin=a)
-            # NOTE: is_admin must be set to false, otherwise role will be overriden and User will be given lecturer role
-            User(  # 4
-                name="s",
-                password="s",
-                is_admin=False,
-                role_id=1,
-            ),
-            User(  # 5
-                name="l",
-                password="l",
-                is_admin=True,
-                role_id=2,
-            ),
-            User(  # 6
-                name="a",
-                password="a",
-                is_admin=False,
-                role_id=3,
-            ),
-            # Making some more realistic sounding lecturers
-            User(  # 7
-                name="John Branchman",
-                password="j",
-                is_admin=True,
-                role_id=2,
-            ),
-            User(  # 8
-                name="Alice Bubblesort",
-                password="a",
-                is_admin=True,
-                role_id=2,
-            ),
-            User(  # 9
-                name="Jean Consolog",
-                password="j",
-                is_admin=True,
-                role_id=2,
-            ),
-            User(name="JSON Derulo", password="jd", is_admin=True, role_id=2),  # 10
-            User(
-                name="Claymore Jackson",
-                password="cj",
-                is_admin=False,
-                role_id=1,
-                tier="Emerald",
-            ),
-            User(
-                name="Santa Clause",
-                password="sc",
-                is_admin=False,
-                role_id=1,
-                tier="Ruby",
-            ),
-            User(
-                name="Gone Wick",
-                password="gw",
-                is_admin=False,
-                role_id=1,
-                tier="Silver",
-            ),
-            User(
-                name="Jason Mourn",
-                password="jm",
-                is_admin=False,
-                role_id=1,
-                tier="Gold",
-            ),
-            User(
-                name="Sherlock Holmeless",
-                password="sh",
-                is_admin=False,
-                role_id=1,
-                tier="Diamond",
-            ),
-            User(name="Jack Leaver", password="jl", is_admin=False, role_id=1),
         ]
     )
 

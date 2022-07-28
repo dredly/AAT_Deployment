@@ -178,7 +178,7 @@ class Badge(db.Model):
     # --- Relationships ---
     awarded_badge = db.relationship("Awarded_Badge", backref="badge", lazy=True)
     # --- Other Columns ---
-    name = db.Column(db.String(20))
+    name = db.Column(db.String(64))
     description = db.Column(db.Text)
 
     def __repr__(self):
@@ -193,7 +193,7 @@ class Achievement(db.Model):
         "Awarded_Achievement", backref="achievement", lazy=True
     )
     # --- Other Columns ---
-    name = db.Column(db.String(20))
+    name = db.Column(db.String(64))
     description = db.Column(db.Text)
 
     def __repr__(self):
